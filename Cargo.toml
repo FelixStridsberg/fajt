@@ -1,0 +1,14 @@
+[package]
+name = "fajt"
+version = "0.1.0"
+authors = ["Felix Stridsberg <felixstridsberg@gmail.com>"]
+edition = "2018"
+
+[workspace]
+members = [
+    "lexer",
+    "parser",
+    "codegen",
+]
+
+[dependencies]
