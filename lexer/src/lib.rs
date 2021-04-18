@@ -65,6 +65,24 @@ impl<'a> Lexer<'a> {
         Ok(())
     }
 
+    pub fn read(&mut self) -> Result<Vec<Token>> {
+        let mut tokens = Vec::new();
+
+        loop {
+            match self.next() {
+                Ok(token) => tokens.push(token),
+                Err(e) => {
+                    if *e.kind() != EndOfFile {
+                        return Err(e);
+                    }
+                    break;
+                }
+            }
+        }
+
+        Ok(tokens)
+    }
+
     pub fn next(&mut self) -> Result<Token> {
         self.skip_whitespaces()?;
 
@@ -165,8 +183,6 @@ impl CodePoint for char {
 }
 
 mod tests {
-    use crate::error::Error;
-    use crate::error::ErrorKind::EndOfFile;
     use crate::token::AssignOp;
     use crate::token::Base::Decimal;
     use crate::token::Keyword::Const;
@@ -174,16 +190,25 @@ mod tests {
     use crate::token::Token::{Assign, Identifier, Keyword, Number};
     use crate::Lexer;
 
+    macro_rules! assert_lexer(
+        (input: $input:expr, output: [$($output:expr),*$(,)?]) => {
+            let mut lexer = Lexer::new($input).expect("Could not create lexer, empty input?");
+            let tokens = lexer.read().unwrap();
+
+            assert_eq!(vec![$($output),*], tokens);
+        }
+    );
+
     #[test]
     fn lex_assignment_const() {
-        let input = "const variable = 1;";
-
-        let mut lexer = Lexer::new(input).unwrap();
-
-        assert_eq!(Ok(Keyword(Const)), lexer.next());
-        assert_eq!(Ok(Identifier("variable".to_owned())), lexer.next());
-        assert_eq!(Ok(Assign(AssignOp::None)), lexer.next());
-        assert_eq!(Ok(Number(Integer(1, Decimal))), lexer.next());
-        assert_eq!(Err(Error::of(EndOfFile)), lexer.next());
+        assert_lexer!(
+            input: "const variable = 1;",
+            output: [
+                Keyword(Const),
+                Identifier("variable".to_owned()),
+                Assign(AssignOp::None),
+                Number(Integer(1, Decimal)),
+            ]
+        );
     }
 }

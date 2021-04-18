@@ -10,6 +10,10 @@ impl Error {
     pub(crate) fn of(kind: ErrorKind) -> Self {
         Error { kind }
     }
+
+    pub fn kind(&self) -> &ErrorKind {
+        &self.kind
+    }
 }
 
 #[derive(Debug, PartialEq)]
