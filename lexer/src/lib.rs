@@ -1,9 +1,13 @@
+use crate::error::Error;
 use crate::token::Base::Decimal;
 use crate::token::Number;
 use crate::token::{AssignOp, Keyword, Token};
 use std::str::CharIndices;
 
+pub mod error;
 pub mod token;
+
+type Result<T> = std::result::Result<T, Error>;
 
 struct Reader<'a> {
     input: &'a str,
