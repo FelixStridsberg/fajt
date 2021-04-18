@@ -1,4 +1,4 @@
-use crate::token::{Keyword, Token};
+use crate::token::{AssignOp, Keyword, Token};
 use std::str::CharIndices;
 
 pub mod token;
@@ -29,6 +29,10 @@ impl<'a> Reader<'a> {
     pub fn current(&mut self) -> char {
         let (_, current) = self.current;
         current
+    }
+
+    pub fn peek(&self) -> Option<char> {
+        self.next.map(|(_, c)| c)
     }
 
     pub fn next(&mut self) -> Option<char> {
@@ -65,7 +69,11 @@ impl<'a> Lexer<'a> {
 
         Some(match c {
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
-            _ => unimplemented!(),
+            '=' if self.reader.peek() != Some('=') => {
+                self.reader.next();
+                Token::Assign(AssignOp::None)
+            }
+            c => unimplemented!("Unimplemented: {}", c),
         })
     }
 
@@ -156,6 +164,8 @@ mod tests {
 
         println!("Token1: {:?}", lexer.next());
         println!("Token2: {:?}", lexer.next());
+        println!("Token3: {:?}", lexer.next());
+        println!("Token4: {:?}", lexer.next());
         assert_eq!(1, 2);
         /*
         let expect = [
