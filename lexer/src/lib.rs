@@ -52,9 +52,15 @@ impl<'a> Lexer<'a> {
         Lexer { reader }
     }
 
-    fn skip_whitespaces(&mut self) {}
+    fn skip_whitespaces(&mut self) {
+        while self.reader.current().is_ecma_whitespace() {
+            self.reader.next();
+        }
+    }
 
     pub fn next(&mut self) -> Option<Token> {
+        self.skip_whitespaces();
+
         let c = self.reader.current();
 
         Some(match c {
@@ -76,8 +82,11 @@ impl<'a> Lexer<'a> {
             }
         }
 
-        println!("WORD: {:?}", word);
-        Token::Keyword(Keyword::from_string(&word).unwrap())
+        if let Some(keyword) = Keyword::from_string(&word) {
+            Token::Keyword(keyword)
+        } else {
+            Token::Identifier(word.to_owned())
+        }
     }
 }
 
@@ -144,9 +153,9 @@ mod tests {
         let input = "const variable = 1;";
 
         let mut lexer = Lexer::new(input);
-        let token = lexer.next();
 
-        println!("Token: {:?}", token);
+        println!("Token1: {:?}", lexer.next());
+        println!("Token2: {:?}", lexer.next());
         assert_eq!(1, 2);
         /*
         let expect = [

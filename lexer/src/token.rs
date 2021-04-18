@@ -46,6 +46,7 @@ pub enum Number {
 #[derive(Debug)]
 pub enum Token {
     Keyword(Keyword),
+    Identifier(String),
     Number(Number),
 
     // let i = 1;
