@@ -1,12 +1,18 @@
 use std::fmt::Formatter;
 use std::{error, fmt};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Error {
     kind: ErrorKind,
 }
 
-#[derive(Debug)]
+impl Error {
+    pub(crate) fn of(kind: ErrorKind) -> Self {
+        Error { kind }
+    }
+}
+
+#[derive(Debug, PartialEq)]
 pub enum ErrorKind {
     EndOfFile,
 

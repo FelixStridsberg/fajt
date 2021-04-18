@@ -1,4 +1,5 @@
 use crate::error::Error;
+use crate::error::ErrorKind::EndOfFile;
 use crate::token::Base::Decimal;
 use crate::token::Number;
 use crate::token::{AssignOp, Keyword, Token};
@@ -12,37 +13,36 @@ type Result<T> = std::result::Result<T, Error>;
 struct Reader<'a> {
     input: &'a str,
     iter: CharIndices<'a>,
-    current: Option<(usize, char)>,
+    current: (usize, char),
     next: Option<(usize, char)>,
 }
 
 impl<'a> Reader<'a> {
-    pub fn new(input: &'a str) -> Self {
+    pub fn new(input: &'a str) -> Result<Self> {
         let mut iter = input.char_indices();
-        let current = iter.next();
+        let current = iter.next().ok_or(Error::of(EndOfFile))?;
         let next = iter.next();
 
-        Reader {
+        Ok(Reader {
             input,
             iter,
             current,
             next,
-        }
+        })
     }
 
     pub fn current(&mut self) -> char {
-        let (_, current) = self.current.unwrap();
-        current
+        self.current.1
     }
 
     pub fn peek(&self) -> Option<char> {
         self.next.map(|(_, c)| c)
     }
 
-    pub fn next(&mut self) -> Option<char> {
-        self.current = self.next;
+    pub fn next(&mut self) -> Result<char> {
+        self.current = self.next.ok_or(Error::of(EndOfFile))?;
         self.next = self.iter.next();
-        self.current.map(|(_, c)| c)
+        Ok(self.current.1)
     }
 }
 
@@ -51,29 +51,29 @@ struct Lexer<'a> {
 }
 
 impl<'a> Lexer<'a> {
-    pub fn new(data: &'a str) -> Self {
-        let reader = Reader::new(data);
-        Lexer { reader }
+    pub fn new(data: &'a str) -> Result<Self> {
+        let reader = Reader::new(data)?;
+        Ok(Lexer { reader })
     }
 
-    fn skip_whitespaces(&mut self) {
+    fn skip_whitespaces(&mut self) -> Result<()> {
         // TODO handle semi colon, skipping for now
         while self.reader.current().is_ecma_whitespace() || self.reader.current() == ';' {
-            if let None = self.reader.next() {
-                break;
-            }
+            self.reader.next()?;
         }
+
+        Ok(())
     }
 
-    pub fn next(&mut self) -> Option<Token> {
-        self.skip_whitespaces();
+    pub fn next(&mut self) -> Result<Token> {
+        self.skip_whitespaces()?;
 
         let c = self.reader.current();
 
-        Some(match c {
+        Ok(match c {
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             '=' if self.reader.peek() != Some('=') => {
-                self.reader.next();
+                self.reader.next()?;
                 Token::Assign(AssignOp::None)
             }
             '0'..='9' => self.read_number(),
@@ -165,6 +165,8 @@ impl CodePoint for char {
 }
 
 mod tests {
+    use crate::error::Error;
+    use crate::error::ErrorKind::EndOfFile;
     use crate::token::AssignOp;
     use crate::token::Base::Decimal;
     use crate::token::Keyword::Const;
@@ -176,12 +178,12 @@ mod tests {
     fn lex_assignment_const() {
         let input = "const variable = 1;";
 
-        let mut lexer = Lexer::new(input);
+        let mut lexer = Lexer::new(input).unwrap();
 
-        assert_eq!(Some(Keyword(Const)), lexer.next());
-        assert_eq!(Some(Identifier("variable".to_owned())), lexer.next());
-        assert_eq!(Some(Assign(AssignOp::None)), lexer.next());
-        assert_eq!(Some(Number(Integer(1, Decimal))), lexer.next());
-        assert_eq!(None, lexer.next());
+        assert_eq!(Ok(Keyword(Const)), lexer.next());
+        assert_eq!(Ok(Identifier("variable".to_owned())), lexer.next());
+        assert_eq!(Ok(Assign(AssignOp::None)), lexer.next());
+        assert_eq!(Ok(Number(Integer(1, Decimal))), lexer.next());
+        assert_eq!(Err(Error::of(EndOfFile)), lexer.next());
     }
 }
