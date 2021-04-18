@@ -8,16 +8,14 @@ pub mod token;
 struct Reader<'a> {
     input: &'a str,
     iter: CharIndices<'a>,
-    current: (usize, char),
+    current: Option<(usize, char)>,
     next: Option<(usize, char)>,
 }
 
 impl<'a> Reader<'a> {
     pub fn new(input: &'a str) -> Self {
         let mut iter = input.char_indices();
-        let current = iter
-            .next()
-            .expect("Cannot create a reader with empty input.");
+        let current = iter.next();
         let next = iter.next();
 
         Reader {
@@ -29,7 +27,7 @@ impl<'a> Reader<'a> {
     }
 
     pub fn current(&mut self) -> char {
-        let (_, current) = self.current;
+        let (_, current) = self.current.unwrap();
         current
     }
 
@@ -38,13 +36,9 @@ impl<'a> Reader<'a> {
     }
 
     pub fn next(&mut self) -> Option<char> {
-        if let Some(next) = self.next {
-            self.current = next;
-            self.next = self.iter.next();
-            Some(next.1)
-        } else {
-            None
-        }
+        self.current = self.next;
+        self.next = self.iter.next();
+        self.current.map(|(_, c)| c)
     }
 }
 
@@ -184,6 +178,6 @@ mod tests {
         assert_eq!(Some(Identifier("variable".to_owned())), lexer.next());
         assert_eq!(Some(Assign(AssignOp::None)), lexer.next());
         assert_eq!(Some(Number(Integer(1, Decimal))), lexer.next());
-        // assert_eq!(None, lexer.next());
+        assert_eq!(None, lexer.next());
     }
 }
