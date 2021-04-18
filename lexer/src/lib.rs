@@ -1,3 +1,5 @@
+use crate::token::Base::Decimal;
+use crate::token::Number;
 use crate::token::{AssignOp, Keyword, Token};
 use std::str::CharIndices;
 
@@ -57,8 +59,11 @@ impl<'a> Lexer<'a> {
     }
 
     fn skip_whitespaces(&mut self) {
-        while self.reader.current().is_ecma_whitespace() {
-            self.reader.next();
+        // TODO handle semi colon, skipping for now
+        while self.reader.current().is_ecma_whitespace() || self.reader.current() == ';' {
+            if let None = self.reader.next() {
+                break;
+            }
         }
     }
 
@@ -73,8 +78,28 @@ impl<'a> Lexer<'a> {
                 self.reader.next();
                 Token::Assign(AssignOp::None)
             }
+            '0'..='9' => self.read_number(),
             c => unimplemented!("Unimplemented: {}", c),
         })
+    }
+
+    fn read_number(&mut self) -> Token {
+        // TODO decimal, octal, hex, etc...
+
+        let mut num_str = String::new();
+        num_str.push(self.reader.current());
+
+        loop {
+            let c = self.reader.next().unwrap(); // TODO
+            if c.is_alphanumeric() {
+                num_str.push(c);
+            } else {
+                break;
+            }
+        }
+
+        Token::Number(Number::Integer(num_str.parse::<i64>().unwrap(), Decimal))
+        // TODO
     }
 
     fn read_identifier_or_keyword(&mut self) -> Token {
@@ -141,19 +166,12 @@ impl CodePoint for char {
     }
 }
 
-fn read_statement_list() {
-    //    read
-}
-
-#[cfg(test)]
 mod tests {
-    /*
-    use crate::token::{Keyword, AssignOp};
-    use crate::token::Keyword::Const;
-    use crate::token::Token::{Assign, Number};
-    use crate::token::Number::Integer;
+    use crate::token::AssignOp;
     use crate::token::Base::Decimal;
-     */
+    use crate::token::Keyword::Const;
+    use crate::token::Number::Integer;
+    use crate::token::Token::{Assign, Identifier, Keyword, Number};
     use crate::Lexer;
 
     #[test]
@@ -162,17 +180,10 @@ mod tests {
 
         let mut lexer = Lexer::new(input);
 
-        println!("Token1: {:?}", lexer.next());
-        println!("Token2: {:?}", lexer.next());
-        println!("Token3: {:?}", lexer.next());
-        println!("Token4: {:?}", lexer.next());
-        assert_eq!(1, 2);
-        /*
-        let expect = [
-            Keyword(Const),
-            Identifier("variable"),
-            Assign(AssignOp::None),
-            Number(Integer(1, Decimal))
-        ];*/
+        assert_eq!(Some(Keyword(Const)), lexer.next());
+        assert_eq!(Some(Identifier("variable".to_owned())), lexer.next());
+        assert_eq!(Some(Assign(AssignOp::None)), lexer.next());
+        assert_eq!(Some(Number(Integer(1, Decimal))), lexer.next());
+        // assert_eq!(None, lexer.next());
     }
 }

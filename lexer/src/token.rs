@@ -11,12 +11,12 @@
 /// ^=      BitwiseXOr
 /// |=      BitwiseOr
 /// **=     Exponent
-#[derive(Debug)]
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]
 pub enum AssignOp {
     None,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]
 pub enum Keyword {
     Const,
 }
@@ -30,20 +30,20 @@ impl Keyword {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]
 pub enum Base {
     Decimal,
     Hex,
     Octal,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialOrd, PartialEq)]
 pub enum Number {
     Integer(i64, Base),
     Decimal(f64),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialOrd, PartialEq)]
 pub enum Token {
     Keyword(Keyword),
     Identifier(String),
