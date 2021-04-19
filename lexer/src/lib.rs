@@ -67,15 +67,6 @@ struct Lexer<'a> {
     reader: Reader<'a>,
 }
 
-macro_rules! token_position(
-    ($self:ident, $cb:expr) => {{
-        let start = $self.reader.position();
-        let value = $cb()?;
-        let end = $self.reader.position();
-        Ok(Token::new(value, (start, end)))
-    }}
-);
-
 impl<'a> Lexer<'a> {
     pub fn new(data: &'a str) -> Result<Self> {
         let reader = Reader::new(data)?;
@@ -114,7 +105,8 @@ impl<'a> Lexer<'a> {
 
         let c = self.reader.current();
 
-        let token = token_position!(self, || match c {
+        let start = self.reader.position();
+        let value = match c {
             '=' if self.reader.peek() != Some('=') => {
                 self.reader.next()?;
                 Ok(TokenValue::Assign(AssignOp::None))
@@ -122,9 +114,10 @@ impl<'a> Lexer<'a> {
             '0'..='9' => self.read_number(),
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             c => unimplemented!("Unimplemented: {}", c),
-        })?;
+        }?;
+        let end = self.reader.position();
 
-        Ok(token)
+        Ok(Token::new(value, (start, end)))
     }
 
     fn read_number(&mut self) -> Result<TokenValue> {
