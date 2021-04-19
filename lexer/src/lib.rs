@@ -114,17 +114,17 @@ impl<'a> Lexer<'a> {
 
         let c = self.reader.current();
 
-        Ok(match c {
-            c if c.is_start_of_identifier() => {
-                token_position!(self, || self.read_identifier_or_keyword())?
-            }
-            '=' if self.reader.peek() != Some('=') => token_position!(self, || {
+        let token = token_position!(self, || match c {
+            '=' if self.reader.peek() != Some('=') => {
                 self.reader.next()?;
                 Ok(TokenValue::Assign(AssignOp::None))
-            })?,
-            '0'..='9' => token_position!(self, || self.read_number())?,
+            }
+            '0'..='9' => self.read_number(),
+            c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             c => unimplemented!("Unimplemented: {}", c),
-        })
+        })?;
+
+        Ok(token)
     }
 
     fn read_number(&mut self) -> Result<TokenValue> {
