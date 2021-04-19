@@ -61,8 +61,26 @@ pub struct Location {
     pub end: Position,
 }
 
+impl Into<Location> for (Position, Position) {
+    fn into(self) -> Location {
+        Location {
+            start: self.0,
+            end: self.1,
+        }
+    }
+}
+
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Token {
     pub value: TokenValue,
     pub location: Location,
+}
+
+impl Token {
+    pub fn new<L: Into<Location>>(value: TokenValue, location: L) -> Self {
+        Token {
+            value,
+            location: location.into(),
+        }
+    }
 }

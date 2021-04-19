@@ -1,7 +1,7 @@
 use crate::error::Error;
 use crate::error::ErrorKind::EndOfFile;
 use crate::token::Base::Decimal;
-use crate::token::{AssignOp, Location, Position, Token};
+use crate::token::{AssignOp, Position, Token};
 use crate::token::{Number, TokenValue};
 use std::str::CharIndices;
 
@@ -90,28 +90,21 @@ impl<'a> Lexer<'a> {
 
         let c = self.reader.current();
 
-        let value = match c {
+        Ok(match c {
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             '=' if self.reader.peek() != Some('=') => {
                 self.reader.next()?;
-                TokenValue::Assign(AssignOp::None)
+
+                let start = Position { line: 0, column: 0 };
+                let end = Position { line: 0, column: 0 };
+                Token::new(TokenValue::Assign(AssignOp::None), (start, end))
             }
             '0'..='9' => self.read_number(),
             c => unimplemented!("Unimplemented: {}", c),
-        };
-
-        Ok({
-            Token {
-                value,
-                location: Location {
-                    start: Position { line: 0, column: 0 },
-                    end: Position { line: 0, column: 0 },
-                },
-            }
         })
     }
 
-    fn read_number(&mut self) -> TokenValue {
+    fn read_number(&mut self) -> Token {
         // TODO decimal, octal, hex, etc...
 
         let mut num_str = String::new();
@@ -126,11 +119,18 @@ impl<'a> Lexer<'a> {
             }
         }
 
-        TokenValue::Number(Number::Integer(num_str.parse::<i64>().unwrap(), Decimal))
-        // TODO
+        let value = num_str.parse::<i64>().unwrap(); // TODO error handling
+
+        let start = Position { line: 0, column: 0 };
+        let end = Position { line: 0, column: 0 };
+
+        Token::new(
+            TokenValue::Number(Number::Integer(value, Decimal)),
+            (start, end),
+        )
     }
 
-    fn read_identifier_or_keyword(&mut self) -> TokenValue {
+    fn read_identifier_or_keyword(&mut self) -> Token {
         let mut word = String::new();
         word.push(self.reader.current());
 
@@ -143,11 +143,16 @@ impl<'a> Lexer<'a> {
             }
         }
 
-        if let Ok(keyword) = word.parse() {
+        let value = if let Ok(keyword) = word.parse() {
             TokenValue::Keyword(keyword)
         } else {
             TokenValue::Identifier(word.to_owned())
-        }
+        };
+
+        let start = Position { line: 0, column: 0 };
+        let end = Position { line: 0, column: 0 };
+
+        Token::new(value, (start, end))
     }
 }
 
