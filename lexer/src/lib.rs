@@ -67,6 +67,15 @@ struct Lexer<'a> {
     reader: Reader<'a>,
 }
 
+macro_rules! token_position(
+    ($self:ident, $cb:expr) => {{
+        let start = $self.reader.position();
+        let value = $cb()?;
+        let end = $self.reader.position();
+        Ok(Token::new(value, (start, end)))
+    }}
+);
+
 impl<'a> Lexer<'a> {
     pub fn new(data: &'a str) -> Result<Self> {
         let reader = Reader::new(data)?;
@@ -106,20 +115,19 @@ impl<'a> Lexer<'a> {
         let c = self.reader.current();
 
         Ok(match c {
-            c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
-            '=' if self.reader.peek() != Some('=') => {
-                let start = self.reader.position();
-                self.reader.next()?;
-                let end = self.reader.position();
-                Token::new(TokenValue::Assign(AssignOp::None), (start, end))
+            c if c.is_start_of_identifier() => {
+                token_position!(self, || self.read_identifier_or_keyword())?
             }
-            '0'..='9' => self.read_number(),
+            '=' if self.reader.peek() != Some('=') => token_position!(self, || {
+                self.reader.next()?;
+                Ok(TokenValue::Assign(AssignOp::None))
+            })?,
+            '0'..='9' => token_position!(self, || self.read_number())?,
             c => unimplemented!("Unimplemented: {}", c),
         })
     }
 
-    fn read_number(&mut self) -> Token {
-        let start = self.reader.position();
+    fn read_number(&mut self) -> Result<TokenValue> {
         // TODO decimal, octal, hex, etc...
 
         let mut num_str = String::new();
@@ -135,17 +143,10 @@ impl<'a> Lexer<'a> {
         }
 
         let value = num_str.parse::<i64>().unwrap(); // TODO error handling
-
-        let end = self.reader.position();
-        Token::new(
-            TokenValue::Number(Number::Integer(value, Decimal)),
-            (start, end),
-        )
+        Ok(TokenValue::Number(Number::Integer(value, Decimal)))
     }
 
-    fn read_identifier_or_keyword(&mut self) -> Token {
-        let start = self.reader.position();
-
+    fn read_identifier_or_keyword(&mut self) -> Result<TokenValue> {
         let mut word = String::new();
         word.push(self.reader.current());
 
@@ -164,8 +165,7 @@ impl<'a> Lexer<'a> {
             TokenValue::Identifier(word.to_owned())
         };
 
-        let end = self.reader.position();
-        Token::new(value, (start, end))
+        Ok(value)
     }
 }
 
