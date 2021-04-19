@@ -55,17 +55,26 @@ pub struct Position {
     pub column: u32,
 }
 
+impl Into<Position> for (u32, u32) {
+    fn into(self) -> Position {
+        Position {
+            line: self.0,
+            column: self.1,
+        }
+    }
+}
+
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Location {
     pub start: Position,
     pub end: Position,
 }
 
-impl Into<Location> for (Position, Position) {
+impl<P: Into<Position>> Into<Location> for (P, P) {
     fn into(self) -> Location {
         Location {
-            start: self.0,
-            end: self.1,
+            start: self.0.into(),
+            end: self.1.into(),
         }
     }
 }

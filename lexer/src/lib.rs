@@ -17,6 +17,8 @@ struct Reader<'a> {
     iter: CharIndices<'a>,
     current: (usize, char),
     next: Option<(usize, char)>,
+    line: u32,
+    column: u32,
 }
 
 impl<'a> Reader<'a> {
@@ -30,7 +32,16 @@ impl<'a> Reader<'a> {
             iter,
             current,
             next,
+            line: 0,
+            column: 0,
         })
+    }
+
+    pub fn position(&self) -> Position {
+        Position {
+            line: self.line,
+            column: self.column,
+        }
     }
 
     pub fn current(&mut self) -> char {
@@ -44,6 +55,10 @@ impl<'a> Reader<'a> {
     pub fn next(&mut self) -> Result<char> {
         self.current = self.next.ok_or(Error::of(EndOfFile))?;
         self.next = self.iter.next();
+
+        // TODO new line
+        self.column += 1;
+
         Ok(self.current.1)
     }
 }
@@ -93,10 +108,9 @@ impl<'a> Lexer<'a> {
         Ok(match c {
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             '=' if self.reader.peek() != Some('=') => {
+                let start = self.reader.position();
                 self.reader.next()?;
-
-                let start = Position { line: 0, column: 0 };
-                let end = Position { line: 0, column: 0 };
+                let end = self.reader.position();
                 Token::new(TokenValue::Assign(AssignOp::None), (start, end))
             }
             '0'..='9' => self.read_number(),
@@ -105,6 +119,7 @@ impl<'a> Lexer<'a> {
     }
 
     fn read_number(&mut self) -> Token {
+        let start = self.reader.position();
         // TODO decimal, octal, hex, etc...
 
         let mut num_str = String::new();
@@ -121,9 +136,7 @@ impl<'a> Lexer<'a> {
 
         let value = num_str.parse::<i64>().unwrap(); // TODO error handling
 
-        let start = Position { line: 0, column: 0 };
-        let end = Position { line: 0, column: 0 };
-
+        let end = self.reader.position();
         Token::new(
             TokenValue::Number(Number::Integer(value, Decimal)),
             (start, end),
@@ -131,6 +144,8 @@ impl<'a> Lexer<'a> {
     }
 
     fn read_identifier_or_keyword(&mut self) -> Token {
+        let start = self.reader.position();
+
         let mut word = String::new();
         word.push(self.reader.current());
 
@@ -149,9 +164,7 @@ impl<'a> Lexer<'a> {
             TokenValue::Identifier(word.to_owned())
         };
 
-        let start = Position { line: 0, column: 0 };
-        let end = Position { line: 0, column: 0 };
-
+        let end = self.reader.position();
         Token::new(value, (start, end))
     }
 }
@@ -205,14 +218,14 @@ mod tests {
     use crate::token::Base::Decimal;
     use crate::token::Keyword::{Const, Let, Var};
     use crate::token::Number::Integer;
-    use crate::token::TokenValue;
+    use crate::token::Token;
     use crate::token::TokenValue::{Assign, Identifier, Keyword, Number};
     use crate::Lexer;
 
     macro_rules! assert_lexer(
         (input: $input:expr, output: [$($output:expr),*$(,)?]) => {
             let mut lexer = Lexer::new($input).expect("Could not create lexer, empty input?");
-            let tokens: Vec<TokenValue> = lexer.read().unwrap().into_iter().map(|t| t.value).collect();
+            let tokens = lexer.read().unwrap();
 
             assert_eq!(vec![$($output),*], tokens);
         }
@@ -223,10 +236,10 @@ mod tests {
         assert_lexer!(
             input: "const variable = 1;",
             output: [
-                Keyword(Const),
-                Identifier("variable".to_owned()),
-                Assign(AssignOp::None),
-                Number(Integer(1, Decimal)),
+                Token::new(Keyword(Const), ((0, 0), (0, 5))),
+                Token::new(Identifier("variable".to_owned()), ((0, 6), (0, 14))),
+                Token::new(Assign(AssignOp::None), ((0, 15), (0, 16))),
+                Token::new(Number(Integer(1, Decimal)), ((0, 17), (0, 18))),
             ]
         );
     }
@@ -236,10 +249,10 @@ mod tests {
         assert_lexer!(
             input: "let variable = 1;",
             output: [
-                Keyword(Let),
-                Identifier("variable".to_owned()),
-                Assign(AssignOp::None),
-                Number(Integer(1, Decimal)),
+                Token::new(Keyword(Let), ((0, 0), (0, 3))),
+                Token::new(Identifier("variable".to_owned()), ((0, 4), (0, 12))),
+                Token::new(Assign(AssignOp::None), ((0, 13), (0, 14))),
+                Token::new(Number(Integer(1, Decimal)), ((0, 15), (0, 16))),
             ]
         );
     }
@@ -249,10 +262,10 @@ mod tests {
         assert_lexer!(
             input: "var variable = 1;",
             output: [
-                Keyword(Var),
-                Identifier("variable".to_owned()),
-                Assign(AssignOp::None),
-                Number(Integer(1, Decimal)),
+                Token::new(Keyword(Var), ((0, 0), (0, 3))),
+                Token::new(Identifier("variable".to_owned()), ((0, 4), (0, 12))),
+                Token::new(Assign(AssignOp::None), ((0, 13), (0, 14))),
+                Token::new(Number(Integer(1, Decimal)), ((0, 15), (0, 16))),
             ]
         );
     }
