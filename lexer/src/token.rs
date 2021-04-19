@@ -1,3 +1,5 @@
+use macros::FromString;
+
 /// ECMAScript supports operators during variable assignment:
 /// *=      Multiply
 /// /=      Divide
@@ -16,18 +18,11 @@ pub enum AssignOp {
     None,
 }
 
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, FromString)]
 pub enum Keyword {
     Const,
-}
-
-impl Keyword {
-    pub fn from_string(string: &str) -> Option<Keyword> {
-        match string {
-            "const" => Some(Keyword::Const),
-            _ => None,
-        }
-    }
+    Let,
+    Var,
 }
 
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]

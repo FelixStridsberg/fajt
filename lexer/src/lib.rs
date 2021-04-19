@@ -2,8 +2,10 @@ use crate::error::Error;
 use crate::error::ErrorKind::EndOfFile;
 use crate::token::Base::Decimal;
 use crate::token::Number;
-use crate::token::{AssignOp, Keyword, Token};
+use crate::token::{AssignOp, Token};
 use std::str::CharIndices;
+
+extern crate macros;
 
 pub mod error;
 pub mod token;
@@ -131,7 +133,7 @@ impl<'a> Lexer<'a> {
             }
         }
 
-        if let Some(keyword) = Keyword::from_string(&word) {
+        if let Ok(keyword) = word.parse() {
             Token::Keyword(keyword)
         } else {
             Token::Identifier(word.to_owned())
@@ -182,10 +184,11 @@ impl CodePoint for char {
     }
 }
 
+#[cfg(test)]
 mod tests {
     use crate::token::AssignOp;
     use crate::token::Base::Decimal;
-    use crate::token::Keyword::Const;
+    use crate::token::Keyword::{Const, Let, Var};
     use crate::token::Number::Integer;
     use crate::token::Token::{Assign, Identifier, Keyword, Number};
     use crate::Lexer;
@@ -205,6 +208,32 @@ mod tests {
             input: "const variable = 1;",
             output: [
                 Keyword(Const),
+                Identifier("variable".to_owned()),
+                Assign(AssignOp::None),
+                Number(Integer(1, Decimal)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_assignment_let() {
+        assert_lexer!(
+            input: "let variable = 1;",
+            output: [
+                Keyword(Let),
+                Identifier("variable".to_owned()),
+                Assign(AssignOp::None),
+                Number(Integer(1, Decimal)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_assignment_var() {
+        assert_lexer!(
+            input: "var variable = 1;",
+            output: [
+                Keyword(Var),
                 Identifier("variable".to_owned()),
                 Assign(AssignOp::None),
                 Number(Integer(1, Decimal)),

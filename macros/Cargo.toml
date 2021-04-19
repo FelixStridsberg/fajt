@@ -1,15 +1,13 @@
 [package]
-name = "fajt"
+name = "macros"
 version = "0.1.0"
 authors = ["Felix Stridsberg <felixstridsberg@gmail.com>"]
 edition = "2018"
 
-[workspace]
-members = [
-    "macros",
-    "lexer",
-    "parser",
-    "codegen",
-]
+[lib]
+proc-macro = true
 
 [dependencies]
+syn = "1.0.69"
+quote = "1.0.9"
+proc-macro2 = "1.0.26"
