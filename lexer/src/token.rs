@@ -39,7 +39,7 @@ pub enum Number {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub enum Token {
+pub enum TokenValue {
     Keyword(Keyword),
     Identifier(String),
     Number(Number),
@@ -47,4 +47,22 @@ pub enum Token {
     // let i = 1;
     //       ^
     Assign(AssignOp),
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct Position {
+    pub line: u32,
+    pub column: u32,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct Location {
+    pub start: Position,
+    pub end: Position,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct Token {
+    pub value: TokenValue,
+    pub location: Location,
 }

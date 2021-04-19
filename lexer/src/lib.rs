@@ -1,8 +1,8 @@
 use crate::error::Error;
 use crate::error::ErrorKind::EndOfFile;
 use crate::token::Base::Decimal;
-use crate::token::Number;
-use crate::token::{AssignOp, Token};
+use crate::token::{AssignOp, Location, Position, Token};
+use crate::token::{Number, TokenValue};
 use std::str::CharIndices;
 
 extern crate macros;
@@ -90,18 +90,28 @@ impl<'a> Lexer<'a> {
 
         let c = self.reader.current();
 
-        Ok(match c {
+        let value = match c {
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             '=' if self.reader.peek() != Some('=') => {
                 self.reader.next()?;
-                Token::Assign(AssignOp::None)
+                TokenValue::Assign(AssignOp::None)
             }
             '0'..='9' => self.read_number(),
             c => unimplemented!("Unimplemented: {}", c),
+        };
+
+        Ok({
+            Token {
+                value,
+                location: Location {
+                    start: Position { line: 0, column: 0 },
+                    end: Position { line: 0, column: 0 },
+                },
+            }
         })
     }
 
-    fn read_number(&mut self) -> Token {
+    fn read_number(&mut self) -> TokenValue {
         // TODO decimal, octal, hex, etc...
 
         let mut num_str = String::new();
@@ -116,11 +126,11 @@ impl<'a> Lexer<'a> {
             }
         }
 
-        Token::Number(Number::Integer(num_str.parse::<i64>().unwrap(), Decimal))
+        TokenValue::Number(Number::Integer(num_str.parse::<i64>().unwrap(), Decimal))
         // TODO
     }
 
-    fn read_identifier_or_keyword(&mut self) -> Token {
+    fn read_identifier_or_keyword(&mut self) -> TokenValue {
         let mut word = String::new();
         word.push(self.reader.current());
 
@@ -134,9 +144,9 @@ impl<'a> Lexer<'a> {
         }
 
         if let Ok(keyword) = word.parse() {
-            Token::Keyword(keyword)
+            TokenValue::Keyword(keyword)
         } else {
-            Token::Identifier(word.to_owned())
+            TokenValue::Identifier(word.to_owned())
         }
     }
 }
@@ -190,13 +200,14 @@ mod tests {
     use crate::token::Base::Decimal;
     use crate::token::Keyword::{Const, Let, Var};
     use crate::token::Number::Integer;
-    use crate::token::Token::{Assign, Identifier, Keyword, Number};
+    use crate::token::TokenValue;
+    use crate::token::TokenValue::{Assign, Identifier, Keyword, Number};
     use crate::Lexer;
 
     macro_rules! assert_lexer(
         (input: $input:expr, output: [$($output:expr),*$(,)?]) => {
             let mut lexer = Lexer::new($input).expect("Could not create lexer, empty input?");
-            let tokens = lexer.read().unwrap();
+            let tokens: Vec<TokenValue> = lexer.read().unwrap().into_iter().map(|t| t.value).collect();
 
             assert_eq!(vec![$($output),*], tokens);
         }
