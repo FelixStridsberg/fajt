@@ -178,7 +178,7 @@ impl<'a> Lexer<'a> {
                     _ => Ok(TokenValue::BitwiseShift(ShiftDirection::Right)),
                 }
             }
-            '0'..='9' => self.read_number(),
+            '0'..='9' => self.read_number_literal(),
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             c => unimplemented!("Unimplemented: {}", c),
         }?;
@@ -187,49 +187,34 @@ impl<'a> Lexer<'a> {
         Ok(Token::new(value, (start, end)))
     }
 
-    fn read_number(&mut self) -> Result<TokenValue> {
-        match self.reader.peek() {
-            Some('x') | Some('X') => self.read_hex(),
-            Some('o') | Some('O') => self.read_octal(),
-            Some('b') | Some('B') => self.read_binary(),
-            _ => self.read_decimal(),
+    fn read_number_literal(&mut self) -> Result<TokenValue> {
+        let number = match self.reader.peek() {
+            Some('x') | Some('X') => {
+                Number::Integer(self.read_number(16, |c| c.is_ascii_hexdigit())?, Hex)
+            }
+            Some('o') | Some('O') => {
+                Number::Integer(self.read_number(8, |c| c >= '0' && c <= '7')?, Octal)
+            }
+            Some('b') | Some('B') => {
+                Number::Integer(self.read_number(2, |c| c == '0' || c == '1')?, Binary)
+            }
+            _ => Number::Integer(self.read_number(10, char::is_numeric)?, Decimal),
+        };
+
+        Ok(TokenValue::Number(number))
+    }
+
+    fn read_number(&mut self, base: u32, check: fn(char) -> bool) -> Result<i64> {
+        // All but base 10 have 2 char prefix: 0b, 0o, 0x
+        if base != 10 {
+            self.reader.next()?;
+            self.reader.next()?;
         }
-    }
 
-    fn read_decimal(&mut self) -> Result<TokenValue> {
-        let num_str = self.reader.read_until(char::is_numeric)?;
-        let value = num_str.parse::<i64>().unwrap(); // TODO error handling
-        Ok(TokenValue::Number(Number::Integer(value, Decimal)))
-    }
+        let number_str = self.reader.read_until(check)?;
 
-    fn read_hex(&mut self) -> Result<TokenValue> {
-        self.reader.next()?; // 0
-        self.reader.next()?; // x
-
-        let hex_str = self.reader.read_until(|c| c.is_ascii_hexdigit())?;
-        let value = i64::from_str_radix(&hex_str, 16).unwrap();
-
-        Ok(TokenValue::Number(Number::Integer(value, Hex)))
-    }
-
-    fn read_octal(&mut self) -> Result<TokenValue> {
-        self.reader.next()?; // 0
-        self.reader.next()?; // o
-
-        let octal_str = self.reader.read_until(|c| c >= '0' && c <= '7')?;
-        let value = i64::from_str_radix(&octal_str, 8).unwrap();
-
-        Ok(TokenValue::Number(Number::Integer(value, Octal)))
-    }
-
-    fn read_binary(&mut self) -> Result<TokenValue> {
-        self.reader.next()?; // 0
-        self.reader.next()?; // b
-
-        let octal_str = self.reader.read_until(|c| c == '0' || c == '1')?;
-        let value = i64::from_str_radix(&octal_str, 2).unwrap();
-
-        Ok(TokenValue::Number(Number::Integer(value, Binary)))
+        // The check must be strict enough for a safe unwrap here
+        Ok(i64::from_str_radix(&number_str, base).unwrap())
     }
 
     fn read_identifier_or_keyword(&mut self) -> Result<TokenValue> {
