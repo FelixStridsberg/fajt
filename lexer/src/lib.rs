@@ -176,6 +176,19 @@ impl<'a> Lexer<'a> {
                 self.reader.next()?;
                 Ok(TokenValue::BinaryOperator(BinaryOp::Divide))
             }
+            '&' => {
+                self.reader.next()?;
+                Ok(TokenValue::BinaryOperator(BinaryOp::BitwiseAnd))
+            }
+            '|' => {
+                // TODO check for ||
+                self.reader.next()?;
+                Ok(TokenValue::BinaryOperator(BinaryOp::BitwiseOr))
+            }
+            '^' => {
+                self.reader.next()?;
+                Ok(TokenValue::BinaryOperator(BinaryOp::BitwiseXOr))
+            }
             '<' if self.reader.peek() == Some('<') => {
                 self.reader.next()?;
                 self.reader.next()?;
@@ -400,6 +413,42 @@ mod tests {
             output: [
                 (Number(Integer(1, Decimal)), (0, 1)),
                 (BinaryOperator(BinaryOp::Modulus), (2, 3)),
+                (Number(Integer(1, Decimal)), (4, 5)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_expression_bitwise_and() {
+        assert_lexer!(
+            input: "1 & 1",
+            output: [
+                (Number(Integer(1, Decimal)), (0, 1)),
+                (BinaryOperator(BinaryOp::BitwiseAnd), (2, 3)),
+                (Number(Integer(1, Decimal)), (4, 5)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_expression_bitwise_or() {
+        assert_lexer!(
+            input: "1 | 1",
+            output: [
+                (Number(Integer(1, Decimal)), (0, 1)),
+                (BinaryOperator(BinaryOp::BitwiseOr), (2, 3)),
+                (Number(Integer(1, Decimal)), (4, 5)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_expression_bitwise_xor() {
+        assert_lexer!(
+            input: "1 ^ 1",
+            output: [
+                (Number(Integer(1, Decimal)), (0, 1)),
+                (BinaryOperator(BinaryOp::BitwiseXOr), (2, 3)),
                 (Number(Integer(1, Decimal)), (4, 5)),
             ]
         );

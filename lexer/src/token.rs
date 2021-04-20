@@ -70,6 +70,9 @@ pub enum BinaryOp {
     LeftShift,
     RightShift,
     URightShift,
+    BitwiseAnd,
+    BitwiseOr,
+    BitwiseXOr,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
