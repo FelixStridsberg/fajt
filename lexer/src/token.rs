@@ -20,6 +20,9 @@ pub enum AssignOp {
     Modulus,
     Add,
     Subtract,
+    BitwiseAnd,
+    BitwiseXOr,
+    BitwiseOr,
     None,
 }
 
