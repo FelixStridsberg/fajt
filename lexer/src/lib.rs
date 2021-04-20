@@ -103,53 +103,31 @@ impl<'a> Lexer<'a> {
     pub fn next(&mut self) -> Result<Token> {
         self.skip_whitespaces()?;
 
-        let c = self.reader.current();
+        let current = self.reader.current();
 
         let start = self.reader.position();
-        let value = match c {
+        let value = match current {
             '=' if self.reader.peek() != Some('=') => {
                 self.reader.next()?;
                 Ok(TokenValue::Assign(AssignOp::None))
             }
-            '/' if self.reader.peek() == Some('=') => {
+
+            // Assign with operator: <op>=
+            '/' | '*' | '%' | '+' | '-' | '|' | '^' | '&' if self.reader.peek() == Some('=') => {
                 self.reader.next()?;
                 self.reader.next()?;
-                Ok(TokenValue::Assign(AssignOp::Divide))
-            }
-            '*' if self.reader.peek() == Some('=') => {
-                self.reader.next()?;
-                self.reader.next()?;
-                Ok(TokenValue::Assign(AssignOp::Multiply))
-            }
-            '%' if self.reader.peek() == Some('=') => {
-                self.reader.next()?;
-                self.reader.next()?;
-                Ok(TokenValue::Assign(AssignOp::Modulus))
-            }
-            '+' if self.reader.peek() == Some('=') => {
-                self.reader.next()?;
-                self.reader.next()?;
-                Ok(TokenValue::Assign(AssignOp::Add))
-            }
-            '-' if self.reader.peek() == Some('=') => {
-                self.reader.next()?;
-                self.reader.next()?;
-                Ok(TokenValue::Assign(AssignOp::Subtract))
-            }
-            '|' if self.reader.peek() == Some('=') => {
-                self.reader.next()?;
-                self.reader.next()?;
-                Ok(TokenValue::Assign(AssignOp::BitwiseOr))
-            }
-            '^' if self.reader.peek() == Some('=') => {
-                self.reader.next()?;
-                self.reader.next()?;
-                Ok(TokenValue::Assign(AssignOp::BitwiseXOr))
-            }
-            '&' if self.reader.peek() == Some('=') => {
-                self.reader.next()?;
-                self.reader.next()?;
-                Ok(TokenValue::Assign(AssignOp::BitwiseAnd))
+
+                match current {
+                    '/' => Ok(TokenValue::Assign(AssignOp::Divide)),
+                    '*' => Ok(TokenValue::Assign(AssignOp::Multiply)),
+                    '%' => Ok(TokenValue::Assign(AssignOp::Modulus)),
+                    '+' => Ok(TokenValue::Assign(AssignOp::Add)),
+                    '-' => Ok(TokenValue::Assign(AssignOp::Subtract)),
+                    '|' => Ok(TokenValue::Assign(AssignOp::BitwiseOr)),
+                    '^' => Ok(TokenValue::Assign(AssignOp::BitwiseXOr)),
+                    '&' => Ok(TokenValue::Assign(AssignOp::BitwiseAnd)),
+                    _ => unreachable!(),
+                }
             }
             '0'..='9' => self.read_number(),
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
