@@ -9,7 +9,7 @@ use crate::code_point::CodePoint;
 use crate::error::Error;
 use crate::error::ErrorKind::EndOfFile;
 use crate::reader::Reader;
-use crate::token::Base::{Decimal, Hex, Octal};
+use crate::token::Base::{Binary, Decimal, Hex, Octal};
 use crate::token::{AssignOp, BinaryOp, ShiftDirection, Token};
 use crate::token::{Number, TokenValue};
 
@@ -191,6 +191,7 @@ impl<'a> Lexer<'a> {
         match self.reader.peek() {
             Some('x') | Some('X') => self.read_hex(),
             Some('o') | Some('O') => self.read_octal(),
+            Some('b') | Some('B') => self.read_binary(),
             _ => self.read_decimal(),
         }
     }
@@ -221,6 +222,16 @@ impl<'a> Lexer<'a> {
         Ok(TokenValue::Number(Number::Integer(value, Octal)))
     }
 
+    fn read_binary(&mut self) -> Result<TokenValue> {
+        self.reader.next()?; // 0
+        self.reader.next()?; // b
+
+        let octal_str = self.reader.read_until(|c| c == '0' || c == '1')?;
+        let value = i64::from_str_radix(&octal_str, 2).unwrap();
+
+        Ok(TokenValue::Number(Number::Integer(value, Binary)))
+    }
+
     fn read_identifier_or_keyword(&mut self) -> Result<TokenValue> {
         let word = self.reader.read_until(char::is_part_of_identifier)?;
         let value = if let Ok(keyword) = word.parse() {
@@ -235,7 +246,7 @@ impl<'a> Lexer<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::token::Base::{Decimal, Hex, Octal};
+    use crate::token::Base::{Binary, Decimal, Hex, Octal};
     use crate::token::Keyword::{Const, Let, Var};
     use crate::token::Number::Integer;
     use crate::token::Token;
@@ -280,6 +291,16 @@ mod tests {
             input: "0o347",
             output: [
                 (Number(Integer(0o347, Octal)), (0, 5)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_number_binary() {
+        assert_lexer!(
+            input: "0b10111100",
+            output: [
+                (Number(Integer(0b10111100, Binary)), (0, 10)),
             ]
         );
     }

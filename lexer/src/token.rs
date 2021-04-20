@@ -40,6 +40,7 @@ pub enum Keyword {
 
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]
 pub enum Base {
+    Binary,
     Decimal,
     Hex,
     Octal,
