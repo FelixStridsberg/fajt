@@ -1,7 +1,7 @@
 use crate::error::Error;
 use crate::error::ErrorKind::EndOfFile;
 use crate::token::Base::Decimal;
-use crate::token::{AssignOp, Position, Token};
+use crate::token::{AssignOp, Position, ShiftDirection, Token};
 use crate::token::{Number, TokenValue};
 use std::str::CharIndices;
 
@@ -129,6 +129,13 @@ impl<'a> Lexer<'a> {
                     _ => unreachable!(),
                 }
             }
+            '<' if self.reader.peek() == Some('<') => {
+                self.reader.next()?;
+                self.reader.next()?;
+                // TODO check if equal sign is current, then it is Assign(LeftShift)
+
+                Ok(TokenValue::BitwiseShift(ShiftDirection::Left))
+            }
             '0'..='9' => self.read_number(),
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             c => unimplemented!("Unimplemented: {}", c),
@@ -225,12 +232,12 @@ impl CodePoint for char {
 
 #[cfg(test)]
 mod tests {
-    use crate::token::AssignOp;
     use crate::token::Base::Decimal;
     use crate::token::Keyword::{Const, Let, Var};
     use crate::token::Number::Integer;
     use crate::token::Token;
-    use crate::token::TokenValue::{Assign, Identifier, Keyword, Number};
+    use crate::token::TokenValue::{Assign, BitwiseShift, Identifier, Keyword, Number};
+    use crate::token::{AssignOp, ShiftDirection};
     use crate::Lexer;
 
     macro_rules! assert_lexer(
@@ -381,6 +388,18 @@ mod tests {
                 (Identifier("variable".to_owned()), (6, 14)),
                 (Assign(AssignOp::BitwiseOr), (15, 17)),
                 (Number(Integer(1, Decimal)), (18, 19)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_assignment_bitwise_shift_left() {
+        assert_lexer!(
+            input: "a << 10;",
+            output: [
+                (Identifier("a".to_owned()), (0, 1)),
+                (BitwiseShift(ShiftDirection::Left), (2, 4)),
+                (Number(Integer(10, Decimal)), (5, 7)),
             ]
         );
     }

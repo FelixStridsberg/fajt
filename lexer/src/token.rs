@@ -47,14 +47,19 @@ pub enum Number {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
+pub enum ShiftDirection {
+    Left,
+    Right,
+    UnsignedRight,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
 pub enum TokenValue {
     Keyword(Keyword),
     Identifier(String),
     Number(Number),
-
-    // let i = 1;
-    //       ^
     Assign(AssignOp),
+    BitwiseShift(ShiftDirection),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
