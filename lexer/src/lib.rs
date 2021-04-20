@@ -116,6 +116,11 @@ impl<'a> Lexer<'a> {
                 self.reader.next()?;
                 Ok(TokenValue::Assign(AssignOp::Divide))
             }
+            '*' if self.reader.peek() == Some('=') => {
+                self.reader.next()?;
+                self.reader.next()?;
+                Ok(TokenValue::Assign(AssignOp::Multiply))
+            }
             '0'..='9' => self.read_number(),
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             c => unimplemented!("Unimplemented: {}", c),
@@ -269,7 +274,20 @@ mod tests {
     }
 
     #[test]
-    fn lex_assignment_div() {
+    fn lex_assignment_multiply() {
+        assert_lexer!(
+            input: "const variable *= 1;",
+            output: [
+                (Keyword(Const), (0, 5)),
+                (Identifier("variable".to_owned()), (6, 14)),
+                (Assign(AssignOp::Multiply), (15, 17)),
+                (Number(Integer(1, Decimal)), (18, 19)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_assignment_divide() {
         assert_lexer!(
             input: "const variable /= 1;",
             output: [

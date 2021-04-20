@@ -15,8 +15,9 @@ use macros::FromString;
 /// **=     Exponent
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]
 pub enum AssignOp {
-    None,
+    Multiply,
     Divide,
+    None,
 }
 
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, FromString)]
