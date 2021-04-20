@@ -153,7 +153,13 @@ impl<'a> Lexer<'a> {
                 // TODO check if equal sign is current, then it is Assign(LeftShift)
                 // TODO check if > is current, then unsight right shift
 
-                Ok(TokenValue::BitwiseShift(ShiftDirection::Right))
+                match self.reader.current() {
+                    '>' => {
+                        self.reader.next()?;
+                        Ok(TokenValue::BitwiseShift(ShiftDirection::UnsignedRight))
+                    }
+                    _ => Ok(TokenValue::BitwiseShift(ShiftDirection::Right)),
+                }
             }
             '0'..='9' => self.read_number(),
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
@@ -441,6 +447,18 @@ mod tests {
                 (Identifier("a".to_owned()), (0, 1)),
                 (BitwiseShift(ShiftDirection::Right), (2, 4)),
                 (Number(Integer(10, Decimal)), (5, 6)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_assignment_bitwise_unsigned_shift_right() {
+        assert_lexer!(
+            input: "a >>> 10",
+            output: [
+                (Identifier("a".to_owned()), (0, 1)),
+                (BitwiseShift(ShiftDirection::UnsignedRight), (2, 5)),
+                (Number(Integer(10, Decimal)), (6, 7)),
             ]
         );
     }
