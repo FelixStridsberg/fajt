@@ -17,6 +17,7 @@ use macros::FromString;
 pub enum AssignOp {
     Multiply,
     Divide,
+    Modulus,
     None,
 }
 
