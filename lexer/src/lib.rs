@@ -1,76 +1,19 @@
-use crate::error::Error;
-use crate::error::ErrorKind::EndOfFile;
-use crate::token::Base::Decimal;
-use crate::token::{AssignOp, BinaryOp, Position, ShiftDirection, Token};
-use crate::token::{Number, TokenValue};
-use std::str::CharIndices;
-
 extern crate macros;
 
+mod code_point;
 pub mod error;
+mod reader;
 pub mod token;
 
+use crate::code_point::CodePoint;
+use crate::error::Error;
+use crate::error::ErrorKind::EndOfFile;
+use crate::reader::Reader;
+use crate::token::Base::Decimal;
+use crate::token::{AssignOp, BinaryOp, ShiftDirection, Token};
+use crate::token::{Number, TokenValue};
+
 type Result<T> = std::result::Result<T, Error>;
-
-struct Reader<'a> {
-    input: &'a str,
-    iter: CharIndices<'a>,
-    current: (usize, char),
-    next: Option<(usize, char)>,
-    line: u32,
-    column: u32,
-    end_of_file: bool,
-}
-
-impl<'a> Reader<'a> {
-    pub fn new(input: &'a str) -> Result<Self> {
-        let mut iter = input.char_indices();
-        let current = iter.next().ok_or(Error::of(EndOfFile))?;
-        let next = iter.next();
-
-        Ok(Reader {
-            input,
-            iter,
-            current,
-            next,
-            line: 0,
-            column: 0,
-            end_of_file: false,
-        })
-    }
-
-    pub fn position(&self) -> Position {
-        Position {
-            line: self.line,
-            column: self.column,
-        }
-    }
-
-    pub fn current(&mut self) -> char {
-        self.current.1
-    }
-
-    pub fn peek(&self) -> Option<char> {
-        self.next.map(|(_, c)| c)
-    }
-
-    pub fn next(&mut self) -> Result<char> {
-        // TODO self.line
-        if !self.end_of_file {
-            self.column += 1;
-        }
-
-        if let Some(next) = self.next {
-            self.current = next;
-            self.next = self.iter.next();
-
-            Ok(self.current.1)
-        } else {
-            self.end_of_file = true;
-            return Err(Error::of(EndOfFile));
-        }
-    }
-}
 
 struct Lexer<'a> {
     reader: Reader<'a>,
@@ -110,7 +53,7 @@ impl<'a> Lexer<'a> {
     }
 
     pub fn next(&mut self) -> Result<Token> {
-        if self.reader.end_of_file {
+        if self.reader.eof() {
             return Err(Error::of(EndOfFile));
         }
 
@@ -293,49 +236,6 @@ impl<'a> Lexer<'a> {
         };
 
         Ok(value)
-    }
-}
-
-trait CodePoint {
-    fn is_ecma_whitespace(&self) -> bool;
-    fn is_ecma_line_terminator(&self) -> bool;
-    fn is_start_of_identifier(&self) -> bool;
-    fn is_part_of_identifier(&self) -> bool;
-}
-
-impl CodePoint for char {
-    fn is_ecma_whitespace(&self) -> bool {
-        match self {
-            // Per table in ECMA-262
-            '\u{0009}' | '\u{000B}' | '\u{000C}' | '\u{0020}' | '\u{00A0}' | '\u{FEFF}' => true,
-            // Other Zs
-            '\u{1680}' | '\u{2000}'..='\u{200A}' | '\u{202F}' | '\u{205F}' | '\u{3000}' => true,
-            _ => false,
-        }
-    }
-
-    fn is_ecma_line_terminator(&self) -> bool {
-        match self {
-            // Per table in ECMA-262
-            '\u{000A}' | '\u{000D}' | '\u{2028}' | '\u{2029}' => true,
-            _ => false,
-        }
-    }
-
-    fn is_start_of_identifier(&self) -> bool {
-        match self {
-            'A'..='Z' | 'a'..='z' | '_' | '$' => true,
-            _ => false, // TODO all unicode ID_Start is allowed
-                        // TODO unicode escape sequence is allowed (ecma-262: 11.8.4)
-        }
-    }
-
-    fn is_part_of_identifier(&self) -> bool {
-        match self {
-            '0'..='9' | 'A'..='Z' | 'a'..='z' | '_' | '$' => true,
-            _ => false, // TODO all unicode ID_Continue is allowed
-                        // TODO unicode escape sequence is allowed (ecma-262: 11.8.4)
-        }
     }
 }
 
