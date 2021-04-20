@@ -1,7 +1,7 @@
 use crate::error::Error;
 use crate::error::ErrorKind::EndOfFile;
 use crate::token::Base::Decimal;
-use crate::token::{AssignOp, Position, ShiftDirection, Token};
+use crate::token::{AssignOp, BinaryOp, Position, ShiftDirection, Token};
 use crate::token::{Number, TokenValue};
 use std::str::CharIndices;
 
@@ -124,7 +124,6 @@ impl<'a> Lexer<'a> {
                 self.reader.next()?;
                 Ok(TokenValue::Assign(AssignOp::None))
             }
-
             // Assign with operator: <op>=
             '/' | '*' | '%' | '+' | '-' | '|' | '^' | '&' if self.reader.peek() == Some('=') => {
                 self.reader.next()?;
@@ -141,6 +140,11 @@ impl<'a> Lexer<'a> {
                     '&' => Ok(TokenValue::Assign(AssignOp::BitwiseAnd)),
                     _ => unreachable!(),
                 }
+            }
+            '+' => {
+                // TODO check for ++
+                self.reader.next()?;
+                Ok(TokenValue::BinaryOperator(BinaryOp::Add))
             }
             '*' => match self.reader.peek() {
                 Some('*') => {
@@ -301,8 +305,10 @@ mod tests {
     use crate::token::Keyword::{Const, Let, Var};
     use crate::token::Number::Integer;
     use crate::token::Token;
-    use crate::token::TokenValue::{Assign, BitwiseShift, Identifier, Keyword, Number};
-    use crate::token::{AssignOp, ShiftDirection};
+    use crate::token::TokenValue::{
+        Assign, BinaryOperator, BitwiseShift, Identifier, Keyword, Number,
+    };
+    use crate::token::{AssignOp, BinaryOp, ShiftDirection};
     use crate::Lexer;
 
     macro_rules! assert_lexer(
@@ -313,6 +319,18 @@ mod tests {
             assert_eq!(vec![$(Token::new($token, ((0, $col1), (0, $col2)))),*], tokens);
         }
     );
+
+    #[test]
+    fn lex_expression_add() {
+        assert_lexer!(
+            input: "1 + 1",
+            output: [
+                (Number(Integer(1, Decimal)), (0, 1)),
+                (BinaryOperator(BinaryOp::Add), (2, 3)),
+                (Number(Integer(1, Decimal)), (4, 5)),
+            ]
+        );
+    }
 
     #[test]
     fn lex_assignment_const() {
