@@ -73,6 +73,9 @@ pub enum BinaryOp {
     BitwiseAnd,
     BitwiseOr,
     BitwiseXOr,
+    LogicalOr,
+    LogicalAnd,
+    Coalesce,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]

@@ -178,12 +178,26 @@ impl<'a> Lexer<'a> {
             }
             '&' => {
                 self.reader.next()?;
-                Ok(TokenValue::BinaryOperator(BinaryOp::BitwiseAnd))
+                if self.reader.current() == '&' {
+                    self.reader.next()?;
+                    Ok(TokenValue::BinaryOperator(BinaryOp::LogicalAnd))
+                } else {
+                    Ok(TokenValue::BinaryOperator(BinaryOp::BitwiseAnd))
+                }
             }
             '|' => {
-                // TODO check for ||
                 self.reader.next()?;
-                Ok(TokenValue::BinaryOperator(BinaryOp::BitwiseOr))
+                if self.reader.current() == '|' {
+                    self.reader.next()?;
+                    Ok(TokenValue::BinaryOperator(BinaryOp::LogicalOr))
+                } else {
+                    Ok(TokenValue::BinaryOperator(BinaryOp::BitwiseOr))
+                }
+            }
+            '?' if self.reader.peek() == Some('?') => {
+                self.reader.next()?;
+                self.reader.next()?;
+                Ok(TokenValue::BinaryOperator(BinaryOp::Coalesce))
             }
             '^' => {
                 self.reader.next()?;
@@ -486,6 +500,42 @@ mod tests {
                 (Identifier("a".to_owned()), (0, 1)),
                 (BitwiseShift(ShiftDirection::UnsignedRight), (2, 5)),
                 (Number(Integer(10, Decimal)), (6, 8)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_expression_and() {
+        assert_lexer!(
+            input: "a && b;",
+            output: [
+                (Identifier("a".to_owned()), (0, 1)),
+                (BinaryOperator(BinaryOp::LogicalAnd), (2, 4)),
+                (Identifier("b".to_owned()), (5, 6)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_expression_or() {
+        assert_lexer!(
+            input: "a || b;",
+            output: [
+                (Identifier("a".to_owned()), (0, 1)),
+                (BinaryOperator(BinaryOp::LogicalOr), (2, 4)),
+                (Identifier("b".to_owned()), (5, 6)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_expression_coalesce() {
+        assert_lexer!(
+            input: "a ?? b;",
+            output: [
+                (Identifier("a".to_owned()), (0, 1)),
+                (BinaryOperator(BinaryOp::Coalesce), (2, 4)),
+                (Identifier("b".to_owned()), (5, 6)),
             ]
         );
     }
