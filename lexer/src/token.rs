@@ -13,6 +13,7 @@ use macros::FromString;
 /// ^=      BitwiseXOr
 /// |=      BitwiseOr
 /// **=     Exponent
+/// TODO revisit naming of these
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]
 pub enum AssignOp {
     Multiply,
@@ -20,6 +21,9 @@ pub enum AssignOp {
     Modulus,
     Add,
     Subtract,
+    LeftShift,
+    RightShift,
+    URightShift,
     BitwiseAnd,
     BitwiseXOr,
     BitwiseOr,

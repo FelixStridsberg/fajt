@@ -145,9 +145,13 @@ impl<'a> Lexer<'a> {
             '<' if self.reader.peek() == Some('<') => {
                 self.reader.next()?;
                 self.reader.next()?;
-                // TODO check if equal sign is current, then it is Assign(LeftShift)
 
-                Ok(TokenValue::BitwiseShift(ShiftDirection::Left))
+                if self.reader.current() == '=' {
+                    self.reader.next()?;
+                    Ok(TokenValue::Assign(AssignOp::LeftShift))
+                } else {
+                    Ok(TokenValue::BitwiseShift(ShiftDirection::Left))
+                }
             }
             '>' if self.reader.peek() == Some('>') => {
                 self.reader.next()?;
@@ -425,6 +429,19 @@ mod tests {
                 (Identifier("variable".to_owned()), (6, 14)),
                 (Assign(AssignOp::BitwiseOr), (15, 17)),
                 (Number(Integer(1, Decimal)), (18, 19)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_assignment_bitwise_left_shift() {
+        assert_lexer!(
+            input: "const variable <<= 1;",
+            output: [
+                (Keyword(Const), (0, 5)),
+                (Identifier("variable".to_owned()), (6, 14)),
+                (Assign(AssignOp::LeftShift), (15, 18)),
+                (Number(Integer(1, Decimal)), (19, 20)),
             ]
         );
     }
