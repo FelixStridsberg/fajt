@@ -216,11 +216,11 @@ mod tests {
     use crate::Lexer;
 
     macro_rules! assert_lexer(
-        (input: $input:expr, output: [$($output:expr),*$(,)?]) => {
+        (input: $input:expr, output: [$(($token:expr, ($col1:expr, $col2:expr)),)*]) => {
             let mut lexer = Lexer::new($input).expect("Could not create lexer, empty input?");
             let tokens = lexer.read().unwrap();
 
-            assert_eq!(vec![$($output),*], tokens);
+            assert_eq!(vec![$(Token::new($token, ((0, $col1), (0, $col2)))),*], tokens);
         }
     );
 
@@ -229,10 +229,10 @@ mod tests {
         assert_lexer!(
             input: "const variable = 1;",
             output: [
-                Token::new(Keyword(Const), ((0, 0), (0, 5))),
-                Token::new(Identifier("variable".to_owned()), ((0, 6), (0, 14))),
-                Token::new(Assign(AssignOp::None), ((0, 15), (0, 16))),
-                Token::new(Number(Integer(1, Decimal)), ((0, 17), (0, 18))),
+                (Keyword(Const), (0, 5)),
+                (Identifier("variable".to_owned()), (6, 14)),
+                (Assign(AssignOp::None), (15, 16)),
+                (Number(Integer(1, Decimal)), (17, 18)),
             ]
         );
     }
@@ -242,10 +242,10 @@ mod tests {
         assert_lexer!(
             input: "let variable = 1;",
             output: [
-                Token::new(Keyword(Let), ((0, 0), (0, 3))),
-                Token::new(Identifier("variable".to_owned()), ((0, 4), (0, 12))),
-                Token::new(Assign(AssignOp::None), ((0, 13), (0, 14))),
-                Token::new(Number(Integer(1, Decimal)), ((0, 15), (0, 16))),
+                (Keyword(Let), (0, 3)),
+                (Identifier("variable".to_owned()), (4, 12)),
+                (Assign(AssignOp::None), (13, 14)),
+                (Number(Integer(1, Decimal)), (15, 16)),
             ]
         );
     }
@@ -255,10 +255,10 @@ mod tests {
         assert_lexer!(
             input: "var variable = 1;",
             output: [
-                Token::new(Keyword(Var), ((0, 0), (0, 3))),
-                Token::new(Identifier("variable".to_owned()), ((0, 4), (0, 12))),
-                Token::new(Assign(AssignOp::None), ((0, 13), (0, 14))),
-                Token::new(Number(Integer(1, Decimal)), ((0, 15), (0, 16))),
+                (Keyword(Var), (0, 3)),
+                (Identifier("variable".to_owned()), (4, 12)),
+                (Assign(AssignOp::None), (13, 14)),
+                (Number(Integer(1, Decimal)), (15, 16)),
             ]
         );
     }
