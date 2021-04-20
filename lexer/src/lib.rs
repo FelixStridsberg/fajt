@@ -142,9 +142,18 @@ impl<'a> Lexer<'a> {
                 }
             }
             '+' => {
-                // TODO check for ++
+                // TODO check for ++, this can be unary as well
                 self.reader.next()?;
                 Ok(TokenValue::BinaryOperator(BinaryOp::Add))
+            }
+            '-' => {
+                // TODO check for --, this can be unary as well
+                self.reader.next()?;
+                Ok(TokenValue::BinaryOperator(BinaryOp::Subtract))
+            }
+            '%' => {
+                self.reader.next()?;
+                Ok(TokenValue::BinaryOperator(BinaryOp::Modulus))
             }
             '*' => match self.reader.peek() {
                 Some('*') => {
@@ -327,6 +336,30 @@ mod tests {
             output: [
                 (Number(Integer(1, Decimal)), (0, 1)),
                 (BinaryOperator(BinaryOp::Add), (2, 3)),
+                (Number(Integer(1, Decimal)), (4, 5)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_expression_subtract() {
+        assert_lexer!(
+            input: "1 - 1",
+            output: [
+                (Number(Integer(1, Decimal)), (0, 1)),
+                (BinaryOperator(BinaryOp::Subtract), (2, 3)),
+                (Number(Integer(1, Decimal)), (4, 5)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_expression_modulus() {
+        assert_lexer!(
+            input: "1 % 1",
+            output: [
+                (Number(Integer(1, Decimal)), (0, 1)),
+                (BinaryOperator(BinaryOp::Modulus), (2, 3)),
                 (Number(Integer(1, Decimal)), (4, 5)),
             ]
         );
