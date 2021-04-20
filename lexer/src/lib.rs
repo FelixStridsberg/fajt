@@ -9,7 +9,7 @@ use crate::code_point::CodePoint;
 use crate::error::Error;
 use crate::error::ErrorKind::EndOfFile;
 use crate::reader::Reader;
-use crate::token::Base::Decimal;
+use crate::token::Base::{Decimal, Hex, Octal};
 use crate::token::{AssignOp, BinaryOp, ShiftDirection, Token};
 use crate::token::{Number, TokenValue};
 
@@ -188,11 +188,37 @@ impl<'a> Lexer<'a> {
     }
 
     fn read_number(&mut self) -> Result<TokenValue> {
-        // TODO decimal, octal, hex, etc...
+        match self.reader.peek() {
+            Some('x') | Some('X') => self.read_hex(),
+            Some('o') | Some('O') => self.read_octal(),
+            _ => self.read_decimal(),
+        }
+    }
 
-        let num_str = self.reader.read_until(char::is_alphanumeric)?;
+    fn read_decimal(&mut self) -> Result<TokenValue> {
+        let num_str = self.reader.read_until(char::is_numeric)?;
         let value = num_str.parse::<i64>().unwrap(); // TODO error handling
         Ok(TokenValue::Number(Number::Integer(value, Decimal)))
+    }
+
+    fn read_hex(&mut self) -> Result<TokenValue> {
+        self.reader.next()?; // 0
+        self.reader.next()?; // x
+
+        let hex_str = self.reader.read_until(|c| c.is_ascii_hexdigit())?;
+        let value = i64::from_str_radix(&hex_str, 16).unwrap();
+
+        Ok(TokenValue::Number(Number::Integer(value, Hex)))
+    }
+
+    fn read_octal(&mut self) -> Result<TokenValue> {
+        self.reader.next()?; // 0
+        self.reader.next()?; // o
+
+        let octal_str = self.reader.read_until(|c| c >= '0' && c <= '7')?;
+        let value = i64::from_str_radix(&octal_str, 8).unwrap();
+
+        Ok(TokenValue::Number(Number::Integer(value, Octal)))
     }
 
     fn read_identifier_or_keyword(&mut self) -> Result<TokenValue> {
@@ -209,7 +235,7 @@ impl<'a> Lexer<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::token::Base::Decimal;
+    use crate::token::Base::{Decimal, Hex, Octal};
     use crate::token::Keyword::{Const, Let, Var};
     use crate::token::Number::Integer;
     use crate::token::Token;
@@ -227,6 +253,36 @@ mod tests {
             assert_eq!(vec![$(Token::new($token, ((0, $col1), (0, $col2)))),*], tokens);
         }
     );
+
+    #[test]
+    fn lex_number_decimal() {
+        assert_lexer!(
+            input: "1234",
+            output: [
+                (Number(Integer(1234, Decimal)), (0, 4)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_number_hex() {
+        assert_lexer!(
+            input: "0xff08",
+            output: [
+                (Number(Integer(0xff08, Hex)), (0, 6)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_number_octal() {
+        assert_lexer!(
+            input: "0o347",
+            output: [
+                (Number(Integer(0o347, Octal)), (0, 5)),
+            ]
+        );
+    }
 
     #[test]
     fn lex_expression_add() {
