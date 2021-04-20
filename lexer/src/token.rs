@@ -64,11 +64,20 @@ pub enum BinaryOp {
     Add,
     Subtract,
     Multiply,
+    Exponent,
     Divide,
     Modulus,
     LeftShift,
     RightShift,
     URightShift,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+// TODO, don't like this UnaryOperator -> UnaryOp
+pub enum UnaryOp {
+    Positive,
+    Negative,
+    BitwiseNot,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -79,6 +88,7 @@ pub enum TokenValue {
     Assign(AssignOp),
     BitwiseShift(ShiftDirection),
     BinaryOperator(BinaryOp),
+    UnaryOperation(UnaryOp),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]

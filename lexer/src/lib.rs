@@ -164,14 +164,18 @@ impl<'a> Lexer<'a> {
                         self.reader.next()?;
                         Ok(TokenValue::Assign(AssignOp::Exponent))
                     } else {
-                        unimplemented!("Math: **")
+                        Ok(TokenValue::BinaryOperator(BinaryOp::Exponent))
                     }
                 }
                 _ => {
                     self.reader.next()?;
-                    unimplemented!("Math: *")
+                    Ok(TokenValue::BinaryOperator(BinaryOp::Multiply))
                 }
             },
+            '/' => {
+                self.reader.next()?;
+                Ok(TokenValue::BinaryOperator(BinaryOp::Divide))
+            }
             '<' if self.reader.peek() == Some('<') => {
                 self.reader.next()?;
                 self.reader.next()?;
@@ -348,6 +352,42 @@ mod tests {
             output: [
                 (Number(Integer(1, Decimal)), (0, 1)),
                 (BinaryOperator(BinaryOp::Subtract), (2, 3)),
+                (Number(Integer(1, Decimal)), (4, 5)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_expression_multiply() {
+        assert_lexer!(
+            input: "1 * 1",
+            output: [
+                (Number(Integer(1, Decimal)), (0, 1)),
+                (BinaryOperator(BinaryOp::Multiply), (2, 3)),
+                (Number(Integer(1, Decimal)), (4, 5)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_expression_exponent() {
+        assert_lexer!(
+            input: "1 ** 1",
+            output: [
+                (Number(Integer(1, Decimal)), (0, 1)),
+                (BinaryOperator(BinaryOp::Exponent), (2, 4)),
+                (Number(Integer(1, Decimal)), (5, 6)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_expression_divide() {
+        assert_lexer!(
+            input: "1 / 1",
+            output: [
+                (Number(Integer(1, Decimal)), (0, 1)),
+                (BinaryOperator(BinaryOp::Divide), (2, 3)),
                 (Number(Integer(1, Decimal)), (4, 5)),
             ]
         );
