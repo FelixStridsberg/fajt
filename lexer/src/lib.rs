@@ -366,6 +366,42 @@ mod tests {
     }
 
     #[test]
+    fn lex_expression_bitwise_shift_left() {
+        assert_lexer!(
+            input: "a << 10",
+            output: [
+                (Identifier("a".to_owned()), (0, 1)),
+                (BitwiseShift(ShiftDirection::Left), (2, 4)),
+                (Number(Integer(10, Decimal)), (5, 7)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_expression_bitwise_shift_right() {
+        assert_lexer!(
+            input: "a >> 10",
+            output: [
+                (Identifier("a".to_owned()), (0, 1)),
+                (BitwiseShift(ShiftDirection::Right), (2, 4)),
+                (Number(Integer(10, Decimal)), (5, 7)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_expression_bitwise_unsigned_shift_right() {
+        assert_lexer!(
+            input: "a >>> 10",
+            output: [
+                (Identifier("a".to_owned()), (0, 1)),
+                (BitwiseShift(ShiftDirection::UnsignedRight), (2, 5)),
+                (Number(Integer(10, Decimal)), (6, 8)),
+            ]
+        );
+    }
+
+    #[test]
     fn lex_assignment_const() {
         assert_lexer!(
             input: "const variable = 1;",
@@ -556,42 +592,6 @@ mod tests {
                 (Identifier("variable".to_owned()), (6, 14)),
                 (Assign(AssignOp::URightShift), (15, 19)),
                 (Number(Integer(1, Decimal)), (20, 21)),
-            ]
-        );
-    }
-
-    #[test]
-    fn lex_assignment_bitwise_shift_left() {
-        assert_lexer!(
-            input: "a << 10",
-            output: [
-                (Identifier("a".to_owned()), (0, 1)),
-                (BitwiseShift(ShiftDirection::Left), (2, 4)),
-                (Number(Integer(10, Decimal)), (5, 7)),
-            ]
-        );
-    }
-
-    #[test]
-    fn lex_assignment_bitwise_shift_right() {
-        assert_lexer!(
-            input: "a >> 10",
-            output: [
-                (Identifier("a".to_owned()), (0, 1)),
-                (BitwiseShift(ShiftDirection::Right), (2, 4)),
-                (Number(Integer(10, Decimal)), (5, 7)),
-            ]
-        );
-    }
-
-    #[test]
-    fn lex_assignment_bitwise_unsigned_shift_right() {
-        assert_lexer!(
-            input: "a >>> 10",
-            output: [
-                (Identifier("a".to_owned()), (0, 1)),
-                (BitwiseShift(ShiftDirection::UnsignedRight), (2, 5)),
-                (Number(Integer(10, Decimal)), (6, 8)),
             ]
         );
     }
