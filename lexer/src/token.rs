@@ -18,6 +18,8 @@ pub enum AssignOp {
     Multiply,
     Divide,
     Modulus,
+    Add,
+    Subtract,
     None,
 }
 

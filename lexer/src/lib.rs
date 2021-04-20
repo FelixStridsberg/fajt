@@ -126,6 +126,16 @@ impl<'a> Lexer<'a> {
                 self.reader.next()?;
                 Ok(TokenValue::Assign(AssignOp::Modulus))
             }
+            '+' if self.reader.peek() == Some('=') => {
+                self.reader.next()?;
+                self.reader.next()?;
+                Ok(TokenValue::Assign(AssignOp::Add))
+            }
+            '-' if self.reader.peek() == Some('=') => {
+                self.reader.next()?;
+                self.reader.next()?;
+                Ok(TokenValue::Assign(AssignOp::Subtract))
+            }
             '0'..='9' => self.read_number(),
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             c => unimplemented!("Unimplemented: {}", c),
@@ -312,6 +322,32 @@ mod tests {
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (Assign(AssignOp::Modulus), (15, 17)),
+                (Number(Integer(1, Decimal)), (18, 19)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_assignment_add() {
+        assert_lexer!(
+            input: "const variable += 1;",
+            output: [
+                (Keyword(Const), (0, 5)),
+                (Identifier("variable".to_owned()), (6, 14)),
+                (Assign(AssignOp::Add), (15, 17)),
+                (Number(Integer(1, Decimal)), (18, 19)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_assignment_subtract() {
+        assert_lexer!(
+            input: "const variable -= 1;",
+            output: [
+                (Keyword(Const), (0, 5)),
+                (Identifier("variable".to_owned()), (6, 14)),
+                (Assign(AssignOp::Subtract), (15, 17)),
                 (Number(Integer(1, Decimal)), (18, 19)),
             ]
         );
