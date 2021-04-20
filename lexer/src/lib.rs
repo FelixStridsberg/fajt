@@ -19,6 +19,7 @@ struct Reader<'a> {
     next: Option<(usize, char)>,
     line: u32,
     column: u32,
+    end_of_file: bool,
 }
 
 impl<'a> Reader<'a> {
@@ -34,6 +35,7 @@ impl<'a> Reader<'a> {
             next,
             line: 0,
             column: 0,
+            end_of_file: false,
         })
     }
 
@@ -53,13 +55,18 @@ impl<'a> Reader<'a> {
     }
 
     pub fn next(&mut self) -> Result<char> {
-        self.current = self.next.ok_or(Error::of(EndOfFile))?;
-        self.next = self.iter.next();
+        if let Some(next) = self.next {
+            self.current = next;
+            self.next = self.iter.next();
 
-        // TODO new line
-        self.column += 1;
+            // TODO new line
+            self.column += 1;
 
-        Ok(self.current.1)
+            Ok(self.current.1)
+        } else {
+            self.end_of_file = true;
+            return Err(Error::of(EndOfFile));
+        }
     }
 }
 
@@ -101,6 +108,10 @@ impl<'a> Lexer<'a> {
     }
 
     pub fn next(&mut self) -> Result<Token> {
+        if self.reader.end_of_file {
+            return Err(Error::of(EndOfFile));
+        }
+
         self.skip_whitespaces()?;
 
         let current = self.reader.current();
@@ -152,11 +163,21 @@ impl<'a> Lexer<'a> {
         num_str.push(self.reader.current());
 
         loop {
-            let c = self.reader.next().unwrap(); // TODO
-            if c.is_alphanumeric() {
-                num_str.push(c);
-            } else {
-                break;
+            match self.reader.next() {
+                Ok(c) => {
+                    if c.is_alphanumeric() {
+                        num_str.push(c);
+                    } else {
+                        break;
+                    }
+                }
+                Err(e) => {
+                    if *e.kind() == EndOfFile {
+                        break;
+                    } else {
+                        return Err(e);
+                    }
+                }
             }
         }
 
@@ -395,11 +416,11 @@ mod tests {
     #[test]
     fn lex_assignment_bitwise_shift_left() {
         assert_lexer!(
-            input: "a << 10;",
+            input: "a << 10",
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
                 (BitwiseShift(ShiftDirection::Left), (2, 4)),
-                (Number(Integer(10, Decimal)), (5, 7)),
+                (Number(Integer(10, Decimal)), (5, 6)),
             ]
         );
     }
