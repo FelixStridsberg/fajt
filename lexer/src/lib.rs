@@ -55,12 +55,14 @@ impl<'a> Reader<'a> {
     }
 
     pub fn next(&mut self) -> Result<char> {
+        // TODO self.line
+        if !self.end_of_file {
+            self.column += 1;
+        }
+
         if let Some(next) = self.next {
             self.current = next;
             self.next = self.iter.next();
-
-            // TODO new line
-            self.column += 1;
 
             Ok(self.current.1)
         } else {
@@ -434,7 +436,7 @@ mod tests {
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
                 (BitwiseShift(ShiftDirection::Left), (2, 4)),
-                (Number(Integer(10, Decimal)), (5, 6)),
+                (Number(Integer(10, Decimal)), (5, 7)),
             ]
         );
     }
@@ -446,7 +448,7 @@ mod tests {
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
                 (BitwiseShift(ShiftDirection::Right), (2, 4)),
-                (Number(Integer(10, Decimal)), (5, 6)),
+                (Number(Integer(10, Decimal)), (5, 7)),
             ]
         );
     }
@@ -458,7 +460,7 @@ mod tests {
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
                 (BitwiseShift(ShiftDirection::UnsignedRight), (2, 5)),
-                (Number(Integer(10, Decimal)), (6, 7)),
+                (Number(Integer(10, Decimal)), (6, 8)),
             ]
         );
     }
