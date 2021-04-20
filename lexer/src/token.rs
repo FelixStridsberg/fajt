@@ -16,6 +16,7 @@ use macros::FromString;
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]
 pub enum AssignOp {
     None,
+    Divide,
 }
 
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, FromString)]
