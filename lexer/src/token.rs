@@ -27,6 +27,7 @@ pub enum AssignOp {
     BitwiseAnd,
     BitwiseXOr,
     BitwiseOr,
+    Exponent,
     None,
 }
 

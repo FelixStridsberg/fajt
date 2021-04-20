@@ -142,6 +142,23 @@ impl<'a> Lexer<'a> {
                     _ => unreachable!(),
                 }
             }
+            '*' => match self.reader.peek() {
+                Some('*') => {
+                    self.reader.next()?;
+                    self.reader.next()?;
+
+                    if self.reader.current() == '=' {
+                        self.reader.next()?;
+                        Ok(TokenValue::Assign(AssignOp::Exponent))
+                    } else {
+                        unimplemented!("Math: **")
+                    }
+                }
+                _ => {
+                    self.reader.next()?;
+                    unimplemented!("Math: *")
+                }
+            },
             '<' if self.reader.peek() == Some('<') => {
                 self.reader.next()?;
                 self.reader.next()?;
@@ -345,6 +362,19 @@ mod tests {
                 (Identifier("variable".to_owned()), (6, 14)),
                 (Assign(AssignOp::Multiply), (15, 17)),
                 (Number(Integer(1, Decimal)), (18, 19)),
+            ]
+        );
+    }
+
+    #[test]
+    fn lex_assignment_exponent() {
+        assert_lexer!(
+            input: "const variable **= 1;",
+            output: [
+                (Keyword(Const), (0, 5)),
+                (Identifier("variable".to_owned()), (6, 14)),
+                (Assign(AssignOp::Exponent), (15, 18)),
+                (Number(Integer(1, Decimal)), (19, 20)),
             ]
         );
     }
