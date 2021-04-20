@@ -67,4 +67,30 @@ impl<'a> Reader<'a> {
             return Err(Error::of(EndOfFile));
         }
     }
+
+    pub fn read_until(&mut self, check: fn(char) -> bool) -> Result<String> {
+        let mut result = String::new();
+        result.push(self.current());
+
+        loop {
+            match self.next() {
+                Ok(c) => {
+                    if check(c) {
+                        result.push(c);
+                    } else {
+                        break;
+                    }
+                }
+                Err(e) => {
+                    if *e.kind() == EndOfFile {
+                        break;
+                    } else {
+                        return Err(e);
+                    }
+                }
+            }
+        }
+
+        Ok(result)
+    }
 }

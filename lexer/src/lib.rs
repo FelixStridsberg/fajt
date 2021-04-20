@@ -190,49 +190,17 @@ impl<'a> Lexer<'a> {
     fn read_number(&mut self) -> Result<TokenValue> {
         // TODO decimal, octal, hex, etc...
 
-        let mut num_str = String::new();
-        num_str.push(self.reader.current());
-
-        loop {
-            match self.reader.next() {
-                Ok(c) => {
-                    if c.is_alphanumeric() {
-                        num_str.push(c);
-                    } else {
-                        break;
-                    }
-                }
-                Err(e) => {
-                    if *e.kind() == EndOfFile {
-                        break;
-                    } else {
-                        return Err(e);
-                    }
-                }
-            }
-        }
-
+        let num_str = self.reader.read_until(char::is_alphanumeric)?;
         let value = num_str.parse::<i64>().unwrap(); // TODO error handling
         Ok(TokenValue::Number(Number::Integer(value, Decimal)))
     }
 
     fn read_identifier_or_keyword(&mut self) -> Result<TokenValue> {
-        let mut word = String::new();
-        word.push(self.reader.current());
-
-        loop {
-            let c = self.reader.next().unwrap(); // TODO
-            if c.is_part_of_identifier() {
-                word.push(c);
-            } else {
-                break;
-            }
-        }
-
+        let word = self.reader.read_until(char::is_part_of_identifier)?;
         let value = if let Ok(keyword) = word.parse() {
             TokenValue::Keyword(keyword)
         } else {
-            TokenValue::Identifier(word.to_owned())
+            TokenValue::Identifier(word)
         };
 
         Ok(value)
