@@ -3,6 +3,8 @@ extern crate macros;
 mod code_point;
 pub mod error;
 mod reader;
+
+#[macro_use]
 pub mod token;
 
 use crate::code_point::CodePoint;

@@ -88,6 +88,7 @@ pub enum UnaryOp {
 }
 
 #[derive(Debug, PartialOrd, PartialEq, FromString)]
+#[from_string_macro("punct")]
 pub enum Punct {
     #[from_string("(")]
     ParantOpen,
