@@ -1,6 +1,6 @@
 use crate::error::Error;
 use crate::error::ErrorKind::EndOfFile;
-use crate::token::LineColumn;
+use crate::token::FilePosition;
 use std::str::CharIndices;
 
 type Result<T> = std::result::Result<T, Error>;
@@ -36,8 +36,8 @@ impl<'a> Reader<'a> {
         return self.end_of_file;
     }
 
-    pub fn position(&self) -> LineColumn {
-        LineColumn {
+    pub fn position(&self) -> FilePosition {
+        FilePosition {
             line: self.line,
             column: self.column,
         }

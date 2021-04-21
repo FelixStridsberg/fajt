@@ -99,14 +99,14 @@ pub enum TokenValue {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct LineColumn {
+pub struct FilePosition {
     pub line: usize,
     pub column: usize,
 }
 
-impl Into<LineColumn> for (usize, usize) {
-    fn into(self) -> LineColumn {
-        LineColumn {
+impl Into<FilePosition> for (usize, usize) {
+    fn into(self) -> FilePosition {
+        FilePosition {
             line: self.0,
             column: self.1,
         }
@@ -115,11 +115,11 @@ impl Into<LineColumn> for (usize, usize) {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Span {
-    pub start: LineColumn,
-    pub end: LineColumn,
+    pub start: FilePosition,
+    pub end: FilePosition,
 }
 
-impl<P: Into<LineColumn>> Into<Span> for (P, P) {
+impl<P: Into<FilePosition>> Into<Span> for (P, P) {
     fn into(self) -> Span {
         Span {
             start: self.0.into(),
