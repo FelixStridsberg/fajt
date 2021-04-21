@@ -187,6 +187,7 @@ impl<'a> Lexer<'a> {
         Ok(Token::new(value, (start, end)))
     }
 
+    // TODO this currently accepts 2xff for example
     fn read_number_literal(&mut self) -> Result<TokenValue> {
         let number = match self.reader.peek() {
             Some('x') | Some('X') => {

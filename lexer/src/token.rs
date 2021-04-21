@@ -99,14 +99,14 @@ pub enum TokenValue {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct Position {
-    pub line: u32,
-    pub column: u32,
+pub struct LineColumn {
+    pub line: usize,
+    pub column: usize,
 }
 
-impl Into<Position> for (u32, u32) {
-    fn into(self) -> Position {
-        Position {
+impl Into<LineColumn> for (usize, usize) {
+    fn into(self) -> LineColumn {
+        LineColumn {
             line: self.0,
             column: self.1,
         }
@@ -115,11 +115,11 @@ impl Into<Position> for (u32, u32) {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Location {
-    pub start: Position,
-    pub end: Position,
+    pub start: LineColumn,
+    pub end: LineColumn,
 }
 
-impl<P: Into<Position>> Into<Location> for (P, P) {
+impl<P: Into<LineColumn>> Into<Location> for (P, P) {
     fn into(self) -> Location {
         Location {
             start: self.0.into(),
