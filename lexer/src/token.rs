@@ -114,14 +114,14 @@ impl Into<LineColumn> for (usize, usize) {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct Location {
+pub struct Span {
     pub start: LineColumn,
     pub end: LineColumn,
 }
 
-impl<P: Into<LineColumn>> Into<Location> for (P, P) {
-    fn into(self) -> Location {
-        Location {
+impl<P: Into<LineColumn>> Into<Span> for (P, P) {
+    fn into(self) -> Span {
+        Span {
             start: self.0.into(),
             end: self.1.into(),
         }
@@ -131,11 +131,11 @@ impl<P: Into<LineColumn>> Into<Location> for (P, P) {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Token {
     pub value: TokenValue,
-    pub location: Location,
+    pub location: Span,
 }
 
 impl Token {
-    pub fn new<L: Into<Location>>(value: TokenValue, location: L) -> Self {
+    pub fn new<L: Into<Span>>(value: TokenValue, location: L) -> Self {
         Token {
             value,
             location: location.into(),
