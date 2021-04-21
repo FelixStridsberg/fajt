@@ -87,58 +87,108 @@ pub enum UnaryOp {
     BitwiseNot,
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
+#[derive(Debug, PartialOrd, PartialEq, FromString)]
 pub enum Punct {
-    ParantOpen,             // (
-    ParantClose,            // )
-    BraceOpen,              // [
-    BraceClose,             // ]
-    BracketOpen,            // {
-    BracketClose,           // }
-    Dot,                    // .
-    TripleDot,              // ...
-    SemiColon,              // ;
-    Comma,                  // ,
-    LessThan,               // <
-    DoubleLessThan,         // <<
-    GreaterThan,            // >
-    DoubleGreaterThan,      // >>
-    TripleGreaterThan,      // >>>
-    Equal,                  // =
-    DoubleEqual,            // ==
-    LessEqual,              // <=
-    DoubleLessEqual,        // <<=
-    GreaterEqual,           // >=
-    DoubleGreaterEqual,     // >>=
-    TripleGreaterEqual,     // >>>=
-    EqualGreater,           // =>
-    NotEqual,               // !=
-    PlusEqual,              // +=
-    MinusEqual,             // -=
-    StarEqual,              // *=
-    DoubleStarEqual,        // **=
-    PercentEqual,           // %=
-    PipeEqual,              // |=
-    CaretEqual,             // ^=
-    TripleEqual,            // ===
-    ExclamationDoubleEqual, // !==
-    Plus,                   // +
-    DoublePlus,             // ++
-    Minus,                  // -
-    DoubleMinus,            // --
-    Star,                   // *
-    DoubleStar,             // **
-    Percent,                // %
-    Ampersand,              // &
-    DoubleAmpersand,        // &&
-    Pipe,                   // |
-    DoublePipe,             // ||
-    Caret,                  // ^
-    Exclamation,            // !
-    Tilde,                  // ~
-    QuestionMark,           // ?
-    DoubleQuestionMark,     // ??
-    Colon,                  // :
+    #[from_string("(")]
+    ParantOpen,
+    #[from_string(")")]
+    ParantClose,
+    #[from_string("[")]
+    BraceOpen,
+    #[from_string("]")]
+    BraceClose,
+    #[from_string("{")]
+    BracketOpen,
+    #[from_string("}")]
+    BracketClose,
+    #[from_string(".")]
+    Dot,
+    #[from_string("...")]
+    TripleDot,
+    #[from_string(";")]
+    SemiColon,
+    #[from_string(",")]
+    Comma,
+    #[from_string("<")]
+    LessThan,
+    #[from_string("<<")]
+    DoubleLessThan,
+    #[from_string(">")]
+    GreaterThan,
+    #[from_string(">>")]
+    DoubleGreaterThan,
+    #[from_string(">>>")]
+    TripleGreaterThan,
+    #[from_string("=")]
+    Equal,
+    #[from_string("==")]
+    DoubleEqual,
+    #[from_string("<=")]
+    LessEqual,
+    #[from_string("<<=")]
+    DoubleLessEqual,
+    #[from_string(">=")]
+    GreaterEqual,
+    #[from_string(">>=")]
+    DoubleGreaterEqual,
+    #[from_string(">>>=")]
+    TripleGreaterEqual,
+    #[from_string("=>")]
+    EqualGreater,
+    #[from_string("!=")]
+    NotEqual,
+    #[from_string("+=")]
+    PlusEqual,
+    #[from_string("-=")]
+    MinusEqual,
+    #[from_string("*=")]
+    StarEqual,
+    #[from_string("**=")]
+    DoubleStarEqual,
+    #[from_string("%=")]
+    PercentEqual,
+    #[from_string("|=")]
+    PipeEqual,
+    #[from_string("^=")]
+    CaretEqual,
+    #[from_string("===")]
+    TripleEqual,
+    #[from_string("!==")]
+    ExclamationDoubleEqual,
+    #[from_string("+")]
+    Plus,
+    #[from_string("++")]
+    DoublePlus,
+    #[from_string("-")]
+    Minus,
+    #[from_string("--")]
+    DoubleMinus,
+    #[from_string("*")]
+    Star,
+    #[from_string("**")]
+    DoubleStar,
+    #[from_string("%")]
+    Percent,
+    #[from_string("&")]
+    Ampersand,
+    #[from_string("&&")]
+    DoubleAmpersand,
+    #[from_string("|")]
+    Pipe,
+    #[from_string("||")]
+    DoublePipe,
+    #[from_string("^")]
+    Caret,
+    #[from_string("!")]
+    Exclamation,
+    #[from_string("~")]
+    Tilde,
+    #[from_string("?")]
+    QuestionMark,
+    #[from_string("??")]
+    DoubleQuestionMark,
+    #[from_string(":")]
+    Colon,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -150,14 +200,10 @@ pub enum TokenValue {
     BitwiseShift(ShiftDirection),
     BinaryOperator(BinaryOp),
     UnaryOperation(UnaryOp),
-
-
-    /**
-    Keyword(Keyword),
-    Ident(String),
-    Punct(Punctuator)
-    Literal(Literal),
-    */
+    //Keyword(Keyword),
+    //Ident(String),
+    //Punct(Punctuator)
+    //Literal(Literal),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
