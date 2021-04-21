@@ -88,6 +88,60 @@ pub enum UnaryOp {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
+pub enum Punct {
+    ParantOpen,             // (
+    ParantClose,            // )
+    BraceOpen,              // [
+    BraceClose,             // ]
+    BracketOpen,            // {
+    BracketClose,           // }
+    Dot,                    // .
+    TripleDot,              // ...
+    SemiColon,              // ;
+    Comma,                  // ,
+    LessThan,               // <
+    DoubleLessThan,         // <<
+    GreaterThan,            // >
+    DoubleGreaterThan,      // >>
+    TripleGreaterThan,      // >>>
+    Equal,                  // =
+    DoubleEqual,            // ==
+    LessEqual,              // <=
+    DoubleLessEqual,        // <<=
+    GreaterEqual,           // >=
+    DoubleGreaterEqual,     // >>=
+    TripleGreaterEqual,     // >>>=
+    EqualGreater,           // =>
+    NotEqual,               // !=
+    PlusEqual,              // +=
+    MinusEqual,             // -=
+    StarEqual,              // *=
+    DoubleStarEqual,        // **=
+    PercentEqual,           // %=
+    PipeEqual,              // |=
+    CaretEqual,             // ^=
+    TripleEqual,            // ===
+    ExclamationDoubleEqual, // !==
+    Plus,                   // +
+    DoublePlus,             // ++
+    Minus,                  // -
+    DoubleMinus,            // --
+    Star,                   // *
+    DoubleStar,             // **
+    Percent,                // %
+    Ampersand,              // &
+    DoubleAmpersand,        // &&
+    Pipe,                   // |
+    DoublePipe,             // ||
+    Caret,                  // ^
+    Exclamation,            // !
+    Tilde,                  // ~
+    QuestionMark,           // ?
+    DoubleQuestionMark,     // ??
+    Colon,                  // :
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
 pub enum TokenValue {
     Keyword(Keyword),
     Identifier(String),
@@ -96,6 +150,14 @@ pub enum TokenValue {
     BitwiseShift(ShiftDirection),
     BinaryOperator(BinaryOp),
     UnaryOperation(UnaryOp),
+
+
+    /**
+    Keyword(Keyword),
+    Ident(String),
+    Punct(Punctuator)
+    Literal(Literal),
+    */
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
