@@ -23,14 +23,6 @@ pub enum Number {
     Decimal(f64),
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
-// TODO, don't like this UnaryOperator -> UnaryOp
-pub enum UnaryOp {
-    Positive,
-    Negative,
-    BitwiseNot,
-}
-
 #[derive(Debug, PartialOrd, PartialEq, FromString)]
 #[from_string_macro("punct")]
 pub enum Punct {
@@ -147,7 +139,6 @@ pub enum TokenValue {
     Keyword(Keyword),
     Identifier(String),
     Number(Number),
-    UnaryOperation(UnaryOp),
     //Keyword(Keyword),
     //Ident(String),
     Punct(Punct)
