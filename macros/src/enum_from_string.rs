@@ -2,9 +2,7 @@ use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 use syn::{Attribute, DataEnum, DeriveInput, Variant};
 
-// TODO dry up a bit
-
-fn attribute_string(variant: &Variant) -> Option<String> {
+fn variant_string(variant: &Variant) -> Option<String> {
     let attribute = variant
         .attrs
         .iter()
@@ -27,57 +25,50 @@ fn get_macro_name(attrs: &Vec<Attribute>) -> Option<String> {
     })
 }
 
-fn gen_match_branches<'a, I: Iterator<Item = &'a Variant>>(
-    ident: &Ident,
-    variants: I,
+fn map_variants<F: Fn(&Ident, &str) -> TokenStream>(
+    enum_data: &DataEnum,
+    map: F,
 ) -> Vec<TokenStream> {
-    variants
+    enum_data
+        .variants
+        .iter()
         .map(|v| {
             let variant_ident = &v.ident;
             let variant_string =
-                attribute_string(v).unwrap_or_else(|| v.ident.to_string().to_lowercase());
-            quote! {
-                #variant_string => Ok(#ident::#variant_ident)
-            }
+                variant_string(v).unwrap_or_else(|| v.ident.to_string().to_lowercase());
+            map(variant_ident, &variant_string)
         })
         .collect()
 }
 
-fn gen_macro_branches<'a, I: Iterator<Item = &'a Variant>>(
-    ident: &Ident,
-    variants: I,
-) -> Vec<TokenStream> {
-    variants
-        .map(|v| {
-            let variant_ident = &v.ident;
-            let variant_string =
-                attribute_string(v).unwrap_or_else(|| v.ident.to_string().to_lowercase());
+fn generate_macro(input: &DeriveInput, enum_data: &DataEnum) -> Option<TokenStream> {
+    let ident = &input.ident;
+    let macro_name = get_macro_name(&input.attrs);
+    macro_name.map(|name| {
+        let macro_name = syn::Ident::new(&name, Span::call_site());
+        let macro_branches = map_variants(enum_data, |variant_ident, variant_string| {
             quote! {
                 (#variant_string) => {#ident::#variant_ident}
             }
-        })
-        .collect()
-}
+        });
 
-pub fn enum_from_string(input: &DeriveInput, enum_data: &DataEnum) -> TokenStream {
-    let match_branches = gen_match_branches(&input.ident, enum_data.variants.iter());
-
-    let ident = &input.ident;
-    let macro_name = get_macro_name(&input.attrs);
-
-    let gen_macro = macro_name.map(|name| {
-        let macro_name = syn::Ident::new(&name, Span::call_site());
-        let macro_branches = gen_macro_branches(ident, enum_data.variants.iter());
         quote! {
             macro_rules! #macro_name {
                 #(#macro_branches;)*
             }
         }
+    })
+}
+
+fn generate_from_str_impl(input: &DeriveInput, enum_data: &DataEnum) -> TokenStream {
+    let ident = &input.ident;
+    let match_branches = map_variants(enum_data, |variant_ident, variant_string| {
+        quote! {
+            #variant_string => Ok(#ident::#variant_ident)
+        }
     });
 
     quote! {
-        #gen_macro
-
         impl std::str::FromStr for #ident {
             type Err = &'static str;
 
@@ -88,5 +79,15 @@ pub fn enum_from_string(input: &DeriveInput, enum_data: &DataEnum) -> TokenStrea
                 }
             }
         }
+    }
+}
+
+pub fn enum_from_string(input: &DeriveInput, enum_data: &DataEnum) -> TokenStream {
+    let from_str_impl_tokens = generate_from_str_impl(input, enum_data);
+    let macro_tokens = generate_macro(input, enum_data);
+
+    quote! {
+        #macro_tokens
+        #from_str_impl_tokens
     }
 }
