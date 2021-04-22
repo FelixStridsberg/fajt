@@ -6,7 +6,6 @@ use std::str::CharIndices;
 type Result<T> = std::result::Result<T, Error>;
 
 pub struct Reader<'a> {
-    input: &'a str,
     iter: CharIndices<'a>,
     current: (usize, char),
     next: Option<(usize, char)>,
@@ -22,7 +21,6 @@ impl<'a> Reader<'a> {
         let next = iter.next();
 
         Ok(Reader {
-            input,
             iter,
             current,
             next,
