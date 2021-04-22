@@ -243,7 +243,7 @@ impl<'a> Lexer<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::token::Base::{Binary, Decimal, Hex, Octal};
+    use crate::token::Base::Binary;
     use crate::token::Keyword::{Const, Let, Var};
     use crate::token::Number::Integer;
     use crate::token::Literal::{Number};
@@ -277,7 +277,7 @@ mod tests {
         assert_lexer!(
             input: "1234",
             output: [
-                (Literal(Number(Integer(1234, Decimal))), (0, 4)),
+                (literal!(integer, 1234), (0, 4)),
             ]
         );
     }
@@ -287,7 +287,7 @@ mod tests {
         assert_lexer!(
             input: "0xff08",
             output: [
-                (Literal(Number(Integer(0xff08, Hex))), (0, 6)),
+                (literal!(hex, 0xff08), (0, 6)),
             ]
         );
     }
@@ -297,7 +297,7 @@ mod tests {
         assert_lexer!(
             input: "0o347",
             output: [
-                (Literal(Number(Integer(0o347, Octal))), (0, 5)),
+                (literal!(octal, 0o347), (0, 5)),
             ]
         );
     }
@@ -341,9 +341,9 @@ mod tests {
         assert_lexer!(
             input: "1 + 1",
             output: [
-                (Literal(Number(Integer(1, Decimal))), (0, 1)),
+                (literal!(integer, 1), (0, 1)),
                 (TokenValue::Punct(punct!("+")), (2, 3)),
-                (Literal(Number(Integer(1, Decimal))), (4, 5)),
+                (literal!(integer, 1), (4, 5)),
             ]
         );
     }
@@ -353,9 +353,9 @@ mod tests {
         assert_lexer!(
             input: "1 - 1",
             output: [
-                (Literal(Number(Integer(1, Decimal))), (0, 1)),
+                (literal!(integer, 1), (0, 1)),
                 (TokenValue::Punct(punct!("-")), (2, 3)),
-                (Literal(Number(Integer(1, Decimal))), (4, 5)),
+                (literal!(integer, 1), (4, 5)),
             ]
         );
     }
@@ -365,9 +365,9 @@ mod tests {
         assert_lexer!(
             input: "1 * 1",
             output: [
-                (Literal(Number(Integer(1, Decimal))), (0, 1)),
+                (literal!(integer, 1), (0, 1)),
                 (TokenValue::Punct(punct!("*")), (2, 3)),
-                (Literal(Number(Integer(1, Decimal))), (4, 5)),
+                (literal!(integer, 1), (4, 5)),
             ]
         );
     }
@@ -377,9 +377,9 @@ mod tests {
         assert_lexer!(
             input: "1 ** 1",
             output: [
-                (Literal(Number(Integer(1, Decimal))), (0, 1)),
+                (literal!(integer, 1), (0, 1)),
                 (TokenValue::Punct(punct!("**")), (2, 4)),
-                (Literal(Number(Integer(1, Decimal))), (5, 6)),
+                (literal!(integer, 1), (5, 6)),
             ]
         );
     }
@@ -389,9 +389,9 @@ mod tests {
         assert_lexer!(
             input: "1 / 1",
             output: [
-                (Literal(Number(Integer(1, Decimal))), (0, 1)),
+                (literal!(integer, 1), (0, 1)),
                 (TokenValue::Punct(punct!("/")), (2, 3)),
-                (Literal(Number(Integer(1, Decimal))), (4, 5)),
+                (literal!(integer, 1), (4, 5)),
             ]
         );
     }
@@ -401,9 +401,9 @@ mod tests {
         assert_lexer!(
             input: "1 % 1",
             output: [
-                (Literal(Number(Integer(1, Decimal))), (0, 1)),
+                (literal!(integer, 1), (0, 1)),
                 (TokenValue::Punct(punct!("%")), (2, 3)),
-                (Literal(Number(Integer(1, Decimal))), (4, 5)),
+                (literal!(integer, 1), (4, 5)),
             ]
         );
     }
@@ -413,9 +413,9 @@ mod tests {
         assert_lexer!(
             input: "1 & 1",
             output: [
-                (Literal(Number(Integer(1, Decimal))), (0, 1)),
+                (literal!(integer, 1), (0, 1)),
                 (TokenValue::Punct(punct!("&")), (2, 3)),
-                (Literal(Number(Integer(1, Decimal))), (4, 5)),
+                (literal!(integer, 1), (4, 5)),
             ]
         );
     }
@@ -425,9 +425,9 @@ mod tests {
         assert_lexer!(
             input: "1 | 1",
             output: [
-                (Literal(Number(Integer(1, Decimal))), (0, 1)),
+                (literal!(integer, 1), (0, 1)),
                 (TokenValue::Punct(punct!("|")), (2, 3)),
-                (Literal(Number(Integer(1, Decimal))), (4, 5)),
+                (literal!(integer, 1), (4, 5)),
             ]
         );
     }
@@ -437,9 +437,9 @@ mod tests {
         assert_lexer!(
             input: "1 ^ 1",
             output: [
-                (Literal(Number(Integer(1, Decimal))), (0, 1)),
+                (literal!(integer, 1), (0, 1)),
                 (TokenValue::Punct(punct!("^")), (2, 3)),
-                (Literal(Number(Integer(1, Decimal))), (4, 5)),
+                (literal!(integer, 1), (4, 5)),
             ]
         );
     }
@@ -451,7 +451,7 @@ mod tests {
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
                 (TokenValue::Punct(punct!("<<")), (2, 4)),
-                (Literal(Number(Integer(10, Decimal))), (5, 7)),
+                (literal!(integer, 10), (5, 7)),
             ]
         );
     }
@@ -463,7 +463,7 @@ mod tests {
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
                 (TokenValue::Punct(punct!(">>")), (2, 4)),
-                (Literal(Number(Integer(10, Decimal))), (5, 7)),
+                (literal!(integer, 10), (5, 7)),
             ]
         );
     }
@@ -475,7 +475,7 @@ mod tests {
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
                 (TokenValue::Punct(punct!(">>>")), (2, 5)),
-                (Literal(Number(Integer(10, Decimal))), (6, 8)),
+                (literal!(integer, 10), (6, 8)),
             ]
         );
     }
@@ -524,7 +524,7 @@ mod tests {
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (TokenValue::Punct(punct!("=")), (15, 16)),
-                (Literal(Number(Integer(1, Decimal))), (17, 18)),
+                (literal!(integer, 1), (17, 18)),
             ]
         );
     }
@@ -537,7 +537,7 @@ mod tests {
                 (Keyword(Let), (0, 3)),
                 (Identifier("variable".to_owned()), (4, 12)),
                 (TokenValue::Punct(punct!("=")), (13, 14)),
-                (Literal(Number(Integer(1, Decimal))), (15, 16)),
+                (literal!(integer, 1), (15, 16)),
             ]
         );
     }
@@ -550,7 +550,7 @@ mod tests {
                 (Keyword(Var), (0, 3)),
                 (Identifier("variable".to_owned()), (4, 12)),
                 (TokenValue::Punct(punct!("=")), (13, 14)),
-                (Literal(Number(Integer(1, Decimal))), (15, 16)),
+                (literal!(integer, 1), (15, 16)),
             ]
         );
     }
@@ -563,7 +563,7 @@ mod tests {
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (TokenValue::Punct(punct!("*=")), (15, 17)),
-                (Literal(Number(Integer(1, Decimal))), (18, 19)),
+                (literal!(integer, 1), (18, 19)),
             ]
         );
     }
@@ -576,7 +576,7 @@ mod tests {
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (TokenValue::Punct(punct!("**=")), (15, 18)),
-                (Literal(Number(Integer(1, Decimal))), (19, 20)),
+                (literal!(integer, 1), (19, 20)),
             ]
         );
     }
@@ -589,7 +589,7 @@ mod tests {
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (TokenValue::Punct(punct!("/=")), (15, 17)),
-                (Literal(Number(Integer(1, Decimal))), (18, 19)),
+                (literal!(integer, 1), (18, 19)),
             ]
         );
     }
@@ -602,7 +602,7 @@ mod tests {
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (TokenValue::Punct(punct!("%=")), (15, 17)),
-                (Literal(Number(Integer(1, Decimal))), (18, 19)),
+                (literal!(integer, 1), (18, 19)),
             ]
         );
     }
@@ -615,7 +615,7 @@ mod tests {
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (TokenValue::Punct(punct!("+=")), (15, 17)),
-                (Literal(Number(Integer(1, Decimal))), (18, 19)),
+                (literal!(integer, 1), (18, 19)),
             ]
         );
     }
@@ -628,7 +628,7 @@ mod tests {
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (TokenValue::Punct(punct!("-=")), (15, 17)),
-                (Literal(Number(Integer(1, Decimal))), (18, 19)),
+                (literal!(integer, 1), (18, 19)),
             ]
         );
     }
@@ -641,7 +641,7 @@ mod tests {
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (TokenValue::Punct(punct!("&=")), (15, 17)),
-                (Literal(Number(Integer(1, Decimal))), (18, 19)),
+                (literal!(integer, 1), (18, 19)),
             ]
         );
     }
@@ -654,7 +654,7 @@ mod tests {
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (TokenValue::Punct(punct!("^=")), (15, 17)),
-                (Literal(Number(Integer(1, Decimal))), (18, 19)),
+                (literal!(integer, 1), (18, 19)),
             ]
         );
     }
@@ -667,7 +667,7 @@ mod tests {
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (TokenValue::Punct(punct!("|=")), (15, 17)),
-                (Literal(Number(Integer(1, Decimal))), (18, 19)),
+                (literal!(integer, 1), (18, 19)),
             ]
         );
     }
@@ -680,7 +680,7 @@ mod tests {
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (TokenValue::Punct(punct!("<<=")), (15, 18)),
-                (Literal(Number(Integer(1, Decimal))), (19, 20)),
+                (literal!(integer, 1), (19, 20)),
             ]
         );
     }
@@ -693,7 +693,7 @@ mod tests {
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (TokenValue::Punct(punct!(">>=")), (15, 18)),
-                (Literal(Number(Integer(1, Decimal))), (19, 20)),
+                (literal!(integer, 1), (19, 20)),
             ]
         );
     }
@@ -706,7 +706,7 @@ mod tests {
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (TokenValue::Punct(punct!(">>>=")), (15, 19)),
-                (Literal(Number(Integer(1, Decimal))), (20, 21)),
+                (literal!(integer, 1), (20, 21)),
             ]
         );
     }
