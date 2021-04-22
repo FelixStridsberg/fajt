@@ -1,4 +1,6 @@
 use macros::FromString;
+use std::fmt::{Display, Formatter};
+use std::fmt;
 
 /// ECMAScript supports operators during variable assignment:
 /// *=      Multiply
@@ -211,6 +213,12 @@ pub enum TokenValue {
 pub struct FilePosition {
     pub line: usize,
     pub column: usize,
+}
+
+impl Display for FilePosition {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{}:{}", self.line, self.column)
+    }
 }
 
 impl Into<FilePosition> for (usize, usize) {

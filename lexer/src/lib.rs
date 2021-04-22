@@ -9,7 +9,7 @@ pub mod token;
 
 use crate::code_point::CodePoint;
 use crate::error::Error;
-use crate::error::ErrorKind::EndOfFile;
+use crate::error::ErrorKind::{EndOfFile, InvalidOrUnexpectedToken};
 use crate::reader::Reader;
 use crate::token::Base::{Binary, Decimal, Hex, Octal};
 use crate::token::{AssignOp, BinaryOp, ShiftDirection, Token};
@@ -24,16 +24,21 @@ struct Lexer<'a> {
 impl<'a> Lexer<'a> {
     pub fn new(data: &'a str) -> Result<Self> {
         let reader = Reader::new(data)?;
-        Ok(Lexer { reader })
+        let mut lexer = Lexer { reader };
+        lexer.skip_whitespaces()?;
+        Ok(lexer)
     }
 
-    fn skip_whitespaces(&mut self) -> Result<()> {
+    fn skip_whitespaces(&mut self) -> Result<usize> {
+        let mut count = 0;
+
         // TODO handle semi colon, skipping for now
         while self.reader.current().is_ecma_whitespace() || self.reader.current() == ';' {
+            count += 1;
             self.reader.next()?;
         }
 
-        Ok(())
+        Ok(count)
     }
 
     pub fn read(&mut self) -> Result<Vec<Token>> {
@@ -58,8 +63,6 @@ impl<'a> Lexer<'a> {
         if self.reader.eof() {
             return Err(Error::of(EndOfFile));
         }
-
-        self.skip_whitespaces()?;
 
         let current = self.reader.current();
 
@@ -186,19 +189,24 @@ impl<'a> Lexer<'a> {
         }?;
         let end = self.reader.position();
 
+        // Tokens must be separated with whitespace character.
+        if self.skip_whitespaces() == Ok(0) && !self.reader.eof() {
+            return Err(Error::of(InvalidOrUnexpectedToken(self.reader.position())));
+        }
+
         Ok(Token::new(value, (start, end)))
     }
 
-    // TODO this currently accepts 2xff for example
     fn read_number_literal(&mut self) -> Result<TokenValue> {
+        let current = self.reader.current();
         let number = match self.reader.peek() {
-            Some('x') | Some('X') => {
+            Some('x') | Some('X') if current == '0' => {
                 Number::Integer(self.read_number(16, |c| c.is_ascii_hexdigit())?, Hex)
             }
-            Some('o') | Some('O') => {
+            Some('o') | Some('O') if current == '0' => {
                 Number::Integer(self.read_number(8, |c| c >= '0' && c <= '7')?, Octal)
             }
-            Some('b') | Some('B') => {
+            Some('b') | Some('B') if current == '0' => {
                 Number::Integer(self.read_number(2, |c| c == '0' || c == '1')?, Binary)
             }
             _ => Number::Integer(self.read_number(10, char::is_numeric)?, Decimal),
@@ -243,15 +251,23 @@ mod tests {
     };
     use crate::token::{AssignOp, BinaryOp, ShiftDirection};
     use crate::Lexer;
+    use crate::error::Error;
+    use crate::error::ErrorKind::InvalidOrUnexpectedToken;
 
-    macro_rules! assert_lexer(
+    macro_rules! assert_lexer {
         (input: $input:expr, output: [$(($token:expr, ($col1:expr, $col2:expr)),)*]) => {
             let mut lexer = Lexer::new($input).expect("Could not create lexer, empty input?");
             let tokens = lexer.read().unwrap();
 
-            assert_eq!(vec![$(Token::new($token, ((0, $col1), (0, $col2)))),*], tokens);
-        }
-    );
+            assert_eq!(tokens, vec![$(Token::new($token, ((0, $col1), (0, $col2)))),*]);
+        };
+        (input: $input:expr, error: $error:expr) => {
+            let mut lexer = Lexer::new($input).expect("Could not create lexer, empty input?");
+            let error = lexer.read().expect_err("Expected error but test passed.");
+
+            assert_eq!(error, $error);
+        };
+    }
 
     #[test]
     fn lex_number_decimal() {
@@ -284,12 +300,36 @@ mod tests {
     }
 
     #[test]
+    fn lex_invalid_octal_digit() {
+        assert_lexer!(
+            input: "0o087",
+            error: Error::of(InvalidOrUnexpectedToken((0, 3).into()))
+        );
+    }
+
+    #[test]
     fn lex_number_binary() {
         assert_lexer!(
             input: "0b10111100",
             output: [
                 (Number(Integer(0b10111100, Binary)), (0, 10)),
             ]
+        );
+    }
+
+    #[test]
+    fn lex_invalid_hex_start() {
+        assert_lexer!(
+            input: "1x4488",
+            error: Error::of(InvalidOrUnexpectedToken((0, 1).into()))
+        );
+    }
+
+    #[test]
+    fn lex_invalid_hex_digit() {
+        assert_lexer!(
+            input: "0x01fq",
+            error: Error::of(InvalidOrUnexpectedToken((0, 5).into()))
         );
     }
 

@@ -1,5 +1,6 @@
 use std::fmt::Formatter;
 use std::{error, fmt};
+use crate::token::FilePosition;
 
 #[derive(Debug, PartialEq)]
 pub struct Error {
@@ -18,6 +19,7 @@ impl Error {
 
 #[derive(Debug, PartialEq)]
 pub enum ErrorKind {
+    InvalidOrUnexpectedToken(FilePosition),
     EndOfFile,
 
     /// Hint to avoid relying on exhaustive match which would break if more errors are added.
@@ -27,8 +29,9 @@ pub enum ErrorKind {
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        match self.kind {
+        match &self.kind {
             ErrorKind::EndOfFile => write!(f, "End of file reached."),
+            ErrorKind::InvalidOrUnexpectedToken(p) => write!(f, "Invalid or unexpected token at {}", p),
             ErrorKind::__NonExhaustive => unreachable!(),
         }
     }
