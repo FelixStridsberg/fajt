@@ -11,8 +11,9 @@ use crate::code_point::CodePoint;
 use crate::error::Error;
 use crate::error::ErrorKind::{EndOfFile, InvalidOrUnexpectedToken};
 use crate::reader::Reader;
+use crate::token::Punct;
 use crate::token::Base::{Binary, Decimal, Hex, Octal};
-use crate::token::{AssignOp, BinaryOp, ShiftDirection, Token};
+use crate::token::{BinaryOp, ShiftDirection, Token};
 use crate::token::{Number, TokenValue};
 
 type Result<T> = std::result::Result<T, Error>;
@@ -70,22 +71,22 @@ impl<'a> Lexer<'a> {
         let value = match current {
             '=' if self.reader.peek() != Some('=') => {
                 self.reader.next()?;
-                Ok(TokenValue::Assign(AssignOp::None))
+                Ok(TokenValue::Punct(punct!("=")))
             }
-            // Assign with operator: <op>=
+            // TokenValue::Punct with operator: <op>=
             '/' | '*' | '%' | '+' | '-' | '|' | '^' | '&' if self.reader.peek() == Some('=') => {
                 self.reader.next()?;
                 self.reader.next()?;
 
                 match current {
-                    '/' => Ok(TokenValue::Assign(AssignOp::Divide)),
-                    '*' => Ok(TokenValue::Assign(AssignOp::Multiply)),
-                    '%' => Ok(TokenValue::Assign(AssignOp::Modulus)),
-                    '+' => Ok(TokenValue::Assign(AssignOp::Add)),
-                    '-' => Ok(TokenValue::Assign(AssignOp::Subtract)),
-                    '|' => Ok(TokenValue::Assign(AssignOp::BitwiseOr)),
-                    '^' => Ok(TokenValue::Assign(AssignOp::BitwiseXOr)),
-                    '&' => Ok(TokenValue::Assign(AssignOp::BitwiseAnd)),
+                    '/' => Ok(TokenValue::Punct(punct!("/="))),
+                    '*' => Ok(TokenValue::Punct(punct!("*="))),
+                    '%' => Ok(TokenValue::Punct(punct!("%="))),
+                    '+' => Ok(TokenValue::Punct(punct!("+="))),
+                    '-' => Ok(TokenValue::Punct(punct!("-="))),
+                    '|' => Ok(TokenValue::Punct(punct!("|="))),
+                    '^' => Ok(TokenValue::Punct(punct!("^="))),
+                    '&' => Ok(TokenValue::Punct(punct!("&="))),
                     _ => unreachable!(),
                 }
             }
@@ -110,7 +111,7 @@ impl<'a> Lexer<'a> {
 
                     if self.reader.current() == '=' {
                         self.reader.next()?;
-                        Ok(TokenValue::Assign(AssignOp::Exponent))
+                        Ok(TokenValue::Punct(punct!("**=")))
                     } else {
                         Ok(TokenValue::BinaryOperator(BinaryOp::Exponent))
                     }
@@ -157,7 +158,7 @@ impl<'a> Lexer<'a> {
 
                 if self.reader.current() == '=' {
                     self.reader.next()?;
-                    Ok(TokenValue::Assign(AssignOp::LeftShift))
+                    Ok(TokenValue::Punct(punct!("<<=")))
                 } else {
                     Ok(TokenValue::BitwiseShift(ShiftDirection::Left))
                 }
@@ -171,14 +172,14 @@ impl<'a> Lexer<'a> {
                         self.reader.next()?;
                         if self.reader.current() == '=' {
                             self.reader.next()?;
-                            Ok(TokenValue::Assign(AssignOp::URightShift))
+                            Ok(TokenValue::Punct(punct!(">>>=")))
                         } else {
                             Ok(TokenValue::BitwiseShift(ShiftDirection::UnsignedRight))
                         }
                     }
                     '=' => {
                         self.reader.next()?;
-                        Ok(TokenValue::Assign(AssignOp::RightShift))
+                        Ok(TokenValue::Punct(punct!(">>=")))
                     }
                     _ => Ok(TokenValue::BitwiseShift(ShiftDirection::Right)),
                 }
@@ -245,11 +246,13 @@ mod tests {
     use crate::token::Base::{Binary, Decimal, Hex, Octal};
     use crate::token::Keyword::{Const, Let, Var};
     use crate::token::Number::Integer;
+    use crate::token::Punct;
     use crate::token::Token;
+    use crate::token::TokenValue;
     use crate::token::TokenValue::{
-        Assign, BinaryOperator, BitwiseShift, Identifier, Keyword, Number,
+        BinaryOperator, BitwiseShift, Identifier, Keyword, Number,
     };
-    use crate::token::{AssignOp, BinaryOp, ShiftDirection};
+    use crate::token::{BinaryOp, ShiftDirection};
     use crate::Lexer;
     use crate::error::Error;
     use crate::error::ErrorKind::InvalidOrUnexpectedToken;
@@ -520,7 +523,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (Assign(AssignOp::None), (15, 16)),
+                (TokenValue::Punct(punct!("=")), (15, 16)),
                 (Number(Integer(1, Decimal)), (17, 18)),
             ]
         );
@@ -533,7 +536,7 @@ mod tests {
             output: [
                 (Keyword(Let), (0, 3)),
                 (Identifier("variable".to_owned()), (4, 12)),
-                (Assign(AssignOp::None), (13, 14)),
+                (TokenValue::Punct(punct!("=")), (13, 14)),
                 (Number(Integer(1, Decimal)), (15, 16)),
             ]
         );
@@ -546,7 +549,7 @@ mod tests {
             output: [
                 (Keyword(Var), (0, 3)),
                 (Identifier("variable".to_owned()), (4, 12)),
-                (Assign(AssignOp::None), (13, 14)),
+                (TokenValue::Punct(punct!("=")), (13, 14)),
                 (Number(Integer(1, Decimal)), (15, 16)),
             ]
         );
@@ -559,7 +562,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (Assign(AssignOp::Multiply), (15, 17)),
+                (TokenValue::Punct(punct!("*=")), (15, 17)),
                 (Number(Integer(1, Decimal)), (18, 19)),
             ]
         );
@@ -572,7 +575,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (Assign(AssignOp::Exponent), (15, 18)),
+                (TokenValue::Punct(punct!("**=")), (15, 18)),
                 (Number(Integer(1, Decimal)), (19, 20)),
             ]
         );
@@ -585,7 +588,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (Assign(AssignOp::Divide), (15, 17)),
+                (TokenValue::Punct(punct!("/=")), (15, 17)),
                 (Number(Integer(1, Decimal)), (18, 19)),
             ]
         );
@@ -598,7 +601,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (Assign(AssignOp::Modulus), (15, 17)),
+                (TokenValue::Punct(punct!("%=")), (15, 17)),
                 (Number(Integer(1, Decimal)), (18, 19)),
             ]
         );
@@ -611,7 +614,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (Assign(AssignOp::Add), (15, 17)),
+                (TokenValue::Punct(punct!("+=")), (15, 17)),
                 (Number(Integer(1, Decimal)), (18, 19)),
             ]
         );
@@ -624,7 +627,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (Assign(AssignOp::Subtract), (15, 17)),
+                (TokenValue::Punct(punct!("-=")), (15, 17)),
                 (Number(Integer(1, Decimal)), (18, 19)),
             ]
         );
@@ -637,7 +640,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (Assign(AssignOp::BitwiseAnd), (15, 17)),
+                (TokenValue::Punct(punct!("&=")), (15, 17)),
                 (Number(Integer(1, Decimal)), (18, 19)),
             ]
         );
@@ -650,7 +653,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (Assign(AssignOp::BitwiseXOr), (15, 17)),
+                (TokenValue::Punct(punct!("^=")), (15, 17)),
                 (Number(Integer(1, Decimal)), (18, 19)),
             ]
         );
@@ -663,7 +666,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (Assign(AssignOp::BitwiseOr), (15, 17)),
+                (TokenValue::Punct(punct!("|=")), (15, 17)),
                 (Number(Integer(1, Decimal)), (18, 19)),
             ]
         );
@@ -676,7 +679,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (Assign(AssignOp::LeftShift), (15, 18)),
+                (TokenValue::Punct(punct!("<<=")), (15, 18)),
                 (Number(Integer(1, Decimal)), (19, 20)),
             ]
         );
@@ -689,7 +692,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (Assign(AssignOp::RightShift), (15, 18)),
+                (TokenValue::Punct(punct!(">>=")), (15, 18)),
                 (Number(Integer(1, Decimal)), (19, 20)),
             ]
         );
@@ -702,7 +705,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (Assign(AssignOp::URightShift), (15, 19)),
+                (TokenValue::Punct(punct!(">>>=")), (15, 19)),
                 (Number(Integer(1, Decimal)), (20, 21)),
             ]
         );

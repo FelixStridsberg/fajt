@@ -2,37 +2,6 @@ use macros::FromString;
 use std::fmt::{Display, Formatter};
 use std::fmt;
 
-/// ECMAScript supports operators during variable assignment:
-/// *=      Multiply
-/// /=      Divide
-/// %=      Modulus
-/// +=      Add
-/// -=      Subtract
-/// <<=     LeftShift
-/// >>=     RightShift
-/// >>>=    URightShift
-/// &=      BitwiseAnd
-/// ^=      BitwiseXOr
-/// |=      BitwiseOr
-/// **=     Exponent
-/// TODO revisit naming of these
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]
-pub enum AssignOp {
-    Multiply,
-    Divide,
-    Modulus,
-    Add,
-    Subtract,
-    LeftShift,
-    RightShift,
-    URightShift,
-    BitwiseAnd,
-    BitwiseXOr,
-    BitwiseOr,
-    Exponent,
-    None,
-}
-
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, FromString)]
 pub enum Keyword {
     Const,
@@ -148,12 +117,16 @@ pub enum Punct {
     StarEqual,
     #[from_string("**=")]
     DoubleStarEqual,
+    #[from_string("/=")]
+    SlashEqual,
     #[from_string("%=")]
     PercentEqual,
     #[from_string("|=")]
     PipeEqual,
     #[from_string("^=")]
     CaretEqual,
+    #[from_string("&=")]
+    AmpersandEqual,
     #[from_string("===")]
     TripleEqual,
     #[from_string("!==")]
@@ -199,13 +172,12 @@ pub enum TokenValue {
     Keyword(Keyword),
     Identifier(String),
     Number(Number),
-    Assign(AssignOp),
     BitwiseShift(ShiftDirection),
     BinaryOperator(BinaryOp),
     UnaryOperation(UnaryOp),
     //Keyword(Keyword),
     //Ident(String),
-    //Punct(Punctuator)
+    Punct(Punct)
     //Literal(Literal),
 }
 
