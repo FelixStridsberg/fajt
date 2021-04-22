@@ -24,26 +24,6 @@ pub enum Number {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-// TODO, don't like this BinaryOperator -> BinaryOp
-pub enum BinaryOp {
-    Add,
-    Subtract,
-    Multiply,
-    Exponent,
-    Divide,
-    Modulus,
-    LeftShift,
-    RightShift,
-    URightShift,
-    BitwiseAnd,
-    BitwiseOr,
-    BitwiseXOr,
-    LogicalOr,
-    LogicalAnd,
-    Coalesce,
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
 // TODO, don't like this UnaryOperator -> UnaryOp
 pub enum UnaryOp {
     Positive,
@@ -136,6 +116,8 @@ pub enum Punct {
     Star,
     #[from_string("**")]
     DoubleStar,
+    #[from_string("/")]
+    Slash,
     #[from_string("%")]
     Percent,
     #[from_string("&")]
@@ -165,7 +147,6 @@ pub enum TokenValue {
     Keyword(Keyword),
     Identifier(String),
     Number(Number),
-    BinaryOperator(BinaryOp),
     UnaryOperation(UnaryOp),
     //Keyword(Keyword),
     //Ident(String),

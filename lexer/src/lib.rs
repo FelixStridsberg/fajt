@@ -13,7 +13,7 @@ use crate::error::ErrorKind::{EndOfFile, InvalidOrUnexpectedToken};
 use crate::reader::Reader;
 use crate::token::Punct;
 use crate::token::Base::{Binary, Decimal, Hex, Octal};
-use crate::token::{BinaryOp, Token};
+use crate::token::Token;
 use crate::token::{Number, TokenValue};
 
 type Result<T> = std::result::Result<T, Error>;
@@ -93,16 +93,16 @@ impl<'a> Lexer<'a> {
             '+' => {
                 // TODO check for ++, this can be unary as well
                 self.reader.next()?;
-                Ok(TokenValue::BinaryOperator(BinaryOp::Add))
+                Ok(TokenValue::Punct(punct!("+")))
             }
             '-' => {
                 // TODO check for --, this can be unary as well
                 self.reader.next()?;
-                Ok(TokenValue::BinaryOperator(BinaryOp::Subtract))
+                Ok(TokenValue::Punct(punct!("-")))
             }
             '%' => {
                 self.reader.next()?;
-                Ok(TokenValue::BinaryOperator(BinaryOp::Modulus))
+                Ok(TokenValue::Punct(punct!("%")))
             }
             '*' => match self.reader.peek() {
                 Some('*') => {
@@ -113,44 +113,44 @@ impl<'a> Lexer<'a> {
                         self.reader.next()?;
                         Ok(TokenValue::Punct(punct!("**=")))
                     } else {
-                        Ok(TokenValue::BinaryOperator(BinaryOp::Exponent))
+                        Ok(TokenValue::Punct(punct!("**")))
                     }
                 }
                 _ => {
                     self.reader.next()?;
-                    Ok(TokenValue::BinaryOperator(BinaryOp::Multiply))
+                    Ok(TokenValue::Punct(punct!("*")))
                 }
             },
             '/' => {
                 self.reader.next()?;
-                Ok(TokenValue::BinaryOperator(BinaryOp::Divide))
+                Ok(TokenValue::Punct(punct!("/")))
             }
             '&' => {
                 self.reader.next()?;
                 if self.reader.current() == '&' {
                     self.reader.next()?;
-                    Ok(TokenValue::BinaryOperator(BinaryOp::LogicalAnd))
+                    Ok(TokenValue::Punct(punct!("&&")))
                 } else {
-                    Ok(TokenValue::BinaryOperator(BinaryOp::BitwiseAnd))
+                    Ok(TokenValue::Punct(punct!("&")))
                 }
             }
             '|' => {
                 self.reader.next()?;
                 if self.reader.current() == '|' {
                     self.reader.next()?;
-                    Ok(TokenValue::BinaryOperator(BinaryOp::LogicalOr))
+                    Ok(TokenValue::Punct(punct!("||")))
                 } else {
-                    Ok(TokenValue::BinaryOperator(BinaryOp::BitwiseOr))
+                    Ok(TokenValue::Punct(punct!("|")))
                 }
             }
             '?' if self.reader.peek() == Some('?') => {
                 self.reader.next()?;
                 self.reader.next()?;
-                Ok(TokenValue::BinaryOperator(BinaryOp::Coalesce))
+                Ok(TokenValue::Punct(punct!("??")))
             }
             '^' => {
                 self.reader.next()?;
-                Ok(TokenValue::BinaryOperator(BinaryOp::BitwiseXOr))
+                Ok(TokenValue::Punct(punct!("^")))
             }
             '<' if self.reader.peek() == Some('<') => {
                 self.reader.next()?;
@@ -181,7 +181,7 @@ impl<'a> Lexer<'a> {
                         self.reader.next()?;
                         Ok(TokenValue::Punct(punct!(">>=")))
                     }
-                    _ => Ok(TokenValue::Punct(punct!(">>>"))),
+                    _ => Ok(TokenValue::Punct(punct!(">>"))),
                 }
             }
             '0'..='9' => self.read_number_literal(),
@@ -250,9 +250,8 @@ mod tests {
     use crate::token::Token;
     use crate::token::TokenValue;
     use crate::token::TokenValue::{
-        BinaryOperator, Identifier, Keyword, Number,
+        Identifier, Keyword, Number,
     };
-    use crate::token::{BinaryOp};
     use crate::Lexer;
     use crate::error::Error;
     use crate::error::ErrorKind::InvalidOrUnexpectedToken;
@@ -342,7 +341,7 @@ mod tests {
             input: "1 + 1",
             output: [
                 (Number(Integer(1, Decimal)), (0, 1)),
-                (BinaryOperator(BinaryOp::Add), (2, 3)),
+                (TokenValue::Punct(punct!("+")), (2, 3)),
                 (Number(Integer(1, Decimal)), (4, 5)),
             ]
         );
@@ -354,7 +353,7 @@ mod tests {
             input: "1 - 1",
             output: [
                 (Number(Integer(1, Decimal)), (0, 1)),
-                (BinaryOperator(BinaryOp::Subtract), (2, 3)),
+                (TokenValue::Punct(punct!("-")), (2, 3)),
                 (Number(Integer(1, Decimal)), (4, 5)),
             ]
         );
@@ -366,7 +365,7 @@ mod tests {
             input: "1 * 1",
             output: [
                 (Number(Integer(1, Decimal)), (0, 1)),
-                (BinaryOperator(BinaryOp::Multiply), (2, 3)),
+                (TokenValue::Punct(punct!("*")), (2, 3)),
                 (Number(Integer(1, Decimal)), (4, 5)),
             ]
         );
@@ -378,7 +377,7 @@ mod tests {
             input: "1 ** 1",
             output: [
                 (Number(Integer(1, Decimal)), (0, 1)),
-                (BinaryOperator(BinaryOp::Exponent), (2, 4)),
+                (TokenValue::Punct(punct!("**")), (2, 4)),
                 (Number(Integer(1, Decimal)), (5, 6)),
             ]
         );
@@ -390,7 +389,7 @@ mod tests {
             input: "1 / 1",
             output: [
                 (Number(Integer(1, Decimal)), (0, 1)),
-                (BinaryOperator(BinaryOp::Divide), (2, 3)),
+                (TokenValue::Punct(punct!("/")), (2, 3)),
                 (Number(Integer(1, Decimal)), (4, 5)),
             ]
         );
@@ -402,7 +401,7 @@ mod tests {
             input: "1 % 1",
             output: [
                 (Number(Integer(1, Decimal)), (0, 1)),
-                (BinaryOperator(BinaryOp::Modulus), (2, 3)),
+                (TokenValue::Punct(punct!("%")), (2, 3)),
                 (Number(Integer(1, Decimal)), (4, 5)),
             ]
         );
@@ -414,7 +413,7 @@ mod tests {
             input: "1 & 1",
             output: [
                 (Number(Integer(1, Decimal)), (0, 1)),
-                (BinaryOperator(BinaryOp::BitwiseAnd), (2, 3)),
+                (TokenValue::Punct(punct!("&")), (2, 3)),
                 (Number(Integer(1, Decimal)), (4, 5)),
             ]
         );
@@ -426,7 +425,7 @@ mod tests {
             input: "1 | 1",
             output: [
                 (Number(Integer(1, Decimal)), (0, 1)),
-                (BinaryOperator(BinaryOp::BitwiseOr), (2, 3)),
+                (TokenValue::Punct(punct!("|")), (2, 3)),
                 (Number(Integer(1, Decimal)), (4, 5)),
             ]
         );
@@ -438,7 +437,7 @@ mod tests {
             input: "1 ^ 1",
             output: [
                 (Number(Integer(1, Decimal)), (0, 1)),
-                (BinaryOperator(BinaryOp::BitwiseXOr), (2, 3)),
+                (TokenValue::Punct(punct!("^")), (2, 3)),
                 (Number(Integer(1, Decimal)), (4, 5)),
             ]
         );
@@ -486,7 +485,7 @@ mod tests {
             input: "a && b;",
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
-                (BinaryOperator(BinaryOp::LogicalAnd), (2, 4)),
+                (TokenValue::Punct(punct!("&&")), (2, 4)),
                 (Identifier("b".to_owned()), (5, 6)),
             ]
         );
@@ -498,7 +497,7 @@ mod tests {
             input: "a || b;",
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
-                (BinaryOperator(BinaryOp::LogicalOr), (2, 4)),
+                (TokenValue::Punct(punct!("||")), (2, 4)),
                 (Identifier("b".to_owned()), (5, 6)),
             ]
         );
@@ -510,7 +509,7 @@ mod tests {
             input: "a ?? b;",
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
-                (BinaryOperator(BinaryOp::Coalesce), (2, 4)),
+                (TokenValue::Punct(punct!("??")), (2, 4)),
                 (Identifier("b".to_owned()), (5, 6)),
             ]
         );
