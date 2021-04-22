@@ -13,7 +13,7 @@ use crate::error::ErrorKind::{EndOfFile, InvalidOrUnexpectedToken};
 use crate::reader::Reader;
 use crate::token::Punct;
 use crate::token::Base::{Binary, Decimal, Hex, Octal};
-use crate::token::{BinaryOp, ShiftDirection, Token};
+use crate::token::{BinaryOp, Token};
 use crate::token::{Number, TokenValue};
 
 type Result<T> = std::result::Result<T, Error>;
@@ -160,7 +160,7 @@ impl<'a> Lexer<'a> {
                     self.reader.next()?;
                     Ok(TokenValue::Punct(punct!("<<=")))
                 } else {
-                    Ok(TokenValue::BitwiseShift(ShiftDirection::Left))
+                    Ok(TokenValue::Punct(punct!("<<")))
                 }
             }
             '>' if self.reader.peek() == Some('>') => {
@@ -174,14 +174,14 @@ impl<'a> Lexer<'a> {
                             self.reader.next()?;
                             Ok(TokenValue::Punct(punct!(">>>=")))
                         } else {
-                            Ok(TokenValue::BitwiseShift(ShiftDirection::UnsignedRight))
+                            Ok(TokenValue::Punct(punct!(">>>")))
                         }
                     }
                     '=' => {
                         self.reader.next()?;
                         Ok(TokenValue::Punct(punct!(">>=")))
                     }
-                    _ => Ok(TokenValue::BitwiseShift(ShiftDirection::Right)),
+                    _ => Ok(TokenValue::Punct(punct!(">>>"))),
                 }
             }
             '0'..='9' => self.read_number_literal(),
@@ -250,9 +250,9 @@ mod tests {
     use crate::token::Token;
     use crate::token::TokenValue;
     use crate::token::TokenValue::{
-        BinaryOperator, BitwiseShift, Identifier, Keyword, Number,
+        BinaryOperator, Identifier, Keyword, Number,
     };
-    use crate::token::{BinaryOp, ShiftDirection};
+    use crate::token::{BinaryOp};
     use crate::Lexer;
     use crate::error::Error;
     use crate::error::ErrorKind::InvalidOrUnexpectedToken;
@@ -450,7 +450,7 @@ mod tests {
             input: "a << 10",
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
-                (BitwiseShift(ShiftDirection::Left), (2, 4)),
+                (TokenValue::Punct(punct!("<<")), (2, 4)),
                 (Number(Integer(10, Decimal)), (5, 7)),
             ]
         );
@@ -462,7 +462,7 @@ mod tests {
             input: "a >> 10",
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
-                (BitwiseShift(ShiftDirection::Right), (2, 4)),
+                (TokenValue::Punct(punct!(">>")), (2, 4)),
                 (Number(Integer(10, Decimal)), (5, 7)),
             ]
         );
@@ -474,7 +474,7 @@ mod tests {
             input: "a >>> 10",
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
-                (BitwiseShift(ShiftDirection::UnsignedRight), (2, 5)),
+                (TokenValue::Punct(punct!(">>>")), (2, 5)),
                 (Number(Integer(10, Decimal)), (6, 8)),
             ]
         );

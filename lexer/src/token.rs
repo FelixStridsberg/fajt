@@ -24,13 +24,6 @@ pub enum Number {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub enum ShiftDirection {
-    Left,
-    Right,
-    UnsignedRight,
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
 // TODO, don't like this BinaryOperator -> BinaryOp
 pub enum BinaryOp {
     Add,
@@ -172,7 +165,6 @@ pub enum TokenValue {
     Keyword(Keyword),
     Identifier(String),
     Number(Number),
-    BitwiseShift(ShiftDirection),
     BinaryOperator(BinaryOp),
     UnaryOperation(UnaryOp),
     //Keyword(Keyword),
