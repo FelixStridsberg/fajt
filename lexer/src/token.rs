@@ -135,14 +135,18 @@ pub enum Punct {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
+pub enum Literal {
+    Number(Number)
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
 pub enum TokenValue {
     Keyword(Keyword),
     Identifier(String),
-    Number(Number),
     //Keyword(Keyword),
     //Ident(String),
-    Punct(Punct)
-    //Literal(Literal),
+    Punct(Punct),
+    Literal(Literal),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
