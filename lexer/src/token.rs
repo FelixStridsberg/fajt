@@ -143,8 +143,6 @@ pub enum Literal {
 pub enum TokenValue {
     Keyword(Keyword),
     Identifier(String),
-    //Keyword(Keyword),
-    //Ident(String),
     Punct(Punct),
     Literal(Literal),
 }
