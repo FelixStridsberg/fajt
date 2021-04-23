@@ -189,7 +189,7 @@ impl<'a> Lexer<'a> {
         }?;
         let end = self.reader.position();
 
-        // Tokens must be separated with whitespace character.
+        // Tokens must be separated with whitespace character. TODO not true for punctors
         if self.skip_whitespaces() == Ok(0) && !self.reader.eof() {
             return Err(Error::of(InvalidOrUnexpectedToken(self.reader.position())));
         }
