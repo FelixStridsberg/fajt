@@ -44,8 +44,13 @@ pub enum Number {
     Decimal(f64),
 }
 
+macro_rules! punct_wrap {
+    ($token:path) => { TokenValue::Punct($token) }
+}
+
 #[derive(Debug, PartialOrd, PartialEq, FromString)]
 #[from_string_macro("punct")]
+#[from_string_macro_wrap(punct_wrap)]
 pub enum Punct {
     #[from_string("(")]
     ParantOpen,

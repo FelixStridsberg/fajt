@@ -71,7 +71,7 @@ impl<'a> Lexer<'a> {
         let value = match current {
             '=' if self.reader.peek() != Some('=') => {
                 self.reader.next()?;
-                Ok(TokenValue::Punct(punct!("=")))
+                Ok(punct!("="))
             }
             // TokenValue::Punct with operator: <op>=
             '/' | '*' | '%' | '+' | '-' | '|' | '^' | '&' if self.reader.peek() == Some('=') => {
@@ -79,30 +79,30 @@ impl<'a> Lexer<'a> {
                 self.reader.next()?;
 
                 match current {
-                    '/' => Ok(TokenValue::Punct(punct!("/="))),
-                    '*' => Ok(TokenValue::Punct(punct!("*="))),
-                    '%' => Ok(TokenValue::Punct(punct!("%="))),
-                    '+' => Ok(TokenValue::Punct(punct!("+="))),
-                    '-' => Ok(TokenValue::Punct(punct!("-="))),
-                    '|' => Ok(TokenValue::Punct(punct!("|="))),
-                    '^' => Ok(TokenValue::Punct(punct!("^="))),
-                    '&' => Ok(TokenValue::Punct(punct!("&="))),
+                    '/' => Ok(punct!("/=")),
+                    '*' => Ok(punct!("*=")),
+                    '%' => Ok(punct!("%=")),
+                    '+' => Ok(punct!("+=")),
+                    '-' => Ok(punct!("-=")),
+                    '|' => Ok(punct!("|=")),
+                    '^' => Ok(punct!("^=")),
+                    '&' => Ok(punct!("&=")),
                     _ => unreachable!(),
                 }
             }
             '+' => {
                 // TODO check for ++, this can be unary as well
                 self.reader.next()?;
-                Ok(TokenValue::Punct(punct!("+")))
+                Ok(punct!("+"))
             }
             '-' => {
                 // TODO check for --, this can be unary as well
                 self.reader.next()?;
-                Ok(TokenValue::Punct(punct!("-")))
+                Ok(punct!("-"))
             }
             '%' => {
                 self.reader.next()?;
-                Ok(TokenValue::Punct(punct!("%")))
+                Ok(punct!("%"))
             }
             '*' => match self.reader.peek() {
                 Some('*') => {
@@ -111,46 +111,46 @@ impl<'a> Lexer<'a> {
 
                     if self.reader.current() == '=' {
                         self.reader.next()?;
-                        Ok(TokenValue::Punct(punct!("**=")))
+                        Ok(punct!("**="))
                     } else {
-                        Ok(TokenValue::Punct(punct!("**")))
+                        Ok(punct!("**"))
                     }
                 }
                 _ => {
                     self.reader.next()?;
-                    Ok(TokenValue::Punct(punct!("*")))
+                    Ok(punct!("*"))
                 }
             },
             '/' => {
                 self.reader.next()?;
-                Ok(TokenValue::Punct(punct!("/")))
+                Ok(punct!("/"))
             }
             '&' => {
                 self.reader.next()?;
                 if self.reader.current() == '&' {
                     self.reader.next()?;
-                    Ok(TokenValue::Punct(punct!("&&")))
+                    Ok(punct!("&&"))
                 } else {
-                    Ok(TokenValue::Punct(punct!("&")))
+                    Ok(punct!("&"))
                 }
             }
             '|' => {
                 self.reader.next()?;
                 if self.reader.current() == '|' {
                     self.reader.next()?;
-                    Ok(TokenValue::Punct(punct!("||")))
+                    Ok(punct!("||"))
                 } else {
-                    Ok(TokenValue::Punct(punct!("|")))
+                    Ok(punct!("|"))
                 }
             }
             '?' if self.reader.peek() == Some('?') => {
                 self.reader.next()?;
                 self.reader.next()?;
-                Ok(TokenValue::Punct(punct!("??")))
+                Ok(punct!("??"))
             }
             '^' => {
                 self.reader.next()?;
-                Ok(TokenValue::Punct(punct!("^")))
+                Ok(punct!("^"))
             }
             '<' if self.reader.peek() == Some('<') => {
                 self.reader.next()?;
@@ -158,9 +158,9 @@ impl<'a> Lexer<'a> {
 
                 if self.reader.current() == '=' {
                     self.reader.next()?;
-                    Ok(TokenValue::Punct(punct!("<<=")))
+                    Ok(punct!("<<="))
                 } else {
-                    Ok(TokenValue::Punct(punct!("<<")))
+                    Ok(punct!("<<"))
                 }
             }
             '>' if self.reader.peek() == Some('>') => {
@@ -172,16 +172,16 @@ impl<'a> Lexer<'a> {
                         self.reader.next()?;
                         if self.reader.current() == '=' {
                             self.reader.next()?;
-                            Ok(TokenValue::Punct(punct!(">>>=")))
+                            Ok(punct!(">>>="))
                         } else {
-                            Ok(TokenValue::Punct(punct!(">>>")))
+                            Ok(punct!(">>>"))
                         }
                     }
                     '=' => {
                         self.reader.next()?;
-                        Ok(TokenValue::Punct(punct!(">>=")))
+                        Ok(punct!(">>="))
                     }
-                    _ => Ok(TokenValue::Punct(punct!(">>"))),
+                    _ => Ok(punct!(">>"))
                 }
             }
             '0'..='9' => self.read_number_literal(),
@@ -342,7 +342,7 @@ mod tests {
             input: "1 + 1",
             output: [
                 (literal!(integer, 1), (0, 1)),
-                (TokenValue::Punct(punct!("+")), (2, 3)),
+                (punct!("+"), (2, 3)),
                 (literal!(integer, 1), (4, 5)),
             ]
         );
@@ -354,7 +354,7 @@ mod tests {
             input: "1 - 1",
             output: [
                 (literal!(integer, 1), (0, 1)),
-                (TokenValue::Punct(punct!("-")), (2, 3)),
+                (punct!("-"), (2, 3)),
                 (literal!(integer, 1), (4, 5)),
             ]
         );
@@ -366,7 +366,7 @@ mod tests {
             input: "1 * 1",
             output: [
                 (literal!(integer, 1), (0, 1)),
-                (TokenValue::Punct(punct!("*")), (2, 3)),
+                (punct!("*"), (2, 3)),
                 (literal!(integer, 1), (4, 5)),
             ]
         );
@@ -378,7 +378,7 @@ mod tests {
             input: "1 ** 1",
             output: [
                 (literal!(integer, 1), (0, 1)),
-                (TokenValue::Punct(punct!("**")), (2, 4)),
+                (punct!("**"), (2, 4)),
                 (literal!(integer, 1), (5, 6)),
             ]
         );
@@ -390,7 +390,7 @@ mod tests {
             input: "1 / 1",
             output: [
                 (literal!(integer, 1), (0, 1)),
-                (TokenValue::Punct(punct!("/")), (2, 3)),
+                (punct!("/"), (2, 3)),
                 (literal!(integer, 1), (4, 5)),
             ]
         );
@@ -402,7 +402,7 @@ mod tests {
             input: "1 % 1",
             output: [
                 (literal!(integer, 1), (0, 1)),
-                (TokenValue::Punct(punct!("%")), (2, 3)),
+                (punct!("%"), (2, 3)),
                 (literal!(integer, 1), (4, 5)),
             ]
         );
@@ -414,7 +414,7 @@ mod tests {
             input: "1 & 1",
             output: [
                 (literal!(integer, 1), (0, 1)),
-                (TokenValue::Punct(punct!("&")), (2, 3)),
+                (punct!("&"), (2, 3)),
                 (literal!(integer, 1), (4, 5)),
             ]
         );
@@ -426,7 +426,7 @@ mod tests {
             input: "1 | 1",
             output: [
                 (literal!(integer, 1), (0, 1)),
-                (TokenValue::Punct(punct!("|")), (2, 3)),
+                (punct!("|"), (2, 3)),
                 (literal!(integer, 1), (4, 5)),
             ]
         );
@@ -438,7 +438,7 @@ mod tests {
             input: "1 ^ 1",
             output: [
                 (literal!(integer, 1), (0, 1)),
-                (TokenValue::Punct(punct!("^")), (2, 3)),
+                (punct!("^"), (2, 3)),
                 (literal!(integer, 1), (4, 5)),
             ]
         );
@@ -450,7 +450,7 @@ mod tests {
             input: "a << 10",
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
-                (TokenValue::Punct(punct!("<<")), (2, 4)),
+                (punct!("<<"), (2, 4)),
                 (literal!(integer, 10), (5, 7)),
             ]
         );
@@ -462,7 +462,7 @@ mod tests {
             input: "a >> 10",
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
-                (TokenValue::Punct(punct!(">>")), (2, 4)),
+                (punct!(">>"), (2, 4)),
                 (literal!(integer, 10), (5, 7)),
             ]
         );
@@ -474,7 +474,7 @@ mod tests {
             input: "a >>> 10",
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
-                (TokenValue::Punct(punct!(">>>")), (2, 5)),
+                (punct!(">>>"), (2, 5)),
                 (literal!(integer, 10), (6, 8)),
             ]
         );
@@ -486,7 +486,7 @@ mod tests {
             input: "a && b;",
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
-                (TokenValue::Punct(punct!("&&")), (2, 4)),
+                (punct!("&&"), (2, 4)),
                 (Identifier("b".to_owned()), (5, 6)),
             ]
         );
@@ -498,7 +498,7 @@ mod tests {
             input: "a || b;",
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
-                (TokenValue::Punct(punct!("||")), (2, 4)),
+                (punct!("||"), (2, 4)),
                 (Identifier("b".to_owned()), (5, 6)),
             ]
         );
@@ -510,7 +510,7 @@ mod tests {
             input: "a ?? b;",
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
-                (TokenValue::Punct(punct!("??")), (2, 4)),
+                (punct!("??"), (2, 4)),
                 (Identifier("b".to_owned()), (5, 6)),
             ]
         );
@@ -523,7 +523,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (TokenValue::Punct(punct!("=")), (15, 16)),
+                (punct!("="), (15, 16)),
                 (literal!(integer, 1), (17, 18)),
             ]
         );
@@ -536,7 +536,7 @@ mod tests {
             output: [
                 (Keyword(Let), (0, 3)),
                 (Identifier("variable".to_owned()), (4, 12)),
-                (TokenValue::Punct(punct!("=")), (13, 14)),
+                (punct!("="), (13, 14)),
                 (literal!(integer, 1), (15, 16)),
             ]
         );
@@ -549,7 +549,7 @@ mod tests {
             output: [
                 (Keyword(Var), (0, 3)),
                 (Identifier("variable".to_owned()), (4, 12)),
-                (TokenValue::Punct(punct!("=")), (13, 14)),
+                (punct!("="), (13, 14)),
                 (literal!(integer, 1), (15, 16)),
             ]
         );
@@ -562,7 +562,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (TokenValue::Punct(punct!("*=")), (15, 17)),
+                (punct!("*="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
             ]
         );
@@ -575,7 +575,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (TokenValue::Punct(punct!("**=")), (15, 18)),
+                (punct!("**="), (15, 18)),
                 (literal!(integer, 1), (19, 20)),
             ]
         );
@@ -588,7 +588,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (TokenValue::Punct(punct!("/=")), (15, 17)),
+                (punct!("/="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
             ]
         );
@@ -601,7 +601,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (TokenValue::Punct(punct!("%=")), (15, 17)),
+                (punct!("%="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
             ]
         );
@@ -614,7 +614,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (TokenValue::Punct(punct!("+=")), (15, 17)),
+                (punct!("+="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
             ]
         );
@@ -627,7 +627,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (TokenValue::Punct(punct!("-=")), (15, 17)),
+                (punct!("-="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
             ]
         );
@@ -640,7 +640,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (TokenValue::Punct(punct!("&=")), (15, 17)),
+                (punct!("&="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
             ]
         );
@@ -653,7 +653,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (TokenValue::Punct(punct!("^=")), (15, 17)),
+                (punct!("^="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
             ]
         );
@@ -666,7 +666,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (TokenValue::Punct(punct!("|=")), (15, 17)),
+                (punct!("|="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
             ]
         );
@@ -679,7 +679,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (TokenValue::Punct(punct!("<<=")), (15, 18)),
+                (punct!("<<="), (15, 18)),
                 (literal!(integer, 1), (19, 20)),
             ]
         );
@@ -692,7 +692,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (TokenValue::Punct(punct!(">>=")), (15, 18)),
+                (punct!(">>="), (15, 18)),
                 (literal!(integer, 1), (19, 20)),
             ]
         );
@@ -705,7 +705,7 @@ mod tests {
             output: [
                 (Keyword(Const), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
-                (TokenValue::Punct(punct!(">>>=")), (15, 19)),
+                (punct!(">>>="), (15, 19)),
                 (literal!(integer, 1), (20, 21)),
             ]
         );

@@ -25,6 +25,14 @@ fn get_macro_name(attrs: &Vec<Attribute>) -> Option<String> {
     })
 }
 
+fn get_macro_wrap_name(attrs: &Vec<Attribute>) -> Option<syn::Ident> {
+    let macro_attribute = attrs.iter().find(|a| a.path.is_ident("from_string_macro_wrap"));
+    macro_attribute.map(|a| {
+        let ident: syn::Ident = a.parse_args().expect("FUCK");
+        ident
+    })
+}
+
 fn map_variants<F: Fn(&Ident, &str) -> TokenStream>(
     enum_data: &DataEnum,
     map: F,
@@ -42,13 +50,21 @@ fn map_variants<F: Fn(&Ident, &str) -> TokenStream>(
 }
 
 fn generate_macro(input: &DeriveInput, enum_data: &DataEnum) -> Option<TokenStream> {
+    let macro_wrap = get_macro_wrap_name(&input.attrs);
+
     let ident = &input.ident;
     let macro_name = get_macro_name(&input.attrs);
     macro_name.map(|name| {
         let macro_name = syn::Ident::new(&name, Span::call_site());
         let macro_branches = map_variants(enum_data, |variant_ident, variant_string| {
-            quote! {
-                (#variant_string) => {#ident::#variant_ident}
+            if let Some(wrap_name) = &macro_wrap {
+                quote! {
+                    (#variant_string) => { #wrap_name!(#ident::#variant_ident) }
+                }
+            } else {
+                quote! {
+                    (#variant_string) => { #ident::#variant_ident }
+                }
             }
         });
 
