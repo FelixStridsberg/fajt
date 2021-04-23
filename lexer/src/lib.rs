@@ -17,7 +17,7 @@ use crate::token::TokenValue;
 
 type Result<T> = std::result::Result<T, Error>;
 
-struct Lexer<'a> {
+pub struct Lexer<'a> {
     reader: Reader<'a>,
 }
 
@@ -41,11 +41,11 @@ impl<'a> Lexer<'a> {
         Ok(count)
     }
 
-    pub fn read(&mut self) -> Result<Vec<Token>> {
+    pub fn read_all(&mut self) -> Result<Vec<Token>> {
         let mut tokens = Vec::new();
 
         loop {
-            match self.next() {
+            match self.read() {
                 Ok(token) => tokens.push(token),
                 Err(e) => {
                     if *e.kind() != EndOfFile {
@@ -59,7 +59,7 @@ impl<'a> Lexer<'a> {
         Ok(tokens)
     }
 
-    pub fn next(&mut self) -> Result<Token> {
+    pub fn read(&mut self) -> Result<Token> {
         if self.reader.eof() {
             return Err(Error::of(EndOfFile));
         }
@@ -204,7 +204,7 @@ impl<'a> Lexer<'a> {
                 (Hex, self.read_number(16, |c| c.is_ascii_hexdigit())?)
             }
             Some('o') | Some('O') if current == '0' => {
-                (Octal, self.read_number(8, |c| c >= '0' && c <= '7')?)
+                (Octal, self.read_number(8, |c| ('0'..='7').contains(&c))?)
             }
             Some('b') | Some('B') if current == '0' => {
                 (Binary, self.read_number(2, |c| c == '0' || c == '1')?)
@@ -229,7 +229,7 @@ impl<'a> Lexer<'a> {
     }
 
     fn read_identifier_or_keyword(&mut self) -> Result<TokenValue> {
-        let word = self.reader.read_until(char::is_part_of_identifier)?;
+        let word = self.reader.read_until(|c| char::is_part_of_identifier(&c))?;
         let value = if let Ok(keyword) = word.parse() {
             TokenValue::Keyword(keyword)
         } else {

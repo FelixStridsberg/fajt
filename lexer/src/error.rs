@@ -18,13 +18,10 @@ impl Error {
 }
 
 #[derive(Debug, PartialEq)]
+#[non_exhaustive]
 pub enum ErrorKind {
     InvalidOrUnexpectedToken(FilePosition),
     EndOfFile,
-
-    /// Hint to avoid relying on exhaustive match which would break if more errors are added.
-    #[doc(hidden)]
-    __NonExhaustive,
 }
 
 impl fmt::Display for Error {
@@ -32,7 +29,6 @@ impl fmt::Display for Error {
         match &self.kind {
             ErrorKind::EndOfFile => write!(f, "End of file reached."),
             ErrorKind::InvalidOrUnexpectedToken(p) => write!(f, "Invalid or unexpected token at {}", p),
-            ErrorKind::__NonExhaustive => unreachable!(),
         }
     }
 }

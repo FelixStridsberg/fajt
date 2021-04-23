@@ -264,11 +264,11 @@ impl Display for FilePosition {
     }
 }
 
-impl Into<FilePosition> for (usize, usize) {
-    fn into(self) -> FilePosition {
+impl From<(usize, usize)> for FilePosition {
+    fn from((line, column): (usize, usize)) -> FilePosition {
         FilePosition {
-            line: self.0,
-            column: self.1,
+            line,
+            column,
         }
     }
 }
@@ -279,11 +279,11 @@ pub struct Span {
     pub end: FilePosition,
 }
 
-impl<P: Into<FilePosition>> Into<Span> for (P, P) {
-    fn into(self) -> Span {
+impl<P: Into<FilePosition>> From<(P, P)> for Span {
+    fn from((start, end): (P, P)) -> Self {
         Span {
-            start: self.0.into(),
-            end: self.1.into(),
+            start: start.into(),
+            end: end.into(),
         }
     }
 }

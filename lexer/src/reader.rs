@@ -17,7 +17,7 @@ pub struct Reader<'a> {
 impl<'a> Reader<'a> {
     pub fn new(input: &'a str) -> Result<Self> {
         let mut iter = input.char_indices();
-        let current = iter.next().ok_or(Error::of(EndOfFile))?;
+        let current = iter.next().ok_or_else(|| Error::of(EndOfFile))?;
         let next = iter.next();
 
         Ok(Reader {
@@ -31,7 +31,7 @@ impl<'a> Reader<'a> {
     }
 
     pub fn eof(&self) -> bool {
-        return self.end_of_file;
+        self.end_of_file
     }
 
     pub fn position(&self) -> FilePosition {
@@ -62,7 +62,7 @@ impl<'a> Reader<'a> {
             Ok(self.current.1)
         } else {
             self.end_of_file = true;
-            return Err(Error::of(EndOfFile));
+            Err(Error::of(EndOfFile))
         }
     }
 
