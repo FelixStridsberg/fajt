@@ -11,7 +11,7 @@ use crate::code_point::CodePoint;
 use crate::error::Error;
 use crate::error::ErrorKind::{EndOfFile, InvalidOrUnexpectedToken};
 use crate::reader::Reader;
-use crate::token::{Punct, Literal};
+use crate::token::{Literal};
 use crate::token::Base::{Binary, Decimal, Hex, Octal};
 use crate::token::Token;
 use crate::token::{Number, TokenValue};
@@ -247,7 +247,6 @@ mod tests {
     use crate::token::Keyword::{Const, Let, Var};
     use crate::token::Number::Integer;
     use crate::token::Literal::{Number};
-    use crate::token::Punct;
     use crate::token::Token;
     use crate::token::TokenValue;
     use crate::token::TokenValue::{

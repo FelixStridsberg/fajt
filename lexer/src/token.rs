@@ -45,7 +45,7 @@ pub enum Number {
 }
 
 macro_rules! punct_wrap {
-    ($token:path) => { TokenValue::Punct($token) }
+    ($variant:ident) => { TokenValue::Punct(crate::token::Punct::$variant) }
 }
 
 #[derive(Debug, PartialOrd, PartialEq, FromString)]

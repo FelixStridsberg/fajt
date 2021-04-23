@@ -59,7 +59,7 @@ fn generate_macro(input: &DeriveInput, enum_data: &DataEnum) -> Option<TokenStre
         let macro_branches = map_variants(enum_data, |variant_ident, variant_string| {
             if let Some(wrap_name) = &macro_wrap {
                 quote! {
-                    (#variant_string) => { #wrap_name!(#ident::#variant_ident) }
+                    (#variant_string) => { #wrap_name!(#variant_ident) }
                 }
             } else {
                 quote! {
