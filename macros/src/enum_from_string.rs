@@ -69,6 +69,7 @@ fn generate_macro(input: &DeriveInput, enum_data: &DataEnum) -> Option<TokenStre
         });
 
         quote! {
+            #[macro_export]
             macro_rules! #macro_name {
                 #(#macro_branches;)*
             }
