@@ -243,13 +243,12 @@ impl<'a> Lexer<'a> {
 #[cfg(test)]
 mod tests {
     use crate::token::Base::Binary;
-    use crate::token::Keyword::{Const, Let, Var};
     use crate::token::Number::Integer;
     use crate::token::Literal::{Number};
     use crate::token::Token;
     use crate::token::TokenValue;
     use crate::token::TokenValue::{
-        Identifier, Keyword, Literal
+        Identifier, Literal
     };
     use crate::Lexer;
     use crate::error::Error;
@@ -519,7 +518,7 @@ mod tests {
         assert_lexer!(
             input: "const variable = 1;",
             output: [
-                (Keyword(Const), (0, 5)),
+                (keyword!("const"), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("="), (15, 16)),
                 (literal!(integer, 1), (17, 18)),
@@ -532,7 +531,7 @@ mod tests {
         assert_lexer!(
             input: "let variable = 1;",
             output: [
-                (Keyword(Let), (0, 3)),
+                (keyword!("let"), (0, 3)),
                 (Identifier("variable".to_owned()), (4, 12)),
                 (punct!("="), (13, 14)),
                 (literal!(integer, 1), (15, 16)),
@@ -545,7 +544,7 @@ mod tests {
         assert_lexer!(
             input: "var variable = 1;",
             output: [
-                (Keyword(Var), (0, 3)),
+                (keyword!("var"), (0, 3)),
                 (Identifier("variable".to_owned()), (4, 12)),
                 (punct!("="), (13, 14)),
                 (literal!(integer, 1), (15, 16)),
@@ -558,7 +557,7 @@ mod tests {
         assert_lexer!(
             input: "const variable *= 1;",
             output: [
-                (Keyword(Const), (0, 5)),
+                (keyword!("const"), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("*="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
@@ -571,7 +570,7 @@ mod tests {
         assert_lexer!(
             input: "const variable **= 1;",
             output: [
-                (Keyword(Const), (0, 5)),
+                (keyword!("const"), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("**="), (15, 18)),
                 (literal!(integer, 1), (19, 20)),
@@ -584,7 +583,7 @@ mod tests {
         assert_lexer!(
             input: "const variable /= 1;",
             output: [
-                (Keyword(Const), (0, 5)),
+                (keyword!("const"), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("/="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
@@ -597,7 +596,7 @@ mod tests {
         assert_lexer!(
             input: "const variable %= 1;",
             output: [
-                (Keyword(Const), (0, 5)),
+                (keyword!("const"), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("%="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
@@ -610,7 +609,7 @@ mod tests {
         assert_lexer!(
             input: "const variable += 1;",
             output: [
-                (Keyword(Const), (0, 5)),
+                (keyword!("const"), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("+="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
@@ -623,7 +622,7 @@ mod tests {
         assert_lexer!(
             input: "const variable -= 1;",
             output: [
-                (Keyword(Const), (0, 5)),
+                (keyword!("const"), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("-="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
@@ -636,7 +635,7 @@ mod tests {
         assert_lexer!(
             input: "const variable &= 1;",
             output: [
-                (Keyword(Const), (0, 5)),
+                (keyword!("const"), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("&="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
@@ -649,7 +648,7 @@ mod tests {
         assert_lexer!(
             input: "const variable ^= 1;",
             output: [
-                (Keyword(Const), (0, 5)),
+                (keyword!("const"), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("^="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
@@ -662,7 +661,7 @@ mod tests {
         assert_lexer!(
             input: "const variable |= 1;",
             output: [
-                (Keyword(Const), (0, 5)),
+                (keyword!("const"), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("|="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
@@ -675,7 +674,7 @@ mod tests {
         assert_lexer!(
             input: "const variable <<= 1;",
             output: [
-                (Keyword(Const), (0, 5)),
+                (keyword!("const"), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("<<="), (15, 18)),
                 (literal!(integer, 1), (19, 20)),
@@ -688,7 +687,7 @@ mod tests {
         assert_lexer!(
             input: "const variable >>= 1;",
             output: [
-                (Keyword(Const), (0, 5)),
+                (keyword!("const"), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!(">>="), (15, 18)),
                 (literal!(integer, 1), (19, 20)),
@@ -701,7 +700,7 @@ mod tests {
         assert_lexer!(
             input: "const variable >>>= 1;",
             output: [
-                (Keyword(Const), (0, 5)),
+                (keyword!("const"), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!(">>>="), (15, 19)),
                 (literal!(integer, 1), (20, 21)),
