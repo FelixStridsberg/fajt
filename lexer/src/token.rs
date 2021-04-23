@@ -4,7 +4,7 @@ use std::fmt;
 
 #[macro_export]
 macro_rules! keyword_wrap {
-    ($variant:ident) => { TokenValue::Keyword(crate::token::Keyword::$variant) }
+    ($variant:ident) => { crate::token::TokenValue::Keyword(crate::token::Keyword::$variant) }
 }
 
 /// When working with tokens, do not use this enum directly. Instead use the macro
@@ -89,7 +89,7 @@ pub enum Number {
 
 #[macro_export]
 macro_rules! punct_wrap {
-    ($variant:ident) => { TokenValue::Punct(crate::token::Punct::$variant) }
+    ($variant:ident) => { crate::token::TokenValue::Punct(crate::token::Punct::$variant) }
 }
 
 /// When working with tokens, do not use this enum directly. Instead use the macro

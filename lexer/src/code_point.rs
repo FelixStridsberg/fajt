@@ -1,3 +1,4 @@
+/// ECMA Script code points are unicode characters.
 pub trait CodePoint {
     fn is_ecma_whitespace(&self) -> bool;
     fn is_ecma_line_terminator(&self) -> bool;
