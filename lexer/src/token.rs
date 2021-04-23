@@ -2,27 +2,6 @@ use macros::FromString;
 use std::fmt::{Display, Formatter};
 use std::fmt;
 
-macro_rules! literal(
-    (integer, $value:expr) => {
-        literal!(crate::token::Base::Decimal, $value)
-    };
-    (hex, $value:expr) => {
-        literal!(crate::token::Base::Hex, $value)
-    };
-    (octal, $value:expr) => {
-        literal!(crate::token::Base::Octal, $value)
-    };
-    ($type:expr, $value:expr) => {
-        crate::token::TokenValue::Literal(
-            crate::token::Literal::Number(
-                crate::token::Number::Integer(
-                    $value, $type
-                )
-            )
-        )
-    };
-);
-
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, FromString)]
 pub enum Keyword {
     Const,
@@ -173,6 +152,28 @@ pub enum Punct {
     #[from_string(":")]
     Colon,
 }
+
+#[macro_export]
+macro_rules! literal(
+    (integer, $value:expr) => {
+        literal!(number, crate::token::Base::Decimal, $value)
+    };
+    (hex, $value:expr) => {
+        literal!(number, crate::token::Base::Hex, $value)
+    };
+    (octal, $value:expr) => {
+        literal!(number, crate::token::Base::Octal, $value)
+    };
+    (number, $type:expr, $value:expr) => {
+        crate::token::TokenValue::Literal(
+            crate::token::Literal::Number(
+                crate::token::Number::Integer(
+                    $value, $type
+                )
+            )
+        )
+    };
+);
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Literal {

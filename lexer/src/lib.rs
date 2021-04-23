@@ -11,10 +11,9 @@ use crate::code_point::CodePoint;
 use crate::error::Error;
 use crate::error::ErrorKind::{EndOfFile, InvalidOrUnexpectedToken};
 use crate::reader::Reader;
-use crate::token::{Literal};
 use crate::token::Base::{Binary, Decimal, Hex, Octal};
 use crate::token::Token;
-use crate::token::{Number, TokenValue};
+use crate::token::TokenValue;
 
 type Result<T> = std::result::Result<T, Error>;
 
@@ -200,20 +199,20 @@ impl<'a> Lexer<'a> {
 
     fn read_number_literal(&mut self) -> Result<TokenValue> {
         let current = self.reader.current();
-        let number = match self.reader.peek() {
+        let (base, number) = match self.reader.peek() {
             Some('x') | Some('X') if current == '0' => {
-                Number::Integer(self.read_number(16, |c| c.is_ascii_hexdigit())?, Hex)
+                (Hex, self.read_number(16, |c| c.is_ascii_hexdigit())?)
             }
             Some('o') | Some('O') if current == '0' => {
-                Number::Integer(self.read_number(8, |c| c >= '0' && c <= '7')?, Octal)
+                (Octal, self.read_number(8, |c| c >= '0' && c <= '7')?)
             }
             Some('b') | Some('B') if current == '0' => {
-                Number::Integer(self.read_number(2, |c| c == '0' || c == '1')?, Binary)
+                (Binary, self.read_number(2, |c| c == '0' || c == '1')?)
             }
-            _ => Number::Integer(self.read_number(10, char::is_numeric)?, Decimal),
+            _ => (Decimal, self.read_number(10, char::is_numeric)?),
         };
 
-        Ok(TokenValue::Literal(Literal::Number(number)))
+        Ok(literal!(number, base, number))
     }
 
     fn read_number(&mut self, base: u32, check: fn(char) -> bool) -> Result<i64> {
