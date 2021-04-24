@@ -4,9 +4,10 @@ extern crate fajt_lexer;
 use fajt_lexer::Lexer;
 use fajt_lexer::token;
 use fajt_lexer::token::Token;
-use std::fs::read;
+use crate::ast::{Program, ProgramType, Stmt, EmptyStmt};
 
 pub mod ast;
+mod statement;
 
 pub struct Reader<'a> {
     lexer: Lexer<'a>,
@@ -38,16 +39,16 @@ impl <'a>Parser<'a> {
         }
     }
 
-    pub fn parse(&mut self) {
-        // TODO just testing for now
-        self.parse_statement();
+    pub fn parse(&mut self) -> Program {
+        let stmt = self.parse_statement();
+        Program::from_body(vec![stmt])
     }
 
-    fn parse_statement(&mut self) {
+    fn parse_statement(&mut self) -> Stmt {
         match self.reader.current.value {
+            punct!(";") => Stmt::Empty(EmptyStmt::new(self.reader.current.location.clone())),
             punct!("{") => unimplemented!("BlockStatement"),
             keyword!("var") => unimplemented!("VariableStatement"),
-            punct!(";") => unimplemented!("EmptyStatement"),
             keyword!("if") => unimplemented!("IfStatement"),
             keyword!("break") => unimplemented!("BreakStatement"),
             keyword!("continue") => unimplemented!("ContinueStatement"),
@@ -68,14 +69,16 @@ impl <'a>Parser<'a> {
 mod tests {
     use crate::{Parser, Reader};
     use fajt_lexer::Lexer;
+    use crate::ast::{Program, Stmt, EmptyStmt};
 
     #[test]
-    fn it_works() {
-        let input = "var a = 1;";
+    fn parse_empty_statment() {
+        let input = ";";
         let mut lexer = Lexer::new(&input).unwrap();
         let mut reader = Reader::new(lexer);
         let mut parser = Parser::new(reader);
-        parser.parse();
+        let program = parser.parse();
 
+        assert_eq!(program, Program::from_body(vec![Stmt::Empty(EmptyStmt::new(((0, 0), (0, 1)).into()))]))
     }
 }

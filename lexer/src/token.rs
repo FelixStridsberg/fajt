@@ -252,7 +252,7 @@ pub enum TokenValue {
     Literal(Literal),
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
+#[derive(Debug, PartialOrd, PartialEq, Clone)]
 pub struct FilePosition {
     pub line: usize,
     pub column: usize,
@@ -273,7 +273,7 @@ impl From<(usize, usize)> for FilePosition {
     }
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
+#[derive(Debug, PartialOrd, PartialEq, Clone)]
 pub struct Span {
     pub start: FilePosition,
     pub end: FilePosition,
