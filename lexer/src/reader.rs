@@ -49,6 +49,16 @@ impl<'a> Reader<'a> {
         self.next.map(|(_, c)| c)
     }
 
+    /// Consumes the current character.
+    pub fn consume(&mut self) -> Result<()> {
+        if self.end_of_file {
+            Err(Error::of(EndOfFile))
+        } else {
+            self.next();
+            Ok(())
+        }
+    }
+
     pub fn next(&mut self) -> Result<char> {
         // TODO self.line
         if !self.end_of_file {

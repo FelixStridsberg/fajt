@@ -32,8 +32,7 @@ impl<'a> Lexer<'a> {
     fn skip_whitespaces(&mut self) -> Result<usize> {
         let mut count = 0;
 
-        // TODO handle semi colon, skipping for now
-        while self.reader.current().is_ecma_whitespace() || self.reader.current() == ';' {
+        while self.reader.current().is_ecma_whitespace() {
             count += 1;
             self.reader.next()?;
         }
@@ -69,13 +68,13 @@ impl<'a> Lexer<'a> {
         let start = self.reader.position();
         let value = match current {
             '=' if self.reader.peek() != Some('=') => {
-                self.reader.next()?;
+                self.reader.consume()?;
                 Ok(punct!("="))
             }
             // TokenValue::Punct with operator: <op>=
             '/' | '*' | '%' | '+' | '-' | '|' | '^' | '&' if self.reader.peek() == Some('=') => {
-                self.reader.next()?;
-                self.reader.next()?;
+                self.reader.consume()?;
+                self.reader.consume()?;
 
                 match current {
                     '/' => Ok(punct!("/=")),
@@ -91,99 +90,103 @@ impl<'a> Lexer<'a> {
             }
             '+' => {
                 // TODO check for ++, this can be unary as well
-                self.reader.next()?;
+                self.reader.consume()?;
                 Ok(punct!("+"))
             }
             '-' => {
                 // TODO check for --, this can be unary as well
-                self.reader.next()?;
+                self.reader.consume()?;
                 Ok(punct!("-"))
             }
             '%' => {
-                self.reader.next()?;
+                self.reader.consume()?;
                 Ok(punct!("%"))
             }
             '*' => match self.reader.peek() {
                 Some('*') => {
-                    self.reader.next()?;
-                    self.reader.next()?;
+                    self.reader.consume()?;
+                    self.reader.consume()?;
 
                     if self.reader.current() == '=' {
-                        self.reader.next()?;
+                        self.reader.consume()?;
                         Ok(punct!("**="))
                     } else {
                         Ok(punct!("**"))
                     }
                 }
                 _ => {
-                    self.reader.next()?;
+                    self.reader.consume()?;
                     Ok(punct!("*"))
                 }
             },
             '/' => {
-                self.reader.next()?;
+                self.reader.consume()?;
                 Ok(punct!("/"))
             }
             '&' => {
-                self.reader.next()?;
+                self.reader.consume()?;
                 if self.reader.current() == '&' {
-                    self.reader.next()?;
+                    self.reader.consume()?;
                     Ok(punct!("&&"))
                 } else {
                     Ok(punct!("&"))
                 }
             }
             '|' => {
-                self.reader.next()?;
+                self.reader.consume()?;
                 if self.reader.current() == '|' {
-                    self.reader.next()?;
+                    self.reader.consume()?;
                     Ok(punct!("||"))
                 } else {
                     Ok(punct!("|"))
                 }
             }
             '?' if self.reader.peek() == Some('?') => {
-                self.reader.next()?;
-                self.reader.next()?;
+                self.reader.consume()?;
+                self.reader.consume()?;
                 Ok(punct!("??"))
             }
             '^' => {
-                self.reader.next()?;
+                self.reader.consume()?;
                 Ok(punct!("^"))
             }
             '<' if self.reader.peek() == Some('<') => {
-                self.reader.next()?;
-                self.reader.next()?;
+                self.reader.consume()?;
+                self.reader.consume()?;
 
                 if self.reader.current() == '=' {
-                    self.reader.next()?;
+                    self.reader.consume()?;
                     Ok(punct!("<<="))
                 } else {
                     Ok(punct!("<<"))
                 }
             }
             '>' if self.reader.peek() == Some('>') => {
-                self.reader.next()?;
-                self.reader.next()?;
+                self.reader.consume()?;
+                self.reader.consume()?;
 
                 match self.reader.current() {
                     '>' => {
-                        self.reader.next()?;
+                        self.reader.consume()?;
                         if self.reader.current() == '=' {
-                            self.reader.next()?;
+                            self.reader.consume()?;
                             Ok(punct!(">>>="))
                         } else {
                             Ok(punct!(">>>"))
                         }
                     }
                     '=' => {
-                        self.reader.next()?;
+                        self.reader.consume()?;
                         Ok(punct!(">>="))
                     }
                     _ => Ok(punct!(">>"))
                 }
             }
             '0'..='9' => self.read_number_literal(),
+            ';' => {
+                self.reader.consume()?;
+                Ok(punct!(";"))
+            }
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             c => unimplemented!("Unimplemented: {}", c),
         }?;
@@ -218,8 +221,8 @@ impl<'a> Lexer<'a> {
     fn read_number(&mut self, base: u32, check: fn(char) -> bool) -> Result<i64> {
         // All but base 10 have 2 char prefix: 0b, 0o, 0x
         if base != 10 {
-            self.reader.next()?;
-            self.reader.next()?;
+            self.reader.consume()?;
+            self.reader.consume()?;
         }
 
         let number_str = self.reader.read_until(check)?;
