@@ -253,37 +253,16 @@ pub enum TokenValue {
 }
 
 #[derive(Debug, PartialOrd, PartialEq, Clone)]
-pub struct FilePosition {
-    pub line: usize,
-    pub column: usize,
-}
-
-impl Display for FilePosition {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{}:{}", self.line, self.column)
-    }
-}
-
-impl From<(usize, usize)> for FilePosition {
-    fn from((line, column): (usize, usize)) -> FilePosition {
-        FilePosition {
-            line,
-            column,
-        }
-    }
-}
-
-#[derive(Debug, PartialOrd, PartialEq, Clone)]
 pub struct Span {
-    pub start: FilePosition,
-    pub end: FilePosition,
+    pub start: usize,
+    pub end: usize,
 }
 
-impl<P: Into<FilePosition>> From<(P, P)> for Span {
-    fn from((start, end): (P, P)) -> Self {
+impl From<(usize, usize)> for Span {
+    fn from((start, end): (usize, usize)) -> Self {
         Span {
-            start: start.into(),
-            end: end.into(),
+            start,
+            end,
         }
     }
 }

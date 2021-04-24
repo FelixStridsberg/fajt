@@ -1,7 +1,7 @@
 use crate::error::Error;
 use crate::error::ErrorKind::EndOfFile;
-use crate::token::FilePosition;
 use std::str::CharIndices;
+use crate::token::Span;
 
 type Result<T> = std::result::Result<T, Error>;
 
@@ -9,8 +9,7 @@ pub struct Reader<'a> {
     iter: CharIndices<'a>,
     current: (usize, char),
     next: Option<(usize, char)>,
-    line: usize,
-    column: usize,
+    position: usize,
     end_of_file: bool,
 }
 
@@ -24,8 +23,7 @@ impl<'a> Reader<'a> {
             iter,
             current,
             next,
-            line: 0,
-            column: 0,
+            position: 0,
             end_of_file: false,
         })
     }
@@ -34,11 +32,8 @@ impl<'a> Reader<'a> {
         self.end_of_file
     }
 
-    pub fn position(&self) -> FilePosition {
-        FilePosition {
-            line: self.line,
-            column: self.column,
-        }
+    pub fn position(&self) -> usize {
+        self.position
     }
 
     pub fn current(&mut self) -> char {
@@ -60,9 +55,8 @@ impl<'a> Reader<'a> {
     }
 
     pub fn next(&mut self) -> Result<char> {
-        // TODO self.line
         if !self.end_of_file {
-            self.column += 1;
+            self.position += 1;
         }
 
         if let Some(next) = self.next {

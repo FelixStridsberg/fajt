@@ -194,7 +194,8 @@ impl<'a> Lexer<'a> {
 
         // Tokens must be separated with whitespace character. TODO not true for punctors
         if self.skip_whitespaces() == Ok(0) && !self.reader.eof() {
-            return Err(Error::of(InvalidOrUnexpectedToken(self.reader.position())));
+            let position = self.reader.position();
+            return Err(Error::of(InvalidOrUnexpectedToken((position, position).into())));
         }
 
         Ok(Token::new(value, (start, end)))
@@ -260,9 +261,9 @@ mod tests {
     macro_rules! assert_lexer {
         (input: $input:expr, output: [$(($token:expr, ($col1:expr, $col2:expr)),)*]) => {
             let mut lexer = Lexer::new($input).expect("Could not create lexer, empty input?");
-            let tokens = lexer.read().unwrap();
+            let tokens = lexer.read_all().unwrap();
 
-            assert_eq!(tokens, vec![$(Token::new($token, ((0, $col1), (0, $col2)))),*]);
+            assert_eq!(tokens, vec![$(Token::new($token, ($col1, $col2))),*]);
         };
         (input: $input:expr, error: $error:expr) => {
             let mut lexer = Lexer::new($input).expect("Could not create lexer, empty input?");

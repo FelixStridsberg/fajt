@@ -79,6 +79,6 @@ mod tests {
         let mut parser = Parser::new(reader);
         let program = parser.parse();
 
-        assert_eq!(program, Program::from_body(vec![Stmt::Empty(EmptyStmt::new(((0, 0), (0, 1)).into()))]))
+        assert_eq!(program, Program::from_body(vec![Stmt::Empty(EmptyStmt::new((0, 1).into()))]))
     }
 }
