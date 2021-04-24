@@ -25,7 +25,6 @@ impl<'a> Lexer<'a> {
     pub fn new(data: &'a str) -> Result<Self> {
         let reader = Reader::new(data)?;
         let mut lexer = Lexer { reader };
-        lexer.skip_whitespaces()?;
         Ok(lexer)
     }
 
@@ -62,6 +61,8 @@ impl<'a> Lexer<'a> {
         if self.reader.eof() {
             return Err(Error::of(EndOfFile));
         }
+
+        self.skip_whitespaces()?;
 
         let current = self.reader.current();
 
@@ -191,12 +192,6 @@ impl<'a> Lexer<'a> {
             c => unimplemented!("Unimplemented: {}", c),
         }?;
         let end = self.reader.position();
-
-        // Tokens must be separated with whitespace character. TODO not true for punctors
-        if self.skip_whitespaces() == Ok(0) && !self.reader.eof() {
-            let position = self.reader.position();
-            return Err(Error::of(InvalidOrUnexpectedToken((position, position).into())));
-        }
 
         Ok(Token::new(value, (start, end)))
     }
@@ -484,7 +479,7 @@ mod tests {
     #[test]
     fn lex_expression_and() {
         assert_lexer!(
-            input: "a && b;",
+            input: "a && b",
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
                 (punct!("&&"), (2, 4)),
@@ -496,7 +491,7 @@ mod tests {
     #[test]
     fn lex_expression_or() {
         assert_lexer!(
-            input: "a || b;",
+            input: "a || b",
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
                 (punct!("||"), (2, 4)),
@@ -508,7 +503,7 @@ mod tests {
     #[test]
     fn lex_expression_coalesce() {
         assert_lexer!(
-            input: "a ?? b;",
+            input: "a ?? b",
             output: [
                 (Identifier("a".to_owned()), (0, 1)),
                 (punct!("??"), (2, 4)),
@@ -526,6 +521,7 @@ mod tests {
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("="), (15, 16)),
                 (literal!(integer, 1), (17, 18)),
+                (punct!(";"), (18, 19)),
             ]
         );
     }
@@ -533,7 +529,7 @@ mod tests {
     #[test]
     fn lex_assignment_let() {
         assert_lexer!(
-            input: "let variable = 1;",
+            input: "let variable = 1",
             output: [
                 (keyword!("let"), (0, 3)),
                 (Identifier("variable".to_owned()), (4, 12)),
@@ -546,7 +542,7 @@ mod tests {
     #[test]
     fn lex_assignment_var() {
         assert_lexer!(
-            input: "var variable = 1;",
+            input: "var variable = 1",
             output: [
                 (keyword!("var"), (0, 3)),
                 (Identifier("variable".to_owned()), (4, 12)),
@@ -559,7 +555,7 @@ mod tests {
     #[test]
     fn lex_assignment_multiply() {
         assert_lexer!(
-            input: "const variable *= 1;",
+            input: "const variable *= 1",
             output: [
                 (keyword!("const"), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
@@ -572,7 +568,7 @@ mod tests {
     #[test]
     fn lex_assignment_exponent() {
         assert_lexer!(
-            input: "const variable **= 1;",
+            input: "const variable **= 1",
             output: [
                 (keyword!("const"), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
@@ -591,6 +587,7 @@ mod tests {
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("/="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
+                (punct!(";"), (19, 20)),
             ]
         );
     }
@@ -598,7 +595,7 @@ mod tests {
     #[test]
     fn lex_assignment_mod() {
         assert_lexer!(
-            input: "const variable %= 1;",
+            input: "const variable %= 1",
             output: [
                 (keyword!("const"), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
@@ -617,6 +614,7 @@ mod tests {
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("+="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
+                (punct!(";"), (19, 20)),
             ]
         );
     }
@@ -624,7 +622,7 @@ mod tests {
     #[test]
     fn lex_assignment_subtract() {
         assert_lexer!(
-            input: "const variable -= 1;",
+            input: "const variable -= 1",
             output: [
                 (keyword!("const"), (0, 5)),
                 (Identifier("variable".to_owned()), (6, 14)),
@@ -643,6 +641,7 @@ mod tests {
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("&="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
+                (punct!(";"), (19, 20)),
             ]
         );
     }
@@ -656,6 +655,7 @@ mod tests {
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("^="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
+                (punct!(";"), (19, 20)),
             ]
         );
     }
@@ -669,6 +669,7 @@ mod tests {
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("|="), (15, 17)),
                 (literal!(integer, 1), (18, 19)),
+                (punct!(";"), (19, 20)),
             ]
         );
     }
@@ -682,6 +683,7 @@ mod tests {
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!("<<="), (15, 18)),
                 (literal!(integer, 1), (19, 20)),
+                (punct!(";"), (20, 21)),
             ]
         );
     }
@@ -695,6 +697,7 @@ mod tests {
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!(">>="), (15, 18)),
                 (literal!(integer, 1), (19, 20)),
+                (punct!(";"), (20, 21)),
             ]
         );
     }
@@ -708,6 +711,7 @@ mod tests {
                 (Identifier("variable".to_owned()), (6, 14)),
                 (punct!(">>>="), (15, 19)),
                 (literal!(integer, 1), (20, 21)),
+                (punct!(";"), (21, 22)),
             ]
         );
     }
