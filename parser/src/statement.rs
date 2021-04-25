@@ -1,5 +1,6 @@
 use crate::ast::{
-    BindingIdentifier, BindingPattern, Stmt, VariableDeclaration, VariableStmt, VariableType,
+    BindingIdentifier, BindingPattern, BindingProperty, Stmt, VariableDeclaration, VariableStmt,
+    VariableType,
 };
 use crate::Parser;
 use fajt_lexer::token::TokenValue;
@@ -29,12 +30,21 @@ impl Parser<'_> {
     }
 
     fn parse_object_property_binding(&mut self) -> BindingPattern {
-        let token = self.reader.next();
-        if matches!(token.value, punct!("}")) {
-            BindingPattern::Object(vec![])
-        } else {
-            unimplemented!();
+        let mut bindings = Vec::new();
+
+        loop {
+            let token = self.reader.next();
+
+            match token.value {
+                punct!("}") => break,
+                TokenValue::Identifier(_) => bindings.push(BindingProperty::Single(
+                    BindingIdentifier::Ident(token.try_into().unwrap()),
+                )),
+                _ => unimplemented!(),
+            }
         }
+
+        BindingPattern::Object(bindings)
     }
 }
 
@@ -42,8 +52,8 @@ impl Parser<'_> {
 mod tests {
     use crate::ast::VariableType::Var;
     use crate::ast::{
-        BindingIdentifier, BindingPattern, EmptyStmt, Ident, Program, Stmt, VariableDeclaration,
-        VariableStmt,
+        BindingIdentifier, BindingPattern, BindingProperty, EmptyStmt, Ident, Program, Stmt,
+        VariableDeclaration, VariableStmt,
     };
     use crate::{Parser, Reader};
     use fajt_lexer::Lexer;
@@ -86,6 +96,28 @@ mod tests {
                     declarations: vec![
                         VariableDeclaration {
                             identifier: BindingPattern::Object(vec![]),
+                        }
+                    ]
+                })
+            ]
+        );
+    }
+
+    #[test]
+    fn parse_var_stmt_empty_single_binding() {
+        parser_test!(
+            input: "var { a } = b;",
+            output: [
+                Stmt::VariableStmt(VariableStmt {
+                    variable_type: Var,
+                    declarations: vec![
+                        VariableDeclaration {
+                            identifier: BindingPattern::Object(vec![BindingProperty::Single(
+                                BindingIdentifier::Ident(Ident {
+                                    name: "a".to_string(),
+                                    span: (6, 7).into()
+                                })
+                            )]),
                         }
                     ]
                 })
