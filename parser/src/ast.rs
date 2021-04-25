@@ -36,7 +36,7 @@ pub struct VariableDeclaration {
     // TODO can have multiple declarations
     pub variable_type: VariableType,
     pub identifier: String, // TODO pattern
-    //pub initializer: TODO
+                            //pub initializer: TODO
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -47,7 +47,7 @@ pub enum Stmt {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct EmptyStmt {
-    span: Span
+    span: Span,
 }
 
 impl EmptyStmt {

@@ -8,7 +8,8 @@ pub trait CodePoint {
 
 impl CodePoint for char {
     fn is_ecma_whitespace(&self) -> bool {
-        matches!(self,
+        matches!(
+            self,
             // Per table in ECMA-262
             '\u{0009}' | '\u{000B}' | '\u{000C}' | '\u{0020}' | '\u{00A0}' | '\u{FEFF}' |
             // Other Zs

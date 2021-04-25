@@ -1,10 +1,10 @@
 #[macro_use]
 extern crate fajt_lexer;
 
-use fajt_lexer::Lexer;
+use crate::ast::{EmptyStmt, Program, Stmt};
 use fajt_lexer::token;
 use fajt_lexer::token::Token;
-use crate::ast::{Program, Stmt, EmptyStmt};
+use fajt_lexer::Lexer;
 
 #[cfg(test)]
 macro_rules! parser_test{
@@ -19,21 +19,18 @@ macro_rules! parser_test{
 }
 
 pub mod ast;
-mod statement;
 mod expression;
+mod statement;
 
 pub struct Reader<'a> {
     lexer: Lexer<'a>,
-    current: Token
+    current: Token,
 }
 
-impl <'a>Reader<'a> {
+impl<'a> Reader<'a> {
     pub fn new(mut lexer: Lexer<'a>) -> Self {
         let current = lexer.read().unwrap();
-        Reader {
-            lexer,
-            current,
-        }
+        Reader { lexer, current }
     }
 
     pub fn current(&self) -> &Token {
@@ -47,14 +44,12 @@ impl <'a>Reader<'a> {
 }
 
 pub struct Parser<'a> {
-    reader: Reader<'a>
+    reader: Reader<'a>,
 }
 
-impl <'a>Parser<'a> {
+impl<'a> Parser<'a> {
     pub fn new(reader: Reader<'a>) -> Self {
-        Parser {
-            reader
-        }
+        Parser { reader }
     }
 
     pub fn parse(&mut self) -> Program {
@@ -78,7 +73,7 @@ impl <'a>Parser<'a> {
             keyword!("debugger") => unimplemented!("DebuggerStatement"),
             // TODO ExpressionStatement
             // TODO LabelledStatement
-            _ => unimplemented!("Invalid statement error handling")
+            _ => unimplemented!("Invalid statement error handling"),
         }
     }
 }

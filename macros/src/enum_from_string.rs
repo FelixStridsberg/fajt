@@ -26,7 +26,9 @@ fn get_macro_name(attrs: &Vec<Attribute>) -> Option<String> {
 }
 
 fn get_macro_wrap_name(attrs: &Vec<Attribute>) -> Option<syn::Ident> {
-    let macro_attribute = attrs.iter().find(|a| a.path.is_ident("from_string_macro_wrap"));
+    let macro_attribute = attrs
+        .iter()
+        .find(|a| a.path.is_ident("from_string_macro_wrap"));
     macro_attribute.map(|a| {
         let ident: syn::Ident = a.parse_args().expect("FUCK");
         ident

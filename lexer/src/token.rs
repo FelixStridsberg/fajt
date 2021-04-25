@@ -2,7 +2,9 @@ use macros::FromString;
 
 #[macro_export]
 macro_rules! keyword_wrap {
-    ($variant:ident) => { crate::token::TokenValue::Keyword(crate::token::Keyword::$variant) }
+    ($variant:ident) => {
+        crate::token::TokenValue::Keyword(crate::token::Keyword::$variant)
+    };
 }
 
 /// When working with tokens, do not use this enum directly. Instead use the macro
@@ -87,7 +89,9 @@ pub enum Number {
 
 #[macro_export]
 macro_rules! punct_wrap {
-    ($variant:ident) => { crate::token::TokenValue::Punct(crate::token::Punct::$variant) }
+    ($variant:ident) => {
+        crate::token::TokenValue::Punct(crate::token::Punct::$variant)
+    };
 }
 
 /// When working with tokens, do not use this enum directly. Instead use the macro
@@ -239,7 +243,7 @@ macro_rules! literal(
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Literal {
-    Number(Number)
+    Number(Number),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -258,10 +262,7 @@ pub struct Span {
 
 impl From<(usize, usize)> for Span {
     fn from((start, end): (usize, usize)) -> Self {
-        Span {
-            start,
-            end,
-        }
+        Span { start, end }
     }
 }
 

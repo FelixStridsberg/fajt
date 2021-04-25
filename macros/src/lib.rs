@@ -63,7 +63,10 @@ use enum_from_string::enum_from_string;
 ///     ...
 /// }
 /// ```
-#[proc_macro_derive(FromString, attributes(from_string, from_string_macro, from_string_macro_wrap))]
+#[proc_macro_derive(
+    FromString,
+    attributes(from_string, from_string_macro, from_string_macro_wrap)
+)]
 pub fn enum_from_string_derive(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 

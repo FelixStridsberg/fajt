@@ -179,7 +179,7 @@ impl<'a> Lexer<'a> {
                         self.reader.consume()?;
                         Ok(punct!(">>="))
                     }
-                    _ => Ok(punct!(">>"))
+                    _ => Ok(punct!(">>")),
                 }
             }
             '0'..='9' => self.read_number_literal(),
@@ -227,7 +227,9 @@ impl<'a> Lexer<'a> {
     }
 
     fn read_identifier_or_keyword(&mut self) -> Result<TokenValue> {
-        let word = self.reader.read_until(|c| char::is_part_of_identifier(&c))?;
+        let word = self
+            .reader
+            .read_until(|c| char::is_part_of_identifier(&c))?;
         let value = if let Ok(keyword) = word.parse() {
             TokenValue::Keyword(keyword)
         } else {
@@ -241,12 +243,10 @@ impl<'a> Lexer<'a> {
 #[cfg(test)]
 mod tests {
     use crate::token::Base::Binary;
+    use crate::token::Literal::Number;
     use crate::token::Number::Integer;
-    use crate::token::Literal::{Number};
     use crate::token::Token;
-    use crate::token::TokenValue::{
-        Identifier, Literal
-    };
+    use crate::token::TokenValue::{Identifier, Literal};
     use crate::Lexer;
 
     macro_rules! assert_lexer {

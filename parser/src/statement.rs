@@ -1,5 +1,5 @@
-use crate::Parser;
 use crate::ast::{Stmt, VariableDeclaration, VariableType};
+use crate::Parser;
 use fajt_lexer::token::TokenValue;
 
 impl Parser<'_> {
@@ -8,7 +8,7 @@ impl Parser<'_> {
         if let TokenValue::Identifier(name) = &tok.value {
             Stmt::VariableDeclaration(VariableDeclaration {
                 variable_type: VariableType::Var,
-                identifier: name.to_owned()
+                identifier: name.to_owned(),
             })
         } else {
             unimplemented!()
@@ -18,10 +18,10 @@ impl Parser<'_> {
 
 #[cfg(test)]
 mod tests {
+    use crate::ast::VariableType::Var;
+    use crate::ast::{EmptyStmt, Program, Stmt, VariableDeclaration};
     use crate::{Parser, Reader};
     use fajt_lexer::Lexer;
-    use crate::ast::{Program, Stmt, EmptyStmt, VariableDeclaration};
-    use crate::ast::VariableType::Var;
 
     #[test]
     fn parse_empty_statement() {

@@ -1,6 +1,6 @@
+use crate::token::Span;
 use std::fmt::Formatter;
 use std::{error, fmt};
-use crate::token::Span;
 
 #[derive(Debug, PartialEq)]
 pub struct Error {
@@ -28,7 +28,9 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match &self.kind {
             ErrorKind::EndOfFile => write!(f, "End of file reached."),
-            ErrorKind::InvalidOrUnexpectedToken(p) => write!(f, "Invalid or unexpected token at {}:{}", p.start, p.end),
+            ErrorKind::InvalidOrUnexpectedToken(p) => {
+                write!(f, "Invalid or unexpected token at {}:{}", p.start, p.end)
+            }
         }
     }
 }
