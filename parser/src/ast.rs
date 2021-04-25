@@ -1,4 +1,5 @@
-use fajt_lexer::token::Span;
+use fajt_lexer::token::{Span, Token, TokenValue};
+use std::convert::TryFrom;
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum ModuleItem {}
@@ -25,6 +26,26 @@ impl Program {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
+pub struct Ident {
+    pub span: Span,
+    pub name: String,
+}
+
+impl TryFrom<&Token> for Ident {
+    type Error = ();
+
+    fn try_from(token: &Token) -> Result<Self, Self::Error> {
+        match &token.value {
+            TokenValue::Identifier(name) => Ok(Ident {
+                span: token.location.clone(),
+                name: name.clone(),
+            }),
+            _ => Err(()),
+        }
+    }
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
 pub enum VariableType {
     Const,
     Let,
@@ -32,17 +53,17 @@ pub enum VariableType {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct VariableDeclaration {
+pub struct VariableStmt {
     // TODO can have multiple declarations
     pub variable_type: VariableType,
-    pub identifier: String, // TODO pattern
-                            //pub initializer: TODO
+    pub identifier: Ident, // TODO supports other than identifiers
+                           //pub initializer: TODO
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Stmt {
     Empty(EmptyStmt),
-    VariableDeclaration(VariableDeclaration),
+    VariableStmt(VariableStmt),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
