@@ -60,12 +60,20 @@ pub enum BindingIdentifier {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub enum ObjectBinding {}
+pub enum BindingProperty {
+    Single(BindingIdentifier), // TODO this can have Initializer as well
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct ObjectBinding {
+    bindings: Vec<BindingProperty>,
+    // TODO rest name
+}
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum BindingPattern {
     Ident(BindingIdentifier),
-    Object(ObjectBinding),
+    Object(Vec<BindingProperty>),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]

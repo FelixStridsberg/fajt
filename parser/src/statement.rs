@@ -2,28 +2,38 @@ use crate::ast::{
     BindingIdentifier, BindingPattern, Stmt, VariableDeclaration, VariableStmt, VariableType,
 };
 use crate::Parser;
-use fajt_lexer::token::{Token, TokenValue};
+use fajt_lexer::token::TokenValue;
 use std::convert::TryInto;
 
 impl Parser<'_> {
     pub(super) fn parse_variable_statement(&mut self, variable_type: VariableType) -> Stmt {
-        let token = self.reader.next();
-        if let TokenValue::Identifier(name) = &token.value {
-            Stmt::VariableStmt(VariableStmt {
-                variable_type,
-                declarations: vec![self.parse_variable_declaration()],
-            })
-        } else {
-            unimplemented!()
-        }
+        Stmt::VariableStmt(VariableStmt {
+            variable_type,
+            declarations: vec![self.parse_variable_declaration()],
+        })
     }
 
     fn parse_variable_declaration(&mut self) -> VariableDeclaration {
-        let token = self.reader.current();
-        VariableDeclaration {
-            identifier: BindingPattern::Ident(BindingIdentifier::Ident(
+        let token = self.reader.next();
+
+        let identifier = match &token.value {
+            TokenValue::Identifier(_) => BindingPattern::Ident(BindingIdentifier::Ident(
                 token.try_into().expect("Expected identifier"),
             )),
+            punct!("{") => self.parse_object_property_binding(),
+            punct!("[") => unimplemented!("Array binding"),
+            _ => unimplemented!(),
+        };
+
+        VariableDeclaration { identifier }
+    }
+
+    fn parse_object_property_binding(&mut self) -> BindingPattern {
+        let token = self.reader.next();
+        if matches!(token.value, punct!("}")) {
+            BindingPattern::Object(vec![])
+        } else {
+            unimplemented!();
         }
     }
 }
@@ -75,10 +85,7 @@ mod tests {
                     variable_type: Var,
                     declarations: vec![
                         VariableDeclaration {
-                            identifier: BindingPattern::Ident(BindingIdentifier::Ident(Ident {
-                                span: (4, 7).into(),
-                                name: "foo".to_string()
-                            })),
+                            identifier: BindingPattern::Object(vec![]),
                         }
                     ]
                 })
