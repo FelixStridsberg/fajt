@@ -1,18 +1,25 @@
-use crate::ast::{BindingPattern, Stmt, VariableStmt, VariableType};
+use crate::ast::{BindingPattern, Stmt, VariableDeclaration, VariableStmt, VariableType};
 use crate::Parser;
-use fajt_lexer::token::TokenValue;
+use fajt_lexer::token::{Token, TokenValue};
 use std::convert::TryInto;
 
 impl Parser<'_> {
-    pub(super) fn parse_variable_statement(&mut self) -> Stmt {
-        let tok = self.reader.next();
-        if let TokenValue::Identifier(name) = &tok.value {
+    pub(super) fn parse_variable_statement(&mut self, variable_type: VariableType) -> Stmt {
+        let token = self.reader.next();
+        if let TokenValue::Identifier(name) = &token.value {
             Stmt::VariableStmt(VariableStmt {
-                variable_type: VariableType::Var,
-                identifier: BindingPattern::Ident(tok.try_into().expect("Expected identifier")),
+                variable_type,
+                declarations: vec![self.parse_variable_declaration()],
             })
         } else {
             unimplemented!()
+        }
+    }
+
+    fn parse_variable_declaration(&mut self) -> VariableDeclaration {
+        let token = self.reader.current();
+        VariableDeclaration {
+            identifier: BindingPattern::Ident(token.try_into().expect("Expected identifier")),
         }
     }
 }
@@ -20,7 +27,9 @@ impl Parser<'_> {
 #[cfg(test)]
 mod tests {
     use crate::ast::VariableType::Var;
-    use crate::ast::{BindingPattern, EmptyStmt, Ident, Program, Stmt, VariableStmt};
+    use crate::ast::{
+        BindingPattern, EmptyStmt, Ident, Program, Stmt, VariableDeclaration, VariableStmt,
+    };
     use crate::{Parser, Reader};
     use fajt_lexer::Lexer;
 
@@ -38,11 +47,15 @@ mod tests {
             input: "var foo = 1;",
             output: [
                 Stmt::VariableStmt(VariableStmt {
-                    identifier: BindingPattern::Ident(Ident {
-                        span: (4, 7).into(),
-                        name: "foo".to_string()
-                    }),
                     variable_type: Var,
+                    declarations: vec![
+                        VariableDeclaration {
+                            identifier: BindingPattern::Ident(Ident {
+                                span: (4, 7).into(),
+                                name: "foo".to_string()
+                            }),
+                        }
+                    ]
                 })
             ]
         );
@@ -54,11 +67,15 @@ mod tests {
             input: "var {} = 1;",
             output: [
                 Stmt::VariableStmt(VariableStmt {
-                    identifier: BindingPattern::Ident(Ident {
-                        span: (4, 7).into(),
-                        name: "foo".to_string()
-                    }),
                     variable_type: Var,
+                    declarations: vec![
+                        VariableDeclaration {
+                            identifier: BindingPattern::Ident(Ident {
+                                span: (4, 7).into(),
+                                name: "foo".to_string()
+                            }),
+                        }
+                    ]
                 })
             ]
         );

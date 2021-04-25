@@ -58,11 +58,16 @@ pub enum BindingPattern {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
+pub struct VariableDeclaration {
+    pub identifier: BindingPattern,
+    //pub initializer: TODO
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
 pub struct VariableStmt {
     // TODO can have multiple declarations
     pub variable_type: VariableType,
-    pub identifier: BindingPattern, // TODO supports other than identifiers
-                                    //pub initializer: TODO
+    pub declarations: Vec<VariableDeclaration>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
