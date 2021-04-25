@@ -13,8 +13,8 @@ use enum_from_string::enum_from_string;
 /// It can also generate a macro for translating strings to enum variants.
 ///
 /// Example:
-/// ```no_run
-/// #[derive(FromString)]
+/// ```ignore
+/// #[derive(Eq, Debug, FromString)]
 /// #[from_string_macro("animal")]
 /// enum Animal {
 ///     Horse,
@@ -24,8 +24,8 @@ use enum_from_string::enum_from_string;
 /// }
 ///
 /// // Runtime
-/// assert_eq!("horse".parse(), Animal::Horse);
-/// assert_eq!("piggy".parse(), Animal::Pig);
+/// assert_eq!("horse".parse().unwrap(), Animal::Horse);
+/// assert_eq!("piggy".parse().unwrap(), Animal::Pig);
 ///
 /// // Compile time
 /// assert_eq!(animal!("horse"), Animal::Horse);
@@ -40,14 +40,14 @@ use enum_from_string::enum_from_string;
 /// from_string_macro_wrap allows to call a custom macro around each variant.
 ///
 /// Example usage:
-/// ```no_run
+/// ```ignore
 ///
 /// // Example macro to make `animal!("horse")` work everywhere without importing Animal first.
 /// macro_rules! wrap_animal {
 ///     ($variant:ident) => { crate::animal::Animal::$ident }
 /// }
 ///
-/// #[derive(FromString)]
+/// #[derive(Eq, Debug, FromString)]
 /// #[from_string_macro("animal")]
 /// #[from_string_macro_wrap(wrap_animal)]
 /// enum Animal {
