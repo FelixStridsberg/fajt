@@ -53,8 +53,19 @@ pub enum VariableType {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub enum BindingPattern {
+pub enum BindingIdentifier {
     Ident(Ident),
+    Yield,
+    Await,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub enum ObjectBinding {}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub enum BindingPattern {
+    Ident(BindingIdentifier),
+    Object(ObjectBinding),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]

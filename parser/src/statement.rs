@@ -1,4 +1,6 @@
-use crate::ast::{BindingPattern, Stmt, VariableDeclaration, VariableStmt, VariableType};
+use crate::ast::{
+    BindingIdentifier, BindingPattern, Stmt, VariableDeclaration, VariableStmt, VariableType,
+};
 use crate::Parser;
 use fajt_lexer::token::{Token, TokenValue};
 use std::convert::TryInto;
@@ -19,7 +21,9 @@ impl Parser<'_> {
     fn parse_variable_declaration(&mut self) -> VariableDeclaration {
         let token = self.reader.current();
         VariableDeclaration {
-            identifier: BindingPattern::Ident(token.try_into().expect("Expected identifier")),
+            identifier: BindingPattern::Ident(BindingIdentifier::Ident(
+                token.try_into().expect("Expected identifier"),
+            )),
         }
     }
 }
@@ -28,7 +32,8 @@ impl Parser<'_> {
 mod tests {
     use crate::ast::VariableType::Var;
     use crate::ast::{
-        BindingPattern, EmptyStmt, Ident, Program, Stmt, VariableDeclaration, VariableStmt,
+        BindingIdentifier, BindingPattern, EmptyStmt, Ident, Program, Stmt, VariableDeclaration,
+        VariableStmt,
     };
     use crate::{Parser, Reader};
     use fajt_lexer::Lexer;
@@ -50,10 +55,10 @@ mod tests {
                     variable_type: Var,
                     declarations: vec![
                         VariableDeclaration {
-                            identifier: BindingPattern::Ident(Ident {
+                            identifier: BindingPattern::Ident(BindingIdentifier::Ident(Ident {
                                 span: (4, 7).into(),
                                 name: "foo".to_string()
-                            }),
+                            })),
                         }
                     ]
                 })
@@ -70,10 +75,10 @@ mod tests {
                     variable_type: Var,
                     declarations: vec![
                         VariableDeclaration {
-                            identifier: BindingPattern::Ident(Ident {
+                            identifier: BindingPattern::Ident(BindingIdentifier::Ident(Ident {
                                 span: (4, 7).into(),
                                 name: "foo".to_string()
-                            }),
+                            })),
                         }
                     ]
                 })
