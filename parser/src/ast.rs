@@ -1,30 +1,48 @@
 use fajt_lexer::token::Span;
-use crate::ast::ProgramType::Script;
 
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]
-pub enum ProgramType {
-    Script,
-    Module,
+#[derive(Debug, PartialOrd, PartialEq)]
+pub enum ModuleItem {}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct Body<T> {
+    span: Span,
+    body: Vec<T>,
 }
 
-#[derive(Debug, PartialEq)]
-pub struct Program {
-    program_type: ProgramType,
-    body: Vec<Stmt>,
+#[derive(Debug, PartialOrd, PartialEq)]
+pub enum Program {
+    Script(Body<Stmt>),
+    Module(Body<ModuleItem>),
 }
 
 impl Program {
     pub fn from_body(body: Vec<Stmt>) -> Self {
-        Program {
-            program_type: Script, // TODO check body
-            body
-        }
+        Program::Script(Body {
+            span: (0, 0).into(),
+            body,
+        })
     }
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
+pub enum VariableType {
+    Const,
+    Let,
+    Var,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct VariableDeclaration {
+    // TODO can have multiple declarations
+    pub variable_type: VariableType,
+    pub identifier: String, // TODO pattern
+    //pub initializer: TODO
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
 pub enum Stmt {
-    Empty(EmptyStmt)
+    Empty(EmptyStmt),
+    VariableDeclaration(VariableDeclaration),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
