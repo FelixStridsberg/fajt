@@ -53,11 +53,16 @@ pub enum VariableType {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
+pub enum BindingPattern {
+    Ident(Ident),
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
 pub struct VariableStmt {
     // TODO can have multiple declarations
     pub variable_type: VariableType,
-    pub identifier: Ident, // TODO supports other than identifiers
-                           //pub initializer: TODO
+    pub identifier: BindingPattern, // TODO supports other than identifiers
+                                    //pub initializer: TODO
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
