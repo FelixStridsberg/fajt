@@ -6,6 +6,18 @@ use fajt_lexer::token;
 use fajt_lexer::token::Token;
 use crate::ast::{Program, Stmt, EmptyStmt};
 
+#[cfg(test)]
+macro_rules! parser_test{
+    (input: $input:literal, output:[$($output:expr),*]) => {
+        let lexer = Lexer::new(&$input).unwrap();
+        let reader = Reader::new(lexer);
+        let mut parser = Parser::new(reader);
+        let program = parser.parse();
+
+        assert_eq!(program, Program::from_body(vec![$($output),*]))
+    }
+}
+
 pub mod ast;
 mod statement;
 mod expression;
@@ -68,45 +80,5 @@ impl <'a>Parser<'a> {
             // TODO LabelledStatement
             _ => unimplemented!("Invalid statement error handling")
         }
-    }
-}
-
-macro_rules! parser_test{
-    (input: $input:literal, output:[$($output:expr),*]) => {
-        let lexer = Lexer::new(&$input).unwrap();
-        let reader = Reader::new(lexer);
-        let mut parser = Parser::new(reader);
-        let program = parser.parse();
-
-        assert_eq!(program, Program::from_body(vec![$($output),*]))
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::{Parser, Reader};
-    use fajt_lexer::Lexer;
-    use crate::ast::{Program, Stmt, EmptyStmt, VariableDeclaration};
-    use crate::ast::VariableType::Var;
-
-    #[test]
-    fn parse_empty_statement() {
-        parser_test!(
-            input: ";",
-            output: [Stmt::Empty(EmptyStmt::new((0, 1).into()))]
-        );
-    }
-
-    #[test]
-    fn parse_var_statement() {
-        parser_test!(
-            input: ";",
-            output: [
-                Stmt::VariableDeclaration(VariableDeclaration {
-                    identifier: "foo".to_owned(),
-                    variable_type: Var,
-                })
-            ]
-        );
     }
 }

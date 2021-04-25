@@ -15,3 +15,32 @@ impl Parser<'_> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{Parser, Reader};
+    use fajt_lexer::Lexer;
+    use crate::ast::{Program, Stmt, EmptyStmt, VariableDeclaration};
+    use crate::ast::VariableType::Var;
+
+    #[test]
+    fn parse_empty_statement() {
+        parser_test!(
+            input: ";",
+            output: [Stmt::Empty(EmptyStmt::new((0, 1).into()))]
+        );
+    }
+
+    #[test]
+    fn parse_var_statement() {
+        parser_test!(
+            input: ";",
+            output: [
+                Stmt::VariableDeclaration(VariableDeclaration {
+                    identifier: "foo".to_owned(),
+                    variable_type: Var,
+                })
+            ]
+        );
+    }
+}
