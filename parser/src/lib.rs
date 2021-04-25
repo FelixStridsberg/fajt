@@ -3,11 +3,12 @@ extern crate fajt_lexer;
 
 use fajt_lexer::Lexer;
 use fajt_lexer::token;
-use fajt_lexer::token::{Token, TokenValue};
-use crate::ast::{Program, Stmt, EmptyStmt, VariableDeclaration, VariableType};
+use fajt_lexer::token::Token;
+use crate::ast::{Program, Stmt, EmptyStmt};
 
 pub mod ast;
 mod statement;
+mod expression;
 
 pub struct Reader<'a> {
     lexer: Lexer<'a>,
@@ -68,17 +69,16 @@ impl <'a>Parser<'a> {
             _ => unimplemented!("Invalid statement error handling")
         }
     }
+}
 
-    fn parse_variable_statement(&mut self) -> Stmt {
-         let tok = self.reader.next();
-        if let TokenValue::Identifier(name) = &tok.value {
-            Stmt::VariableDeclaration(VariableDeclaration {
-                variable_type: VariableType::Var,
-                identifier: name.to_owned()
-            })
-        } else {
-            unimplemented!()
-        }
+macro_rules! parser_test{
+    (input: $input:literal, output:[$($output:expr),*]) => {
+        let lexer = Lexer::new(&$input).unwrap();
+        let reader = Reader::new(lexer);
+        let mut parser = Parser::new(reader);
+        let program = parser.parse();
+
+        assert_eq!(program, Program::from_body(vec![$($output),*]))
     }
 }
 
@@ -91,26 +91,22 @@ mod tests {
 
     #[test]
     fn parse_empty_statement() {
-        let input = ";";
-        let lexer = Lexer::new(&input).unwrap();
-        let reader = Reader::new(lexer);
-        let mut parser = Parser::new(reader);
-        let program = parser.parse();
-
-        assert_eq!(program, Program::from_body(vec![Stmt::Empty(EmptyStmt::new((0, 1).into()))]))
+        parser_test!(
+            input: ";",
+            output: [Stmt::Empty(EmptyStmt::new((0, 1).into()))]
+        );
     }
 
     #[test]
     fn parse_var_statement() {
-        let input = "var foo = 1;";
-        let lexer = Lexer::new(&input).unwrap();
-        let reader = Reader::new(lexer);
-        let mut parser = Parser::new(reader);
-        let program = parser.parse();
-
-        assert_eq!(program, Program::from_body(vec![Stmt::VariableDeclaration(VariableDeclaration {
-            identifier: "foo".to_owned(),
-            variable_type: Var,
-        })]))
+        parser_test!(
+            input: ";",
+            output: [
+                Stmt::VariableDeclaration(VariableDeclaration {
+                    identifier: "foo".to_owned(),
+                    variable_type: Var,
+                })
+            ]
+        );
     }
 }

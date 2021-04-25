@@ -55,3 +55,6 @@ impl EmptyStmt {
         EmptyStmt { span }
     }
 }
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub enum Expr {}
