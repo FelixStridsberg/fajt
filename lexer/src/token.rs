@@ -1,6 +1,4 @@
 use macros::FromString;
-use std::fmt::{Display, Formatter};
-use std::fmt;
 
 #[macro_export]
 macro_rules! keyword_wrap {

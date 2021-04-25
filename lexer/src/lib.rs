@@ -9,7 +9,7 @@ pub mod token;
 
 use crate::code_point::CodePoint;
 use crate::error::Error;
-use crate::error::ErrorKind::{EndOfFile, InvalidOrUnexpectedToken};
+use crate::error::ErrorKind::EndOfFile;
 use crate::reader::Reader;
 use crate::token::Base::{Binary, Decimal, Hex, Octal};
 use crate::token::Token;
@@ -24,8 +24,7 @@ pub struct Lexer<'a> {
 impl<'a> Lexer<'a> {
     pub fn new(data: &'a str) -> Result<Self> {
         let reader = Reader::new(data)?;
-        let mut lexer = Lexer { reader };
-        Ok(lexer)
+        Ok(Lexer { reader })
     }
 
     fn skip_whitespaces(&mut self) -> Result<usize> {
@@ -245,13 +244,10 @@ mod tests {
     use crate::token::Number::Integer;
     use crate::token::Literal::{Number};
     use crate::token::Token;
-    use crate::token::TokenValue;
     use crate::token::TokenValue::{
         Identifier, Literal
     };
     use crate::Lexer;
-    use crate::error::Error;
-    use crate::error::ErrorKind::InvalidOrUnexpectedToken;
 
     macro_rules! assert_lexer {
         (input: $input:expr, output: [$(($token:expr, ($col1:expr, $col2:expr)),)*]) => {
@@ -299,36 +295,12 @@ mod tests {
     }
 
     #[test]
-    fn lex_invalid_octal_digit() {
-        assert_lexer!(
-            input: "0o087",
-            error: Error::of(InvalidOrUnexpectedToken((0, 3).into()))
-        );
-    }
-
-    #[test]
     fn lex_number_binary() {
         assert_lexer!(
             input: "0b10111100",
             output: [
                 (Literal(Number(Integer(0b10111100, Binary))), (0, 10)),
             ]
-        );
-    }
-
-    #[test]
-    fn lex_invalid_hex_start() {
-        assert_lexer!(
-            input: "1x4488",
-            error: Error::of(InvalidOrUnexpectedToken((0, 1).into()))
-        );
-    }
-
-    #[test]
-    fn lex_invalid_hex_digit() {
-        assert_lexer!(
-            input: "0x01fq",
-            error: Error::of(InvalidOrUnexpectedToken((0, 5).into()))
         );
     }
 

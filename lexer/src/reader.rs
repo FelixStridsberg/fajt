@@ -1,7 +1,6 @@
 use crate::error::Error;
 use crate::error::ErrorKind::EndOfFile;
 use std::str::CharIndices;
-use crate::token::Span;
 
 type Result<T> = std::result::Result<T, Error>;
 
@@ -49,7 +48,7 @@ impl<'a> Reader<'a> {
         if self.end_of_file {
             Err(Error::of(EndOfFile))
         } else {
-            self.next();
+            let _ = self.next();
             Ok(())
         }
     }
