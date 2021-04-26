@@ -37,6 +37,13 @@ macro_rules! consume {
         $self.reader.consume()?;
         Ok($produce)
     }};
+    ($self:ident, peek: $peek:literal ? $product1:expr ; $product2:expr) => {{
+        if $self.reader.peek() == Some($peek) {
+            consume!($self, 2, $product1)
+        } else {
+            consume!($self, 1, $product2)
+        }
+    }};
 }
 
 impl<'a> Lexer<'a> {
@@ -85,11 +92,8 @@ impl<'a> Lexer<'a> {
 
         let start = self.reader.position();
         let value = match current {
-            '=' if self.reader.peek() != Some('=') => {
-                self.reader.consume()?;
-                Ok(punct!("="))
-            }
-            // TokenValue::Punct with operator: <op>=
+            '=' if self.reader.peek() != Some('=') => consume!(self, 1, punct!("=")),
+            // <op>=
             '/' | '*' | '%' | '+' | '-' | '|' | '^' | '&' if self.reader.peek() == Some('=') => {
                 match current {
                     '/' => consume!(self, 2, punct!("/=")),
@@ -103,78 +107,43 @@ impl<'a> Lexer<'a> {
                     _ => unreachable!(),
                 }
             }
-            '+' => {
-                // TODO check for ++, this can be unary as well
-                consume!(self, 1, punct!("+"))
-            }
-            '-' => {
-                // TODO check for --, this can be unary as well
-                consume!(self, 1, punct!("-"))
-            }
-            '*' => match self.reader.peek() {
-                Some('*') => {
-                    self.reader.consume()?;
-                    if self.reader.peek() == Some('=') {
-                        consume!(self, 2, punct!("**="))
-                    } else {
-                        consume!(self, 1, punct!("**"))
-                    }
-                }
-                _ => consume!(self, 1, punct!("*")),
-            },
-            '/' => {
-                // TODO handle comment //
-                consume!(self, 1, punct!("/"))
-            }
-            '&' => {
-                if self.reader.peek() == Some('&') {
-                    consume!(self, 2, punct!("&&"))
-                } else {
-                    consume!(self, 1, punct!("&"))
-                }
-            }
-            '|' => {
-                if self.reader.peek() == Some('|') {
-                    consume!(self, 2, punct!("||"))
-                } else {
-                    consume!(self, 1, punct!("|"))
-                }
-            }
-            '?' if self.reader.peek() == Some('?') => {
-                consume!(self, 2, punct!("??"))
-            }
-            '<' if self.reader.peek() == Some('<') => {
-                self.reader.consume()?;
-
-                if self.reader.peek() == Some('=') {
-                    consume!(self, 2, punct!("<<="))
-                } else {
-                    consume!(self, 1, punct!("<<"))
-                }
-            }
-            '>' if self.reader.peek() == Some('>') => {
-                self.reader.consume()?;
-
-                match self.reader.peek() {
-                    Some('>') => {
-                        self.reader.consume()?;
-                        if self.reader.peek() == Some('=') {
-                            consume!(self, 2, punct!(">>>="))
-                        } else {
-                            consume!(self, 1, punct!(">>>"))
-                        }
-                    }
-                    Some('=') => consume!(self, 2, punct!(">>=")),
-                    _ => consume!(self, 1, punct!(">>")),
-                }
-            }
-            '0'..='9' => self.read_number_literal(),
             '^' => consume!(self, 1, punct!("^")),
             '%' => consume!(self, 1, punct!("%")),
             ';' => consume!(self, 1, punct!(";")),
             '{' => consume!(self, 1, punct!("{")),
             '}' => consume!(self, 1, punct!("}")),
             ',' => consume!(self, 1, punct!(",")),
+            '&' => consume!(self, peek: '&' ? punct!("&&") ; punct!("&")),
+            '|' => consume!(self, peek: '|' ? punct!("||") ; punct!("|")),
+            '?' => consume!(self, peek: '?' ? punct!("??") ; punct!("?")),
+            '+' => consume!(self, peek: '+' ? punct!("++") ; punct!("+")),
+            '-' => consume!(self, peek: '-' ? punct!("--") ; punct!("-")),
+            '*' => {
+                if self.reader.peek() == Some('*') {
+                    self.reader.consume()?;
+                    consume!(self, peek: '=' ? punct!("**=") ; punct!("**"))
+                } else {
+                    consume!(self, 1, punct!("*"))
+                }
+            }
+            // TODO handle comments (//, /*)
+            '/' => consume!(self, 1, punct!("/")),
+            '<' if self.reader.peek() == Some('<') => {
+                self.reader.consume()?;
+                consume!(self, peek: '=' ? punct!("<<=") ; punct!("<<"))
+            }
+            '>' if self.reader.peek() == Some('>') => {
+                self.reader.consume()?;
+                match self.reader.peek() {
+                    Some('>') => {
+                        self.reader.consume()?;
+                        consume!(self, peek: '=' ? punct!(">>>=") ; punct!(">>>"))
+                    }
+                    Some('=') => consume!(self, 2, punct!(">>=")),
+                    _ => consume!(self, 1, punct!(">>")),
+                }
+            }
+            '0'..='9' => self.read_number_literal(),
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             c => unimplemented!("Unimplemented: {}", c),
         }?;
