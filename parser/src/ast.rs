@@ -2,9 +2,6 @@ use fajt_lexer::token::{Span, Token, TokenValue};
 use std::convert::TryFrom;
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub enum ModuleItem {}
-
-#[derive(Debug, PartialOrd, PartialEq)]
 pub struct Body<T> {
     span: Span,
     body: Vec<T>,
@@ -24,6 +21,9 @@ impl Program {
         })
     }
 }
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub enum ModuleItem {}
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Ident {
