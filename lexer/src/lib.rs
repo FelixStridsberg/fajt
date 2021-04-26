@@ -195,6 +195,10 @@ impl<'a> Lexer<'a> {
                 self.reader.consume()?;
                 Ok(punct!("}"))
             }
+            ',' => {
+                self.reader.consume()?;
+                Ok(punct!(","))
+            }
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             c => unimplemented!("Unimplemented: {}", c),
         }?;

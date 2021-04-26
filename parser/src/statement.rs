@@ -37,6 +37,7 @@ impl Parser<'_> {
 
             match token.value {
                 punct!("}") => break,
+                punct!(",") => {} // TODO verify correct placement of comma
                 TokenValue::Identifier(_) => bindings.push(BindingProperty::Single(
                     BindingIdentifier::Ident(token.try_into().unwrap()),
                 )),
@@ -118,6 +119,32 @@ mod tests {
                                     span: (6, 7).into()
                                 })
                             )]),
+                        }
+                    ]
+                })
+            ]
+        );
+    }
+
+    #[test]
+    fn parse_var_stmt_empty_multiple_binding() {
+        parser_test!(
+            input: "var { a, b } = c;",
+            output: [
+                Stmt::VariableStmt(VariableStmt {
+                    variable_type: Var,
+                    declarations: vec![
+                        VariableDeclaration {
+                            identifier: BindingPattern::Object(vec![
+                                BindingProperty::Single(BindingIdentifier::Ident(Ident {
+                                    name: "a".to_string(),
+                                    span: (6, 7).into()
+                                })),
+                                BindingProperty::Single(BindingIdentifier::Ident(Ident {
+                                    name: "b".to_string(),
+                                    span: (9, 10).into()
+                                }))
+                            ]),
                         }
                     ]
                 })
