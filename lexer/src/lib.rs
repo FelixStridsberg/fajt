@@ -15,13 +15,22 @@ use crate::token::Base::{Binary, Decimal, Hex, Octal};
 use crate::token::Token;
 use crate::token::TokenValue;
 
-type Result<T> = std::result::Result<T, Error>;
-
-pub struct Lexer<'a> {
-    reader: Reader<'a>,
-}
-
-macro_rules! consume {
+/// Consume code points from lexer to produce data.
+///
+/// Consume and produce syntax:
+/// ```ignore
+/// produce!(self, 1, punct!("/"))   // Consumes 1, produces token `/`
+/// produce!(self, 2, punct!("/="))  // Consumes 2, produces token `/=`
+/// produce!(self, 3, punct!("**=")) // Consumes 3, produces token `**=`
+/// ```
+///
+/// Conditional produce syntax:
+/// ```ignore
+/// // If a peek at next code point matches '&' consume 2 and produce `&&`
+/// // ... otherwise consume 1 and produce `&`
+/// produce!(self, peek: '&' ? punct!("&&") ; punct!("&"))
+/// ```
+macro_rules! produce {
     ($self:ident, 1, $produce:expr) => {{
         $self.reader.consume()?;
         Ok($produce)
@@ -39,11 +48,17 @@ macro_rules! consume {
     }};
     ($self:ident, peek: $peek:literal ? $product1:expr ; $product2:expr) => {{
         if $self.reader.peek() == Some($peek) {
-            consume!($self, 2, $product1)
+            produce!($self, 2, $product1)
         } else {
-            consume!($self, 1, $product2)
+            produce!($self, 1, $product2)
         }
     }};
+}
+
+type Result<T> = std::result::Result<T, Error>;
+
+pub struct Lexer<'a> {
+    reader: Reader<'a>,
 }
 
 impl<'a> Lexer<'a> {
@@ -92,55 +107,55 @@ impl<'a> Lexer<'a> {
 
         let start = self.reader.position();
         let value = match current {
-            '=' if self.reader.peek() != Some('=') => consume!(self, 1, punct!("=")),
+            '=' if self.reader.peek() != Some('=') => produce!(self, 1, punct!("=")),
             // <op>=
             '/' | '*' | '%' | '+' | '-' | '|' | '^' | '&' if self.reader.peek() == Some('=') => {
                 match current {
-                    '/' => consume!(self, 2, punct!("/=")),
-                    '*' => consume!(self, 2, punct!("*=")),
-                    '%' => consume!(self, 2, punct!("%=")),
-                    '+' => consume!(self, 2, punct!("+=")),
-                    '-' => consume!(self, 2, punct!("-=")),
-                    '|' => consume!(self, 2, punct!("|=")),
-                    '^' => consume!(self, 2, punct!("^=")),
-                    '&' => consume!(self, 2, punct!("&=")),
+                    '/' => produce!(self, 2, punct!("/=")),
+                    '*' => produce!(self, 2, punct!("*=")),
+                    '%' => produce!(self, 2, punct!("%=")),
+                    '+' => produce!(self, 2, punct!("+=")),
+                    '-' => produce!(self, 2, punct!("-=")),
+                    '|' => produce!(self, 2, punct!("|=")),
+                    '^' => produce!(self, 2, punct!("^=")),
+                    '&' => produce!(self, 2, punct!("&=")),
                     _ => unreachable!(),
                 }
             }
-            '^' => consume!(self, 1, punct!("^")),
-            '%' => consume!(self, 1, punct!("%")),
-            ';' => consume!(self, 1, punct!(";")),
-            '{' => consume!(self, 1, punct!("{")),
-            '}' => consume!(self, 1, punct!("}")),
-            ',' => consume!(self, 1, punct!(",")),
-            '&' => consume!(self, peek: '&' ? punct!("&&") ; punct!("&")),
-            '|' => consume!(self, peek: '|' ? punct!("||") ; punct!("|")),
-            '?' => consume!(self, peek: '?' ? punct!("??") ; punct!("?")),
-            '+' => consume!(self, peek: '+' ? punct!("++") ; punct!("+")),
-            '-' => consume!(self, peek: '-' ? punct!("--") ; punct!("-")),
+            '^' => produce!(self, 1, punct!("^")),
+            '%' => produce!(self, 1, punct!("%")),
+            ';' => produce!(self, 1, punct!(";")),
+            '{' => produce!(self, 1, punct!("{")),
+            '}' => produce!(self, 1, punct!("}")),
+            ',' => produce!(self, 1, punct!(",")),
+            '&' => produce!(self, peek: '&' ? punct!("&&") ; punct!("&")),
+            '|' => produce!(self, peek: '|' ? punct!("||") ; punct!("|")),
+            '?' => produce!(self, peek: '?' ? punct!("??") ; punct!("?")),
+            '+' => produce!(self, peek: '+' ? punct!("++") ; punct!("+")),
+            '-' => produce!(self, peek: '-' ? punct!("--") ; punct!("-")),
             '*' => {
                 if self.reader.peek() == Some('*') {
                     self.reader.consume()?;
-                    consume!(self, peek: '=' ? punct!("**=") ; punct!("**"))
+                    produce!(self, peek: '=' ? punct!("**=") ; punct!("**"))
                 } else {
-                    consume!(self, 1, punct!("*"))
+                    produce!(self, 1, punct!("*"))
                 }
             }
             // TODO handle comments (//, /*)
-            '/' => consume!(self, 1, punct!("/")),
+            '/' => produce!(self, 1, punct!("/")),
             '<' if self.reader.peek() == Some('<') => {
                 self.reader.consume()?;
-                consume!(self, peek: '=' ? punct!("<<=") ; punct!("<<"))
+                produce!(self, peek: '=' ? punct!("<<=") ; punct!("<<"))
             }
             '>' if self.reader.peek() == Some('>') => {
                 self.reader.consume()?;
                 match self.reader.peek() {
                     Some('>') => {
                         self.reader.consume()?;
-                        consume!(self, peek: '=' ? punct!(">>>=") ; punct!(">>>"))
+                        produce!(self, peek: '=' ? punct!(">>>=") ; punct!(">>>"))
                     }
-                    Some('=') => consume!(self, 2, punct!(">>=")),
-                    _ => consume!(self, 1, punct!(">>")),
+                    Some('=') => produce!(self, 2, punct!(">>=")),
+                    _ => produce!(self, 1, punct!(">>")),
                 }
             }
             '0'..='9' => self.read_number_literal(),
