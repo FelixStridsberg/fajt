@@ -224,6 +224,9 @@ macro_rules! literal(
     (octal, $value:expr) => {
         literal!(number, crate::token::Base::Octal, $value)
     };
+    (binary, $value:expr) => {
+        literal!(number, crate::token::Base::Binary, $value)
+    };
     (number, $type:expr, $value:expr) => {
         crate::token::TokenValue::Literal(
             crate::token::Literal::Number(
