@@ -34,38 +34,31 @@ use enum_from_string::enum_from_string;
 ///
 /// Note: The module using the macro must import the enum, it does not use full path.
 ///       I.e. it resolves to `Animal::Horse` and not `crate::animal::Animal::Horse`,
-///       have not found a way to do that yet. See Wrap macro below for workaround.
+///       have not found a way to do that yet. See Custom macro rules for workaround.
 ///
-/// # Wrap macro
-/// from_string_macro_wrap allows to call a custom macro around each variant.
+/// # Custom macro rules
+/// from_string_macro_rules allows to add custom rules to the macro.
+/// Note: All generated branches always calls it self, so if you add custom rules one of them
+///       must accept a variant. Example: `($variant:ident) => { $variant }`
 ///
 /// Example usage:
 /// ```ignore
-///
-/// // Example macro to make `animal!("horse")` work everywhere without importing Animal first.
-/// macro_rules! wrap_animal {
-///     ($variant:ident) => { crate::animal::Animal::$ident }
-/// }
-///
 /// #[derive(Eq, Debug, FromString)]
 /// #[from_string_macro("animal")]
-/// #[from_string_macro_wrap(wrap_animal)]
+/// #[from_string_macro_rules(
+///     ($variant:ident) => {
+///         crate::animal::Animal::$variant
+///     };
+/// )]
 /// enum Animal {
 ///     Horse,
 ///     Cow,
 ///     Pig,
 /// }
-///
-/// // Output will be equivalent to the following:
-/// macro_rules! animal {
-///     ("horse") => { wrap_animal!(Horse) };
-///     ("cow") => { wrap_animal!(Cow) };
-///     ...
-/// }
 /// ```
 #[proc_macro_derive(
     FromString,
-    attributes(from_string, from_string_macro, from_string_macro_wrap)
+    attributes(from_string, from_string_macro, from_string_macro_rules)
 )]
 pub fn enum_from_string_derive(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);

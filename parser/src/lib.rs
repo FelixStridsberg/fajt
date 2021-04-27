@@ -1,7 +1,8 @@
-#[macro_use]
 extern crate fajt_lexer;
 
 use crate::ast::{EmptyStmt, Program, Stmt, VariableType};
+use fajt_lexer::keyword;
+use fajt_lexer::punct;
 use fajt_lexer::token;
 use fajt_lexer::token::Token;
 use fajt_lexer::Lexer;

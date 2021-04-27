@@ -1,4 +1,4 @@
-use proc_macro2::{Ident, Span, TokenStream};
+use proc_macro2::{Ident, Span, TokenStream, TokenTree};
 use quote::quote;
 use syn::{Attribute, DataEnum, DeriveInput, Variant};
 
@@ -25,13 +25,26 @@ fn get_macro_name(attrs: &Vec<Attribute>) -> Option<String> {
     })
 }
 
-fn get_macro_wrap_name(attrs: &Vec<Attribute>) -> Option<syn::Ident> {
+fn get_group_content(tokens: &TokenStream) -> TokenStream {
+    tokens
+        .clone()
+        .into_iter()
+        .map(|t| match t {
+            TokenTree::Group(g) => g.stream(),
+            _ => panic!("Expected a TokenTree::Group"),
+        })
+        .collect()
+}
+
+fn get_macro_rules(attrs: &Vec<Attribute>) -> Option<TokenStream> {
     let macro_attribute = attrs
         .iter()
-        .find(|a| a.path.is_ident("from_string_macro_wrap"));
+        .find(|a| a.path.is_ident("from_string_macro_rules"));
     macro_attribute.map(|a| {
-        let ident: syn::Ident = a.parse_args().expect("FUCK");
-        ident
+        // #[from_string_macro_rules( ($item:ident) => { $ident } )]
+        //      We get all of this  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        //      but we only want the contents of the parenthesis.
+        get_group_content(&a.tokens)
     })
 }
 
@@ -52,28 +65,26 @@ fn map_variants<F: Fn(&Ident, &str) -> TokenStream>(
 }
 
 fn generate_macro(input: &DeriveInput, enum_data: &DataEnum) -> Option<TokenStream> {
-    let macro_wrap = get_macro_wrap_name(&input.attrs);
-
-    let ident = &input.ident;
     let macro_name = get_macro_name(&input.attrs);
+    let extra_rules = get_macro_rules(&input.attrs).unwrap_or_else(|| {
+        quote! {
+            ($a:ident) => { $a };
+        }
+    });
+
     macro_name.map(|name| {
         let macro_name = syn::Ident::new(&name, Span::call_site());
-        let macro_branches = map_variants(enum_data, |variant_ident, variant_string| {
-            if let Some(wrap_name) = &macro_wrap {
-                quote! {
-                    (#variant_string) => { #wrap_name!(#variant_ident) }
-                }
-            } else {
-                quote! {
-                    (#variant_string) => { #ident::#variant_ident }
-                }
+        let macro_rules = map_variants(enum_data, |variant_ident, variant_string| {
+            quote! {
+                (#variant_string) => { #macro_name!(#variant_ident) }
             }
         });
 
         quote! {
             #[macro_export]
             macro_rules! #macro_name {
-                #(#macro_branches;)*
+                #extra_rules
+                #(#macro_rules;)*
             }
         }
     })
