@@ -67,17 +67,6 @@ impl<'a> Lexer<'a> {
         Ok(Lexer { reader })
     }
 
-    fn skip_whitespaces(&mut self) -> Result<usize> {
-        let mut count = 0;
-
-        while self.reader.current().is_ecma_whitespace() {
-            count += 1;
-            self.reader.next()?;
-        }
-
-        Ok(count)
-    }
-
     pub fn read_all(&mut self) -> Result<Vec<Token>> {
         let mut tokens = Vec::new();
 
@@ -167,6 +156,19 @@ impl<'a> Lexer<'a> {
         Ok(Token::new(value, (start, end)))
     }
 
+    fn read_identifier_or_keyword(&mut self) -> Result<TokenValue> {
+        let word = self
+            .reader
+            .read_until(|c| char::is_part_of_identifier(&c))?;
+        let value = if let Ok(keyword) = word.parse() {
+            TokenValue::Keyword(keyword)
+        } else {
+            TokenValue::Identifier(word)
+        };
+
+        Ok(value)
+    }
+
     fn read_number_literal(&mut self) -> Result<TokenValue> {
         let current = self.reader.current();
         let (base, number) = match self.reader.peek() {
@@ -198,17 +200,15 @@ impl<'a> Lexer<'a> {
         Ok(i64::from_str_radix(&number_str, base).unwrap())
     }
 
-    fn read_identifier_or_keyword(&mut self) -> Result<TokenValue> {
-        let word = self
-            .reader
-            .read_until(|c| char::is_part_of_identifier(&c))?;
-        let value = if let Ok(keyword) = word.parse() {
-            TokenValue::Keyword(keyword)
-        } else {
-            TokenValue::Identifier(word)
-        };
+    fn skip_whitespaces(&mut self) -> Result<usize> {
+        let mut count = 0;
 
-        Ok(value)
+        while self.reader.current().is_ecma_whitespace() {
+            count += 1;
+            self.reader.next()?;
+        }
+
+        Ok(count)
     }
 }
 
