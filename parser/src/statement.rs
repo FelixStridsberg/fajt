@@ -75,9 +75,7 @@ mod tests {
             output: [
                 Stmt::VariableStmt(
                     VariableStmt::new(Var, vec![
-                        VariableDeclaration {
-                            identifier: BindingPattern::ident("foo", (4, 7))
-                        }
+                        VariableDeclaration::new(Ident::new("foo", (4, 7)))
                     ])
                 )
             ]
@@ -92,9 +90,7 @@ mod tests {
                 Stmt::VariableStmt(VariableStmt {
                     variable_type: Var,
                     declarations: vec![
-                        VariableDeclaration {
-                            identifier: BindingPattern::Object(vec![]),
-                        }
+                        VariableDeclaration::new(BindingPattern::Object(vec![])),
                     ]
                 })
             ]
@@ -109,13 +105,9 @@ mod tests {
                 Stmt::VariableStmt(VariableStmt {
                     variable_type: Var,
                     declarations: vec![
-                        VariableDeclaration {
-                            identifier: BindingPattern::Object(vec![
-                                BindingProperty::Single(
-                                    BindingIdentifier::ident("a", (6, 7))
-                                )
-                            ]),
-                        }
+                        VariableDeclaration::new(BindingPattern::Object(vec![
+                            Ident::new("a", (6, 7)).into()
+                        ])),
                     ]
                 })
             ]
@@ -130,14 +122,8 @@ mod tests {
                 Stmt::VariableStmt(VariableStmt::new(Var, vec![
                         VariableDeclaration {
                             identifier: BindingPattern::Object(vec![
-                                BindingProperty::Single(BindingIdentifier::Ident(Ident {
-                                    name: "a".to_string(),
-                                    span: (6, 7).into()
-                                })),
-                                BindingProperty::Single(BindingIdentifier::Ident(Ident {
-                                    name: "b".to_string(),
-                                    span: (9, 10).into()
-                                }))
+                                Ident::new("a", (6, 7)).into(),
+                                Ident::new("b", (9, 10)).into(),
                             ]),
                         }
                     ]

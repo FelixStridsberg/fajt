@@ -1,5 +1,6 @@
 use fajt_lexer::token::{Span, Token, TokenValue};
 use std::convert::TryFrom;
+use std::process::id;
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Body<T> {
@@ -58,6 +59,24 @@ impl TryFrom<&Token> for Ident {
     }
 }
 
+impl From<Ident> for BindingIdentifier {
+    fn from(ident: Ident) -> Self {
+        Self::Ident(ident)
+    }
+}
+
+impl From<Ident> for BindingProperty {
+    fn from(ident: Ident) -> Self {
+        Self::Single(BindingIdentifier::Ident(ident))
+    }
+}
+
+impl From<Ident> for BindingPattern {
+    fn from(ident: Ident) -> Self {
+        Self::Ident(BindingIdentifier::Ident(ident))
+    }
+}
+
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum VariableType {
     Const,
@@ -72,13 +91,9 @@ pub enum BindingIdentifier {
     Await,
 }
 
-impl BindingIdentifier {
-    pub fn ident<N, S>(name: N, span: S) -> Self
-        where
-            N: Into<String>,
-            S: Into<Span>,
-    {
-        Self::Ident(Ident::new(name, span))
+impl Into<BindingProperty> for BindingIdentifier {
+    fn into(self) -> BindingProperty {
+        BindingProperty::Single(self)
     }
 }
 
@@ -99,22 +114,18 @@ pub enum BindingPattern {
     Object(Vec<BindingProperty>),
 }
 
-impl BindingPattern {
-    pub fn ident<N, S>(name: N, span: S) -> Self
-        where
-            N: Into<String>,
-            S: Into<Span>,
-    {
-        Self::Ident(
-            BindingIdentifier::ident(name, span)
-        )
-    }
-}
-
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct VariableDeclaration {
     pub identifier: BindingPattern,
     //pub initializer: TODO
+}
+
+impl VariableDeclaration {
+    pub fn new<I: Into<BindingPattern>>(identifier: I) -> Self {
+        VariableDeclaration {
+            identifier: identifier.into(),
+        }
+    }
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
