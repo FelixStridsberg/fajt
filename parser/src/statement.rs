@@ -73,17 +73,13 @@ mod tests {
         parser_test!(
             input: "var foo = 1;",
             output: [
-                Stmt::VariableStmt(VariableStmt {
-                    variable_type: Var,
-                    declarations: vec![
+                Stmt::VariableStmt(
+                    VariableStmt::new(Var, vec![
                         VariableDeclaration {
-                            identifier: BindingPattern::Ident(BindingIdentifier::Ident(Ident {
-                                span: (4, 7).into(),
-                                name: "foo".to_string()
-                            })),
+                            identifier: BindingPattern::ident("foo", (4, 7))
                         }
-                    ]
-                })
+                    ])
+                )
             ]
         );
     }
@@ -114,12 +110,11 @@ mod tests {
                     variable_type: Var,
                     declarations: vec![
                         VariableDeclaration {
-                            identifier: BindingPattern::Object(vec![BindingProperty::Single(
-                                BindingIdentifier::Ident(Ident {
-                                    name: "a".to_string(),
-                                    span: (6, 7).into()
-                                })
-                            )]),
+                            identifier: BindingPattern::Object(vec![
+                                BindingProperty::Single(
+                                    BindingIdentifier::ident("a", (6, 7))
+                                )
+                            ]),
                         }
                     ]
                 })
@@ -132,9 +127,7 @@ mod tests {
         parser_test!(
             input: "var { a, b } = c;",
             output: [
-                Stmt::VariableStmt(VariableStmt {
-                    variable_type: Var,
-                    declarations: vec![
+                Stmt::VariableStmt(VariableStmt::new(Var, vec![
                         VariableDeclaration {
                             identifier: BindingPattern::Object(vec![
                                 BindingProperty::Single(BindingIdentifier::Ident(Ident {
@@ -148,7 +141,7 @@ mod tests {
                             ]),
                         }
                     ]
-                })
+                ))
             ]
         );
     }

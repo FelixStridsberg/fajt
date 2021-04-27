@@ -31,6 +31,19 @@ pub struct Ident {
     pub name: String,
 }
 
+impl Ident {
+    pub fn new<N, S>(name: N, span: S) -> Self
+    where
+        N: Into<String>,
+        S: Into<Span>,
+    {
+        Ident {
+            name: name.into(),
+            span: span.into(),
+        }
+    }
+}
+
 impl TryFrom<&Token> for Ident {
     type Error = ();
 
@@ -59,6 +72,16 @@ pub enum BindingIdentifier {
     Await,
 }
 
+impl BindingIdentifier {
+    pub fn ident<N, S>(name: N, span: S) -> Self
+        where
+            N: Into<String>,
+            S: Into<Span>,
+    {
+        Self::Ident(Ident::new(name, span))
+    }
+}
+
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum BindingProperty {
     Single(BindingIdentifier), // TODO this can have Initializer as well
@@ -76,6 +99,18 @@ pub enum BindingPattern {
     Object(Vec<BindingProperty>),
 }
 
+impl BindingPattern {
+    pub fn ident<N, S>(name: N, span: S) -> Self
+        where
+            N: Into<String>,
+            S: Into<Span>,
+    {
+        Self::Ident(
+            BindingIdentifier::ident(name, span)
+        )
+    }
+}
+
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct VariableDeclaration {
     pub identifier: BindingPattern,
@@ -87,6 +122,15 @@ pub struct VariableStmt {
     // TODO can have multiple declarations
     pub variable_type: VariableType,
     pub declarations: Vec<VariableDeclaration>,
+}
+
+impl VariableStmt {
+    pub fn new(variable_type: VariableType, declarations: Vec<VariableDeclaration>) -> Self {
+        VariableStmt {
+            variable_type,
+            declarations,
+        }
+    }
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
