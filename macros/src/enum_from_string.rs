@@ -60,7 +60,7 @@ fn generate_macro(input: &DeriveInput, enum_data: &DataEnum) -> Option<TokenStre
     })
 }
 
-fn get_macro_name(attrs: &Vec<Attribute>) -> Option<String> {
+fn get_macro_name(attrs: &[Attribute]) -> Option<String> {
     let macro_attribute = attrs.iter().find(|a| a.path.is_ident("from_string_macro"));
     macro_attribute.map(|a| {
         let string_literal: syn::LitStr = a
@@ -70,7 +70,7 @@ fn get_macro_name(attrs: &Vec<Attribute>) -> Option<String> {
     })
 }
 
-fn get_macro_rules(attrs: &Vec<Attribute>) -> Option<TokenStream> {
+fn get_macro_rules(attrs: &[Attribute]) -> Option<TokenStream> {
     let macro_attribute = attrs
         .iter()
         .find(|a| a.path.is_ident("from_string_macro_rules"));
