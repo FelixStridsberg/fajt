@@ -113,5 +113,5 @@ pub enum ObjectBindingProp {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ArrayBinding {
-    pub elements: Vec<Option<BindingPattern>>
+    pub elements: Vec<Option<BindingPattern>>,
 }

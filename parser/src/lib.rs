@@ -7,18 +7,6 @@ use fajt_lexer::token;
 use fajt_lexer::token::Token;
 use fajt_lexer::Lexer;
 
-#[cfg(test)]
-macro_rules! parser_test{
-    (input: $input:literal, output:[$($output:expr),*]) => {
-        let lexer = Lexer::new(&$input).unwrap();
-        let reader = Reader::new(lexer);
-        let mut parser = Parser::new(reader);
-        let program = parser.parse();
-
-        assert_eq!(program, Program::from_body(vec![$($output),*]))
-    }
-}
-
 pub mod ast;
 mod expression;
 mod statement;
