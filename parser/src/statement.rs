@@ -1,6 +1,6 @@
 use crate::ast::{
-    BindingIdentifier, BindingPattern, ObjectBindingProp, Stmt, VariableDeclaration, VariableStmt,
-    VariableType,
+    BindingIdentifier, BindingPattern, ObjectBindingProp, Stmt, VariableDeclaration, VariableKind,
+    VariableStmt,
 };
 use crate::Parser;
 use fajt_lexer::punct;
@@ -8,11 +8,8 @@ use fajt_lexer::token::TokenValue;
 use std::convert::TryInto;
 
 impl Parser<'_> {
-    pub(super) fn parse_variable_statement(&mut self, variable_type: VariableType) -> Stmt {
-        Stmt::VariableStmt(VariableStmt {
-            variable_type,
-            declarations: vec![self.parse_variable_declaration()],
-        })
+    pub(super) fn parse_variable_statement(&mut self, variable_type: VariableKind) -> Stmt {
+        VariableStmt::new(variable_type, vec![self.parse_variable_declaration()]).into()
     }
 
     fn parse_variable_declaration(&mut self) -> VariableDeclaration {

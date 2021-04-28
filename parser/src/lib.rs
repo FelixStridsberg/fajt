@@ -1,6 +1,6 @@
 extern crate fajt_lexer;
 
-use crate::ast::{EmptyStmt, Program, Stmt, VariableType};
+use crate::ast::{EmptyStmt, Program, Stmt, VariableKind};
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token;
@@ -50,7 +50,7 @@ impl<'a> Parser<'a> {
         match self.reader.current.value {
             punct!(";") => Stmt::Empty(EmptyStmt::new(self.reader.current.location.clone())),
             punct!("{") => unimplemented!("BlockStatement"),
-            keyword!("var") => self.parse_variable_statement(VariableType::Var),
+            keyword!("var") => self.parse_variable_statement(VariableKind::Var),
             keyword!("if") => unimplemented!("IfStatement"),
             keyword!("break") => unimplemented!("BreakStatement"),
             keyword!("continue") => unimplemented!("ContinueStatement"),

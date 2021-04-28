@@ -33,7 +33,7 @@ impl EmptyStmt {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct VariableStmt {
     // TODO can have multiple declarations
-    pub variable_type: VariableType,
+    pub kind: VariableKind,
     pub declarations: Vec<VariableDeclaration>,
 }
 
@@ -52,16 +52,13 @@ impl VariableDeclaration {
 }
 
 impl VariableStmt {
-    pub fn new(variable_type: VariableType, declarations: Vec<VariableDeclaration>) -> Self {
-        VariableStmt {
-            variable_type,
-            declarations,
-        }
+    pub fn new(kind: VariableKind, declarations: Vec<VariableDeclaration>) -> Self {
+        VariableStmt { kind, declarations }
     }
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub enum VariableType {
+pub enum VariableKind {
     Const,
     Let,
     Var,
