@@ -110,6 +110,12 @@ pub struct ObjectBinding {
     pub props: Vec<ObjectBindingProp>,
 }
 
+impl ObjectBinding {
+    pub fn new(props: Vec<ObjectBindingProp>) -> Self {
+        Self { props }
+    }
+}
+
 impl From<Vec<ObjectBindingProp>> for ObjectBinding {
     fn from(props: Vec<ObjectBindingProp>) -> Self {
         Self { props }
