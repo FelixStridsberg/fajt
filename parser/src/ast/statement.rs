@@ -7,6 +7,18 @@ pub enum Stmt {
     VariableStmt(VariableStmt),
 }
 
+impl From<EmptyStmt> for Stmt {
+    fn from(stmt: EmptyStmt) -> Self {
+        Self::Empty(stmt)
+    }
+}
+
+impl From<VariableStmt> for Stmt {
+    fn from(stmt: VariableStmt) -> Self {
+        Self::VariableStmt(stmt)
+    }
+}
+
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct EmptyStmt {
     span: Span,
