@@ -10,10 +10,12 @@ use std::convert::TryInto;
 impl Parser<'_> {
     pub(super) fn parse_variable_statement(&mut self, variable_type: VariableKind) -> Stmt {
         let start = self.reader.current.location.start;
-        let declaration = self.parse_variable_declaration();
+
+        // TODO parse all declarations
+        let declarations = vec![self.parse_variable_declaration()];
         let end = self.reader.current.location.end;
 
-        VariableStmt::new(variable_type, vec![declaration], (start, end)).into()
+        VariableStmt::new(variable_type, declarations, (start, end)).into()
     }
 
     fn parse_variable_declaration(&mut self) -> VariableDeclaration {
@@ -27,6 +29,14 @@ impl Parser<'_> {
             punct!("[") => unimplemented!("Array binding"),
             _ => unimplemented!(),
         };
+
+        // TODO read initializer
+        loop {
+            self.reader.next();
+            if punct!(";") == self.reader.current.value {
+                break;
+            }
+        }
 
         VariableDeclaration { identifier }
     }

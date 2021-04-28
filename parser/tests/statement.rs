@@ -18,7 +18,7 @@ fn parse_var_statement() {
         output: [
             VariableStmt::new(Var, vec![
                 VariableDeclaration::new(Ident::new("foo", (4, 7)))
-            ], (0, 7 /* TODO wrong */)).into()
+            ], (0, 12)).into()
         ]
     );
 }
@@ -30,7 +30,7 @@ fn parse_var_stmt_empty_obj_binding() {
         output: [
             VariableStmt::new(Var, vec![
                 VariableDeclaration::new(BindingPattern::Object(ObjectBinding::new(vec![]))),
-            ], (0, 6 /* TODO wrong */)).into()
+            ], (0, 11)).into()
         ]
     );
 }
@@ -44,7 +44,7 @@ fn parse_var_stmt_empty_single_binding() {
                 VariableDeclaration::new(ObjectBinding::new(vec![
                     Ident::new("a", (6, 7)).into()
                 ])),
-            ], (0, 9 /* TODO wrong */)).into()
+            ], (0, 14)).into()
         ]
     );
 }
@@ -59,7 +59,7 @@ fn parse_var_stmt_empty_multiple_binding() {
                     Ident::new("a", (6, 7)).into(),
                     Ident::new("b", (9, 10)).into(),
                 ]))
-            ], (0, 12 /* TODO wrong */)).into()
+            ], (0, 17)).into()
         ]
     );
 }
