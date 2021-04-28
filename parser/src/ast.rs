@@ -1,6 +1,9 @@
+pub mod statement;
+
+pub use statement::*;
+
 use fajt_lexer::token::{Span, Token, TokenValue};
 use std::convert::TryFrom;
-use std::process::id;
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Body<T> {
@@ -56,108 +59,6 @@ impl TryFrom<&Token> for Ident {
             }),
             _ => Err(()),
         }
-    }
-}
-
-impl From<Ident> for BindingIdentifier {
-    fn from(ident: Ident) -> Self {
-        Self::Ident(ident)
-    }
-}
-
-impl From<Ident> for BindingProperty {
-    fn from(ident: Ident) -> Self {
-        Self::Single(BindingIdentifier::Ident(ident))
-    }
-}
-
-impl From<Ident> for BindingPattern {
-    fn from(ident: Ident) -> Self {
-        Self::Ident(BindingIdentifier::Ident(ident))
-    }
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum VariableType {
-    Const,
-    Let,
-    Var,
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum BindingIdentifier {
-    Ident(Ident),
-    Yield,
-    Await,
-}
-
-impl Into<BindingProperty> for BindingIdentifier {
-    fn into(self) -> BindingProperty {
-        BindingProperty::Single(self)
-    }
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum BindingProperty {
-    Single(BindingIdentifier), // TODO this can have Initializer as well
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
-pub struct ObjectBinding {
-    bindings: Vec<BindingProperty>,
-    // TODO rest name
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum BindingPattern {
-    Ident(BindingIdentifier),
-    Object(Vec<BindingProperty>),
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
-pub struct VariableDeclaration {
-    pub identifier: BindingPattern,
-    //pub initializer: TODO
-}
-
-impl VariableDeclaration {
-    pub fn new<I: Into<BindingPattern>>(identifier: I) -> Self {
-        VariableDeclaration {
-            identifier: identifier.into(),
-        }
-    }
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
-pub struct VariableStmt {
-    // TODO can have multiple declarations
-    pub variable_type: VariableType,
-    pub declarations: Vec<VariableDeclaration>,
-}
-
-impl VariableStmt {
-    pub fn new(variable_type: VariableType, declarations: Vec<VariableDeclaration>) -> Self {
-        VariableStmt {
-            variable_type,
-            declarations,
-        }
-    }
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum Stmt {
-    Empty(EmptyStmt),
-    VariableStmt(VariableStmt),
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
-pub struct EmptyStmt {
-    span: Span,
-}
-
-impl EmptyStmt {
-    pub fn new(span: Span) -> Self {
-        EmptyStmt { span }
     }
 }
 

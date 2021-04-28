@@ -39,14 +39,14 @@ impl Parser<'_> {
             match token.value {
                 punct!("}") => break,
                 punct!(",") => {} // TODO verify correct placement of comma
-                TokenValue::Identifier(_) => bindings.push(BindingProperty::Single(
+                TokenValue::Identifier(_) => bindings.push(BindingProperty::Assign(
                     BindingIdentifier::Ident(token.try_into().unwrap()),
                 )),
                 _ => unimplemented!(),
             }
         }
 
-        BindingPattern::Object(bindings)
+        bindings.into()
     }
 }
 
@@ -54,8 +54,8 @@ impl Parser<'_> {
 mod tests {
     use crate::ast::VariableType::Var;
     use crate::ast::{
-        BindingIdentifier, BindingPattern, BindingProperty, EmptyStmt, Ident, Program, Stmt,
-        VariableDeclaration, VariableStmt,
+        BindingPattern, EmptyStmt, Ident, ObjectBinding, Program, Stmt, VariableDeclaration,
+        VariableStmt,
     };
     use crate::{Parser, Reader};
     use fajt_lexer::Lexer;
@@ -90,7 +90,7 @@ mod tests {
                 Stmt::VariableStmt(VariableStmt {
                     variable_type: Var,
                     declarations: vec![
-                        VariableDeclaration::new(BindingPattern::Object(vec![])),
+                        VariableDeclaration::new(BindingPattern::Object(ObjectBinding { props: vec![] })),
                     ]
                 })
             ]
@@ -105,9 +105,11 @@ mod tests {
                 Stmt::VariableStmt(VariableStmt {
                     variable_type: Var,
                     declarations: vec![
-                        VariableDeclaration::new(BindingPattern::Object(vec![
-                            Ident::new("a", (6, 7)).into()
-                        ])),
+                        VariableDeclaration::new(BindingPattern::Object(ObjectBinding {
+                            props: vec![
+                                Ident::new("a", (6, 7)).into()
+                            ]
+                        })),
                     ]
                 })
             ]
@@ -121,10 +123,12 @@ mod tests {
             output: [
                 Stmt::VariableStmt(VariableStmt::new(Var, vec![
                         VariableDeclaration {
-                            identifier: BindingPattern::Object(vec![
+                            identifier: BindingPattern::Object(ObjectBinding {
+                                props: vec![
                                 Ident::new("a", (6, 7)).into(),
                                 Ident::new("b", (9, 10)).into(),
-                            ]),
+                                ]
+                            }),
                         }
                     ]
                 ))
