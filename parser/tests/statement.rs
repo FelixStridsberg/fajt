@@ -1,6 +1,6 @@
 mod lib;
 
-use fajt_parser::ast::VariableType::*;
+use fajt_parser::ast::VariableKind::*;
 use fajt_parser::ast::*;
 
 #[test]
@@ -18,7 +18,7 @@ fn parse_var_statement() {
         output: [
             VariableStmt::new(Var, vec![
                 VariableDeclaration::new(Ident::new("foo", (4, 7)))
-            ]).into()
+            ], (0, 7 /* TODO wrong */)).into()
         ]
     );
 }
@@ -30,7 +30,7 @@ fn parse_var_stmt_empty_obj_binding() {
         output: [
             VariableStmt::new(Var, vec![
                 VariableDeclaration::new(BindingPattern::Object(ObjectBinding::new(vec![]))),
-            ]).into()
+            ], (0, 6 /* TODO wrong */)).into()
         ]
     );
 }
@@ -44,7 +44,7 @@ fn parse_var_stmt_empty_single_binding() {
                 VariableDeclaration::new(ObjectBinding::new(vec![
                     Ident::new("a", (6, 7)).into()
                 ])),
-            ]).into()
+            ], (0, 9 /* TODO wrong */)).into()
         ]
     );
 }
@@ -55,12 +55,11 @@ fn parse_var_stmt_empty_multiple_binding() {
         input: "var { a, b } = c;",
         output: [
             VariableStmt::new(Var, vec![
-                    VariableDeclaration::new(ObjectBinding::new(vec![
-                        Ident::new("a", (6, 7)).into(),
-                        Ident::new("b", (9, 10)).into(),
-                    ]))
-                ]
-            ).into()
+                VariableDeclaration::new(ObjectBinding::new(vec![
+                    Ident::new("a", (6, 7)).into(),
+                    Ident::new("b", (9, 10)).into(),
+                ]))
+            ], (0, 12 /* TODO wrong */)).into()
         ]
     );
 }

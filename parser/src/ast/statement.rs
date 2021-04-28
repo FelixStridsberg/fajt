@@ -32,7 +32,7 @@ impl EmptyStmt {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct VariableStmt {
-    // TODO can have multiple declarations
+    pub span: Span,
     pub kind: VariableKind,
     pub declarations: Vec<VariableDeclaration>,
 }
@@ -52,8 +52,15 @@ impl VariableDeclaration {
 }
 
 impl VariableStmt {
-    pub fn new(kind: VariableKind, declarations: Vec<VariableDeclaration>) -> Self {
-        VariableStmt { kind, declarations }
+    pub fn new<S>(kind: VariableKind, declarations: Vec<VariableDeclaration>, span: S) -> Self
+    where
+        S: Into<Span>,
+    {
+        VariableStmt {
+            kind,
+            declarations,
+            span: span.into(),
+        }
     }
 }
 

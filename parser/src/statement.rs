@@ -9,7 +9,11 @@ use std::convert::TryInto;
 
 impl Parser<'_> {
     pub(super) fn parse_variable_statement(&mut self, variable_type: VariableKind) -> Stmt {
-        VariableStmt::new(variable_type, vec![self.parse_variable_declaration()]).into()
+        let start = self.reader.current.location.start;
+        let declaration = self.parse_variable_declaration();
+        let end = self.reader.current.location.end;
+
+        VariableStmt::new(variable_type, vec![declaration], (start, end)).into()
     }
 
     fn parse_variable_declaration(&mut self) -> VariableDeclaration {
