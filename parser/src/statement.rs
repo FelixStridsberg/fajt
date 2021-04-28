@@ -1,5 +1,5 @@
 use crate::ast::{
-    BindingIdentifier, BindingPattern, BindingProperty, Stmt, VariableDeclaration, VariableStmt,
+    BindingIdentifier, BindingPattern, ObjectBindingProp, Stmt, VariableDeclaration, VariableStmt,
     VariableType,
 };
 use crate::Parser;
@@ -39,7 +39,7 @@ impl Parser<'_> {
             match token.value {
                 punct!("}") => break,
                 punct!(",") => {} // TODO verify correct placement of comma
-                TokenValue::Identifier(_) => bindings.push(BindingProperty::Assign(
+                TokenValue::Identifier(_) => bindings.push(ObjectBindingProp::Assign(
                     BindingIdentifier::Ident(token.try_into().unwrap()),
                 )),
                 _ => unimplemented!(),
