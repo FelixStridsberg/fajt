@@ -13,7 +13,7 @@ use macros::FromString;
 /// assert_eq!(keyword!("const"), TokenValue::Keyword(Keyword::Const))
 /// # }
 /// ```
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, FromString)]
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, FromString, Clone)]
 #[from_string_macro("keyword")]
 #[from_string_macro_rules(
     ($variant:ident) => {
@@ -70,7 +70,7 @@ pub enum Keyword {
     Yield,
 }
 
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Clone)]
 pub enum Base {
     Binary,
     Decimal,
@@ -78,7 +78,7 @@ pub enum Base {
     Octal,
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
+#[derive(Debug, PartialOrd, PartialEq, Clone)]
 pub enum Number {
     Integer(i64, Base),
     Decimal(f64),
@@ -97,7 +97,7 @@ pub enum Number {
 /// assert_eq!(punct!("["), TokenValue::Punct(Punct::BraceOpen))
 /// # }
 /// ```
-#[derive(Debug, PartialOrd, PartialEq, FromString)]
+#[derive(Debug, PartialOrd, PartialEq, FromString, Clone)]
 #[from_string_macro("punct")]
 #[from_string_macro_rules(
     ($variant:ident) => {
@@ -238,12 +238,12 @@ macro_rules! literal(
     };
 );
 
-#[derive(Debug, PartialOrd, PartialEq)]
+#[derive(Debug, PartialOrd, PartialEq, Clone)]
 pub enum Literal {
     Number(Number),
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
+#[derive(Debug, PartialOrd, PartialEq, Clone)]
 pub enum TokenValue {
     Keyword(Keyword),
     Identifier(String),
@@ -263,7 +263,7 @@ impl From<(usize, usize)> for Span {
     }
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
+#[derive(Debug, PartialOrd, PartialEq, Clone)]
 pub struct Token {
     pub value: TokenValue,
     pub location: Span,

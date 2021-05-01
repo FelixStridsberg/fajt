@@ -1,44 +1,27 @@
 extern crate fajt_lexer;
 
 use crate::ast::{EmptyStmt, Program, Stmt, VariableKind};
+use crate::reader::Reader;
+use crate::error::Result;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token;
-use fajt_lexer::token::Token;
 use fajt_lexer::Lexer;
 
+pub mod error;
 pub mod ast;
 mod expression;
+mod reader;
 mod statement;
-
-pub struct Reader<'a> {
-    lexer: Lexer<'a>,
-    current: Token,
-}
-
-impl<'a> Reader<'a> {
-    pub fn new(mut lexer: Lexer<'a>) -> Self {
-        let current = lexer.read().unwrap();
-        Reader { lexer, current }
-    }
-
-    pub fn current(&self) -> &Token {
-        &self.current
-    }
-
-    pub fn next(&mut self) -> &Token {
-        self.current = self.lexer.read().unwrap(); // TODO
-        &self.current
-    }
-}
 
 pub struct Parser<'a> {
     reader: Reader<'a>,
 }
 
 impl<'a> Parser<'a> {
-    pub fn new(reader: Reader<'a>) -> Self {
-        Parser { reader }
+    pub fn new(lexer: Lexer<'a>) -> Result<Self> {
+        let reader = Reader::new(lexer)?;
+        Ok(Parser { reader })
     }
 
     pub fn parse(&mut self) -> Program {
@@ -47,8 +30,8 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_statement(&mut self) -> Stmt {
-        match self.reader.current.value {
-            punct!(";") => Stmt::Empty(EmptyStmt::new(self.reader.current.location.clone())),
+        match self.reader.current().value {
+            punct!(";") => Stmt::Empty(EmptyStmt::new(self.reader.current().location.clone())),
             punct!("{") => unimplemented!("BlockStatement"),
             keyword!("var") => self.parse_variable_statement(VariableKind::Var),
             keyword!("if") => unimplemented!("IfStatement"),
