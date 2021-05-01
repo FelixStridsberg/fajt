@@ -36,6 +36,10 @@ impl<'a> Reader<'a> {
         &self.current
     }
 
+    pub fn peek(&self) -> Option<&Token> {
+        self.next.as_ref()
+    }
+
     pub fn next(&mut self) -> Result<&Token> {
         let mut next = self.next_if_exists()?;
         mem::swap(&mut next, &mut self.next);
