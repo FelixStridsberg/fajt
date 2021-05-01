@@ -1,15 +1,15 @@
 extern crate fajt_lexer;
 
 use crate::ast::{EmptyStmt, Program, Stmt, VariableKind};
-use crate::reader::Reader;
 use crate::error::Result;
+use crate::reader::Reader;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token;
 use fajt_lexer::Lexer;
 
-pub mod error;
 pub mod ast;
+pub mod error;
 mod expression;
 mod reader;
 mod statement;

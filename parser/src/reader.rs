@@ -1,4 +1,5 @@
 use crate::error::Result;
+use core::mem;
 use fajt_lexer::token::Token;
 use fajt_lexer::Lexer;
 
@@ -33,8 +34,10 @@ impl<'a> Reader<'a> {
     }
 
     pub fn next(&mut self) -> Result<&Token> {
-        self.current = self.next.clone().unwrap(); // TODO
-        self.next = self.lexer.read().map(|v| Some(v)).unwrap_or(None); // TODO
+        let mut next = self.lexer.read().map(|v| Some(v)).unwrap_or(None); // TODO
+        mem::swap(&mut next, &mut self.next);
+
+        self.current = next.unwrap(); // TODO
         Ok(&self.current)
     }
 }
