@@ -1,5 +1,7 @@
-use crate::error::Result;
+use crate::error::ErrorKind::EndOfStream;
+use crate::error::{Error, Result};
 use core::mem;
+use fajt_lexer::error::ErrorKind::EndOfFile;
 use fajt_lexer::token::Token;
 use fajt_lexer::Lexer;
 
@@ -7,26 +9,27 @@ pub struct Reader<'a> {
     lexer: Lexer<'a>,
     current: Token,
     next: Option<Token>,
-    end_of_file: bool,
+    end: bool,
 }
 
 impl<'a> Reader<'a> {
     pub fn new(mut lexer: Lexer<'a>) -> Result<Self> {
-        let current = lexer.read().unwrap();
+        let current = lexer.read()?;
 
-        // TODO handle errors, only end of file should result in None
-        let next = lexer.read().map(|t| Some(t)).unwrap_or(None);
-
-        Ok(Reader {
+        let mut reader = Reader {
             lexer,
             current,
-            next,
-            end_of_file: false,
-        })
+            next: None,
+            end: false,
+        };
+
+        reader.next = reader.next_if_exists()?;
+
+        Ok(reader)
     }
 
-    pub fn eof(&self) -> bool {
-        self.end_of_file
+    pub fn has_next(&self) -> bool {
+        !self.end
     }
 
     pub fn current(&self) -> &Token {
@@ -34,10 +37,27 @@ impl<'a> Reader<'a> {
     }
 
     pub fn next(&mut self) -> Result<&Token> {
-        let mut next = self.lexer.read().map(|v| Some(v)).unwrap_or(None); // TODO
+        let mut next = self.next_if_exists()?;
         mem::swap(&mut next, &mut self.next);
 
-        self.current = next.unwrap(); // TODO
-        Ok(&self.current)
+        if let Some(next) = next {
+            self.current = next;
+            Ok(&self.current)
+        } else {
+            Err(Error::of(EndOfStream))
+        }
+    }
+
+    fn next_if_exists(&mut self) -> Result<Option<Token>> {
+        match self.lexer.read() {
+            Ok(token) => Ok(Some(token)),
+            Err(err) => {
+                if err.kind() == &EndOfFile {
+                    Ok(None)
+                } else {
+                    Err(err)?
+                }
+            }
+        }
     }
 }

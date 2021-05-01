@@ -1,3 +1,4 @@
+use crate::error::ErrorKind::LexerError;
 use std::fmt::Formatter;
 use std::{error, fmt};
 
@@ -35,3 +36,9 @@ impl fmt::Display for Error {
 }
 
 impl error::Error for Error {}
+
+impl From<fajt_lexer::error::Error> for Error {
+    fn from(lexer_err: fajt_lexer::error::Error) -> Self {
+        Error::of(LexerError(lexer_err))
+    }
+}
