@@ -57,15 +57,19 @@ impl Parser<'_> {
     fn parse_object_property_binding(&mut self) -> Result<BindingPattern> {
         let mut bindings = Vec::new();
 
+        let mut comma_allowed = false;
         loop {
             let token = self.reader.next().unwrap(); // TODO
 
             match token {
                 token_matches!(punct!("}")) => break,
-                token_matches!(punct!(",")) if !bindings.is_empty() => {}
-                token_matches!(@ident) => bindings.push(ObjectBindingProp::Assign(
-                    BindingIdentifier::Ident(token.try_into().unwrap()),
-                )),
+                token_matches!(punct!(",")) if comma_allowed => comma_allowed = false,
+                token_matches!(@ident) => {
+                    comma_allowed = true;
+                    bindings.push(ObjectBindingProp::Assign(
+                        BindingIdentifier::Ident(token.try_into().unwrap()),
+                    ))
+                },
                 t => return Err(Error::of(UnexpectedToken(t.clone()))),
             }
         }

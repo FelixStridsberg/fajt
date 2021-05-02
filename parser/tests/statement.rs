@@ -88,3 +88,11 @@ fn fail_var_statement_prefix_comma() {
         error: UnexpectedToken(Token::new(punct!(","), (6, 7)))
     );
 }
+
+#[test]
+fn fail_var_statement_double_comma() {
+    parser_test!(
+        input: "var { a,, b } = c;",
+        error: UnexpectedToken(Token::new(punct!(","), (8, 9)))
+    );
+}
