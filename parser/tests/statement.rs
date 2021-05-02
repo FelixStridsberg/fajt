@@ -5,7 +5,6 @@ use fajt_lexer::token;
 use fajt_lexer::token::Token;
 use fajt_parser::ast::VariableKind::*;
 use fajt_parser::ast::*;
-use fajt_parser::error::Error;
 use fajt_parser::error::ErrorKind::UnexpectedToken;
 
 #[test]
@@ -31,7 +30,7 @@ fn parse_var_statement_no_init() {
 #[test]
 fn parse_var_statement() {
     parser_test!(
-        input: "var foo = 1;",
+        input: "var foo = a;",
         output: [
             VariableStmt::new(Var, vec![
                 VariableDeclaration::new(Ident::new("foo", (4, 7)))
@@ -43,7 +42,7 @@ fn parse_var_statement() {
 #[test]
 fn parse_var_stmt_empty_obj_binding() {
     parser_test!(
-        input: "var {} = 1;",
+        input: "var {} = a;",
         output: [
             VariableStmt::new(Var, vec![
                 VariableDeclaration::new(BindingPattern::Object(ObjectBinding::new(vec![]))),

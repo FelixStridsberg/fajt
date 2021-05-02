@@ -1,5 +1,7 @@
+pub mod expression;
 pub mod statement;
 
+pub use expression::*;
 pub use statement::*;
 
 use fajt_lexer::token::{Span, Token, TokenValue};
@@ -61,6 +63,3 @@ impl TryFrom<&Token> for Ident {
         }
     }
 }
-
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum Expr {}

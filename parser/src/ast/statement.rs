@@ -1,4 +1,5 @@
 use super::Ident;
+use crate::ast::Expr;
 use fajt_lexer::token::Span;
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -40,13 +41,14 @@ pub struct VariableStmt {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct VariableDeclaration {
     pub identifier: BindingPattern,
-    //pub initializer: TODO
+    pub initializer: Option<Expr>,
 }
 
 impl VariableDeclaration {
     pub fn new<I: Into<BindingPattern>>(identifier: I) -> Self {
         VariableDeclaration {
             identifier: identifier.into(),
+            initializer: None,
         }
     }
 }

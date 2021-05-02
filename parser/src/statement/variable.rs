@@ -1,6 +1,6 @@
 use crate::ast::{
-    BindingIdentifier, BindingPattern, ObjectBindingProp, Stmt, VariableDeclaration, VariableKind,
-    VariableStmt,
+    BindingIdentifier, BindingPattern, Expr, ObjectBindingProp, Stmt, VariableDeclaration,
+    VariableKind, VariableStmt,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Error, Result};
@@ -33,25 +33,24 @@ impl Parser<'_> {
             c => unimplemented!("{:?}", c),
         };
 
+        let mut initializer = None;
         match self.reader.peek() {
-            token_matches!(opt: punct!("=")) => self.parse_variable_initializer(),
+            token_matches!(opt: punct!("=")) => {
+                initializer = Some(self.parse_variable_initializer())
+            }
             token_matches!(opt: punct!(";")) => {
                 self.reader.next().unwrap(); // TODO fix unwrap
             }
             _ => (),
         }
 
-        Ok(VariableDeclaration { identifier })
+        Ok(VariableDeclaration::new(identifier))
     }
 
-    fn parse_variable_initializer(&mut self) {
-        // TODO read initializer
-        loop {
-            self.reader.next();
-            if token_matches!(self.reader.current(), punct!(";")) {
-                break;
-            }
-        }
+    fn parse_variable_initializer(&mut self) -> Result<Expr> {
+        self.reader.next()?; // Skip =
+        self.reader.next()?; // Skip =
+        self.parse_assignment_expression()
     }
 
     fn parse_object_property_binding(&mut self) -> Result<BindingPattern> {
@@ -66,10 +65,10 @@ impl Parser<'_> {
                 token_matches!(punct!(",")) if comma_allowed => comma_allowed = false,
                 token_matches!(@ident) => {
                     comma_allowed = true;
-                    bindings.push(ObjectBindingProp::Assign(
-                        BindingIdentifier::Ident(token.try_into().unwrap()),
-                    ))
-                },
+                    bindings.push(ObjectBindingProp::Assign(BindingIdentifier::Ident(
+                        token.try_into().unwrap(),
+                    )))
+                }
                 t => return Err(Error::of(UnexpectedToken(t.clone()))),
             }
         }
