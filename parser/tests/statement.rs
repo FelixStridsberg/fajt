@@ -12,6 +12,18 @@ fn parse_empty_statement() {
 }
 
 #[test]
+fn parse_var_statement_no_init() {
+    parser_test!(
+        input: "var foo;",
+        output: [
+            VariableStmt::new(Var, vec![
+                VariableDeclaration::new(Ident::new("foo", (4, 7)))
+            ], (0, 8)).into()
+        ]
+    );
+}
+
+#[test]
 fn parse_var_statement() {
     parser_test!(
         input: "var foo = 1;",
