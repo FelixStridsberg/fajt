@@ -1,7 +1,12 @@
 mod lib;
 
+use fajt_lexer::punct;
+use fajt_lexer::token;
+use fajt_lexer::token::Token;
 use fajt_parser::ast::VariableKind::*;
 use fajt_parser::ast::*;
+use fajt_parser::error::Error;
+use fajt_parser::error::ErrorKind::UnexpectedToken;
 
 #[test]
 fn parse_empty_statement() {
@@ -80,13 +85,6 @@ fn parse_var_stmt_empty_multiple_binding() {
 fn fail_var_statement_prefix_comma() {
     parser_test!(
         input: "var { , a, b } = c;",
-        output: [
-            VariableStmt::new(Var, vec![
-                VariableDeclaration::new(ObjectBinding::new(vec![
-                    Ident::new("a", (6, 7)).into(),
-                    Ident::new("b", (9, 10)).into(),
-                ]))
-            ], (0, 17)).into()
-        ]
+        error: UnexpectedToken(Token::new(punct!(","), (6, 7)))
     );
 }

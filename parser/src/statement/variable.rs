@@ -2,6 +2,8 @@ use crate::ast::{
     BindingIdentifier, BindingPattern, ObjectBindingProp, Stmt, VariableDeclaration, VariableKind,
     VariableStmt,
 };
+use crate::error::ErrorKind::UnexpectedToken;
+use crate::error::{Error, Result};
 use crate::Parser;
 use fajt_lexer::punct;
 use fajt_lexer::token::TokenValue;
@@ -9,24 +11,24 @@ use fajt_lexer::token_matches;
 use std::convert::TryInto;
 
 impl Parser<'_> {
-    pub(crate) fn parse_variable_statement(&mut self, variable_type: VariableKind) -> Stmt {
+    pub(crate) fn parse_variable_statement(&mut self, variable_type: VariableKind) -> Result<Stmt> {
         let start = self.reader.current().location.start;
 
         // TODO parse all declarations
-        let declarations = vec![self.parse_variable_declaration()];
+        let declarations = vec![self.parse_variable_declaration()?];
         let end = self.reader.current().location.end;
 
-        VariableStmt::new(variable_type, declarations, (start, end)).into()
+        Ok(VariableStmt::new(variable_type, declarations, (start, end)).into())
     }
 
-    fn parse_variable_declaration(&mut self) -> VariableDeclaration {
+    fn parse_variable_declaration(&mut self) -> Result<VariableDeclaration> {
         let token = self.reader.next().unwrap();
 
         let identifier = match &token.value {
             TokenValue::Identifier(_) => BindingPattern::Ident(BindingIdentifier::Ident(
                 token.try_into().expect("Expected identifier"),
             )),
-            punct!("{") => self.parse_object_property_binding(),
+            punct!("{") => self.parse_object_property_binding()?,
             punct!("[") => unimplemented!("Array binding"),
             c => unimplemented!("{:?}", c),
         };
@@ -39,7 +41,7 @@ impl Parser<'_> {
             _ => (),
         }
 
-        VariableDeclaration { identifier }
+        Ok(VariableDeclaration { identifier })
     }
 
     fn parse_variable_initializer(&mut self) {
@@ -52,7 +54,7 @@ impl Parser<'_> {
         }
     }
 
-    fn parse_object_property_binding(&mut self) -> BindingPattern {
+    fn parse_object_property_binding(&mut self) -> Result<BindingPattern> {
         let mut bindings = Vec::new();
 
         loop {
@@ -60,14 +62,14 @@ impl Parser<'_> {
 
             match token {
                 token_matches!(punct!("}")) => break,
-                token_matches!(punct!(",")) if bindings.is_empty() => {},
+                token_matches!(punct!(",")) if !bindings.is_empty() => {}
                 token_matches!(@ident) => bindings.push(ObjectBindingProp::Assign(
                     BindingIdentifier::Ident(token.try_into().unwrap()),
                 )),
-                t => unimplemented!("TOKEN: {:?}", t),
+                t => return Err(Error::of(UnexpectedToken(t.clone()))),
             }
         }
 
-        bindings.into()
+        Ok(bindings.into())
     }
 }

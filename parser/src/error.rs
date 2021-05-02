@@ -24,6 +24,7 @@ impl Error {
 pub enum ErrorKind {
     EndOfStream,
     LexerError(fajt_lexer::error::Error),
+    UnexpectedToken(fajt_lexer::token::Token),
 }
 
 impl fmt::Display for Error {
@@ -31,6 +32,7 @@ impl fmt::Display for Error {
         match &self.kind {
             ErrorKind::EndOfStream => write!(f, "End of file reached."),
             ErrorKind::LexerError(e) => write!(f, "Lexer error '{}'", e),
+            ErrorKind::UnexpectedToken(t) => write!(f, "Unexpected token: {:?}", t),
         }
     }
 }
