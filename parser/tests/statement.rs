@@ -75,3 +75,18 @@ fn parse_var_stmt_empty_multiple_binding() {
         ]
     );
 }
+
+#[test]
+fn fail_var_statement_prefix_comma() {
+    parser_test!(
+        input: "var { , a, b } = c;",
+        output: [
+            VariableStmt::new(Var, vec![
+                VariableDeclaration::new(ObjectBinding::new(vec![
+                    Ident::new("a", (6, 7)).into(),
+                    Ident::new("b", (9, 10)).into(),
+                ]))
+            ], (0, 17)).into()
+        ]
+    );
+}

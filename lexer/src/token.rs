@@ -3,9 +3,18 @@ use macros::FromString;
 #[macro_export]
 macro_rules! token_matches {
     ($token:expr, $value:pat) => {
-        matches!($token, Some(crate::token::Token { value: $value, .. }));
+        matches!($token, crate::token::Token { value: $value, .. });
     };
     ($value:pat) => {
+        crate::token::Token { value: $value, .. }
+    };
+    (@ident) => {
+        token_matches!(crate::token::TokenValue::Identifier(_))
+    };
+    ($token:expr, opt: $value:pat) => {
+        matches!($token, Some(crate::token::Token { value: $value, .. }));
+    };
+    (opt: $value:pat) => {
         Some(crate::token::Token { value: $value, .. })
     };
 }

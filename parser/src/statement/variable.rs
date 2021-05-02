@@ -20,9 +20,7 @@ impl Parser<'_> {
     }
 
     fn parse_variable_declaration(&mut self) -> VariableDeclaration {
-        println!("TOKEN: {:?}", self.reader.current());
         let token = self.reader.next().unwrap();
-        println!("TOKEN: {:?}", token);
 
         let identifier = match &token.value {
             TokenValue::Identifier(_) => BindingPattern::Ident(BindingIdentifier::Ident(
@@ -34,8 +32,8 @@ impl Parser<'_> {
         };
 
         match self.reader.peek() {
-            token_matches!(punct!("=")) => self.parse_variable_initializer(),
-            token_matches!(punct!(";")) => {
+            token_matches!(opt: punct!("=")) => self.parse_variable_initializer(),
+            token_matches!(opt: punct!(";")) => {
                 self.reader.next().unwrap(); // TODO fix unwrap
             }
             _ => (),
@@ -48,7 +46,7 @@ impl Parser<'_> {
         // TODO read initializer
         loop {
             self.reader.next();
-            if punct!(";") == self.reader.current().value {
+            if token_matches!(self.reader.current(), punct!(";")) {
                 break;
             }
         }
@@ -60,13 +58,13 @@ impl Parser<'_> {
         loop {
             let token = self.reader.next().unwrap(); // TODO
 
-            match token.value {
-                punct!("}") => break,
-                punct!(",") => {} // TODO verify correct placement of comma
-                TokenValue::Identifier(_) => bindings.push(ObjectBindingProp::Assign(
+            match token {
+                token_matches!(punct!("}")) => break,
+                token_matches!(punct!(",")) if bindings.is_empty() => {},
+                token_matches!(@ident) => bindings.push(ObjectBindingProp::Assign(
                     BindingIdentifier::Ident(token.try_into().unwrap()),
                 )),
-                _ => unimplemented!(),
+                t => unimplemented!("TOKEN: {:?}", t),
             }
         }
 
