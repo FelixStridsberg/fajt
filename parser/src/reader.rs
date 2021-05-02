@@ -40,6 +40,14 @@ impl<'a> Reader<'a> {
         self.next.as_ref()
     }
 
+    /// Consumes the current token.
+    /// TODO revisit if this is the correct approach. Is only peek and next better?
+    /// TODO if this should be used, should it return ownership of Token?
+    pub fn consume(&mut self) -> Result<()> {
+        let _ = self.next();
+        Ok(())
+    }
+
     pub fn next(&mut self) -> Result<&Token> {
         let mut next = self.next_if_exists()?;
         mem::swap(&mut next, &mut self.next);
