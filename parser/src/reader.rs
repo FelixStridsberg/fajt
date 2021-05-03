@@ -13,25 +13,29 @@ pub struct Reader<'a> {
 }
 
 impl<'a> Reader<'a> {
+    /// Returns an instance of a Reader.
+    /// Returns error if lexer returns error (other than eof) when reading first 2 tokens.
     pub fn new(mut lexer: Lexer<'a>) -> Result<Self> {
-        let current = lexer.read()?;
-
         let mut reader = Reader {
             lexer,
-            current: Some(current),
+            current: None,
             next: None,
             location: 0,
         };
 
+        reader.current = reader.next_if_exists()?;
         reader.next = reader.next_if_exists()?;
 
         Ok(reader)
     }
 
+    /// Location of the current token, or location of end of stream if there is no tokens left.
     pub fn location(&self) -> usize {
         self.location
     }
 
+    /// Returns reference to the current token.
+    /// Calling this function after the stream has been fully consumed results in EndOfStream error.
     pub fn current(&self) -> Result<&Token> {
         if let Some(current) = self.current.as_ref() {
             Ok(current)
@@ -40,7 +44,14 @@ impl<'a> Reader<'a> {
         }
     }
 
-    /// Consumes the current token.
+    /// Peek at the token that will become current after next consume.
+    pub fn peek(&self) -> Option<&Token> {
+        self.next.as_ref()
+    }
+
+    /// Returns the current token and reads a new one from the lexer.
+    /// Reading passed the end of lexer stream results in EndOfStream
+    /// Any errors in the lexer while reading will also result in an error.
     pub fn consume(&mut self) -> Result<Token> {
         let mut next = self.next_if_exists()?;
         mem::swap(&mut next, &mut self.next);
