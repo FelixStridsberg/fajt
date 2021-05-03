@@ -33,7 +33,11 @@ impl<'a> Reader<'a> {
     }
 
     pub fn current(&self) -> Result<&Token> {
-        Ok(self.current.as_ref().unwrap())
+        if let Some(current) = self.current.as_ref() {
+            Ok(current)
+        } else {
+            Err(Error::of(EndOfStream))
+        }
     }
 
     /// Consumes the current token.
