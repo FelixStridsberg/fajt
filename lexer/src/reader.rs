@@ -6,7 +6,7 @@ type Result<T> = std::result::Result<T, Error>;
 
 pub struct Reader<'a> {
     iter: CharIndices<'a>,
-    current: (usize, char),
+    current: Option<(usize, char)>,
     next: Option<(usize, char)>,
     position: usize,
     end_of_file: bool,
@@ -15,7 +15,7 @@ pub struct Reader<'a> {
 impl<'a> Reader<'a> {
     pub fn new(input: &'a str) -> Result<Self> {
         let mut iter = input.char_indices();
-        let current = iter.next().ok_or_else(|| Error::of(EndOfFile))?;
+        let current = iter.next();
         let next = iter.next();
 
         Ok(Reader {
@@ -39,7 +39,7 @@ impl<'a> Reader<'a> {
     /// Returns current char.
     /// TODO Calling this function after end of file results in EndOfFile error.
     pub fn current(&mut self) -> char {
-        self.current.1
+        self.current.unwrap().1 // TODO EndOfFile
     }
 
     /// Peek at the code point that will become current after next consume.
@@ -89,10 +89,10 @@ impl<'a> Reader<'a> {
         }
 
         if let Some(next) = self.next {
-            self.current = next;
+            self.current = Some(next);
             self.next = self.iter.next();
 
-            Ok(self.current.1)
+            Ok(self.current.unwrap().1) // TODO end of file
         } else {
             self.end_of_file = true;
             Err(Error::of(EndOfFile))
