@@ -23,8 +23,8 @@ impl<'a> Reader<'a> {
             position: 0,
         };
 
-        reader.current = reader.next_if_exists()?;
-        reader.next = reader.next_if_exists()?;
+        reader.current = reader.next()?;
+        reader.next = reader.next()?;
 
         Ok(reader)
     }
@@ -54,7 +54,7 @@ impl<'a> Reader<'a> {
     /// Reading passed the end of lexer stream results in EndOfStream
     /// Any errors in the lexer while reading will also result in an error.
     pub fn consume(&mut self) -> Result<Token> {
-        let mut next = self.next_if_exists()?;
+        let mut next = self.next()?;
         mem::swap(&mut next, &mut self.next);
 
         let mut current = next;
@@ -71,7 +71,7 @@ impl<'a> Reader<'a> {
         }
     }
 
-    fn next_if_exists(&mut self) -> Result<Option<Token>> {
+    fn next(&mut self) -> Result<Option<Token>> {
         match self.lexer.read() {
             Ok(token) => Ok(Some(token)),
             Err(err) => {
