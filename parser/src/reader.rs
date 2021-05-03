@@ -9,7 +9,7 @@ pub struct Reader<'a> {
     lexer: Lexer<'a>,
     current: Option<Token>,
     next: Option<Token>,
-    location: usize,
+    position: usize,
 }
 
 impl<'a> Reader<'a> {
@@ -20,7 +20,7 @@ impl<'a> Reader<'a> {
             lexer,
             current: None,
             next: None,
-            location: 0,
+            position: 0,
         };
 
         reader.current = reader.next_if_exists()?;
@@ -30,8 +30,8 @@ impl<'a> Reader<'a> {
     }
 
     /// Location of the current token, or location of end of stream if there is no tokens left.
-    pub fn location(&self) -> usize {
-        self.location
+    pub fn position(&self) -> usize {
+        self.position
     }
 
     /// Returns reference to the current token.
@@ -60,7 +60,7 @@ impl<'a> Reader<'a> {
         mem::swap(&mut current, &mut self.current);
 
         if let Some(t) = &current {
-            self.location = t.location.end;
+            self.position = t.location.end;
         }
 
         if matches!(current, Some(_)) {

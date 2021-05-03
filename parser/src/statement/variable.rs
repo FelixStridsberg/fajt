@@ -17,7 +17,7 @@ impl Parser<'_> {
 
         // TODO parse all declarations
         let declarations = vec![self.parse_variable_declaration()?];
-        let end = self.reader.location();
+        let end = self.reader.position();
 
         Ok(VariableStmt::new(variable_type, declarations, (start, end)).into())
     }
