@@ -56,7 +56,7 @@ impl TryFrom<Token> for Ident {
     fn try_from(token: Token) -> Result<Self, Self::Error> {
         match &token.value {
             TokenValue::Identifier(name) => Ok(Ident {
-                span: token.location.clone(),
+                span: token.span.clone(),
                 name: name.clone(),
             }),
             _ => Err(()),

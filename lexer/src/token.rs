@@ -285,14 +285,14 @@ impl From<(usize, usize)> for Span {
 #[derive(Debug, PartialOrd, PartialEq, Clone)]
 pub struct Token {
     pub value: TokenValue,
-    pub location: Span,
+    pub span: Span,
 }
 
 impl Token {
-    pub fn new<L: Into<Span>>(value: TokenValue, location: L) -> Self {
+    pub fn new<S: Into<Span>>(value: TokenValue, span: S) -> Self {
         Token {
             value,
-            location: location.into(),
+            span: span.into(),
         }
     }
 }

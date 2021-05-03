@@ -28,7 +28,7 @@ impl Parser<'_> {
         })
     }
     fn parse_empty_statement(&mut self) -> Result<Stmt> {
-        let stmt = Stmt::Empty(EmptyStmt::new(self.reader.current()?.location.clone()));
+        let stmt = Stmt::Empty(EmptyStmt::new(self.reader.current()?.span.clone()));
         self.reader.consume()?;
         Ok(stmt)
     }

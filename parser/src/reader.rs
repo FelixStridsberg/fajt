@@ -29,7 +29,8 @@ impl<'a> Reader<'a> {
         Ok(reader)
     }
 
-    /// Location of the current token, or location of end of stream if there is no tokens left.
+    /// Code point position of the current token, or position of end of file if there are no tokens
+    /// left.
     pub fn position(&self) -> usize {
         self.position
     }
@@ -60,7 +61,7 @@ impl<'a> Reader<'a> {
         mem::swap(&mut current, &mut self.current);
 
         if let Some(t) = &current {
-            self.position = t.location.end;
+            self.position = t.span.end;
         }
 
         if matches!(current, Some(_)) {

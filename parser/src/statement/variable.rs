@@ -13,7 +13,7 @@ use std::convert::TryInto;
 impl Parser<'_> {
     pub(crate) fn parse_variable_statement(&mut self, variable_type: VariableKind) -> Result<Stmt> {
         let token = self.reader.consume()?;
-        let start = token.location.start;
+        let start = token.span.start;
 
         // TODO parse all declarations
         let declarations = vec![self.parse_variable_declaration()?];
