@@ -1,4 +1,5 @@
-use crate::error::Result;
+use crate::error::ErrorKind::EndOfStream;
+use crate::error::{Error, Result};
 use core::mem;
 use fajt_lexer::error::ErrorKind::EndOfFile;
 use fajt_lexer::token::Token;
@@ -36,7 +37,6 @@ impl<'a> Reader<'a> {
     }
 
     /// Consumes the current token.
-    /// TODO error handling
     pub fn consume(&mut self) -> Result<Token> {
         let mut next = self.next_if_exists()?;
         mem::swap(&mut next, &mut self.next);
@@ -48,7 +48,11 @@ impl<'a> Reader<'a> {
             self.location = t.location.end;
         }
 
-        Ok(current.unwrap()) // TODO end of stream error
+        if matches!(current, Some(_)) {
+            Ok(current.unwrap())
+        } else {
+            Err(Error::of(EndOfStream))
+        }
     }
 
     fn next_if_exists(&mut self) -> Result<Option<Token>> {
