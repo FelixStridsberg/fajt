@@ -10,11 +10,11 @@ use std::convert::TryInto;
 impl Parser<'_> {
     pub(crate) fn parse_assignment_expression(&mut self) -> Result<Expr> {
         // TODO other than primary expressions
-        Ok(self.parse_primary_expression())
+        self.parse_primary_expression()
     }
 
-    fn parse_primary_expression(&mut self) -> Expr {
-        match self.reader.current() {
+    fn parse_primary_expression(&mut self) -> Result<Expr> {
+        Ok(match self.reader.current()? {
             token_matches!(keyword!("this")) => unimplemented!(),
             token_matches!(keyword!("yield")) => unimplemented!(),
             token_matches!(keyword!("await")) => unimplemented!(),
@@ -29,15 +29,15 @@ impl Parser<'_> {
             // TODO RegularExpressionLiteral
             // TODO TemplateLiteral
             // TODO CoverParenthesizedExpressionAndArrowParameterList
-            token_matches!(@ident) => self.parse_identifier_reference(),
+            token_matches!(@ident) => self.parse_identifier_reference()?,
             r => unimplemented!("TOKEN: {:?}", r),
-        }
+        })
     }
-    fn parse_identifier_reference(&mut self) -> Expr {
-        let ident: Ident = self.reader.current().try_into().unwrap();
+    fn parse_identifier_reference(&mut self) -> Result<Expr> {
+        let ident: Ident = self.reader.current()?.try_into().unwrap();
 
         self.reader.next().unwrap(); // TODO Doing this here feels weird? decide if we work on current or next (probably next)
 
-        IdentifierReference(ident.into())
+        Ok(IdentifierReference(ident.into()))
     }
 }

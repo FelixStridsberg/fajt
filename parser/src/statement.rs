@@ -9,7 +9,7 @@ mod variable;
 
 impl Parser<'_> {
     pub(crate) fn parse_statement(&mut self) -> Result<Stmt> {
-        Ok(match self.reader.current() {
+        Ok(match self.reader.current()? {
             token_matches!(punct!(";")) => self.parse_empty_statement()?,
             token_matches!(punct!("{")) => unimplemented!("BlockStatement"),
             token_matches!(keyword!("var")) => self.parse_variable_statement(VariableKind::Var)?,
@@ -28,7 +28,7 @@ impl Parser<'_> {
         })
     }
     fn parse_empty_statement(&mut self) -> Result<Stmt> {
-        let stmt = Stmt::Empty(EmptyStmt::new(self.reader.current().location.clone()));
+        let stmt = Stmt::Empty(EmptyStmt::new(self.reader.current()?.location.clone()));
         self.reader.consume()?;
         Ok(stmt)
     }

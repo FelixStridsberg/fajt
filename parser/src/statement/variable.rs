@@ -12,11 +12,11 @@ use std::convert::TryInto;
 
 impl Parser<'_> {
     pub(crate) fn parse_variable_statement(&mut self, variable_type: VariableKind) -> Result<Stmt> {
-        let start = self.reader.current().location.start;
+        let start = self.reader.current()?.location.start;
 
         // TODO parse all declarations
         let declarations = vec![self.parse_variable_declaration()?];
-        let end = self.reader.current().location.end;
+        let end = self.reader.current()?.location.end;
 
         Ok(VariableStmt::new(variable_type, declarations, (start, end)).into())
     }

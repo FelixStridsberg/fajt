@@ -7,7 +7,7 @@ use fajt_lexer::Lexer;
 
 pub struct Reader<'a> {
     lexer: Lexer<'a>,
-    current: Token,
+    current: Option<Token>,
     next: Option<Token>,
     end: bool,
 }
@@ -18,7 +18,7 @@ impl<'a> Reader<'a> {
 
         let mut reader = Reader {
             lexer,
-            current,
+            current: Some(current),
             next: None,
             end: false,
         };
@@ -32,8 +32,8 @@ impl<'a> Reader<'a> {
         !self.end
     }
 
-    pub fn current(&self) -> &Token {
-        &self.current
+    pub fn current(&self) -> Result<&Token> {
+        Ok(self.current.as_ref().unwrap())
     }
 
     pub fn peek(&self) -> Option<&Token> {
@@ -41,23 +41,22 @@ impl<'a> Reader<'a> {
     }
 
     /// Consumes the current token.
-    /// TODO revisit if this is the correct approach. Is only peek and next better?
-    /// TODO if this should be used, should it return ownership of Token?
-    pub fn consume(&mut self) -> Result<()> {
-        let _ = self.next();
-        Ok(())
+    /// TODO error handling
+    pub fn consume(&mut self) -> Result<Token> {
+        let mut next = self.next_if_exists()?;
+        mem::swap(&mut next, &mut self.next);
+
+        let mut current = next;
+        mem::swap(&mut current, &mut self.current);
+        Ok(current.unwrap()) // TODO end of stream error
     }
 
     pub fn next(&mut self) -> Result<&Token> {
         let mut next = self.next_if_exists()?;
         mem::swap(&mut next, &mut self.next);
 
-        if let Some(next) = next {
-            self.current = next;
-            Ok(&self.current)
-        } else {
-            Err(Error::of(EndOfStream))
-        }
+        self.current = next;
+        Ok(&self.current.as_ref().unwrap()) // TODO end of stream error
     }
 
     fn next_if_exists(&mut self) -> Result<Option<Token>> {
