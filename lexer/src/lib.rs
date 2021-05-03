@@ -205,7 +205,7 @@ impl<'a> Lexer<'a> {
 
         while self.reader.current().is_ecma_whitespace() {
             count += 1;
-            self.reader.next()?;
+            self.reader.consume()?;
         }
 
         Ok(count)

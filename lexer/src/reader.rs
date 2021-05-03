@@ -31,14 +31,18 @@ impl<'a> Reader<'a> {
         self.end_of_file
     }
 
+    /// Current code point position.
     pub fn position(&self) -> usize {
         self.position
     }
 
+    /// Returns current char.
+    /// TODO Calling this function after end of file results in EndOfFile error.
     pub fn current(&mut self) -> char {
         self.current.1
     }
 
+    /// Peek at the code point that will become current after next consume.
     pub fn peek(&self) -> Option<char> {
         self.next.map(|(_, c)| c)
     }
@@ -50,22 +54,6 @@ impl<'a> Reader<'a> {
         } else {
             let _ = self.next();
             Ok(())
-        }
-    }
-
-    pub fn next(&mut self) -> Result<char> {
-        if !self.end_of_file {
-            self.position += 1;
-        }
-
-        if let Some(next) = self.next {
-            self.current = next;
-            self.next = self.iter.next();
-
-            Ok(self.current.1)
-        } else {
-            self.end_of_file = true;
-            Err(Error::of(EndOfFile))
         }
     }
 
@@ -93,5 +81,21 @@ impl<'a> Reader<'a> {
         }
 
         Ok(result)
+    }
+
+    fn next(&mut self) -> Result<char> {
+        if !self.end_of_file {
+            self.position += 1;
+        }
+
+        if let Some(next) = self.next {
+            self.current = next;
+            self.next = self.iter.next();
+
+            Ok(self.current.1)
+        } else {
+            self.end_of_file = true;
+            Err(Error::of(EndOfFile))
+        }
     }
 }
