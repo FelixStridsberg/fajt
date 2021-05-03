@@ -92,7 +92,7 @@ impl<'a> Lexer<'a> {
 
         self.skip_whitespaces()?;
 
-        let current = self.reader.current();
+        let current = self.reader.current()?;
 
         let start = self.reader.position();
         let value = match current {
@@ -170,7 +170,7 @@ impl<'a> Lexer<'a> {
     }
 
     fn read_number_literal(&mut self) -> Result<TokenValue> {
-        let current = self.reader.current();
+        let current = self.reader.current()?;
         let (base, number) = match self.reader.peek() {
             Some('x') | Some('X') if current == '0' => {
                 (Hex, self.read_number(16, |c| c.is_ascii_hexdigit())?)
@@ -203,7 +203,7 @@ impl<'a> Lexer<'a> {
     fn skip_whitespaces(&mut self) -> Result<usize> {
         let mut count = 0;
 
-        while self.reader.current().is_ecma_whitespace() {
+        while self.reader.current()?.is_ecma_whitespace() {
             count += 1;
             self.reader.consume()?;
         }

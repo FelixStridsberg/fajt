@@ -38,8 +38,12 @@ impl<'a> Reader<'a> {
 
     /// Returns current char.
     /// TODO Calling this function after end of file results in EndOfFile error.
-    pub fn current(&mut self) -> char {
-        self.current.unwrap().1 // TODO EndOfFile
+    pub fn current(&mut self) -> Result<char> {
+        if let Some((_, current)) = self.current {
+            Ok(current)
+        } else {
+            Err(Error::of(EndOfFile))
+        }
     }
 
     /// Peek at the code point that will become current after next consume.
@@ -59,7 +63,7 @@ impl<'a> Reader<'a> {
 
     pub fn read_until(&mut self, check: fn(char) -> bool) -> Result<String> {
         let mut result = String::new();
-        result.push(self.current());
+        result.push(self.current()?);
 
         loop {
             match self.next() {
@@ -92,7 +96,7 @@ impl<'a> Reader<'a> {
             self.current = Some(next);
             self.next = self.iter.next();
 
-            Ok(self.current.unwrap().1) // TODO end of file
+            Ok(self.current.unwrap().1) // TODO end of file?
         } else {
             self.end_of_file = true;
             Err(Error::of(EndOfFile))
