@@ -1,9 +1,9 @@
 use crate::error::ErrorKind::EndOfStream;
 use crate::error::{Error, Result};
-use core::mem;
 use fajt_lexer::error::ErrorKind::EndOfFile;
 use fajt_lexer::token::Token;
 use fajt_lexer::Lexer;
+use std::mem;
 
 pub struct Reader<'a> {
     lexer: Lexer<'a>,

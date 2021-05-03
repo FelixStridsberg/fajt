@@ -86,10 +86,6 @@ impl<'a> Lexer<'a> {
     }
 
     pub fn read(&mut self) -> Result<Token> {
-        if self.reader.eof() {
-            return Err(Error::of(EndOfFile));
-        }
-
         self.skip_whitespaces()?;
 
         let current = self.reader.current()?;

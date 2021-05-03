@@ -1,5 +1,6 @@
 use crate::error::Error;
 use crate::error::ErrorKind::EndOfFile;
+use std::mem;
 use std::str::CharIndices;
 
 type Result<T> = std::result::Result<T, Error>;
@@ -27,10 +28,6 @@ impl<'a> Reader<'a> {
         })
     }
 
-    pub fn eof(&self) -> bool {
-        self.end_of_file
-    }
-
     /// Current code point position.
     pub fn position(&self) -> usize {
         self.position
@@ -52,34 +49,40 @@ impl<'a> Reader<'a> {
     }
 
     /// Consumes the current character.
-    pub fn consume(&mut self) -> Result<()> {
-        if self.end_of_file {
-            Err(Error::of(EndOfFile))
+    pub fn consume(&mut self) -> Result<char> {
+        let mut next = self.iter.next();
+        mem::swap(&mut next, &mut self.next);
+
+        let mut current = next;
+        mem::swap(&mut current, &mut self.current);
+
+        if let Some((pos, a)) = current {
+            self.position = pos + a.len_utf16();
+        }
+
+        if let Some((_, c)) = current {
+            println!("Consumed; {:?}", c);
+            Ok(c)
         } else {
-            let _ = self.next();
-            Ok(())
+            Err(Error::of(EndOfFile))
         }
     }
 
     pub fn read_until(&mut self, check: fn(char) -> bool) -> Result<String> {
         let mut result = String::new();
-        result.push(self.current()?);
 
         loop {
-            match self.next() {
+            match self.current() {
                 Ok(c) => {
                     if check(c) {
-                        result.push(c);
+                        result.push(self.consume()?);
                     } else {
                         break;
                     }
                 }
                 Err(e) => {
-                    if *e.kind() == EndOfFile {
-                        break;
-                    } else {
-                        return Err(e);
-                    }
+                    assert_eq!(*e.kind(), EndOfFile);
+                    break;
                 }
             }
         }
