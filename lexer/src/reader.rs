@@ -61,7 +61,6 @@ impl<'a> Reader<'a> {
         }
 
         if let Some((_, c)) = current {
-            println!("Consumed; {:?}", c);
             Ok(c)
         } else {
             Err(Error::of(EndOfFile))
@@ -88,21 +87,5 @@ impl<'a> Reader<'a> {
         }
 
         Ok(result)
-    }
-
-    fn next(&mut self) -> Result<char> {
-        if !self.end_of_file {
-            self.position += 1;
-        }
-
-        if let Some(next) = self.next {
-            self.current = Some(next);
-            self.next = self.iter.next();
-
-            Ok(self.current.unwrap().1) // TODO end of file?
-        } else {
-            self.end_of_file = true;
-            Err(Error::of(EndOfFile))
-        }
     }
 }
