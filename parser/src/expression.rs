@@ -4,6 +4,7 @@ use crate::Parser;
 
 use crate::ast::Expr::IdentifierReference;
 use fajt_lexer::keyword;
+use fajt_lexer::punct;
 use fajt_lexer::token_matches;
 use std::convert::TryInto;
 
@@ -34,9 +35,13 @@ impl Parser<'_> {
         })
     }
     fn parse_identifier_reference(&mut self) -> Result<Expr> {
-        let ident: Ident = self.reader.current()?.try_into().unwrap();
+        let token = self.reader.consume()?;
+        let ident: Ident = token.try_into().unwrap();
 
-        self.reader.next().unwrap(); // TODO Doing this here feels weird? decide if we work on current or next (probably next)
+        // Consume potential trailing semi colon TODO how to handle these in general?
+        if self.reader.current()?.value == punct!(";") {
+            self.reader.consume()?;
+        }
 
         Ok(IdentifierReference(ident.into()))
     }

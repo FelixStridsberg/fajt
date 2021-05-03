@@ -12,17 +12,18 @@ use std::convert::TryInto;
 
 impl Parser<'_> {
     pub(crate) fn parse_variable_statement(&mut self, variable_type: VariableKind) -> Result<Stmt> {
-        let start = self.reader.current()?.location.start;
+        let token = self.reader.consume()?;
+        let start = token.location.start;
 
         // TODO parse all declarations
         let declarations = vec![self.parse_variable_declaration()?];
-        let end = self.reader.current()?.location.end;
+        let end = self.reader.location();
 
         Ok(VariableStmt::new(variable_type, declarations, (start, end)).into())
     }
 
     fn parse_variable_declaration(&mut self) -> Result<VariableDeclaration> {
-        let token = self.reader.next().unwrap();
+        let token = self.reader.consume()?;
 
         let identifier = match &token.value {
             TokenValue::Identifier(_) => BindingPattern::Ident(BindingIdentifier::Ident(
@@ -34,22 +35,20 @@ impl Parser<'_> {
         };
 
         let mut initializer = None;
-        match self.reader.peek() {
-            token_matches!(opt: punct!("=")) => {
-                initializer = Some(self.parse_variable_initializer())
-            }
-            token_matches!(opt: punct!(";")) => {
-                self.reader.next().unwrap(); // TODO fix unwrap
+        match self.reader.current()? {
+            token_matches!(punct!("=")) => initializer = Some(self.parse_variable_initializer()?),
+            token_matches!(punct!(";")) => {
+                println!("HEJ");
+                self.reader.consume()?;
             }
             _ => (),
         }
 
-        Ok(VariableDeclaration::new(identifier))
+        Ok(VariableDeclaration::new(identifier, initializer))
     }
 
     fn parse_variable_initializer(&mut self) -> Result<Expr> {
-        self.reader.next()?; // Skip =
-        self.reader.next()?; // Skip =
+        self.reader.consume()?; // Skip =
         self.parse_assignment_expression()
     }
 
@@ -58,7 +57,7 @@ impl Parser<'_> {
 
         let mut comma_allowed = false;
         loop {
-            let token = self.reader.next().unwrap(); // TODO
+            let token = self.reader.consume()?; // TODO
 
             match token {
                 token_matches!(punct!("}")) => break,
@@ -71,6 +70,11 @@ impl Parser<'_> {
                 }
                 t => return Err(Error::of(UnexpectedToken(t.clone()))),
             }
+        }
+
+        println!("OU: {:?}", self.reader.current());
+        if self.reader.current()?.value == punct!(";") {
+            self.reader.consume()?;
         }
 
         Ok(bindings.into())

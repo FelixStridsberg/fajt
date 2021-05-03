@@ -1,5 +1,4 @@
-use crate::error::ErrorKind::EndOfStream;
-use crate::error::{Error, Result};
+use crate::error::Result;
 use core::mem;
 use fajt_lexer::error::ErrorKind::EndOfFile;
 use fajt_lexer::token::Token;
@@ -9,7 +8,7 @@ pub struct Reader<'a> {
     lexer: Lexer<'a>,
     current: Option<Token>,
     next: Option<Token>,
-    end: bool,
+    location: usize,
 }
 
 impl<'a> Reader<'a> {
@@ -20,7 +19,7 @@ impl<'a> Reader<'a> {
             lexer,
             current: Some(current),
             next: None,
-            end: false,
+            location: 0,
         };
 
         reader.next = reader.next_if_exists()?;
@@ -28,16 +27,12 @@ impl<'a> Reader<'a> {
         Ok(reader)
     }
 
-    pub fn has_next(&self) -> bool {
-        !self.end
+    pub fn location(&self) -> usize {
+        self.location
     }
 
     pub fn current(&self) -> Result<&Token> {
         Ok(self.current.as_ref().unwrap())
-    }
-
-    pub fn peek(&self) -> Option<&Token> {
-        self.next.as_ref()
     }
 
     /// Consumes the current token.
@@ -48,15 +43,12 @@ impl<'a> Reader<'a> {
 
         let mut current = next;
         mem::swap(&mut current, &mut self.current);
+
+        if let Some(t) = &current {
+            self.location = t.location.end;
+        }
+
         Ok(current.unwrap()) // TODO end of stream error
-    }
-
-    pub fn next(&mut self) -> Result<&Token> {
-        let mut next = self.next_if_exists()?;
-        mem::swap(&mut next, &mut self.next);
-
-        self.current = next;
-        Ok(&self.current.as_ref().unwrap()) // TODO end of stream error
     }
 
     fn next_if_exists(&mut self) -> Result<Option<Token>> {

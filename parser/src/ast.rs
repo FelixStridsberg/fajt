@@ -50,10 +50,10 @@ impl Ident {
     }
 }
 
-impl TryFrom<&Token> for Ident {
+impl TryFrom<Token> for Ident {
     type Error = ();
 
-    fn try_from(token: &Token) -> Result<Self, Self::Error> {
+    fn try_from(token: Token) -> Result<Self, Self::Error> {
         match &token.value {
             TokenValue::Identifier(name) => Ok(Ident {
                 span: token.location.clone(),
