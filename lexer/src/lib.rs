@@ -2,7 +2,6 @@ extern crate macros;
 
 mod code_point;
 pub mod error;
-mod reader;
 
 #[macro_use]
 pub mod token;
@@ -10,11 +9,12 @@ pub mod token;
 use crate::code_point::CodePoint;
 use crate::error::Error;
 use crate::error::ErrorKind::EndOfFile;
-use crate::reader::Reader;
 use crate::token::Base::{Binary, Decimal, Hex, Octal};
 use crate::token::Token;
 use crate::token::TokenValue;
-use fajt_common::io::PeekRead;
+use fajt_common::io::{PeekRead, PeekReader};
+use std::iter::FromIterator;
+use std::str::CharIndices;
 
 /// Consume code points from lexer to produce data.
 ///
@@ -48,7 +48,7 @@ macro_rules! produce {
         Ok($produce)
     }};
     ($self:ident, peek: $peek:literal ? $product1:expr ; $product2:expr) => {{
-        if $self.reader.peek() == Some($peek) {
+        if $self.reader.peek() == Some(&$peek) {
             produce!($self, 2, $product1)
         } else {
             produce!($self, 1, $product2)
@@ -59,28 +59,13 @@ macro_rules! produce {
 type Result<T> = std::result::Result<T, Error>;
 
 pub struct Lexer<'a> {
-    reader: Reader<'a>,
-}
-
-impl PeekRead<Token> for Lexer<'_> {
-    type Error = error::Error;
-
-    fn next(&mut self) -> std::result::Result<Option<(usize, Token)>, Error> {
-        match self.read() {
-            Ok(t) => Ok(Some((t.span.end, t))),
-            Err(e) => {
-                if *e.kind() == EndOfFile {
-                    return Ok(None);
-                }
-                Err(e)
-            }
-        }
-    }
+    reader: PeekReader<char, CharIndices<'a>>,
 }
 
 impl<'a> Lexer<'a> {
     pub fn new(data: &'a str) -> Result<Self> {
-        let reader = Reader::new(data)?;
+        //        let reader = Reader::new(data)?;
+        let reader = PeekReader::new(data.char_indices());
         Ok(Lexer { reader })
     }
 
@@ -109,9 +94,9 @@ impl<'a> Lexer<'a> {
 
         let start = self.reader.position();
         let value = match current {
-            '=' if self.reader.peek() != Some('=') => produce!(self, 1, punct!("=")),
+            '=' if self.reader.peek() != Some(&'=') => produce!(self, 1, punct!("=")),
             // <op>=
-            '/' | '*' | '%' | '+' | '-' | '|' | '^' | '&' if self.reader.peek() == Some('=') => {
+            '/' | '*' | '%' | '+' | '-' | '|' | '^' | '&' if self.reader.peek() == Some(&'=') => {
                 match current {
                     '/' => produce!(self, 2, punct!("/=")),
                     '*' => produce!(self, 2, punct!("*=")),
@@ -136,7 +121,7 @@ impl<'a> Lexer<'a> {
             '+' => produce!(self, peek: '+' ? punct!("++") ; punct!("+")),
             '-' => produce!(self, peek: '-' ? punct!("--") ; punct!("-")),
             '*' => {
-                if self.reader.peek() == Some('*') {
+                if self.reader.peek() == Some(&'*') {
                     self.reader.consume()?;
                     produce!(self, peek: '=' ? punct!("**=") ; punct!("**"))
                 } else {
@@ -145,14 +130,14 @@ impl<'a> Lexer<'a> {
             }
             // TODO handle comments (//, /*)
             '/' => produce!(self, 1, punct!("/")),
-            '<' if self.reader.peek() == Some('<') => {
+            '<' if self.reader.peek() == Some(&'<') => {
                 self.reader.consume()?;
                 produce!(self, peek: '=' ? punct!("<<=") ; punct!("<<"))
             }
-            '>' if self.reader.peek() == Some('>') => {
+            '>' if self.reader.peek() == Some(&'>') => {
                 self.reader.consume()?;
                 match self.reader.peek() {
-                    Some('>') => {
+                    Some(&'>') => {
                         self.reader.consume()?;
                         produce!(self, peek: '=' ? punct!(">>>=") ; punct!(">>>"))
                     }
@@ -173,6 +158,7 @@ impl<'a> Lexer<'a> {
         let word = self
             .reader
             .read_until(|c| char::is_part_of_identifier(&c))?;
+        let word = String::from_iter(word);
         let value = if let Ok(keyword) = word.parse() {
             TokenValue::Keyword(keyword)
         } else {
@@ -185,22 +171,22 @@ impl<'a> Lexer<'a> {
     fn read_number_literal(&mut self) -> Result<TokenValue> {
         let current = self.reader.current()?;
         let (base, number) = match self.reader.peek() {
-            Some('x') | Some('X') if current == '0' => {
-                (Hex, self.read_number(16, |c| c.is_ascii_hexdigit())?)
+            Some(&'x') | Some(&'X') if current == &'0' => {
+                (Hex, self.read_number(16, char::is_ascii_hexdigit)?)
             }
-            Some('o') | Some('O') if current == '0' => {
+            Some(&'o') | Some(&'O') if current == &'0' => {
                 (Octal, self.read_number(8, |c| ('0'..='7').contains(&c))?)
             }
-            Some('b') | Some('B') if current == '0' => {
-                (Binary, self.read_number(2, |c| c == '0' || c == '1')?)
+            Some(&'b') | Some(&'B') if current == &'0' => {
+                (Binary, self.read_number(2, |c| c == &'0' || c == &'1')?)
             }
-            _ => (Decimal, self.read_number(10, char::is_numeric)?),
+            _ => (Decimal, self.read_number(10, |c| c.is_numeric())?),
         };
 
         Ok(literal!(number, base, number))
     }
 
-    fn read_number(&mut self, base: u32, check: fn(char) -> bool) -> Result<i64> {
+    fn read_number(&mut self, base: u32, check: fn(&char) -> bool) -> Result<i64> {
         // All but base 10 have 2 char prefix: 0b, 0o, 0x
         if base != 10 {
             self.reader.consume()?;
@@ -208,6 +194,7 @@ impl<'a> Lexer<'a> {
         }
 
         let number_str = self.reader.read_until(check)?;
+        let number_str = String::from_iter(number_str);
 
         // The check must be strict enough for a safe unwrap here
         Ok(i64::from_str_radix(&number_str, base).unwrap())
@@ -222,5 +209,21 @@ impl<'a> Lexer<'a> {
         }
 
         Ok(count)
+    }
+}
+
+impl PeekRead<Token> for Lexer<'_> {
+    type Error = error::Error;
+
+    fn next(&mut self) -> std::result::Result<Option<(usize, Token)>, Error> {
+        match self.read() {
+            Ok(t) => Ok(Some((t.span.end, t))),
+            Err(e) => {
+                if *e.kind() == EndOfFile {
+                    return Ok(None);
+                }
+                Err(e)
+            }
+        }
     }
 }

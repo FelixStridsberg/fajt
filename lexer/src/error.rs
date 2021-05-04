@@ -2,6 +2,8 @@ use crate::token::Span;
 use std::fmt::Formatter;
 use std::{error, fmt};
 
+use fajt_common::io::Error as CommonError;
+
 #[derive(Debug, PartialEq)]
 pub struct Error {
     kind: ErrorKind,
@@ -36,3 +38,12 @@ impl fmt::Display for Error {
 }
 
 impl error::Error for Error {}
+
+impl From<CommonError<()>> for Error {
+    fn from(error: CommonError<()>) -> Self {
+        match error {
+            CommonError::EndOfStream => Error::of(ErrorKind::EndOfFile),
+            CommonError::ReaderError(_) => unreachable!(),
+        }
+    }
+}

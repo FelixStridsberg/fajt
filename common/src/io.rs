@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 use std::mem;
+use std::str::CharIndices;
 
 #[derive(Debug)]
 pub enum Error<E> {
@@ -84,5 +85,37 @@ where
         } else {
             Err(Error::EndOfStream)
         }
+    }
+
+    pub fn read_until(&mut self, check: fn(&T) -> bool) -> Result<Vec<T>, I::Error> {
+        let mut result = Vec::new();
+
+        loop {
+            match self.current() {
+                Ok(c) => {
+                    if check(c) {
+                        result.push(self.consume()?);
+                    } else {
+                        break;
+                    }
+                }
+                Err(Error::EndOfStream) => {
+                    break;
+                }
+                Err(e) => {
+                    return Err(e);
+                }
+            }
+        }
+
+        Ok(result)
+    }
+}
+
+impl<'a> PeekRead<char> for CharIndices<'a> {
+    type Error = ();
+
+    fn next(&mut self) -> std::result::Result<Option<(usize, char)>, Self::Error> {
+        Ok(Iterator::next(self).map(|(pos, c)| (pos + c.len_utf16(), c)))
     }
 }
