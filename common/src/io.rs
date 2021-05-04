@@ -19,9 +19,12 @@ type Result<T, E> = std::result::Result<T, Error<E>>;
 pub trait PeekRead<T> {
     type Error;
 
+    /// Returns next item if exists, otherwise `None`.
+    /// The item is returned in a tuple with the end position as first element.
     fn next(&mut self) -> std::result::Result<Option<(usize, T)>, Self::Error>;
 }
 
+/// The peek reader is always one step ahead to enable peeking.
 pub struct PeekReader<T, I> {
     inner: I,
     current: Option<(usize, T)>,
@@ -34,9 +37,8 @@ where
     I: PeekRead<T>,
     I::Error: Debug,
 {
-    // TODO update documentation, copied from when it was specific to parser reader.
-    /// Returns an instance of a Reader.
-    /// Returns error if lexer returns error (other than eof) when reading first 2 tokens.
+    /// Returns an instance of a PeekReader.
+    /// Returns error if inner reader returns error when reading first 2 items.
     pub fn new(mut inner: I) -> Self {
         let current = inner.next().unwrap();
         let next = inner.next().unwrap();
@@ -49,13 +51,12 @@ where
         }
     }
 
-    /// Code point position of the current token, or position of end of file if there are no tokens
-    /// left.
+    /// Position of the current item, or position of end of stream if there are no items left.
     pub fn position(&self) -> usize {
         self.position
     }
 
-    /// Returns reference to the current token.
+    /// Returns reference to the current item.
     /// Calling this function after the stream has been fully consumed results in EndOfStream error.
     pub fn current(&self) -> Result<&T, I::Error> {
         if let Some((_, current)) = self.current.as_ref() {
@@ -65,14 +66,14 @@ where
         }
     }
 
-    /// Peek at the token that will become current after next consume.
+    /// Peek at the item that will become current after next consume.
     pub fn peek(&self) -> Option<&T> {
         self.next.as_ref().map(|(_, item)| item)
     }
 
-    /// Returns the current token and reads a new one from the lexer.
-    /// Reading passed the end of lexer stream results in EndOfStream
-    /// Any errors in the lexer while reading will also result in an error.
+    /// Returns the current item and reads a new one from the inner reader.
+    /// Consuming passed the end of stream results in EndOfStream error.
+    /// Any errors from the inner reader while reading will also result in an error.
     pub fn consume(&mut self) -> Result<T, I::Error> {
         let mut next = self.inner.next()?;
         mem::swap(&mut next, &mut self.next);
@@ -94,6 +95,8 @@ where
     I: PeekRead<char>,
     I::Error: Debug,
 {
+
+    /// Read a string until `check` callback returns false or the end of the stream is reached.
     pub fn read_until(&mut self, check: fn(&char) -> bool) -> Result<String, I::Error> {
         let mut result = String::new();
 
