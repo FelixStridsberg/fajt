@@ -17,7 +17,7 @@ pub struct Parser<'a> {
 
 impl<'a> Parser<'a> {
     pub fn new(lexer: Lexer<'a>) -> Result<Self> {
-        let reader = PeekReader::new(lexer); // TODO
+        let reader = PeekReader::new(lexer)?;
         Ok(Parser { reader })
     }
 

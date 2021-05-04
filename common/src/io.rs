@@ -39,16 +39,16 @@ where
 {
     /// Returns an instance of a PeekReader.
     /// Returns error if inner reader returns error when reading first 2 items.
-    pub fn new(mut inner: I) -> Self {
-        let current = inner.next().unwrap();
-        let next = inner.next().unwrap();
+    pub fn new(mut inner: I) -> Result<Self, I::Error> {
+        let current = inner.next()?;
+        let next = inner.next()?;
 
-        PeekReader {
+        Ok(PeekReader {
             inner,
             current,
             next,
             position: 0,
-        }
+        })
     }
 
     /// Position of the current item, or position of end of stream if there are no items left.
@@ -95,7 +95,6 @@ where
     I: PeekRead<char>,
     I::Error: Debug,
 {
-
     /// Read a string until `check` callback returns false or the end of the stream is reached.
     pub fn read_until(&mut self, check: fn(&char) -> bool) -> Result<String, I::Error> {
         let mut result = String::new();

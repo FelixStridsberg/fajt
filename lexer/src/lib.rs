@@ -64,8 +64,7 @@ pub struct Lexer<'a> {
 
 impl<'a> Lexer<'a> {
     pub fn new(data: &'a str) -> Result<Self> {
-        //        let reader = Reader::new(data)?;
-        let reader = PeekReader::new(data.char_indices());
+        let reader = PeekReader::new(data.char_indices())?;
         Ok(Lexer { reader })
     }
 
