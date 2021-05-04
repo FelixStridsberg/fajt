@@ -2,22 +2,22 @@ extern crate fajt_lexer;
 pub mod ast;
 pub mod error;
 mod expression;
-mod reader;
 mod statement;
 
 use crate::ast::Program;
 use crate::error::Result;
-use crate::reader::Reader;
+use fajt_common::io::PeekReader;
 use fajt_lexer::token;
+use fajt_lexer::token::Token;
 use fajt_lexer::Lexer;
 
 pub struct Parser<'a> {
-    reader: Reader<'a>,
+    reader: PeekReader<Token, Lexer<'a>>,
 }
 
 impl<'a> Parser<'a> {
     pub fn new(lexer: Lexer<'a>) -> Result<Self> {
-        let reader = Reader::new(lexer)?;
+        let reader = PeekReader::new(lexer); // TODO
         Ok(Parser { reader })
     }
 

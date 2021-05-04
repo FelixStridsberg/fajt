@@ -11,9 +11,14 @@ name = "fajt_codegen"
 version = "0.1.0"
 
 [[package]]
+name = "fajt_common"
+version = "0.1.0"
+
+[[package]]
 name = "fajt_lexer"
 version = "0.1.0"
 dependencies = [
+ "fajt_common",
  "macros",
 ]
 
@@ -21,6 +26,7 @@ dependencies = [
 name = "fajt_parser"
 version = "0.1.0"
 dependencies = [
+ "fajt_common",
  "fajt_lexer",
 ]
 

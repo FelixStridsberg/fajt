@@ -61,7 +61,7 @@ impl<'a> Reader<'a> {
         }
 
         if let Some((_, c)) = current {
-            Ok(c)
+            Ok(c) // TODO use Into trait to (usize, char) and harmonize with other reader?
         } else {
             Err(Error::of(EndOfFile))
         }

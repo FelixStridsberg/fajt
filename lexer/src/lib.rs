@@ -14,6 +14,7 @@ use crate::reader::Reader;
 use crate::token::Base::{Binary, Decimal, Hex, Octal};
 use crate::token::Token;
 use crate::token::TokenValue;
+use fajt_common::io::PeekRead;
 
 /// Consume code points from lexer to produce data.
 ///
@@ -59,6 +60,22 @@ type Result<T> = std::result::Result<T, Error>;
 
 pub struct Lexer<'a> {
     reader: Reader<'a>,
+}
+
+impl PeekRead<Token> for Lexer<'_> {
+    type Error = error::Error;
+
+    fn next(&mut self) -> std::result::Result<Option<(usize, Token)>, Error> {
+        match self.read() {
+            Ok(t) => Ok(Some((t.span.end, t))),
+            Err(e) => {
+                if *e.kind() == EndOfFile {
+                    return Ok(None);
+                }
+                Err(e)
+            }
+        }
+    }
 }
 
 impl<'a> Lexer<'a> {

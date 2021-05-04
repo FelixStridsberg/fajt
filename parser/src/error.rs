@@ -1,6 +1,8 @@
-use crate::error::ErrorKind::LexerError;
 use std::fmt::Formatter;
 use std::{error, fmt};
+
+use fajt_common::io::Error as CommonError;
+use fajt_lexer::error::Error as LexerError;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
@@ -23,7 +25,7 @@ impl Error {
 #[non_exhaustive]
 pub enum ErrorKind {
     EndOfStream,
-    LexerError(fajt_lexer::error::Error),
+    LexerError(LexerError),
     UnexpectedToken(fajt_lexer::token::Token),
 }
 
@@ -39,8 +41,17 @@ impl fmt::Display for Error {
 
 impl error::Error for Error {}
 
-impl From<fajt_lexer::error::Error> for Error {
-    fn from(lexer_err: fajt_lexer::error::Error) -> Self {
-        Error::of(LexerError(lexer_err))
+impl From<LexerError> for Error {
+    fn from(lexer_err: LexerError) -> Self {
+        Error::of(ErrorKind::LexerError(lexer_err))
+    }
+}
+
+impl From<CommonError<LexerError>> for Error {
+    fn from(error: CommonError<LexerError>) -> Self {
+        match error {
+            CommonError::EndOfStream => Error::of(ErrorKind::EndOfStream),
+            CommonError::ReaderError(lexer_error) => lexer_error.into(),
+        }
     }
 }
