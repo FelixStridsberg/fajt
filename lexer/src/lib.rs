@@ -158,7 +158,6 @@ impl<'a> Lexer<'a> {
         let word = self
             .reader
             .read_until(|c| char::is_part_of_identifier(&c))?;
-        let word = String::from_iter(word);
         let value = if let Ok(keyword) = word.parse() {
             TokenValue::Keyword(keyword)
         } else {
@@ -194,7 +193,6 @@ impl<'a> Lexer<'a> {
         }
 
         let number_str = self.reader.read_until(check)?;
-        let number_str = String::from_iter(number_str);
 
         // The check must be strict enough for a safe unwrap here
         Ok(i64::from_str_radix(&number_str, base).unwrap())

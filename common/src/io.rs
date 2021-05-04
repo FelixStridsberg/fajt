@@ -34,6 +34,7 @@ where
     I: PeekRead<T>,
     I::Error: Debug,
 {
+    // TODO update documentation, copied from when it was specific to parser reader.
     /// Returns an instance of a Reader.
     /// Returns error if lexer returns error (other than eof) when reading first 2 tokens.
     pub fn new(mut inner: I) -> Self {
@@ -86,9 +87,15 @@ where
             Err(Error::EndOfStream)
         }
     }
+}
 
-    pub fn read_until(&mut self, check: fn(&T) -> bool) -> Result<Vec<T>, I::Error> {
-        let mut result = Vec::new();
+impl<I> PeekReader<char, I>
+where
+    I: PeekRead<char>,
+    I::Error: Debug,
+{
+    pub fn read_until(&mut self, check: fn(&char) -> bool) -> Result<String, I::Error> {
+        let mut result = String::new();
 
         loop {
             match self.current() {
