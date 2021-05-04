@@ -45,7 +45,7 @@ pub struct VariableDeclaration {
 }
 
 impl VariableDeclaration {
-    pub fn new<I: Into<BindingPattern>>(identifier: I, initializer: Option<Expr>) -> Self {
+    pub fn new<I: Into<BindingPattern>>(identifier: I, _initializer: Option<Expr>) -> Self {
         VariableDeclaration {
             identifier: identifier.into(),
             initializer: None,

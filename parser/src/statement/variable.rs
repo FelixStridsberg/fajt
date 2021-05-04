@@ -68,7 +68,7 @@ impl Parser<'_> {
                         token.try_into().unwrap(),
                     )))
                 }
-                t => return Err(Error::of(UnexpectedToken(t.clone()))),
+                t => return Err(Error::of(UnexpectedToken(t))),
             }
         }
 

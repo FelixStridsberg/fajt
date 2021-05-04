@@ -13,7 +13,6 @@ use crate::token::Base::{Binary, Decimal, Hex, Octal};
 use crate::token::Token;
 use crate::token::TokenValue;
 use fajt_common::io::{PeekRead, PeekReader};
-use std::iter::FromIterator;
 use std::str::CharIndices;
 
 /// Consume code points from lexer to produce data.
