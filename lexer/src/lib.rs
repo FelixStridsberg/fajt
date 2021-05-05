@@ -113,6 +113,8 @@ impl<'a> Lexer<'a> {
             '{' => produce!(self, 1, punct!("{")),
             '}' => produce!(self, 1, punct!("}")),
             ',' => produce!(self, 1, punct!(",")),
+            '[' => produce!(self, 1, punct!("[")),
+            ']' => produce!(self, 1, punct!("]")),
             '&' => produce!(self, peek: '&' ? punct!("&&") ; punct!("&")),
             '|' => produce!(self, peek: '|' ? punct!("||") ; punct!("|")),
             '?' => produce!(self, peek: '?' ? punct!("??") ; punct!("?")),
