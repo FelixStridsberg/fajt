@@ -102,3 +102,11 @@ fn fail_var_statement_double_comma() {
         error: UnexpectedToken(Token::new(punct!(","), (8, 9)))
     );
 }
+
+#[test]
+fn fail_var_invalid_identifier() {
+    parser_test!(
+        input: "var * = c;",
+        error: UnexpectedToken(Token::new(punct!("*"), (4, 5)))
+    );
+}

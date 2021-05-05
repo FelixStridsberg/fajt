@@ -27,15 +27,15 @@ impl Parser<'_> {
         let span_start = token.span.start;
 
         let identifier = match &token.value {
+            punct!("{") => self.parse_object_property_binding()?,
+            punct!("[") => unimplemented!("Array binding"),
             TokenValue::Identifier(_) => BindingPattern::Ident(BindingIdentifier::Ident(
                 self.reader
                     .consume()?
                     .try_into()
                     .expect("Expected identifier"),
             )),
-            punct!("{") => self.parse_object_property_binding()?,
-            punct!("[") => unimplemented!("Array binding"),
-            c => unimplemented!("{:?}", c),
+            _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
         };
 
         let mut initializer = None;
