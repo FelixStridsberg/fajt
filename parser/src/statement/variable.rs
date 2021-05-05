@@ -38,7 +38,6 @@ impl Parser<'_> {
         match self.reader.current()? {
             token_matches!(punct!("=")) => initializer = Some(self.parse_variable_initializer()?),
             token_matches!(punct!(";")) => {
-                println!("HEJ");
                 self.reader.consume()?;
             }
             _ => (),
@@ -72,7 +71,6 @@ impl Parser<'_> {
             }
         }
 
-        println!("OU: {:?}", self.reader.current());
         if self.reader.current()?.value == punct!(";") {
             self.reader.consume()?;
         }
