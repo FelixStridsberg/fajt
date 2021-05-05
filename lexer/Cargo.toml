@@ -8,4 +8,4 @@ edition = "2018"
 
 [dependencies]
 fajt_common = { path = "../common" }
-macros = { path = "../macros" }
+fajt_macros = { path = "../macros" }

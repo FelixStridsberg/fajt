@@ -1,4 +1,4 @@
-extern crate macros;
+extern crate fajt_macros;
 
 mod code_point;
 pub mod error;

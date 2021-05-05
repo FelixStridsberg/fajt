@@ -1,5 +1,5 @@
 [package]
-name = "macros"
+name = "fajt_macros"
 version = "0.1.0"
 authors = ["Felix Stridsberg <felixstridsberg@gmail.com>"]
 edition = "2018"

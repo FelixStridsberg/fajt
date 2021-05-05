@@ -1,4 +1,4 @@
-use macros::FromString;
+use fajt_macros::FromString;
 
 #[macro_export]
 macro_rules! token_matches {

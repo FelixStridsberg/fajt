@@ -19,7 +19,16 @@ name = "fajt_lexer"
 version = "0.1.0"
 dependencies = [
  "fajt_common",
- "macros",
+ "fajt_macros",
+]
+
+[[package]]
+name = "fajt_macros"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -28,15 +37,6 @@ version = "0.1.0"
 dependencies = [
  "fajt_common",
  "fajt_lexer",
-]
-
-[[package]]
-name = "macros"
-version = "0.1.0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
