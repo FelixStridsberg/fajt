@@ -119,18 +119,19 @@ impl<I: Into<ObjectBinding>> From<I> for BindingPattern {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ObjectBinding {
+    pub span: Span,
     pub props: Vec<ObjectBindingProp>,
 }
 
 impl ObjectBinding {
-    pub fn new(props: Vec<ObjectBindingProp>) -> Self {
-        Self { props }
-    }
-}
-
-impl From<Vec<ObjectBindingProp>> for ObjectBinding {
-    fn from(props: Vec<ObjectBindingProp>) -> Self {
-        Self { props }
+    pub fn new<S>(props: Vec<ObjectBindingProp>, span: S) -> Self
+    where
+        S: Into<Span>,
+    {
+        Self {
+            props,
+            span: span.into(),
+        }
     }
 }
 

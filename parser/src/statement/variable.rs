@@ -1,6 +1,6 @@
 use crate::ast::{
-    BindingIdentifier, BindingPattern, Expr, ObjectBindingProp, Stmt, VariableDeclaration,
-    VariableKind, VariableStmt,
+    BindingIdentifier, BindingPattern, Expr, ObjectBinding, ObjectBindingProp, Stmt,
+    VariableDeclaration, VariableKind, VariableStmt,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Error, Result};
@@ -23,12 +23,15 @@ impl Parser<'_> {
     }
 
     fn parse_variable_declaration(&mut self) -> Result<VariableDeclaration> {
-        let token = self.reader.consume()?;
+        let token = self.reader.current()?;
         let span_start = token.span.start;
 
         let identifier = match &token.value {
             TokenValue::Identifier(_) => BindingPattern::Ident(BindingIdentifier::Ident(
-                token.try_into().expect("Expected identifier"),
+                self.reader
+                    .consume()?
+                    .try_into()
+                    .expect("Expected identifier"),
             )),
             punct!("{") => self.parse_object_property_binding()?,
             punct!("[") => unimplemented!("Array binding"),
@@ -55,11 +58,14 @@ impl Parser<'_> {
     }
 
     fn parse_object_property_binding(&mut self) -> Result<BindingPattern> {
+        let token = self.reader.consume()?;
+        let span_start = token.span.start;
+
         let mut bindings = Vec::new();
 
         let mut comma_allowed = false;
         loop {
-            let token = self.reader.consume()?; // TODO
+            let token = self.reader.consume()?;
 
             match token {
                 token_matches!(punct!("}")) => break,
@@ -78,6 +84,8 @@ impl Parser<'_> {
             self.reader.consume()?;
         }
 
-        Ok(bindings.into())
+        let span_end = self.reader.position();
+        let span = (span_start, span_end);
+        Ok(ObjectBinding::new(bindings, span).into())
     }
 }

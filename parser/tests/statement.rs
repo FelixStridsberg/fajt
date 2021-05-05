@@ -46,10 +46,9 @@ fn parse_var_stmt_empty_obj_binding() {
         output: [
             VariableStmt::new(Var, vec![
                 VariableDeclaration::new(
-                    BindingPattern::Object(ObjectBinding::new(vec![])),
-                    None,
-                    (4, 11)
-                ),
+                    BindingPattern::Object(
+                        ObjectBinding::new(vec![], (4, 6))
+                    ), None, (4, 11)),
             ], (0, 11)).into()
         ]
     );
@@ -61,9 +60,10 @@ fn parse_var_stmt_empty_single_binding() {
         input: "var { a } = b;",
         output: [
             VariableStmt::new(Var, vec![
-                VariableDeclaration::new(ObjectBinding::new(vec![
-                    Ident::new("a", (6, 7)).into()
-                ]), None, (4, 14)),
+                VariableDeclaration::new(ObjectBinding::new(
+                    vec![Ident::new("a", (6, 7)).into()],
+                    (4, 9)
+                ), None, (4, 14)),
             ], (0, 14)).into()
         ]
     );
@@ -75,10 +75,13 @@ fn parse_var_stmt_empty_multiple_binding() {
         input: "var { a, b } = c;",
         output: [
             VariableStmt::new(Var, vec![
-                VariableDeclaration::new(ObjectBinding::new(vec![
-                    Ident::new("a", (6, 7)).into(),
-                    Ident::new("b", (9, 10)).into(),
-                ]), None, (4, 17))
+                VariableDeclaration::new(ObjectBinding::new(
+                    vec![
+                        Ident::new("a", (6, 7)).into(),
+                        Ident::new("b", (9, 10)).into(),
+                    ],
+                    (4, 12)
+                ), None, (4, 17))
             ], (0, 17)).into()
         ]
     );
