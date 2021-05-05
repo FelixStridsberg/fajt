@@ -48,14 +48,14 @@ impl Parser<'_> {
             _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
         };
 
-        let mut initializer = None;
-        match self.reader.current()? {
-            token_matches!(punct!("=")) => initializer = Some(self.parse_variable_initializer()?),
+        let initializer = match self.reader.current()? {
+            token_matches!(punct!("=")) => Some(self.parse_variable_initializer()?),
             token_matches!(punct!(";")) => {
                 self.reader.consume()?;
+                None
             }
-            _ => (),
-        }
+            _ => None,
+        };
 
         let span_end = self.reader.position();
         let span = (span_start, span_end);
