@@ -11,6 +11,11 @@ use fajt_lexer::token_matches;
 use std::convert::TryInto;
 
 impl Parser<'_> {
+    /// Parses the `VariableStatement` and `LexicalDeclaration` goal symbols.
+    ///
+    /// Example:
+    /// var a = 2 + b, c = 2;
+    /// ^~~~~~~~~~~~~~~~~~~~^
     pub(crate) fn parse_variable_statement(&mut self, variable_type: VariableKind) -> Result<Stmt> {
         let token = self.reader.consume()?;
         let start = token.span.start;
@@ -22,13 +27,18 @@ impl Parser<'_> {
         Ok(VariableStmt::new(variable_type, declarations, (start, end)).into())
     }
 
+    /// Parses the `VariableDeclaration` and `LexicalBinding` goal symbols.
+    ///
+    /// Example:
+    /// var a = 2 + b, c = 2;
+    ///     ^~~~~~~~^  ^~~~~^
     fn parse_variable_declaration(&mut self) -> Result<VariableDeclaration> {
         let token = self.reader.current()?;
         let span_start = token.span.start;
 
         let identifier = match &token.value {
             punct!("{") => self.parse_object_binding_pattern()?,
-            punct!("[") => unimplemented!("Array binding"),
+            punct!("[") => self.parse_array_binding_pattern()?,
             TokenValue::Identifier(_) => BindingPattern::Ident(BindingIdentifier::Ident(
                 self.reader
                     .consume()?
@@ -52,11 +62,21 @@ impl Parser<'_> {
         Ok(VariableDeclaration::new(identifier, initializer, span))
     }
 
+    /// Parses the `Initializer` goal symbol.
+    ///
+    /// Example:
+    /// var a = 1 + 2, b = 100;
+    ///         ^~~~^      ^~^
     fn parse_variable_initializer(&mut self) -> Result<Expr> {
         self.reader.consume()?; // Skip =
         self.parse_assignment_expression()
     }
 
+    /// Parses the `ObjectBindingPattern` goal symbol.
+    ///
+    /// Example:
+    /// var { a, b, ...rest} = c;
+    ///     ^~~~~~~~~~~~~~~^
     fn parse_object_binding_pattern(&mut self) -> Result<BindingPattern> {
         let token = self.reader.consume()?;
         let span_start = token.span.start;
@@ -87,5 +107,14 @@ impl Parser<'_> {
         let span_end = self.reader.position();
         let span = (span_start, span_end);
         Ok(ObjectBinding::new(bindings, span).into())
+    }
+
+    /// Parses the `ArrayBindingPattern` goal symbol.
+    ///
+    /// Example:
+    /// var [ a, b, ...rest ] = c;
+    ///     ^~~~~~~~~~~~~~~~^
+    fn parse_array_binding_pattern(&mut self) -> Result<BindingPattern> {
+        todo!()
     }
 }
