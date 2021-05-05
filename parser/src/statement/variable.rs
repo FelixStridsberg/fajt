@@ -27,7 +27,7 @@ impl Parser<'_> {
         let span_start = token.span.start;
 
         let identifier = match &token.value {
-            punct!("{") => self.parse_object_property_binding()?,
+            punct!("{") => self.parse_object_binding_pattern()?,
             punct!("[") => unimplemented!("Array binding"),
             TokenValue::Identifier(_) => BindingPattern::Ident(BindingIdentifier::Ident(
                 self.reader
@@ -57,7 +57,7 @@ impl Parser<'_> {
         self.parse_assignment_expression()
     }
 
-    fn parse_object_property_binding(&mut self) -> Result<BindingPattern> {
+    fn parse_object_binding_pattern(&mut self) -> Result<BindingPattern> {
         let token = self.reader.consume()?;
         let span_start = token.span.start;
 
