@@ -22,7 +22,7 @@ impl From<VariableStmt> for Stmt {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct EmptyStmt {
-    span: Span,
+    pub span: Span,
 }
 
 impl EmptyStmt {
