@@ -24,6 +24,7 @@ impl Parser<'_> {
 
     fn parse_variable_declaration(&mut self) -> Result<VariableDeclaration> {
         let token = self.reader.consume()?;
+        let span_start = token.span.start;
 
         let identifier = match &token.value {
             TokenValue::Identifier(_) => BindingPattern::Ident(BindingIdentifier::Ident(
@@ -43,7 +44,9 @@ impl Parser<'_> {
             _ => (),
         }
 
-        Ok(VariableDeclaration::new(identifier, initializer))
+        let span_end = self.reader.position();
+        let span = (span_start, span_end);
+        Ok(VariableDeclaration::new(identifier, initializer, span))
     }
 
     fn parse_variable_initializer(&mut self) -> Result<Expr> {

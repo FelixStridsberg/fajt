@@ -40,15 +40,21 @@ pub struct VariableStmt {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct VariableDeclaration {
+    pub span: Span,
     pub identifier: BindingPattern,
     pub initializer: Option<Expr>,
 }
 
 impl VariableDeclaration {
-    pub fn new<I: Into<BindingPattern>>(identifier: I, _initializer: Option<Expr>) -> Self {
+    pub fn new<I, S>(identifier: I, _initializer: Option<Expr>, span: S) -> Self
+    where
+        I: Into<BindingPattern>,
+        S: Into<Span>,
+    {
         VariableDeclaration {
             identifier: identifier.into(),
             initializer: None,
+            span: span.into(),
         }
     }
 }
