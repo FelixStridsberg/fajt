@@ -87,6 +87,7 @@ impl Parser<'_> {
         loop {
             let token = self.reader.consume()?;
 
+            // TODO key value and rest patterns
             match token {
                 token_matches!(punct!("}")) => break,
                 token_matches!(punct!(",")) if comma_allowed => comma_allowed = false,
