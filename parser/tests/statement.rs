@@ -40,6 +40,14 @@ fn parse_var_statement() {
 }
 
 #[test]
+fn fail_var_invalid_identifier() {
+    parser_test!(
+        input: "var * = c;",
+        error: UnexpectedToken(Token::new(punct!("*"), (4, 5)))
+    );
+}
+
+#[test]
 fn parse_var_stmt_empty_obj_binding() {
     parser_test!(
         input: "var {} = a;",
@@ -104,9 +112,16 @@ fn fail_var_statement_double_comma() {
 }
 
 #[test]
-fn fail_var_invalid_identifier() {
+fn parse_var_stmt_empty_array_binding() {
     parser_test!(
-        input: "var * = c;",
-        error: UnexpectedToken(Token::new(punct!("*"), (4, 5)))
+        input: "var [] = a;",
+        output: [
+            VariableStmt::new(Var, vec![
+                VariableDeclaration::new(
+                    BindingPattern::Array(
+                        ArrayBinding::new(vec![], (4, 6))
+                    ), None, (4, 11)),
+            ], (0, 11)).into()
+        ]
     );
 }

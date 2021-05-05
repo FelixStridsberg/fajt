@@ -1,5 +1,5 @@
 use crate::ast::{
-    BindingIdentifier, BindingPattern, Expr, ObjectBinding, ObjectBindingProp, Stmt,
+    ArrayBinding, BindingIdentifier, BindingPattern, Expr, ObjectBinding, ObjectBindingProp, Stmt,
     VariableDeclaration, VariableKind, VariableStmt,
 };
 use crate::error::ErrorKind::UnexpectedToken;
@@ -79,6 +79,8 @@ impl Parser<'_> {
     ///     ^~~~~~~~~~~~~~~^
     fn parse_object_binding_pattern(&mut self) -> Result<BindingPattern> {
         let token = self.reader.consume()?;
+        debug_assert_eq!(token.value, punct!("{"));
+
         let span_start = token.span.start;
 
         let mut bindings = Vec::new();
@@ -116,6 +118,23 @@ impl Parser<'_> {
     /// var [ a, b, ...rest ] = c;
     ///     ^~~~~~~~~~~~~~~~^
     fn parse_array_binding_pattern(&mut self) -> Result<BindingPattern> {
-        todo!()
+        let token = self.reader.consume()?;
+        debug_assert_eq!(token.value, punct!("["));
+
+        let span_start = token.span.start;
+
+        loop {
+            let token = self.reader.consume()?;
+
+            match token {
+                token_matches!(punct!("]")) => break,
+                t => return Err(Error::of(UnexpectedToken(t))),
+            }
+        }
+
+        let span_end = self.reader.position();
+        let span = (span_start, span_end);
+
+        Ok(ArrayBinding::new(vec![], span).into())
     }
 }

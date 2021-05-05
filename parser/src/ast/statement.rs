@@ -111,9 +111,15 @@ pub enum BindingPattern {
     Array(ArrayBinding),
 }
 
-impl<I: Into<ObjectBinding>> From<I> for BindingPattern {
-    fn from(binding: I) -> Self {
+impl From<ObjectBinding> for BindingPattern {
+    fn from(binding: ObjectBinding) -> Self {
         Self::Object(binding.into())
+    }
+}
+
+impl From<ArrayBinding> for BindingPattern {
+    fn from(binding: ArrayBinding) -> Self {
+        Self::Array(binding.into())
     }
 }
 
@@ -144,5 +150,18 @@ pub enum ObjectBindingProp {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ArrayBinding {
+    pub span: Span,
     pub elements: Vec<Option<BindingPattern>>,
+}
+
+impl ArrayBinding {
+    pub fn new<S>(elements: Vec<Option<BindingPattern>>, span: S) -> Self
+    where
+        S: Into<Span>,
+    {
+        Self {
+            elements,
+            span: span.into(),
+        }
+    }
 }
