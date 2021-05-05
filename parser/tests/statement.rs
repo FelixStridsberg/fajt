@@ -55,7 +55,7 @@ fn parse_var_stmt_empty_obj_binding() {
 }
 
 #[test]
-fn parse_var_stmt_empty_single_binding() {
+fn parse_var_stmt_single_obj_binding() {
     parser_test!(
         input: "var { a } = b;",
         output: [
@@ -70,7 +70,7 @@ fn parse_var_stmt_empty_single_binding() {
 }
 
 #[test]
-fn parse_var_stmt_empty_multiple_binding() {
+fn parse_var_stmt_multiple_obj_binding() {
     parser_test!(
         input: "var { a, b } = c;",
         output: [
