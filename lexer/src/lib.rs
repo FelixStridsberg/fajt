@@ -92,9 +92,10 @@ impl<'a> Lexer<'a> {
 
         let start = self.reader.position();
         let value = match current {
-            '=' if self.reader.peek() != Some(&'=') => produce!(self, 1, punct!("=")),
             // <op>=
-            '/' | '*' | '%' | '+' | '-' | '|' | '^' | '&' if self.reader.peek() == Some(&'=') => {
+            '/' | '*' | '%' | '+' | '-' | '|' | '^' | '&' | '<' | '>' | '='
+                if self.reader.peek() == Some(&'=') =>
+            {
                 match current {
                     '/' => produce!(self, 2, punct!("/=")),
                     '*' => produce!(self, 2, punct!("*=")),
@@ -104,32 +105,15 @@ impl<'a> Lexer<'a> {
                     '|' => produce!(self, 2, punct!("|=")),
                     '^' => produce!(self, 2, punct!("^=")),
                     '&' => produce!(self, 2, punct!("&=")),
+                    '<' => produce!(self, 2, punct!("<=")),
+                    '>' => produce!(self, 2, punct!(">=")),
+                    '=' => {
+                        self.reader.consume()?;
+                        produce!(self, peek: '=' ? punct!("===") ; punct!("=="))
+                    }
                     _ => unreachable!(),
                 }
             }
-            '^' => produce!(self, 1, punct!("^")),
-            '%' => produce!(self, 1, punct!("%")),
-            ';' => produce!(self, 1, punct!(";")),
-            '{' => produce!(self, 1, punct!("{")),
-            '}' => produce!(self, 1, punct!("}")),
-            ',' => produce!(self, 1, punct!(",")),
-            '[' => produce!(self, 1, punct!("[")),
-            ']' => produce!(self, 1, punct!("]")),
-            '&' => produce!(self, peek: '&' ? punct!("&&") ; punct!("&")),
-            '|' => produce!(self, peek: '|' ? punct!("||") ; punct!("|")),
-            '?' => produce!(self, peek: '?' ? punct!("??") ; punct!("?")),
-            '+' => produce!(self, peek: '+' ? punct!("++") ; punct!("+")),
-            '-' => produce!(self, peek: '-' ? punct!("--") ; punct!("-")),
-            '*' => {
-                if self.reader.peek() == Some(&'*') {
-                    self.reader.consume()?;
-                    produce!(self, peek: '=' ? punct!("**=") ; punct!("**"))
-                } else {
-                    produce!(self, 1, punct!("*"))
-                }
-            }
-            // TODO handle comments (//, /*)
-            '/' => produce!(self, 1, punct!("/")),
             '<' if self.reader.peek() == Some(&'<') => {
                 self.reader.consume()?;
                 produce!(self, peek: '=' ? punct!("<<=") ; punct!("<<"))
@@ -145,6 +129,53 @@ impl<'a> Lexer<'a> {
                     _ => produce!(self, 1, punct!(">>")),
                 }
             }
+            '!' if self.reader.peek() == Some(&'=') => {
+                self.reader.consume()?;
+                produce!(self, peek: '=' ? punct!("!==") ; punct!("!="))
+            }
+            '=' => produce!(self, peek: '>' ? punct!("=>") ; punct!("=")),
+            '<' => produce!(self, 1, punct!("<")),
+            '>' => produce!(self, 1, punct!(">")),
+            '^' => produce!(self, 1, punct!("^")),
+            '%' => produce!(self, 1, punct!("%")),
+            ';' => produce!(self, 1, punct!(";")),
+            '{' => produce!(self, 1, punct!("{")),
+            '}' => produce!(self, 1, punct!("}")),
+            ',' => produce!(self, 1, punct!(",")),
+            '[' => produce!(self, 1, punct!("[")),
+            ']' => produce!(self, 1, punct!("]")),
+            '(' => produce!(self, 1, punct!("(")),
+            ')' => produce!(self, 1, punct!(")")),
+            '~' => produce!(self, 1, punct!("~")),
+            ':' => produce!(self, 1, punct!(":")),
+            '!' => produce!(self, 1, punct!("!")),
+            '&' => produce!(self, peek: '&' ? punct!("&&") ; punct!("&")),
+            '|' => produce!(self, peek: '|' ? punct!("||") ; punct!("|")),
+            '?' => produce!(self, peek: '?' ? punct!("??") ; punct!("?")),
+            '+' => produce!(self, peek: '+' ? punct!("++") ; punct!("+")),
+            '-' => produce!(self, peek: '-' ? punct!("--") ; punct!("-")),
+            '*' => {
+                if self.reader.peek() == Some(&'*') {
+                    self.reader.consume()?;
+                    produce!(self, peek: '=' ? punct!("**=") ; punct!("**"))
+                } else {
+                    produce!(self, 1, punct!("*"))
+                }
+            }
+            '.' => {
+                if self.reader.peek() == Some(&'.') {
+                    self.reader.consume()?;
+                    if self.reader.peek() == Some(&'.') {
+                        produce!(self, 2, punct!("..."))
+                    } else {
+                        todo!("Syntax error, '..' is not a valid punctuator.")
+                    }
+                } else {
+                    produce!(self, 1, punct!("."))
+                }
+            }
+            // TODO handle comments (//, /*)
+            '/' => produce!(self, 1, punct!("/")),
             '0'..='9' => self.read_number_literal(),
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             c => unimplemented!("Lexer did not recognize code point '{}'.", c),
