@@ -144,7 +144,24 @@ fn parse_var_stmt_single_elem_array_binding() {
 }
 
 #[test]
-fn parse_var_stmt_single_ellison_array_binding() {
+fn parse_var_stmt_single_elem_array_binding_trailing_comma() {
+    parser_test!(
+        input: "var [ a, ] = b;",
+        output: [
+            VariableStmt::new(Var, vec![
+                VariableDeclaration::new(
+                    BindingPattern::Array(
+                        ArrayBinding::new(vec![
+                            Some(BindingPattern::Ident(Ident::new("a", (6, 7)).into()))
+                        ], (4, 10))
+                    ), None, (4, 15)),
+            ], (0, 15)).into()
+        ]
+    );
+}
+
+#[test]
+fn parse_var_stmt_single_elision_array_binding() {
     parser_test!(
         input: "var [ , ] = b;",
         output: [
@@ -156,6 +173,25 @@ fn parse_var_stmt_single_ellison_array_binding() {
                         ], (4, 9))
                     ), None, (4, 14)),
             ], (0, 14)).into()
+        ]
+    );
+}
+#[test]
+fn parse_var_stmt_array_binding_mixed() {
+    parser_test!(
+        input: "var [ , a,,b ] = c;",
+        output: [
+            VariableStmt::new(Var, vec![
+                VariableDeclaration::new(
+                    BindingPattern::Array(
+                        ArrayBinding::new(vec![
+                            None,
+                            Some(BindingPattern::Ident(Ident::new("a", (8, 9)).into())),
+                            None,
+                            Some(BindingPattern::Ident(Ident::new("b", (11, 12)).into())),
+                        ], (4, 14))
+                    ), None, (4, 19)),
+            ], (0, 19)).into()
         ]
     );
 }
