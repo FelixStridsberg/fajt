@@ -123,11 +123,15 @@ impl Parser<'_> {
 
         let span_start = token.span.start;
 
+        let mut bindings = Vec::new();
         loop {
             let token = self.reader.consume()?;
 
             match token {
                 token_matches!(punct!("]")) => break,
+                token_matches!(@ident) => bindings.push(Some(BindingPattern::Ident(
+                    BindingIdentifier::Ident(token.try_into().unwrap()),
+                ))),
                 t => return Err(Error::of(UnexpectedToken(t))),
             }
         }
@@ -135,6 +139,6 @@ impl Parser<'_> {
         let span_end = self.reader.position();
         let span = (span_start, span_end);
 
-        Ok(ArrayBinding::new(vec![], span).into())
+        Ok(ArrayBinding::new(bindings, span).into())
     }
 }
