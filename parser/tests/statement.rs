@@ -142,3 +142,20 @@ fn parse_var_stmt_single_elem_array_binding() {
         ]
     );
 }
+
+#[test]
+fn parse_var_stmt_single_ellison_array_binding() {
+    parser_test!(
+        input: "var [ , ] = b;",
+        output: [
+            VariableStmt::new(Var, vec![
+                VariableDeclaration::new(
+                    BindingPattern::Array(
+                        ArrayBinding::new(vec![
+                            None
+                        ], (4, 9))
+                    ), None, (4, 14)),
+            ], (0, 14)).into()
+        ]
+    );
+}

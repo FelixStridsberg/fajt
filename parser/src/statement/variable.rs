@@ -124,14 +124,26 @@ impl Parser<'_> {
         let span_start = token.span.start;
 
         let mut bindings = Vec::new();
+
+        let mut comma_delimiter = false;
         loop {
             let token = self.reader.consume()?;
 
             match token {
                 token_matches!(punct!("]")) => break,
-                token_matches!(@ident) => bindings.push(Some(BindingPattern::Ident(
-                    BindingIdentifier::Ident(token.try_into().unwrap()),
-                ))),
+                token_matches!(punct!(",")) => {
+                    if !comma_delimiter {
+                        bindings.push(None);
+                    }
+
+                    comma_delimiter = false;
+                },
+                token_matches!(@ident) => {
+                    comma_delimiter = true;
+                    bindings.push(Some(BindingPattern::Ident(
+                        BindingIdentifier::Ident(token.try_into().unwrap()),
+                    )))
+                },
                 t => return Err(Error::of(UnexpectedToken(t))),
             }
         }
