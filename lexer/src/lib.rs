@@ -147,7 +147,7 @@ impl<'a> Lexer<'a> {
             }
             '0'..='9' => self.read_number_literal(),
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
-            c => unimplemented!("Unimplemented: {}", c),
+            c => unimplemented!("Lexer did not recognize code point '{}'.", c),
         }?;
         let end = self.reader.position();
 
