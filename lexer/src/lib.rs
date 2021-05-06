@@ -141,7 +141,7 @@ impl<'a> Lexer<'a> {
                         self.reader.consume()?;
                         produce!(self, peek: '=' ? punct!(">>>=") ; punct!(">>>"))
                     }
-                    Some('=') => produce!(self, 2, punct!(">>=")),
+                    Some(&'=') => produce!(self, 2, punct!(">>=")),
                     _ => produce!(self, 1, punct!(">>")),
                 }
             }
