@@ -119,7 +119,7 @@ fn parse_var_stmt_empty_array_binding() {
             VariableStmt::new(Var, vec![
                 VariableDeclaration::new(
                     BindingPattern::Array(
-                        ArrayBinding::new(vec![], (4, 6))
+                        ArrayBinding::new(vec![], None, (4, 6))
                     ), None, (4, 11)),
             ], (0, 11)).into()
         ]
@@ -136,7 +136,7 @@ fn parse_var_stmt_single_elem_array_binding() {
                     BindingPattern::Array(
                         ArrayBinding::new(vec![
                             Some(BindingPattern::Ident(Ident::new("a", (6, 7)).into()))
-                        ], (4, 9))
+                        ], None, (4, 9))
                     ), None, (4, 14)),
             ], (0, 14)).into()
         ]
@@ -153,7 +153,7 @@ fn parse_var_stmt_single_elem_array_binding_trailing_comma() {
                     BindingPattern::Array(
                         ArrayBinding::new(vec![
                             Some(BindingPattern::Ident(Ident::new("a", (6, 7)).into()))
-                        ], (4, 10))
+                        ], None, (4, 10))
                     ), None, (4, 15)),
             ], (0, 15)).into()
         ]
@@ -170,12 +170,29 @@ fn parse_var_stmt_single_elision_array_binding() {
                     BindingPattern::Array(
                         ArrayBinding::new(vec![
                             None
-                        ], (4, 9))
+                        ], None, (4, 9))
                     ), None, (4, 14)),
             ], (0, 14)).into()
         ]
     );
 }
+
+#[test]
+fn parse_var_stmt_single_rest_array_binding() {
+    parser_test!(
+        input: "var [ ...a ] = b;",
+        output: [
+            VariableStmt::new(Var, vec![
+                VariableDeclaration::new(
+                    BindingPattern::Array(
+                        ArrayBinding::new(vec![
+                        ], Some(Ident::new("a", (9, 10))), (4, 12))
+                    ), None, (4, 17)),
+            ], (0, 17)).into()
+        ]
+    );
+}
+
 #[test]
 fn parse_var_stmt_array_binding_mixed() {
     parser_test!(
@@ -189,7 +206,7 @@ fn parse_var_stmt_array_binding_mixed() {
                             Some(BindingPattern::Ident(Ident::new("a", (8, 9)).into())),
                             None,
                             Some(BindingPattern::Ident(Ident::new("b", (11, 12)).into())),
-                        ], (4, 14))
+                        ], None, (4, 14))
                     ), None, (4, 19)),
             ], (0, 19)).into()
         ]

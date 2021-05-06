@@ -5,6 +5,9 @@ macro_rules! token_matches {
     ($token:expr, $value:pat) => {
         matches!($token, crate::token::Token { value: $value, .. });
     };
+    ($token:expr, @ident) => {
+        token_matches!($token, crate::token::TokenValue::Identifier(_))
+    };
     ($value:pat) => {
         crate::token::Token { value: $value, .. }
     };

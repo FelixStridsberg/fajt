@@ -152,15 +152,17 @@ pub enum ObjectBindingProp {
 pub struct ArrayBinding {
     pub span: Span,
     pub elements: Vec<Option<BindingPattern>>,
+    pub rest: Option<Ident>,
 }
 
 impl ArrayBinding {
-    pub fn new<S>(elements: Vec<Option<BindingPattern>>, span: S) -> Self
+    pub fn new<S>(elements: Vec<Option<BindingPattern>>, rest: Option<Ident>, span: S) -> Self
     where
         S: Into<Span>,
     {
         Self {
             elements,
+            rest,
             span: span.into(),
         }
     }

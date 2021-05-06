@@ -125,6 +125,7 @@ impl Parser<'_> {
 
         let mut bindings = Vec::new();
 
+        let mut rest = None;
         let mut comma_delimiter = false;
         loop {
             let token = self.reader.consume()?;
@@ -137,13 +138,30 @@ impl Parser<'_> {
                     }
 
                     comma_delimiter = false;
-                },
+                }
+                token_matches!(punct!("...")) => {
+                    if !token_matches!(self.reader.current()?, @ident) {
+                        return Err(Error::of(UnexpectedToken(self.reader.consume()?)));
+                    }
+
+                    if !token_matches!(self.reader.peek(), opt: punct!("]")) {
+                        // TODO better error message, ...rest must be last element
+                        self.reader.consume()?;
+                        return Err(Error::of(UnexpectedToken(self.reader.consume()?)));
+                    }
+
+                    let ident_token = self.reader.consume()?;
+                    self.reader.consume()?; // ]
+
+                    rest = Some(ident_token.try_into().unwrap());
+                    break;
+                }
                 token_matches!(@ident) => {
                     comma_delimiter = true;
-                    bindings.push(Some(BindingPattern::Ident(
-                        BindingIdentifier::Ident(token.try_into().unwrap()),
-                    )))
-                },
+                    bindings.push(Some(BindingPattern::Ident(BindingIdentifier::Ident(
+                        token.try_into().unwrap(),
+                    ))))
+                }
                 t => return Err(Error::of(UnexpectedToken(t))),
             }
         }
@@ -151,6 +169,6 @@ impl Parser<'_> {
         let span_end = self.reader.position();
         let span = (span_start, span_end);
 
-        Ok(ArrayBinding::new(bindings, span).into())
+        Ok(ArrayBinding::new(bindings, rest, span).into())
     }
 }
