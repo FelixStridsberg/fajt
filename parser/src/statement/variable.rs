@@ -1,12 +1,13 @@
 use crate::ast::{
-    ArrayBinding, BindingIdentifier, BindingPattern, Expr, ObjectBinding, ObjectBindingProp, Stmt,
-    VariableDeclaration, VariableKind, VariableStmt,
+    ArrayBinding, BindingIdentifier, BindingPattern, Expr, Ident, ObjectBinding, ObjectBindingProp,
+    Stmt, VariableDeclaration, VariableKind, VariableStmt,
 };
 use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::{Error, Result};
 use crate::Parser;
 use fajt_lexer::punct;
-use fajt_lexer::token::TokenValue;
+use fajt_lexer::token::Punct::{BraceClose, BracketClose};
+use fajt_lexer::token::{Punct, TokenValue};
 use fajt_lexer::token_matches;
 use std::convert::TryInto;
 
@@ -101,22 +102,7 @@ impl Parser<'_> {
                     )))
                 }
                 token_matches!(punct!("...")) => {
-                    if !token_matches!(self.reader.current()?, @ident) {
-                        return Err(Error::of(UnexpectedToken(self.reader.consume()?)));
-                    }
-
-                    let ident_token = self.reader.consume()?;
-                    if !token_matches!(self.reader.current()?, punct!("}")) {
-                        self.reader.consume()?; // Illegal token
-                        return Err(Error::of(SyntaxError(
-                            "Rest element must be last element".to_owned(),
-                            ident_token.span,
-                        )));
-                    }
-
-                    self.reader.consume()?; // ]
-
-                    rest = Some(ident_token.try_into().unwrap());
+                    rest = self.parse_rest_binding_ident(BracketClose)?;
                     break;
                 }
                 t => return Err(Error::of(UnexpectedToken(t))),
@@ -160,22 +146,7 @@ impl Parser<'_> {
                     comma_delimiter = false;
                 }
                 token_matches!(punct!("...")) => {
-                    if !token_matches!(self.reader.current()?, @ident) {
-                        return Err(Error::of(UnexpectedToken(self.reader.consume()?)));
-                    }
-
-                    let ident_token = self.reader.consume()?;
-                    if !token_matches!(self.reader.current()?, punct!("]")) {
-                        self.reader.consume()?; // Illegal token
-                        return Err(Error::of(SyntaxError(
-                            "Rest element must be last element".to_owned(),
-                            ident_token.span,
-                        )));
-                    }
-
-                    self.reader.consume()?; // ]
-
-                    rest = Some(ident_token.try_into().unwrap());
+                    rest = self.parse_rest_binding_ident(BraceClose)?;
                     break;
                 }
                 token_matches!(@ident) => {
@@ -192,5 +163,32 @@ impl Parser<'_> {
         let span = (span_start, span_end);
 
         Ok(ArrayBinding::new(bindings, rest, span).into())
+    }
+
+    /// Parses the BindingIdentifier goal symbol.
+    /// This also consumes the expected end punctuator.
+    ///
+    /// Examples:
+    /// var { ...rest } = a;
+    ///          ^~~~~^
+    /// var [ ...rest ] = a;
+    ///          ^~~~~^
+    fn parse_rest_binding_ident(&mut self, expected_end: Punct) -> Result<Option<Ident>> {
+        if !token_matches!(self.reader.current()?, @ident) {
+            return Err(Error::of(UnexpectedToken(self.reader.consume()?)));
+        }
+        let ident_token = self.reader.consume()?;
+        let end_token = self.reader.consume()?;
+
+        if let TokenValue::Punct(p) = end_token.value {
+            if p == expected_end {
+                return Ok(Some(ident_token.try_into().unwrap()));
+            }
+        }
+
+        Err(Error::of(SyntaxError(
+            "Rest element must be last element".to_owned(),
+            ident_token.span,
+        )))
     }
 }
