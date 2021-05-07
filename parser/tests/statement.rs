@@ -324,3 +324,24 @@ fn fail_var_stmt_array_biding_rest_not_last() {
         error: SyntaxError("Rest element must be last element".to_owned(), (9, 13).into())
     );
 }
+
+#[test]
+fn parse_var_stmt_array_binding_with_obj_binding() {
+    parser_test!(
+        input: "var [ { a } ] = b;",
+        output: [
+            VariableStmt::new(Var, vec![
+                VariableDeclaration::new(
+                    BindingPattern::Array(
+                        ArrayBinding::new(vec![
+                            Some(BindingPattern::Object(
+                                ObjectBinding::new(vec![
+                                    Ident::new("a", (8, 9)).into()
+                                ], None, (6, 11))
+                            ))
+                        ], None, (4, 13))
+                    ), None, (4, 18)),
+            ], (0, 18)).into()
+        ]
+    );
+}

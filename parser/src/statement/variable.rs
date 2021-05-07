@@ -90,21 +90,27 @@ impl Parser<'_> {
         let mut rest = None;
         let mut comma_allowed = false;
         loop {
-            let token = self.reader.consume()?;
-
-            // TODO key value and rest patterns
-            match token {
-                token_matches!(punct!("}")) => break,
-                token_matches!(punct!(",")) if comma_allowed => comma_allowed = false,
+            match self.reader.current()? {
+                token_matches!(punct!("}")) => {
+                    self.reader.consume()?;
+                    break;
+                }
+                token_matches!(punct!(",")) if comma_allowed => {
+                    self.reader.consume()?;
+                    comma_allowed = false
+                }
                 token_matches!(punct!("...")) => {
+                    self.reader.consume()?;
                     rest = self.parse_rest_binding_ident(BracketClose)?;
                     break;
                 }
                 token_matches!(@ident) => {
+                    let token = self.reader.consume()?;
                     comma_allowed = true;
                     bindings.push(ObjectBindingProp::Assign(token.try_into().unwrap()))
                 }
                 token_matches!(keyword!("await")) => {
+                    let token = self.reader.consume()?;
                     comma_allowed = true;
                     bindings.push(ObjectBindingProp::Assign(Ident::new(
                         "await".to_owned(),
@@ -112,13 +118,14 @@ impl Parser<'_> {
                     )))
                 }
                 token_matches!(keyword!("yield")) => {
+                    let token = self.reader.consume()?;
                     comma_allowed = true;
                     bindings.push(ObjectBindingProp::Assign(Ident::new(
                         "yield".to_owned(),
                         token.span,
                     )))
                 }
-                t => return Err(Error::of(UnexpectedToken(t))),
+                _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
             }
         }
 
@@ -147,11 +154,20 @@ impl Parser<'_> {
         let mut rest = None;
         let mut comma_delimiter = false;
         loop {
-            let token = self.reader.consume()?;
+            match self.reader.current()? {
+                token_matches!(punct!("]")) => {
+                    self.reader.consume()?;
+                    break;
+                }
+                token_matches!(punct!("{")) => {
+                    let pat = self.parse_object_binding_pattern()?;
+                    println!("PAT: {:?}", pat);
+                    bindings.push(Some(pat));
 
-            match token {
-                token_matches!(punct!("]")) => break,
+                    comma_delimiter = true;
+                }
                 token_matches!(punct!(",")) => {
+                    self.reader.consume()?;
                     if !comma_delimiter {
                         bindings.push(None);
                     }
@@ -159,14 +175,17 @@ impl Parser<'_> {
                     comma_delimiter = false;
                 }
                 token_matches!(punct!("...")) => {
+                    self.reader.consume()?;
                     rest = self.parse_rest_binding_ident(BraceClose)?;
                     break;
                 }
                 token_matches!(@ident) => {
+                    let token = self.reader.consume()?;
                     comma_delimiter = true;
                     bindings.push(Some(BindingPattern::Ident(token.try_into().unwrap())))
                 }
                 token_matches!(keyword!("await")) => {
+                    let token = self.reader.consume()?;
                     comma_delimiter = true;
                     bindings.push(Some(BindingPattern::Ident(Ident::new(
                         "await".to_owned(),
@@ -174,13 +193,14 @@ impl Parser<'_> {
                     ))))
                 }
                 token_matches!(keyword!("yield")) => {
+                    let token = self.reader.consume()?;
                     comma_delimiter = true;
                     bindings.push(Some(BindingPattern::Ident(Ident::new(
                         "yield".to_owned(),
                         token.span,
                     ))))
                 }
-                t => return Err(Error::of(UnexpectedToken(t))),
+                _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
             }
         }
 
