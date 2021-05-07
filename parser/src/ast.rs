@@ -54,15 +54,15 @@ impl TryFrom<Token> for Ident {
     type Error = ();
 
     fn try_from(token: Token) -> Result<Self, Self::Error> {
-        match &token.value {
+        match token.value {
             TokenValue::Identifier(name) => Ok(Ident {
-                name: name.clone(),
                 span: token.span.clone(),
+                name,
             }),
             // Await can be used as a keyword in non async contexts.
             TokenValue::Keyword(Keyword::Await) => Ok(Ident {
                 name: "await".to_owned(),
-                span: token.span.clone(),
+                span: token.span,
             }),
             _ => Err(()),
         }
