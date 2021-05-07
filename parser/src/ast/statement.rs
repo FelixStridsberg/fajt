@@ -127,15 +127,17 @@ impl From<ArrayBinding> for BindingPattern {
 pub struct ObjectBinding {
     pub span: Span,
     pub props: Vec<ObjectBindingProp>,
+    pub rest: Option<Ident>,
 }
 
 impl ObjectBinding {
-    pub fn new<S>(props: Vec<ObjectBindingProp>, span: S) -> Self
+    pub fn new<S>(props: Vec<ObjectBindingProp>, rest: Option<Ident>, span: S) -> Self
     where
         S: Into<Span>,
     {
         Self {
             props,
+            rest,
             span: span.into(),
         }
     }

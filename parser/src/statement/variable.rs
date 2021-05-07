@@ -85,6 +85,7 @@ impl Parser<'_> {
 
         let mut bindings = Vec::new();
 
+        let mut rest = None;
         let mut comma_allowed = false;
         loop {
             let token = self.reader.consume()?;
@@ -99,6 +100,25 @@ impl Parser<'_> {
                         token.try_into().unwrap(),
                     )))
                 }
+                token_matches!(punct!("...")) => {
+                    if !token_matches!(self.reader.current()?, @ident) {
+                        return Err(Error::of(UnexpectedToken(self.reader.consume()?)));
+                    }
+
+                    let ident_token = self.reader.consume()?;
+                    if !token_matches!(self.reader.current()?, punct!("}")) {
+                        self.reader.consume()?; // Illegal token
+                        return Err(Error::of(SyntaxError(
+                            "Rest element must be last element".to_owned(),
+                            ident_token.span,
+                        )));
+                    }
+
+                    self.reader.consume()?; // ]
+
+                    rest = Some(ident_token.try_into().unwrap());
+                    break;
+                }
                 t => return Err(Error::of(UnexpectedToken(t))),
             }
         }
@@ -109,7 +129,7 @@ impl Parser<'_> {
 
         let span_end = self.reader.position();
         let span = (span_start, span_end);
-        Ok(ObjectBinding::new(bindings, span).into())
+        Ok(ObjectBinding::new(bindings, rest, span).into())
     }
 
     /// Parses the `ArrayBindingPattern` goal symbol.
