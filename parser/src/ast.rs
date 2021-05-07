@@ -4,7 +4,7 @@ pub mod statement;
 pub use expression::*;
 pub use statement::*;
 
-use fajt_lexer::token::{Span, Token, TokenValue};
+use fajt_lexer::token::{Keyword, Span, Token, TokenValue};
 use std::convert::TryFrom;
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -56,8 +56,13 @@ impl TryFrom<Token> for Ident {
     fn try_from(token: Token) -> Result<Self, Self::Error> {
         match &token.value {
             TokenValue::Identifier(name) => Ok(Ident {
-                span: token.span.clone(),
                 name: name.clone(),
+                span: token.span.clone(),
+            }),
+            // Await can be used as a keyword in non async contexts.
+            TokenValue::Keyword(Keyword::Await) => Ok(Ident {
+                name: "await".to_owned(),
+                span: token.span.clone(),
             }),
             _ => Err(()),
         }

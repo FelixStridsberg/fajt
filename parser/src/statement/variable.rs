@@ -5,6 +5,7 @@ use crate::ast::{
 use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::{Error, Result};
 use crate::Parser;
+use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token::Punct::{BraceClose, BracketClose};
 use fajt_lexer::token::{Punct, TokenValue};
@@ -95,13 +96,20 @@ impl Parser<'_> {
             match token {
                 token_matches!(punct!("}")) => break,
                 token_matches!(punct!(",")) if comma_allowed => comma_allowed = false,
+                token_matches!(punct!("...")) => {
+                    rest = self.parse_rest_binding_ident(BracketClose)?;
+                    break;
+                }
                 token_matches!(@ident) => {
                     comma_allowed = true;
                     bindings.push(ObjectBindingProp::Assign(token.try_into().unwrap()))
                 }
-                token_matches!(punct!("...")) => {
-                    rest = self.parse_rest_binding_ident(BracketClose)?;
-                    break;
+                token_matches!(keyword!("await")) => {
+                    comma_allowed = true;
+                    bindings.push(ObjectBindingProp::Assign(Ident::new(
+                        "await".to_owned(),
+                        token.span,
+                    )))
                 }
                 t => return Err(Error::of(UnexpectedToken(t))),
             }
@@ -170,10 +178,11 @@ impl Parser<'_> {
     /// var [ ...rest ] = a;
     ///          ^~~~~^
     fn parse_rest_binding_ident(&mut self, expected_end: Punct) -> Result<Option<Ident>> {
-        if !token_matches!(self.reader.current()?, @ident) {
-            return Err(Error::of(UnexpectedToken(self.reader.consume()?)));
-        }
         let ident_token = self.reader.consume()?;
+        if !token_matches!(ident_token, @ident) && !token_matches!(ident_token, keyword!("await")) {
+            return Err(Error::of(UnexpectedToken(ident_token)));
+        }
+
         let end_token = self.reader.consume()?;
 
         if let TokenValue::Punct(p) = end_token.value {

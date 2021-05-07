@@ -113,6 +113,26 @@ fn parse_var_stmt_obj_binding_rest() {
     );
 }
 
+/// `await` is a valid identifier in the parser context.
+/// See the goal symbol `BindingIdentifier` specification.
+#[test]
+fn parse_var_stmt_obj_binding_await() {
+    parser_test!(
+        input: "var { await, ...await } = c;",
+        output: [
+            VariableStmt::new(Var, vec![
+                VariableDeclaration::new(ObjectBinding::new(
+                    vec![
+                        Ident::new("await", (6, 11)).into(),
+                    ],
+                    Some(Ident::new("await", (16, 21))),
+                    (4, 23)
+                ), None, (4, 28))
+            ], (0, 28)).into()
+        ]
+    );
+}
+
 #[test]
 fn fail_var_statement_prefix_comma() {
     parser_test!(
