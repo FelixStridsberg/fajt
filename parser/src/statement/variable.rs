@@ -104,26 +104,12 @@ impl Parser<'_> {
                     rest = self.parse_rest_binding_ident(BracketClose)?;
                     break;
                 }
-                token_matches!(@ident) => {
+                token_matches!(@ident)
+                | token_matches!(keyword!("await"))
+                | token_matches!(keyword!("yield")) => {
                     let token = self.reader.consume()?;
                     comma_allowed = true;
-                    bindings.push(ObjectBindingProp::Assign(token.try_into().unwrap()))
-                }
-                token_matches!(keyword!("await")) => {
-                    let token = self.reader.consume()?;
-                    comma_allowed = true;
-                    bindings.push(ObjectBindingProp::Assign(Ident::new(
-                        "await".to_owned(),
-                        token.span,
-                    )))
-                }
-                token_matches!(keyword!("yield")) => {
-                    let token = self.reader.consume()?;
-                    comma_allowed = true;
-                    bindings.push(ObjectBindingProp::Assign(Ident::new(
-                        "yield".to_owned(),
-                        token.span,
-                    )))
+                    bindings.push(ObjectBindingProp::Assign(token.try_into()?))
                 }
                 _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
             }
@@ -179,26 +165,12 @@ impl Parser<'_> {
                     rest = self.parse_rest_binding_ident(BraceClose)?;
                     break;
                 }
-                token_matches!(@ident) => {
+                token_matches!(@ident)
+                | token_matches!(keyword!("await"))
+                | token_matches!(keyword!("yield")) => {
                     let token = self.reader.consume()?;
                     comma_delimiter = true;
-                    bindings.push(Some(BindingPattern::Ident(token.try_into().unwrap())))
-                }
-                token_matches!(keyword!("await")) => {
-                    let token = self.reader.consume()?;
-                    comma_delimiter = true;
-                    bindings.push(Some(BindingPattern::Ident(Ident::new(
-                        "await".to_owned(),
-                        token.span,
-                    ))))
-                }
-                token_matches!(keyword!("yield")) => {
-                    let token = self.reader.consume()?;
-                    comma_delimiter = true;
-                    bindings.push(Some(BindingPattern::Ident(Ident::new(
-                        "yield".to_owned(),
-                        token.span,
-                    ))))
+                    bindings.push(Some(BindingPattern::Ident(token.try_into()?)))
                 }
                 _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
             }
