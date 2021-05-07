@@ -1,6 +1,6 @@
 use crate::ast::{
-    ArrayBinding, BindingIdentifier, BindingPattern, Expr, Ident, ObjectBinding, ObjectBindingProp,
-    Stmt, VariableDeclaration, VariableKind, VariableStmt,
+    ArrayBinding, BindingPattern, Expr, Ident, ObjectBinding, ObjectBindingProp, Stmt,
+    VariableDeclaration, VariableKind, VariableStmt,
 };
 use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::{Error, Result};
@@ -40,12 +40,12 @@ impl Parser<'_> {
         let identifier = match &token.value {
             punct!("{") => self.parse_object_binding_pattern()?,
             punct!("[") => self.parse_array_binding_pattern()?,
-            TokenValue::Identifier(_) => BindingPattern::Ident(BindingIdentifier::Ident(
+            TokenValue::Identifier(_) => BindingPattern::Ident(
                 self.reader
                     .consume()?
                     .try_into()
                     .expect("Expected identifier"),
-            )),
+            ),
             _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
         };
 
@@ -97,9 +97,7 @@ impl Parser<'_> {
                 token_matches!(punct!(",")) if comma_allowed => comma_allowed = false,
                 token_matches!(@ident) => {
                     comma_allowed = true;
-                    bindings.push(ObjectBindingProp::Assign(BindingIdentifier::Ident(
-                        token.try_into().unwrap(),
-                    )))
+                    bindings.push(ObjectBindingProp::Assign(token.try_into().unwrap()))
                 }
                 token_matches!(punct!("...")) => {
                     rest = self.parse_rest_binding_ident(BracketClose)?;
@@ -151,9 +149,7 @@ impl Parser<'_> {
                 }
                 token_matches!(@ident) => {
                     comma_delimiter = true;
-                    bindings.push(Some(BindingPattern::Ident(BindingIdentifier::Ident(
-                        token.try_into().unwrap(),
-                    ))))
+                    bindings.push(Some(BindingPattern::Ident(token.try_into().unwrap())))
                 }
                 t => return Err(Error::of(UnexpectedToken(t))),
             }

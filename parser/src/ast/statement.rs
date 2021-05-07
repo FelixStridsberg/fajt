@@ -79,34 +79,15 @@ pub enum VariableKind {
     Var,
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum BindingIdentifier {
-    Ident(Ident),
-    Yield,
-    Await,
-}
-
-impl From<Ident> for BindingIdentifier {
+impl From<Ident> for BindingPattern {
     fn from(ident: Ident) -> Self {
         Self::Ident(ident)
     }
 }
 
-impl<I: Into<BindingIdentifier>> From<I> for ObjectBindingProp {
-    fn from(ident: I) -> Self {
-        Self::Assign(ident.into())
-    }
-}
-
-impl From<Ident> for BindingPattern {
-    fn from(ident: Ident) -> Self {
-        Self::Ident(BindingIdentifier::Ident(ident))
-    }
-}
-
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum BindingPattern {
-    Ident(BindingIdentifier),
+    Ident(Ident),
     Object(ObjectBinding),
     Array(ArrayBinding),
 }
@@ -145,9 +126,14 @@ impl ObjectBinding {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum ObjectBindingProp {
-    Assign(BindingIdentifier), // TODO this can have Initializer as well
-                               // KeyValue
-                               // Rest
+    Assign(Ident), // TODO this can have Initializer as well
+                   // KeyValue
+}
+
+impl From<Ident> for ObjectBindingProp {
+    fn from(ident: Ident) -> Self {
+        Self::Assign(ident)
+    }
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
