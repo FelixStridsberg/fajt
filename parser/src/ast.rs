@@ -59,9 +59,14 @@ impl TryFrom<Token> for Ident {
                 span: token.span.clone(),
                 name,
             }),
-            // Await can be used as a keyword in non async contexts.
+            // Await can be used as a keyword in the parser context.
             TokenValue::Keyword(Keyword::Await) => Ok(Ident {
                 name: "await".to_owned(),
+                span: token.span,
+            }),
+            // Yield can be used as a keyword in the parser context.
+            TokenValue::Keyword(Keyword::Yield) => Ok(Ident {
+                name: "yield".to_owned(),
                 span: token.span,
             }),
             _ => Err(()),

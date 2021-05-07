@@ -133,6 +133,26 @@ fn parse_var_stmt_obj_binding_await() {
     );
 }
 
+/// `yield` is a valid identifier in the parser context.
+/// See the goal symbol `BindingIdentifier` specification.
+#[test]
+fn parse_var_stmt_obj_binding_yield() {
+    parser_test!(
+        input: "var { yield, ...yield } = c;",
+        output: [
+            VariableStmt::new(Var, vec![
+                VariableDeclaration::new(ObjectBinding::new(
+                    vec![
+                        Ident::new("yield", (6, 11)).into(),
+                    ],
+                    Some(Ident::new("yield", (16, 21))),
+                    (4, 23)
+                ), None, (4, 28))
+            ], (0, 28)).into()
+        ]
+    );
+}
+
 #[test]
 fn fail_var_statement_prefix_comma() {
     parser_test!(

@@ -111,6 +111,13 @@ impl Parser<'_> {
                         token.span,
                     )))
                 }
+                token_matches!(keyword!("yield")) => {
+                    comma_allowed = true;
+                    bindings.push(ObjectBindingProp::Assign(Ident::new(
+                        "yield".to_owned(),
+                        token.span,
+                    )))
+                }
                 t => return Err(Error::of(UnexpectedToken(t))),
             }
         }
@@ -179,7 +186,10 @@ impl Parser<'_> {
     ///          ^~~~~^
     fn parse_rest_binding_ident(&mut self, expected_end: Punct) -> Result<Option<Ident>> {
         let ident_token = self.reader.consume()?;
-        if !token_matches!(ident_token, @ident) && !token_matches!(ident_token, keyword!("await")) {
+        if !token_matches!(ident_token, @ident)
+            && !token_matches!(ident_token, keyword!("await"))
+            && !token_matches!(ident_token, keyword!("yield"))
+        {
             return Err(Error::of(UnexpectedToken(ident_token)));
         }
 
