@@ -271,6 +271,52 @@ fn parse_var_stmt_array_binding_mixed() {
     );
 }
 
+/// `await` is a valid identifier in the parser context.
+/// See the goal symbol `BindingIdentifier` specification.
+#[test]
+fn parse_var_stmt_array_binding_await() {
+    parser_test!(
+        input: "var [ await, ...await ] = c;",
+        output: [
+            VariableStmt::new(Var, vec![
+                VariableDeclaration::new(
+                    BindingPattern::Array(
+                        ArrayBinding::new(
+                            vec![
+                                Some(BindingPattern::Ident(Ident::new("await", (6, 11)).into())),
+                            ],
+                            Some(Ident::new("await", (16, 21)).into()),
+                            (4, 23)
+                        )
+                    ), None, (4, 28)),
+            ], (0, 28)).into()
+        ]
+    );
+}
+
+/// `yield` is a valid identifier in the parser context.
+/// See the goal symbol `BindingIdentifier` specification.
+#[test]
+fn parse_var_stmt_array_binding_yield() {
+    parser_test!(
+        input: "var [ yield, ...yield ] = c;",
+        output: [
+            VariableStmt::new(Var, vec![
+                VariableDeclaration::new(
+                    BindingPattern::Array(
+                        ArrayBinding::new(
+                            vec![
+                                Some(BindingPattern::Ident(Ident::new("yield", (6, 11)).into())),
+                            ],
+                            Some(Ident::new("yield", (16, 21)).into()),
+                            (4, 23)
+                        )
+                    ), None, (4, 28)),
+            ], (0, 28)).into()
+        ]
+    );
+}
+
 #[test]
 fn fail_var_stmt_array_biding_rest_not_last() {
     parser_test!(

@@ -166,6 +166,20 @@ impl Parser<'_> {
                     comma_delimiter = true;
                     bindings.push(Some(BindingPattern::Ident(token.try_into().unwrap())))
                 }
+                token_matches!(keyword!("await")) => {
+                    comma_delimiter = true;
+                    bindings.push(Some(BindingPattern::Ident(Ident::new(
+                        "await".to_owned(),
+                        token.span,
+                    ))))
+                }
+                token_matches!(keyword!("yield")) => {
+                    comma_delimiter = true;
+                    bindings.push(Some(BindingPattern::Ident(Ident::new(
+                        "yield".to_owned(),
+                        token.span,
+                    ))))
+                }
                 t => return Err(Error::of(UnexpectedToken(t))),
             }
         }
