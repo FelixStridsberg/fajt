@@ -146,9 +146,7 @@ impl Parser<'_> {
                     break;
                 }
                 token_matches!(punct!("{")) => {
-                    let pat = self.parse_object_binding_pattern()?;
-                    println!("PAT: {:?}", pat);
-                    bindings.push(Some(pat));
+                    bindings.push(Some(self.parse_object_binding_pattern()?));
 
                     comma_delimiter = true;
                 }
