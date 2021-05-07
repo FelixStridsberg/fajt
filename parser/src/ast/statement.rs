@@ -113,13 +113,13 @@ pub enum BindingPattern {
 
 impl From<ObjectBinding> for BindingPattern {
     fn from(binding: ObjectBinding) -> Self {
-        Self::Object(binding.into())
+        Self::Object(binding)
     }
 }
 
 impl From<ArrayBinding> for BindingPattern {
     fn from(binding: ArrayBinding) -> Self {
-        Self::Array(binding.into())
+        Self::Array(binding)
     }
 }
 
