@@ -4,6 +4,8 @@ pub mod statement;
 pub use expression::*;
 pub use statement::*;
 
+use crate::error::Error;
+use crate::error::ErrorKind::SyntaxError;
 use fajt_lexer::token::{Keyword, Span, Token, TokenValue};
 use std::convert::TryFrom;
 
@@ -51,7 +53,7 @@ impl Ident {
 }
 
 impl TryFrom<Token> for Ident {
-    type Error = ();
+    type Error = Error;
 
     fn try_from(token: Token) -> Result<Self, Self::Error> {
         match token.value {
@@ -69,7 +71,10 @@ impl TryFrom<Token> for Ident {
                 name: "yield".to_owned(),
                 span: token.span,
             }),
-            _ => Err(()),
+            _ => Err(Error::of(SyntaxError(
+                format!("Tried to use '{:?}' as an identifier.", token.value),
+                token.span,
+            ))),
         }
     }
 }
