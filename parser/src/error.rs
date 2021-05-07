@@ -3,6 +3,7 @@ use std::{error, fmt};
 
 use fajt_common::io::Error as CommonError;
 use fajt_lexer::error::Error as LexerError;
+use fajt_lexer::token::Span;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
@@ -26,6 +27,7 @@ impl Error {
 pub enum ErrorKind {
     EndOfStream,
     LexerError(LexerError),
+    SyntaxError(String, Span),
     UnexpectedToken(fajt_lexer::token::Token),
 }
 
@@ -34,6 +36,7 @@ impl fmt::Display for Error {
         match &self.kind {
             ErrorKind::EndOfStream => write!(f, "End of file reached."),
             ErrorKind::LexerError(e) => write!(f, "Lexer error '{}'", e),
+            ErrorKind::SyntaxError(msg, span) => write!(f, "{}:{:?}", msg, span),
             ErrorKind::UnexpectedToken(t) => write!(f, "Unexpected token: {:?}", t),
         }
     }

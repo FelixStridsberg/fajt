@@ -5,7 +5,7 @@ use fajt_lexer::token;
 use fajt_lexer::token::Token;
 use fajt_parser::ast::VariableKind::*;
 use fajt_parser::ast::*;
-use fajt_parser::error::ErrorKind::UnexpectedToken;
+use fajt_parser::error::ErrorKind::{SyntaxError, UnexpectedToken};
 
 #[test]
 fn parse_empty_statement() {
@@ -210,5 +210,13 @@ fn parse_var_stmt_array_binding_mixed() {
                     ), None, (4, 19)),
             ], (0, 19)).into()
         ]
+    );
+}
+
+#[test]
+fn fail_var_stmt_array_biding_rest_not_last() {
+    parser_test!(
+        input: "var [ ...rest, b ] = c;",
+        error: SyntaxError("Rest element must be last element".to_owned(), (9, 13).into())
     );
 }

@@ -2,7 +2,7 @@ use crate::ast::{
     ArrayBinding, BindingIdentifier, BindingPattern, Expr, ObjectBinding, ObjectBindingProp, Stmt,
     VariableDeclaration, VariableKind, VariableStmt,
 };
-use crate::error::ErrorKind::UnexpectedToken;
+use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::{Error, Result};
 use crate::Parser;
 use fajt_lexer::punct;
@@ -144,13 +144,15 @@ impl Parser<'_> {
                         return Err(Error::of(UnexpectedToken(self.reader.consume()?)));
                     }
 
-                    if !token_matches!(self.reader.peek(), opt: punct!("]")) {
-                        // TODO better error message, ...rest must be last element
-                        self.reader.consume()?;
-                        return Err(Error::of(UnexpectedToken(self.reader.consume()?)));
+                    let ident_token = self.reader.consume()?;
+                    if !token_matches!(self.reader.current()?, punct!("]")) {
+                        self.reader.consume()?; // Illegal token
+                        return Err(Error::of(SyntaxError(
+                            "Rest element must be last element".to_owned(),
+                            ident_token.span,
+                        )));
                     }
 
-                    let ident_token = self.reader.consume()?;
                     self.reader.consume()?; // ]
 
                     rest = Some(ident_token.try_into().unwrap());
