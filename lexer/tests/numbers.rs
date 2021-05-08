@@ -4,11 +4,21 @@ use fajt_lexer::literal;
 use fajt_lexer::token;
 
 #[test]
-fn number_decimal() {
+fn number_integer_decimal() {
     assert_lexer!(
         input: "1234",
         output: [
             (literal!(integer, 1234), (0, 4)),
+        ]
+    );
+}
+
+#[test]
+fn number_decimal() {
+    assert_lexer!(
+        input: "1234.5",
+        output: [
+            (literal!(decimal, 1234.5), (0, 6)),
         ]
     );
 }

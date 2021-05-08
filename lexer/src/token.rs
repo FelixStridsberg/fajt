@@ -255,6 +255,15 @@ macro_rules! literal(
     (binary, $value:expr) => {
         literal!(number, crate::token::Base::Binary, $value)
     };
+    (decimal, $value:expr) => {
+         crate::token::TokenValue::Literal(
+            crate::token::Literal::Number(
+                crate::token::Number::Decimal(
+                    $value
+                )
+            )
+        )
+    };
     (number, $type:expr, $value:expr) => {
         crate::token::TokenValue::Literal(
             crate::token::Literal::Number(
