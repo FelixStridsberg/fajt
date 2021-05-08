@@ -74,3 +74,48 @@ fn decimal_literal() {
         ]
     );
 }
+
+#[test]
+fn decimal_hex_literal() {
+    parser_test!(
+        input: "0xff",
+        output: [
+            Expr::Literal(LiteralExpr::new(
+                Literal::Number(
+                    Number::Integer(0xff, Base::Hex)
+                ),
+                (0, 4)
+            )).into()
+        ]
+    );
+}
+
+#[test]
+fn decimal_octal_literal() {
+    parser_test!(
+        input: "0o77",
+        output: [
+            Expr::Literal(LiteralExpr::new(
+                Literal::Number(
+                    Number::Integer(0o77, Base::Octal)
+                ),
+                (0, 4)
+            )).into()
+        ]
+    );
+}
+
+#[test]
+fn decimal_binary_literal() {
+    parser_test!(
+        input: "0b11110000",
+        output: [
+            Expr::Literal(LiteralExpr::new(
+                Literal::Number(
+                    Number::Integer(0b11110000, Base::Binary)
+                ),
+                (0, 10)
+            )).into()
+        ]
+    );
+}
