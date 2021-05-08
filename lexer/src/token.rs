@@ -8,11 +8,17 @@ macro_rules! token_matches {
     ($token:expr, @ident) => {
         token_matches!($token, crate::token::TokenValue::Identifier(_))
     };
+    ($token:expr, @literal) => {
+        token_matches!($token, crate::token::TokenValue::Literal(_))
+    };
     ($value:pat) => {
         crate::token::Token { value: $value, .. }
     };
     (@ident) => {
         token_matches!(crate::token::TokenValue::Identifier(_))
+    };
+    (@literal) => {
+        token_matches!(crate::token::TokenValue::Literal(_))
     };
     ($token:expr, opt: $value:pat) => {
         matches!($token, Some(crate::token::Token { value: $value, .. }));

@@ -1,4 +1,5 @@
 use crate::ast::Ident;
+use fajt_lexer::token::Literal as LexerLiteral;
 use fajt_lexer::token::Span;
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -42,6 +43,16 @@ impl LiteralExpr {
 pub enum Literal {
     Null,
     Boolean(bool),
+    String(String, char),
+}
+
+impl From<LexerLiteral> for Literal {
+    fn from(lexer_literal: LexerLiteral) -> Self {
+        match lexer_literal {
+            LexerLiteral::Number(_) => todo!(),
+            LexerLiteral::String(s, d) => Self::String(s, d),
+        }
+    }
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]

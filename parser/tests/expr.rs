@@ -33,3 +33,29 @@ fn boolean_false_literal() {
         output: [Expr::Literal(LiteralExpr::new(Literal::Boolean(false), (0, 5))).into()]
     );
 }
+
+#[test]
+fn string_literal_double_quote() {
+    parser_test!(
+        input: r#""this is string""#,
+        output: [
+            Expr::Literal(LiteralExpr::new(
+                Literal::String("this is string".to_owned(), '"'),
+                (0, 16)
+            )).into()
+        ]
+    );
+}
+
+#[test]
+fn string_literal_single_quote() {
+    parser_test!(
+        input: "'this is string'",
+        output: [
+            Expr::Literal(LiteralExpr::new(
+                Literal::String("this is string".to_owned(), '\''),
+                (0, 16)
+            )).into()
+        ]
+    );
+}

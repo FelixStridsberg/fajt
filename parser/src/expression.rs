@@ -5,6 +5,7 @@ use crate::Parser;
 use crate::ast::Expr::IdentifierReference;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
+use fajt_lexer::token::TokenValue;
 use fajt_lexer::token_matches;
 use std::convert::TryInto;
 
@@ -23,10 +24,10 @@ impl Parser<'_> {
             token_matches!(keyword!("this")) => self.parse_this_expression()?,
             token_matches!(keyword!("yield")) => unimplemented!(),
             token_matches!(keyword!("await")) => unimplemented!(),
-            // TODO Numeric and string literals
             token_matches!(keyword!("null")) => self.consume_literal(Literal::Null)?,
             token_matches!(keyword!("true")) => self.consume_literal(Literal::Boolean(true))?,
             token_matches!(keyword!("false")) => self.consume_literal(Literal::Boolean(false))?,
+            token_matches!(@literal) => self.parse_literal()?,
 
             // TODO ArrayLiteral
             // TODO ObjectLiteral
@@ -46,6 +47,17 @@ impl Parser<'_> {
     fn consume_literal(&mut self, literal: Literal) -> Result<Expr> {
         let token = self.reader.consume()?;
         Ok(LiteralExpr::new(literal, token.span).into())
+    }
+
+    fn parse_literal(&mut self) -> Result<Expr> {
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, @literal));
+
+        if let TokenValue::Literal(literal) = token.value {
+            Ok(LiteralExpr::new(literal.into(), token.span).into())
+        } else {
+            unreachable!()
+        }
     }
 
     fn parse_this_expression(&mut self) -> Result<Expr> {
