@@ -10,6 +10,7 @@ use crate::code_point::CodePoint;
 use crate::error::Error;
 use crate::error::ErrorKind::EndOfFile;
 use crate::token::Base::{Binary, Decimal, Hex, Octal};
+use crate::token::Literal;
 use crate::token::Token;
 use crate::token::TokenValue;
 use fajt_common::io::{PeekRead, PeekReader};
@@ -177,6 +178,7 @@ impl<'a> Lexer<'a> {
             // TODO handle comments (//, /*)
             '/' => produce!(self, 1, punct!("/")),
             '0'..='9' => self.read_number_literal(),
+            '"' | '\'' => self.read_string_literal(),
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             c => unimplemented!("Lexer did not recognize code point '{}'.", c),
         }?;
@@ -196,6 +198,27 @@ impl<'a> Lexer<'a> {
         };
 
         Ok(value)
+    }
+
+    fn read_string_literal(&mut self) -> Result<TokenValue> {
+        let delimiter = self.reader.consume()?;
+        debug_assert!(delimiter == '"' || delimiter == '\'');
+
+        let mut result = String::new();
+        let mut escape = false;
+        loop {
+            let c = self.reader.consume()?;
+            if !escape && c == delimiter {
+                break;
+            }
+
+            escape = c == '\\' && !escape;
+            if !escape {
+                result.push(c);
+            }
+        }
+
+        Ok(TokenValue::Literal(Literal::String(result, delimiter)))
     }
 
     fn read_number_literal(&mut self) -> Result<TokenValue> {

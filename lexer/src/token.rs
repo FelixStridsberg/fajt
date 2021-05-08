@@ -258,11 +258,19 @@ macro_rules! literal(
             )
         )
     };
+    (string, $type:expr, $value:expr) => {
+         crate::token::TokenValue::Literal(
+            crate::token::Literal::String(
+                $value.to_owned(), $type
+            )
+        )
+    }
 );
 
 #[derive(Debug, PartialOrd, PartialEq, Clone)]
 pub enum Literal {
     Number(Number),
+    String(String, char),
 }
 
 #[derive(Debug, PartialOrd, PartialEq, Clone)]
