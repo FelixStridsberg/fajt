@@ -1,5 +1,7 @@
 use crate::ast::Ident;
+use fajt_lexer::token::Base as LexerBase;
 use fajt_lexer::token::Literal as LexerLiteral;
+use fajt_lexer::token::Number as LexerNumber;
 use fajt_lexer::token::Span;
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -44,12 +46,41 @@ pub enum Literal {
     Null,
     Boolean(bool),
     String(String, char),
+    Number(Number),
+}
+
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Clone)]
+pub enum Base {
+    Binary,
+    Decimal,
+    Hex,
+    Octal,
+}
+
+impl From<LexerBase> for Base {
+    fn from(base: LexerBase) -> Self {
+        match base {
+            LexerBase::Binary => Base::Binary,
+            LexerBase::Decimal => Base::Decimal,
+            LexerBase::Hex => Base::Hex,
+            LexerBase::Octal => Base::Octal,
+        }
+    }
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub enum Number {
+    Integer(i64, Base),
+    Decimal(f64),
 }
 
 impl From<LexerLiteral> for Literal {
     fn from(lexer_literal: LexerLiteral) -> Self {
         match lexer_literal {
-            LexerLiteral::Number(_) => todo!(),
+            LexerLiteral::Number(LexerNumber::Integer(f, b)) => {
+                Self::Number(Number::Integer(f, b.into()))
+            }
+            LexerLiteral::Number(LexerNumber::Decimal(f)) => todo!(),
             LexerLiteral::String(s, d) => Self::String(s, d),
         }
     }

@@ -59,3 +59,18 @@ fn string_literal_single_quote() {
         ]
     );
 }
+
+#[test]
+fn decimal_literal() {
+    parser_test!(
+        input: "1234",
+        output: [
+            Expr::Literal(LiteralExpr::new(
+                Literal::Number(
+                    Number::Integer(1234, Base::Decimal)
+                ),
+                (0, 4)
+            )).into()
+        ]
+    );
+}
