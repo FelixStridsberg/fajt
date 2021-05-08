@@ -6,6 +6,7 @@ use fajt_lexer::token::Span;
 pub enum Stmt {
     Empty(EmptyStmt),
     VariableStmt(VariableStmt),
+    ExpressionStmt(Expr),
 }
 
 impl From<EmptyStmt> for Stmt {
@@ -17,6 +18,12 @@ impl From<EmptyStmt> for Stmt {
 impl From<VariableStmt> for Stmt {
     fn from(stmt: VariableStmt) -> Self {
         Self::VariableStmt(stmt)
+    }
+}
+
+impl From<Expr> for Stmt {
+    fn from(expr: Expr) -> Self {
+        Self::ExpressionStmt(expr)
     }
 }
 

@@ -1,4 +1,4 @@
-use crate::ast::{Expr, Ident};
+use crate::ast::{Expr, Ident, ThisExpr};
 use crate::error::Result;
 use crate::Parser;
 
@@ -9,6 +9,10 @@ use fajt_lexer::token_matches;
 use std::convert::TryInto;
 
 impl Parser<'_> {
+    pub(crate) fn parse_expression(&mut self) -> Result<Expr> {
+        self.parse_assignment_expression()
+    }
+
     pub(crate) fn parse_assignment_expression(&mut self) -> Result<Expr> {
         // TODO other than primary expressions
         self.parse_primary_expression()
@@ -16,7 +20,7 @@ impl Parser<'_> {
 
     fn parse_primary_expression(&mut self) -> Result<Expr> {
         Ok(match self.reader.current()? {
-            token_matches!(keyword!("this")) => unimplemented!(),
+            token_matches!(keyword!("this")) => self.parse_this_expression()?,
             token_matches!(keyword!("yield")) => unimplemented!(),
             token_matches!(keyword!("await")) => unimplemented!(),
             // TODO Literal
@@ -34,6 +38,12 @@ impl Parser<'_> {
             r => unimplemented!("TOKEN: {:?}", r),
         })
     }
+
+    fn parse_this_expression(&mut self) -> Result<Expr> {
+        let token = self.reader.consume()?;
+        Ok(ThisExpr::new(token.span).into())
+    }
+
     fn parse_identifier_reference(&mut self) -> Result<Expr> {
         let token = self.reader.consume()?;
         let ident: Ident = token.try_into().unwrap();
