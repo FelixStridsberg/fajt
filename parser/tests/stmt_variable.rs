@@ -8,14 +8,6 @@ use fajt_parser::ast::*;
 use fajt_parser::error::ErrorKind::{SyntaxError, UnexpectedToken};
 
 #[test]
-fn parse_empty_statement() {
-    parser_test!(
-        input: ";",
-        output: [EmptyStmt::new((0, 1).into()).into()]
-    );
-}
-
-#[test]
 fn parse_var_statement_no_init() {
     parser_test!(
         input: "var foo;",
