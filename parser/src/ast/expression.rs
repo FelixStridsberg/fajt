@@ -41,6 +41,7 @@ impl LiteralExpr {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Literal {
     Null,
+    Boolean(bool),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]

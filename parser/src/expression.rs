@@ -23,8 +23,10 @@ impl Parser<'_> {
             token_matches!(keyword!("this")) => self.parse_this_expression()?,
             token_matches!(keyword!("yield")) => unimplemented!(),
             token_matches!(keyword!("await")) => unimplemented!(),
-            // TODO Other literals:
+            // TODO Numeric and string literals
             token_matches!(keyword!("null")) => self.consume_literal(Literal::Null)?,
+            token_matches!(keyword!("true")) => self.consume_literal(Literal::Boolean(true))?,
+            token_matches!(keyword!("false")) => self.consume_literal(Literal::Boolean(false))?,
 
             // TODO ArrayLiteral
             // TODO ObjectLiteral

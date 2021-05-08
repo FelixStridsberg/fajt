@@ -17,3 +17,19 @@ fn null_literal() {
         output: [Expr::Literal(LiteralExpr::new(Literal::Null, (0, 4))).into()]
     );
 }
+
+#[test]
+fn boolean_true_literal() {
+    parser_test!(
+        input: "true",
+        output: [Expr::Literal(LiteralExpr::new(Literal::Boolean(true), (0, 4))).into()]
+    );
+}
+
+#[test]
+fn boolean_false_literal() {
+    parser_test!(
+        input: "false",
+        output: [Expr::Literal(LiteralExpr::new(Literal::Boolean(false), (0, 5))).into()]
+    );
+}
