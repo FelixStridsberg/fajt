@@ -61,7 +61,7 @@ fn string_literal_single_quote() {
 }
 
 #[test]
-fn decimal_literal() {
+fn decimal_integer_literal() {
     parser_test!(
         input: "1234",
         output: [
@@ -115,6 +115,21 @@ fn decimal_binary_literal() {
                     Number::Integer(0b11110000, Base::Binary)
                 ),
                 (0, 10)
+            )).into()
+        ]
+    );
+}
+
+#[test]
+fn decimal_literal() {
+    parser_test!(
+        input: "1234.5",
+        output: [
+            Expr::Literal(LiteralExpr::new(
+                Literal::Number(
+                    Number::Decimal(1234.5)
+                ),
+                (0, 6)
             )).into()
         ]
     );

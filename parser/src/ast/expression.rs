@@ -80,7 +80,7 @@ impl From<LexerLiteral> for Literal {
             LexerLiteral::Number(LexerNumber::Integer(f, b)) => {
                 Self::Number(Number::Integer(f, b.into()))
             }
-            LexerLiteral::Number(LexerNumber::Decimal(f)) => todo!(),
+            LexerLiteral::Number(LexerNumber::Decimal(f)) => Self::Number(Number::Decimal(f)),
             LexerLiteral::String(s, d) => Self::String(s, d),
         }
     }
