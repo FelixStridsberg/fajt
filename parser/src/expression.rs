@@ -1,4 +1,4 @@
-use crate::ast::{Expr, Ident, ThisExpr};
+use crate::ast::{Expr, Ident, Literal, LiteralExpr, ThisExpr};
 use crate::error::Result;
 use crate::Parser;
 
@@ -23,7 +23,9 @@ impl Parser<'_> {
             token_matches!(keyword!("this")) => self.parse_this_expression()?,
             token_matches!(keyword!("yield")) => unimplemented!(),
             token_matches!(keyword!("await")) => unimplemented!(),
-            // TODO Literal
+            // TODO Other literals:
+            token_matches!(keyword!("null")) => self.consume_literal(Literal::Null)?,
+
             // TODO ArrayLiteral
             // TODO ObjectLiteral
             // TODO FunctionExpression
@@ -37,6 +39,11 @@ impl Parser<'_> {
             token_matches!(@ident) => self.parse_identifier_reference()?,
             r => unimplemented!("TOKEN: {:?}", r),
         })
+    }
+
+    fn consume_literal(&mut self, literal: Literal) -> Result<Expr> {
+        let token = self.reader.consume()?;
+        Ok(LiteralExpr::new(literal, token.span).into())
     }
 
     fn parse_this_expression(&mut self) -> Result<Expr> {
