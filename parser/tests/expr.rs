@@ -134,3 +134,18 @@ fn decimal_literal() {
         ]
     );
 }
+
+#[test]
+fn empty_array_literal() {
+    parser_test!(
+        input: "[]",
+        output: [
+            Expr::Literal(LiteralExpr::new(
+                Literal::Array(
+                    Array::new(vec![])
+                ),
+                (0, 2)
+            )).into()
+        ]
+    );
+}

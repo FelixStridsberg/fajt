@@ -47,6 +47,18 @@ pub enum Literal {
     Boolean(bool),
     String(String, char),
     Number(Number),
+    Array(Array),
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct Array {
+    elements: Vec<Option<() /* TODO */>>,
+}
+
+impl Array {
+    pub fn new(elements: Vec<Option<()>>) -> Self {
+        Self { elements }
+    }
 }
 
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Clone)]

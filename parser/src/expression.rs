@@ -2,6 +2,7 @@ use crate::ast::{Expr, Ident, Literal, LiteralExpr, ThisExpr};
 use crate::error::Result;
 use crate::Parser;
 
+use crate::ast::Array;
 use crate::ast::Expr::IdentifierReference;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
@@ -28,8 +29,7 @@ impl Parser<'_> {
             token_matches!(keyword!("true")) => self.consume_literal(Literal::Boolean(true))?,
             token_matches!(keyword!("false")) => self.consume_literal(Literal::Boolean(false))?,
             token_matches!(@literal) => self.parse_literal()?,
-
-            // TODO ArrayLiteral
+            token_matches!(punct!("[")) => self.parse_array_literal()?,
             // TODO ObjectLiteral
             // TODO FunctionExpression
             // TODO ClassExpression
@@ -58,6 +58,28 @@ impl Parser<'_> {
         } else {
             unreachable!()
         }
+    }
+
+    fn parse_array_literal(&mut self) -> Result<Expr> {
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, punct!("[")));
+
+        let span_start = token.span.start;
+
+        let elements = Vec::new();
+        loop {
+            match self.reader.current()? {
+                token_matches!(punct!("]")) => {
+                    self.reader.consume()?;
+                    break;
+                }
+                _ => todo!(),
+            }
+        }
+
+        let span_end = self.reader.position();
+        let span = (span_start, span_end);
+        Ok(LiteralExpr::new(Literal::Array(Array::new(elements)), span).into())
     }
 
     fn parse_this_expression(&mut self) -> Result<Expr> {
