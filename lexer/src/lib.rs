@@ -234,20 +234,24 @@ impl<'a> Lexer<'a> {
                 (Binary, self.read_number(2, |c| c == &'0' || c == &'1')?)
             }
             _ => {
-                let integer = self.read_number(10, |c| c.is_numeric())?;
-                if let Ok(&'.') = self.reader.current() {
-                    self.reader.consume()?;
-                    let fraction = self.read_number(10, |c| c.is_numeric())?;
-                    let digits = (fraction as f64).log10().floor() + 1.0;
-                    let float = integer as f64 + (fraction as f64 / (digits * 10.0));
-                    return Ok(literal!(decimal, float));
-                } else {
-                    (Decimal, integer)
-                }
+                return self.read_integer_or_decimal();
             }
         };
 
         Ok(literal!(number, base, number))
+    }
+
+    fn read_integer_or_decimal(&mut self) -> Result<TokenValue> {
+        let integral = self.read_number(10, |c| c.is_numeric())?;
+        if let Ok(&'.') = self.reader.current() {
+            self.reader.consume()?;
+            let fraction = self.read_number(10, |c| c.is_numeric())?;
+            let digits = (fraction as f64).log10().floor() + 1.0;
+            let float = integral as f64 + (fraction as f64 / (digits * 10.0));
+            Ok(literal!(decimal, float))
+        } else {
+            Ok(literal!(integer, integral))
+        }
     }
 
     fn read_number(&mut self, base: u32, check: fn(&char) -> bool) -> Result<i64> {
