@@ -149,3 +149,18 @@ fn empty_array_literal() {
         ]
     );
 }
+
+#[test]
+fn elision_array_literal() {
+    parser_test!(
+        input: "[, ]",
+        output: [
+            Expr::Literal(LiteralExpr::new(
+                Literal::Array(
+                    Array::new(vec![None])
+                ),
+                (0, 4)
+            )).into()
+        ]
+    );
+}

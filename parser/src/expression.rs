@@ -66,12 +66,16 @@ impl Parser<'_> {
 
         let span_start = token.span.start;
 
-        let elements = Vec::new();
+        let mut elements = Vec::new();
         loop {
             match self.reader.current()? {
                 token_matches!(punct!("]")) => {
                     self.reader.consume()?;
                     break;
+                }
+                token_matches!(punct!(",")) => {
+                    self.reader.consume()?;
+                    elements.push(None);
                 }
                 _ => todo!(),
             }
