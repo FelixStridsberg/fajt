@@ -9,7 +9,7 @@ pub mod token;
 use crate::code_point::CodePoint;
 use crate::error::Error;
 use crate::error::ErrorKind::EndOfFile;
-use crate::token::Base::{Binary, Decimal, Hex, Octal};
+use crate::token::Base::{Binary, Hex, Octal};
 use crate::token::Literal;
 use crate::token::Token;
 use crate::token::TokenValue;
