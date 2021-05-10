@@ -23,6 +23,12 @@ impl From<LiteralExpr> for Expr {
     }
 }
 
+impl From<IdentifierReference> for Expr {
+    fn from(expr: IdentifierReference) -> Self {
+        Self::IdentifierReference(expr)
+    }
+}
+
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct LiteralExpr {
     span: Span,
@@ -109,12 +115,6 @@ impl ThisExpr {
         S: Into<Span>,
     {
         Self { span: span.into() }
-    }
-}
-
-impl From<IdentifierReference> for Expr {
-    fn from(expr: IdentifierReference) -> Self {
-        Self::IdentifierReference(expr)
     }
 }
 

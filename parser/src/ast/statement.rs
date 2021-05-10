@@ -53,14 +53,14 @@ pub struct VariableDeclaration {
 }
 
 impl VariableDeclaration {
-    pub fn new<I, S>(identifier: I, _initializer: Option<Expr>, span: S) -> Self
+    pub fn new<I, S>(identifier: I, initializer: Option<Expr>, span: S) -> Self
     where
         I: Into<BindingPattern>,
         S: Into<Span>,
     {
         VariableDeclaration {
             identifier: identifier.into(),
-            initializer: None,
+            initializer,
             span: span.into(),
         }
     }

@@ -25,7 +25,11 @@ fn parse_var_statement() {
         input: "var foo = a;",
         output: [
             VariableStmt::new(Var, vec![
-                VariableDeclaration::new(Ident::new("foo", (4, 7)), None, (4, 12))
+                VariableDeclaration::new(
+                    Ident::new("foo", (4, 7)),
+                    Some(IdentifierReference::Ident(Ident::new("a", (10, 11))).into()),
+                    (4, 12)
+                )
             ], (0, 12)).into()
         ]
     );
@@ -48,7 +52,9 @@ fn parse_var_stmt_empty_obj_binding() {
                 VariableDeclaration::new(
                     BindingPattern::Object(
                         ObjectBinding::new(vec![], None, (4, 6))
-                    ), None, (4, 11)),
+                    ),
+                    Some(IdentifierReference::Ident(Ident::new("a", (9, 10))).into()),
+                    (4, 11)),
             ], (0, 11)).into()
         ]
     );
@@ -60,11 +66,15 @@ fn parse_var_stmt_single_obj_binding() {
         input: "var { a } = b;",
         output: [
             VariableStmt::new(Var, vec![
-                VariableDeclaration::new(ObjectBinding::new(
-                    vec![Ident::new("a", (6, 7)).into()],
-                    None,
-                    (4, 9)
-                ), None, (4, 14)),
+                VariableDeclaration::new(
+                    ObjectBinding::new(
+                        vec![Ident::new("a", (6, 7)).into()],
+                        None,
+                        (4, 9)
+                    ),
+                    Some(IdentifierReference::Ident(Ident::new("b", (12, 13))).into()),
+                    (4, 14)
+                ),
             ], (0, 14)).into()
         ]
     );
@@ -76,14 +86,17 @@ fn parse_var_stmt_multiple_obj_binding() {
         input: "var { a, b } = c;",
         output: [
             VariableStmt::new(Var, vec![
-                VariableDeclaration::new(ObjectBinding::new(
-                    vec![
-                        Ident::new("a", (6, 7)).into(),
-                        Ident::new("b", (9, 10)).into(),
-                    ],
-                    None,
-                    (4, 12)
-                ), None, (4, 17))
+                VariableDeclaration::new(
+                    ObjectBinding::new(
+                        vec![
+                            Ident::new("a", (6, 7)).into(),
+                            Ident::new("b", (9, 10)).into(),
+                        ],
+                        None,
+                        (4, 12)
+                    ),
+                Some(IdentifierReference::Ident(Ident::new("c", (15, 16))).into()),
+                (4, 17))
             ], (0, 17)).into()
         ]
     );
@@ -95,11 +108,15 @@ fn parse_var_stmt_obj_binding_rest() {
         input: "var { ...rest } = c;",
         output: [
             VariableStmt::new(Var, vec![
-                VariableDeclaration::new(ObjectBinding::new(
-                    vec![],
-                    Some(Ident::new("rest", (9, 13))),
-                    (4, 15)
-                ), None, (4, 20))
+                VariableDeclaration::new(
+                    ObjectBinding::new(
+                        vec![],
+                        Some(Ident::new("rest", (9, 13))),
+                        (4, 15)
+                    ),
+                    Some(IdentifierReference::Ident(Ident::new("c", (18, 19))).into()),
+                    (4, 20)
+                )
             ], (0, 20)).into()
         ]
     );
@@ -113,13 +130,17 @@ fn parse_var_stmt_obj_binding_await() {
         input: "var { await, ...await } = c;",
         output: [
             VariableStmt::new(Var, vec![
-                VariableDeclaration::new(ObjectBinding::new(
-                    vec![
-                        Ident::new("await", (6, 11)).into(),
-                    ],
-                    Some(Ident::new("await", (16, 21))),
-                    (4, 23)
-                ), None, (4, 28))
+                VariableDeclaration::new(
+                    ObjectBinding::new(
+                        vec![
+                            Ident::new("await", (6, 11)).into(),
+                        ],
+                        Some(Ident::new("await", (16, 21))),
+                        (4, 23)
+                    ),
+                    Some(IdentifierReference::Ident(Ident::new("c", (26, 27))).into()),
+                    (4, 28)
+                )
             ], (0, 28)).into()
         ]
     );
@@ -133,13 +154,17 @@ fn parse_var_stmt_obj_binding_yield() {
         input: "var { yield, ...yield } = c;",
         output: [
             VariableStmt::new(Var, vec![
-                VariableDeclaration::new(ObjectBinding::new(
-                    vec![
-                        Ident::new("yield", (6, 11)).into(),
-                    ],
-                    Some(Ident::new("yield", (16, 21))),
-                    (4, 23)
-                ), None, (4, 28))
+                VariableDeclaration::new(
+                    ObjectBinding::new(
+                        vec![
+                            Ident::new("yield", (6, 11)).into(),
+                        ],
+                        Some(Ident::new("yield", (16, 21))),
+                        (4, 23)
+                    ),
+                    Some(IdentifierReference::Ident(Ident::new("c", (26, 27))).into()),
+                    (4, 28)
+                )
             ], (0, 28)).into()
         ]
     );
@@ -170,7 +195,10 @@ fn parse_var_stmt_empty_array_binding() {
                 VariableDeclaration::new(
                     BindingPattern::Array(
                         ArrayBinding::new(vec![], None, (4, 6))
-                    ), None, (4, 11)),
+                    ),
+                    Some(IdentifierReference::Ident(Ident::new("a", (9, 10))).into()),
+                    (4, 11)
+                ),
             ], (0, 11)).into()
         ]
     );
@@ -187,7 +215,10 @@ fn parse_var_stmt_single_elem_array_binding() {
                         ArrayBinding::new(vec![
                             Some(BindingPattern::Ident(Ident::new("a", (6, 7)).into()))
                         ], None, (4, 9))
-                    ), None, (4, 14)),
+                    ),
+                    Some(IdentifierReference::Ident(Ident::new("b", (12, 13))).into()),
+                    (4, 14)
+                ),
             ], (0, 14)).into()
         ]
     );
@@ -204,7 +235,10 @@ fn parse_var_stmt_single_elem_array_binding_trailing_comma() {
                         ArrayBinding::new(vec![
                             Some(BindingPattern::Ident(Ident::new("a", (6, 7)).into()))
                         ], None, (4, 10))
-                    ), None, (4, 15)),
+                    ),
+                    Some(IdentifierReference::Ident(Ident::new("b", (13, 14))).into()),
+                    (4, 15)
+                ),
             ], (0, 15)).into()
         ]
     );
@@ -221,7 +255,10 @@ fn parse_var_stmt_single_elision_array_binding() {
                         ArrayBinding::new(vec![
                             None
                         ], None, (4, 9))
-                    ), None, (4, 14)),
+                    ),
+                    Some(IdentifierReference::Ident(Ident::new("b", (12, 13))).into()),
+                    (4, 14)
+                ),
             ], (0, 14)).into()
         ]
     );
@@ -237,7 +274,10 @@ fn parse_var_stmt_single_rest_array_binding() {
                     BindingPattern::Array(
                         ArrayBinding::new(vec![
                         ], Some(Ident::new("a", (9, 10))), (4, 12))
-                    ), None, (4, 17)),
+                    ),
+                    Some(IdentifierReference::Ident(Ident::new("b", (15, 16))).into()),
+                    (4, 17)
+                ),
             ], (0, 17)).into()
         ]
     );
@@ -257,7 +297,9 @@ fn parse_var_stmt_array_binding_mixed() {
                             None,
                             Some(BindingPattern::Ident(Ident::new("b", (11, 12)).into())),
                         ], None, (4, 14))
-                    ), None, (4, 19)),
+                    ),
+                    Some(IdentifierReference::Ident(Ident::new("c", (17, 18))).into()),
+                    (4, 19)),
             ], (0, 19)).into()
         ]
     );
@@ -280,7 +322,9 @@ fn parse_var_stmt_array_binding_await() {
                             Some(Ident::new("await", (16, 21)).into()),
                             (4, 23)
                         )
-                    ), None, (4, 28)),
+                    ),
+                    Some(IdentifierReference::Ident(Ident::new("c", (26, 27))).into()),
+                    (4, 28)),
             ], (0, 28)).into()
         ]
     );
@@ -303,7 +347,9 @@ fn parse_var_stmt_array_binding_yield() {
                             Some(Ident::new("yield", (16, 21)).into()),
                             (4, 23)
                         )
-                    ), None, (4, 28)),
+                    ),
+                    Some(IdentifierReference::Ident(Ident::new("c", (26, 27))).into()),
+                    (4, 28)),
             ], (0, 28)).into()
         ]
     );
@@ -332,7 +378,9 @@ fn parse_var_stmt_array_binding_with_obj_binding() {
                                 ], None, (6, 11))
                             ))
                         ], None, (4, 13))
-                    ), None, (4, 18)),
+                    ),
+                    Some(IdentifierReference::Ident(Ident::new("b", (16, 17))).into()),
+                    (4, 18)),
             ], (0, 18)).into()
         ]
     );
