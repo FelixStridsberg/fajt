@@ -6,7 +6,7 @@ use crate::ast::Array;
 use crate::ast::Expr::IdentifierReference;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
-use fajt_lexer::token::TokenValue;
+use fajt_lexer::token::{Span, TokenValue};
 use fajt_lexer::token_matches;
 use std::convert::TryInto;
 
@@ -46,7 +46,11 @@ impl Parser<'_> {
 
     fn consume_literal(&mut self, literal: Literal) -> Result<Expr> {
         let token = self.reader.consume()?;
-        Ok(LiteralExpr::new(literal, token.span).into())
+        Ok(LiteralExpr {
+            span: token.span,
+            literal,
+        }
+        .into())
     }
 
     fn parse_literal(&mut self) -> Result<Expr> {
@@ -54,7 +58,11 @@ impl Parser<'_> {
         debug_assert!(token_matches!(token, @literal));
 
         if let TokenValue::Literal(literal) = token.value {
-            Ok(LiteralExpr::new(literal.into(), token.span).into())
+            Ok(LiteralExpr {
+                span: token.span,
+                literal: literal.into(),
+            }
+            .into())
         } else {
             unreachable!()
         }
@@ -82,8 +90,12 @@ impl Parser<'_> {
         }
 
         let span_end = self.reader.position();
-        let span = (span_start, span_end);
-        Ok(LiteralExpr::new(Literal::Array(Array::new(elements)), span).into())
+        let span = Span::new(span_start, span_end);
+        Ok(LiteralExpr {
+            span,
+            literal: Literal::Array(Array::new(elements)),
+        }
+        .into())
     }
 
     fn parse_this_expression(&mut self) -> Result<Expr> {

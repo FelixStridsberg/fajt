@@ -35,18 +35,6 @@ pub struct LiteralExpr {
     pub literal: Literal,
 }
 
-impl LiteralExpr {
-    pub fn new<S>(literal: Literal, span: S) -> Self
-    where
-        S: Into<Span>,
-    {
-        Self {
-            literal,
-            span: span.into(),
-        }
-    }
-}
-
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Literal {
     Null,

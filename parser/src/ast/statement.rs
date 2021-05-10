@@ -32,12 +32,6 @@ pub struct EmptyStmt {
     pub span: Span,
 }
 
-impl EmptyStmt {
-    pub fn new(span: Span) -> Self {
-        EmptyStmt { span }
-    }
-}
-
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct VariableStmt {
     pub span: Span,
@@ -50,33 +44,6 @@ pub struct VariableDeclaration {
     pub span: Span,
     pub identifier: BindingPattern,
     pub initializer: Option<Expr>,
-}
-
-impl VariableDeclaration {
-    pub fn new<I, S>(identifier: I, initializer: Option<Expr>, span: S) -> Self
-    where
-        I: Into<BindingPattern>,
-        S: Into<Span>,
-    {
-        VariableDeclaration {
-            identifier: identifier.into(),
-            initializer,
-            span: span.into(),
-        }
-    }
-}
-
-impl VariableStmt {
-    pub fn new<S>(kind: VariableKind, declarations: Vec<VariableDeclaration>, span: S) -> Self
-    where
-        S: Into<Span>,
-    {
-        VariableStmt {
-            kind,
-            declarations,
-            span: span.into(),
-        }
-    }
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -118,19 +85,6 @@ pub struct ObjectBinding {
     pub rest: Option<Ident>,
 }
 
-impl ObjectBinding {
-    pub fn new<S>(props: Vec<ObjectBindingProp>, rest: Option<Ident>, span: S) -> Self
-    where
-        S: Into<Span>,
-    {
-        Self {
-            props,
-            rest,
-            span: span.into(),
-        }
-    }
-}
-
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum ObjectBindingProp {
     Assign(Ident), // TODO this can have Initializer as well
@@ -148,17 +102,4 @@ pub struct ArrayBinding {
     pub span: Span,
     pub elements: Vec<Option<BindingPattern>>,
     pub rest: Option<Ident>,
-}
-
-impl ArrayBinding {
-    pub fn new<S>(elements: Vec<Option<BindingPattern>>, rest: Option<Ident>, span: S) -> Self
-    where
-        S: Into<Span>,
-    {
-        Self {
-            elements,
-            rest,
-            span: span.into(),
-        }
-    }
 }

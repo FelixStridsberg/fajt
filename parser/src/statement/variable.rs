@@ -8,7 +8,7 @@ use crate::Parser;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token::Punct::{BraceClose, BracketClose};
-use fajt_lexer::token::{Punct, TokenValue};
+use fajt_lexer::token::{Punct, Span, TokenValue};
 use fajt_lexer::token_matches;
 use std::convert::TryInto;
 
@@ -18,7 +18,7 @@ impl Parser<'_> {
     /// Example:
     /// var a = 2 + b, c = 2;
     /// ^~~~~~~~~~~~~~~~~~~~^
-    pub(crate) fn parse_variable_statement(&mut self, variable_type: VariableKind) -> Result<Stmt> {
+    pub(crate) fn parse_variable_statement(&mut self, kind: VariableKind) -> Result<Stmt> {
         let token = self.reader.consume()?;
         let start = token.span.start;
 
@@ -26,7 +26,13 @@ impl Parser<'_> {
         let declarations = vec![self.parse_variable_declaration()?];
         let end = self.reader.position();
 
-        Ok(VariableStmt::new(variable_type, declarations, (start, end)).into())
+        let span = Span::new(start, end);
+        Ok(VariableStmt {
+            span,
+            kind,
+            declarations,
+        }
+        .into())
     }
 
     /// Parses the `VariableDeclaration` and `LexicalBinding` goal symbols.
@@ -60,8 +66,12 @@ impl Parser<'_> {
         };
 
         let span_end = self.reader.position();
-        let span = (span_start, span_end);
-        Ok(VariableDeclaration::new(identifier, initializer, span))
+        let span = Span::new(span_start, span_end);
+        Ok(VariableDeclaration {
+            span,
+            identifier,
+            initializer,
+        })
     }
 
     /// Parses the `Initializer` goal symbol.
@@ -85,7 +95,7 @@ impl Parser<'_> {
 
         let span_start = token.span.start;
 
-        let mut bindings = Vec::new();
+        let mut props = Vec::new();
 
         let mut rest = None;
         let mut comma_allowed = false;
@@ -109,7 +119,7 @@ impl Parser<'_> {
                 | token_matches!(keyword!("yield")) => {
                     let token = self.reader.consume()?;
                     comma_allowed = true;
-                    bindings.push(ObjectBindingProp::Assign(token.try_into()?))
+                    props.push(ObjectBindingProp::Assign(token.try_into()?))
                 }
                 _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
             }
@@ -120,8 +130,9 @@ impl Parser<'_> {
         }
 
         let span_end = self.reader.position();
-        let span = (span_start, span_end);
-        Ok(ObjectBinding::new(bindings, rest, span).into())
+        let span = Span::new(span_start, span_end);
+
+        Ok(ObjectBinding { span, props, rest }.into())
     }
 
     /// Parses the `ArrayBindingPattern` goal symbol.
@@ -135,7 +146,7 @@ impl Parser<'_> {
 
         let span_start = token.span.start;
 
-        let mut bindings = Vec::new();
+        let mut elements = Vec::new();
 
         let mut rest = None;
         let mut comma_delimiter = false;
@@ -146,14 +157,14 @@ impl Parser<'_> {
                     break;
                 }
                 token_matches!(punct!("{")) => {
-                    bindings.push(Some(self.parse_object_binding_pattern()?));
+                    elements.push(Some(self.parse_object_binding_pattern()?));
 
                     comma_delimiter = true;
                 }
                 token_matches!(punct!(",")) => {
                     self.reader.consume()?;
                     if !comma_delimiter {
-                        bindings.push(None);
+                        elements.push(None);
                     }
 
                     comma_delimiter = false;
@@ -168,16 +179,21 @@ impl Parser<'_> {
                 | token_matches!(keyword!("yield")) => {
                     let token = self.reader.consume()?;
                     comma_delimiter = true;
-                    bindings.push(Some(BindingPattern::Ident(token.try_into()?)))
+                    elements.push(Some(BindingPattern::Ident(token.try_into()?)))
                 }
                 _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
             }
         }
 
         let span_end = self.reader.position();
-        let span = (span_start, span_end);
+        let span = Span::new(span_start, span_end);
 
-        Ok(ArrayBinding::new(bindings, rest, span).into())
+        Ok(ArrayBinding {
+            span,
+            elements,
+            rest,
+        }
+        .into())
     }
 
     /// Parses the BindingIdentifier goal symbol.
