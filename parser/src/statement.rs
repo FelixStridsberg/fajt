@@ -25,25 +25,29 @@ impl Parser<'_> {
             token_matches!(keyword!("debugger")) => unimplemented!("DebuggerStatement"),
             // TODO ExpressionStatement
             // TODO LabelledStatement
-            _ if self.is_expression_statement() => self.parse_expression_statement()?,
-            _ => unimplemented!("Invalid statement error handling"),
+            _ if self.is_expression_statement()? => self.parse_expression_statement()?,
+            t => unimplemented!("Invalid statement error handling {:?}", t),
         })
     }
 
-    fn is_expression_statement(&self) -> bool {
-        if let Some(peek) = self.reader.peek() {
-            // TODO async [no LineTerminator here} function
-            !matches!(
-                peek.value,
-                punct!("{")
-                    | keyword!("function")
-                    | keyword!("class")
-                    | keyword!("let")
-                    | punct!("[")
-            )
-        } else {
-            true
+    fn is_expression_statement(&self) -> Result<bool> {
+        let token = self.reader.current()?;
+        if matches!(
+            token.value,
+            punct!("{") | keyword!("function") | keyword!("class")
+        ) {
+            return Ok(false);
         }
+
+        // TODO async [no LineTerminator here] function, "async function" as a single token from lexer?
+
+        if matches!(token.value, keyword!("let"))
+            && token_matches!(self.reader.peek(), opt: punct!("["))
+        {
+            return Ok(false);
+        }
+
+        Ok(true)
     }
 
     fn parse_expression_statement(&mut self) -> Result<Stmt> {

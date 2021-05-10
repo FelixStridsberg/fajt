@@ -1,4 +1,4 @@
-use crate::ast::{Expr, Ident, Literal, LiteralExpr, ThisExpr};
+use crate::ast::{Expr, Ident, Literal, LiteralExpr, Object, ThisExpr};
 use crate::error::Result;
 use crate::Parser;
 
@@ -30,7 +30,7 @@ impl Parser<'_> {
             token_matches!(keyword!("false")) => self.consume_literal(Literal::Boolean(false))?,
             token_matches!(@literal) => self.parse_literal()?,
             token_matches!(punct!("[")) => self.parse_array_literal()?,
-            // TODO ObjectLiteral
+            token_matches!(punct!("{")) => self.parse_object_literal()?,
             // TODO FunctionExpression
             // TODO ClassExpression
             // TODO GeneratorExpression
@@ -104,6 +104,31 @@ impl Parser<'_> {
         Ok(LiteralExpr {
             span,
             literal: Literal::Array(Array::new(elements)),
+        }
+        .into())
+    }
+
+    fn parse_object_literal(&mut self) -> Result<Expr> {
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, punct!("{")));
+
+        let span_start = token.span.start;
+
+        loop {
+            match self.reader.current()? {
+                token_matches!(punct!("}")) => {
+                    self.reader.consume()?;
+                    break;
+                }
+                _ => unimplemented!(),
+            }
+        }
+
+        let span_end = self.reader.position();
+        let span = Span::new(span_start, span_end);
+        Ok(LiteralExpr {
+            span,
+            literal: Literal::Object(Object { props: vec![] }),
         }
         .into())
     }

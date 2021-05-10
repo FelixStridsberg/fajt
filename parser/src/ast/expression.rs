@@ -42,6 +42,7 @@ pub enum Literal {
     String(String, char),
     Number(Number),
     Array(Array),
+    Object(Object),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -53,6 +54,11 @@ impl Array {
     pub fn new(elements: Vec<Option<Expr>>) -> Self {
         Self { elements }
     }
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct Object {
+    pub props: Vec<Option<() /* TODO */>>,
 }
 
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Clone)]
