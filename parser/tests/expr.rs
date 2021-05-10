@@ -1,12 +1,17 @@
 mod lib;
 
 use fajt_parser::ast::*;
+use fajt_lexer::token::Span;
 
 #[test]
 fn this() {
     parser_test!(
         input: "this",
-        output: [Expr::This(ThisExpr::new((0, 4))).into()]
+        output: [
+            Expr::This(ThisExpr {
+                span: Span::new(0, 4)
+            }).into()
+        ]
     );
 }
 
@@ -14,7 +19,14 @@ fn this() {
 fn null_literal() {
     parser_test!(
         input: "null",
-        output: [Expr::Literal(LiteralExpr::new(Literal::Null, (0, 4))).into()]
+        output: [
+            Expr::Literal(
+                LiteralExpr {
+                    span: Span::new(0, 4),
+                    literal: Literal::Null,
+                }
+            ).into()
+        ]
     );
 }
 
@@ -22,7 +34,14 @@ fn null_literal() {
 fn boolean_true_literal() {
     parser_test!(
         input: "true",
-        output: [Expr::Literal(LiteralExpr::new(Literal::Boolean(true), (0, 4))).into()]
+        output: [
+            Expr::Literal(
+                LiteralExpr {
+                    span: Span::new(0, 4),
+                    literal: Literal::Boolean(true),
+                }
+            ).into()
+        ]
     );
 }
 
@@ -30,7 +49,14 @@ fn boolean_true_literal() {
 fn boolean_false_literal() {
     parser_test!(
         input: "false",
-        output: [Expr::Literal(LiteralExpr::new(Literal::Boolean(false), (0, 5))).into()]
+        output: [
+            Expr::Literal(
+                LiteralExpr {
+                    span: Span::new(0, 5),
+                    literal: Literal::Boolean(false),
+                }
+            ).into()
+        ]
     );
 }
 
@@ -39,10 +65,12 @@ fn string_literal_double_quote() {
     parser_test!(
         input: r#""this is string""#,
         output: [
-            Expr::Literal(LiteralExpr::new(
-                Literal::String("this is string".to_owned(), '"'),
-                (0, 16)
-            )).into()
+            Expr::Literal(
+                LiteralExpr {
+                    span: Span::new(0, 16),
+                    literal: Literal::String("this is string".to_owned(), '"'),
+                }
+            ).into()
         ]
     );
 }
@@ -52,10 +80,12 @@ fn string_literal_single_quote() {
     parser_test!(
         input: "'this is string'",
         output: [
-            Expr::Literal(LiteralExpr::new(
-                Literal::String("this is string".to_owned(), '\''),
-                (0, 16)
-            )).into()
+            Expr::Literal(
+                LiteralExpr {
+                    span: Span::new(0, 16),
+                    literal: Literal::String("this is string".to_owned(), '\''),
+                }
+            ).into()
         ]
     );
 }
@@ -65,12 +95,14 @@ fn decimal_integer_literal() {
     parser_test!(
         input: "1234",
         output: [
-            Expr::Literal(LiteralExpr::new(
-                Literal::Number(
-                    Number::Integer(1234, Base::Decimal)
-                ),
-                (0, 4)
-            )).into()
+            Expr::Literal(
+                LiteralExpr {
+                    span: Span::new(0, 4),
+                    literal: Literal::Number(
+                        Number::Integer(1234, Base::Decimal)
+                    ),
+                }
+            ).into()
         ]
     );
 }
@@ -80,12 +112,14 @@ fn decimal_hex_literal() {
     parser_test!(
         input: "0xff",
         output: [
-            Expr::Literal(LiteralExpr::new(
-                Literal::Number(
-                    Number::Integer(0xff, Base::Hex)
-                ),
-                (0, 4)
-            )).into()
+            Expr::Literal(
+                LiteralExpr {
+                    span: Span::new(0, 4),
+                    literal: Literal::Number(
+                        Number::Integer(0xff, Base::Hex)
+                    ),
+                }
+            ).into()
         ]
     );
 }
@@ -95,12 +129,14 @@ fn decimal_octal_literal() {
     parser_test!(
         input: "0o77",
         output: [
-            Expr::Literal(LiteralExpr::new(
-                Literal::Number(
-                    Number::Integer(0o77, Base::Octal)
-                ),
-                (0, 4)
-            )).into()
+            Expr::Literal(
+                LiteralExpr {
+                    span: Span::new(0, 4),
+                    literal: Literal::Number(
+                        Number::Integer(0o77, Base::Octal)
+                    ),
+                }
+            ).into()
         ]
     );
 }
@@ -110,12 +146,14 @@ fn decimal_binary_literal() {
     parser_test!(
         input: "0b11110000",
         output: [
-            Expr::Literal(LiteralExpr::new(
-                Literal::Number(
-                    Number::Integer(0b11110000, Base::Binary)
-                ),
-                (0, 10)
-            )).into()
+            Expr::Literal(
+                LiteralExpr {
+                    span: Span::new(0, 10),
+                    literal: Literal::Number(
+                        Number::Integer(0b11110000, Base::Binary)
+                    ),
+                }
+            ).into()
         ]
     );
 }
@@ -125,12 +163,14 @@ fn decimal_literal() {
     parser_test!(
         input: "1234.5",
         output: [
-            Expr::Literal(LiteralExpr::new(
-                Literal::Number(
-                    Number::Decimal(1234.5)
-                ),
-                (0, 6)
-            )).into()
+            Expr::Literal(
+                LiteralExpr {
+                    span: Span::new(0, 6),
+                    literal: Literal::Number(
+                        Number::Decimal(1234.5)
+                    ),
+                }
+            ).into()
         ]
     );
 }
@@ -140,12 +180,14 @@ fn empty_array_literal() {
     parser_test!(
         input: "[]",
         output: [
-            Expr::Literal(LiteralExpr::new(
-                Literal::Array(
-                    Array::new(vec![])
-                ),
-                (0, 2)
-            )).into()
+            Expr::Literal(
+                LiteralExpr {
+                    span: Span::new(0, 2),
+                    literal: Literal::Array(
+                        Array::new(vec![])
+                    ),
+                }
+            ).into()
         ]
     );
 }
@@ -155,12 +197,14 @@ fn elision_array_literal() {
     parser_test!(
         input: "[, ]",
         output: [
-            Expr::Literal(LiteralExpr::new(
-                Literal::Array(
-                    Array::new(vec![None])
-                ),
-                (0, 4)
-            )).into()
+            Expr::Literal(
+                LiteralExpr {
+                    span: Span::new(0, 4),
+                    literal: Literal::Array(
+                        Array::new(vec![None])
+                    ),
+                }
+            ).into()
         ]
     );
 }

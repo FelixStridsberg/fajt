@@ -31,8 +31,8 @@ impl From<IdentifierReference> for Expr {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct LiteralExpr {
-    span: Span,
-    literal: Literal,
+    pub span: Span,
+    pub literal: Literal,
 }
 
 impl LiteralExpr {

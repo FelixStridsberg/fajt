@@ -302,6 +302,12 @@ pub struct Span {
     pub end: usize,
 }
 
+impl Span {
+    pub fn new(start: usize, end: usize) -> Self {
+        Self { start, end }
+    }
+}
+
 impl From<(usize, usize)> for Span {
     fn from((start, end): (usize, usize)) -> Self {
         Span { start, end }
