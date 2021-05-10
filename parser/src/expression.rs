@@ -75,6 +75,7 @@ impl Parser<'_> {
         let span_start = token.span.start;
 
         let mut elements = Vec::new();
+        let mut comma_delimiter = false;
         loop {
             match self.reader.current()? {
                 token_matches!(punct!("]")) => {
@@ -83,11 +84,17 @@ impl Parser<'_> {
                 }
                 token_matches!(punct!(",")) => {
                     self.reader.consume()?;
-                    elements.push(None);
+
+                    if !comma_delimiter {
+                        elements.push(None);
+                    }
+                    comma_delimiter = false;
                 }
                 _ => {
                     let expr = self.parse_expression()?;
                     elements.push(Some(expr));
+
+                    comma_delimiter = true;
                 }
             }
         }

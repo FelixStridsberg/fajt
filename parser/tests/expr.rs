@@ -227,3 +227,24 @@ fn single_element_array_literal() {
         ]
     );
 }
+
+#[test]
+fn mixed_element_array_literal() {
+    parser_test!(
+        input: "[ a,, b ]",
+        output: [
+            Expr::Literal(
+                LiteralExpr {
+                    span: Span::new(0, 9),
+                    literal: Literal::Array(
+                        Array::new(vec![
+                            Some(Expr::IdentifierReference(Ident::new("a", (2, 3)).into())),
+                            None,
+                            Some(Expr::IdentifierReference(Ident::new("b", (6, 7)).into())),
+                        ]),
+                    ),
+                }
+            ).into()
+        ]
+    );
+}
