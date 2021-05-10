@@ -208,3 +208,22 @@ fn elision_array_literal() {
         ]
     );
 }
+
+#[test]
+fn single_element_array_literal() {
+    parser_test!(
+        input: "[ a ]",
+        output: [
+            Expr::Literal(
+                LiteralExpr {
+                    span: Span::new(0, 5),
+                    literal: Literal::Array(
+                        Array::new(vec![
+                            Some(Expr::IdentifierReference(Ident::new("a", (2, 3)).into()))
+                        ])
+                    ),
+                }
+            ).into()
+        ]
+    );
+}

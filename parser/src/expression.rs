@@ -85,7 +85,10 @@ impl Parser<'_> {
                     self.reader.consume()?;
                     elements.push(None);
                 }
-                _ => todo!(),
+                _ => {
+                    let expr = self.parse_expression()?;
+                    elements.push(Some(expr));
+                }
             }
         }
 

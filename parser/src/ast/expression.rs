@@ -46,11 +46,11 @@ pub enum Literal {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Array {
-    elements: Vec<Option<() /* TODO */>>,
+    elements: Vec<Option<Expr>>,
 }
 
 impl Array {
-    pub fn new(elements: Vec<Option<()>>) -> Self {
+    pub fn new(elements: Vec<Option<Expr>>) -> Self {
         Self { elements }
     }
 }
