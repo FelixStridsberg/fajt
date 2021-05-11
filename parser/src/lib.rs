@@ -4,7 +4,7 @@ pub mod error;
 mod expression;
 mod statement;
 
-use crate::ast::{Program, Expr};
+use crate::ast::{Expr, Program};
 use crate::error::Result;
 use fajt_common::io::PeekReader;
 use fajt_lexer::token;

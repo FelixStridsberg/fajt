@@ -265,3 +265,24 @@ fn empty_object_literal() {
         ]
     );
 }
+
+#[test]
+fn single_element_object_literal() {
+    parser_test!(
+        input: "{ a }",
+        expr_output: [
+            Expr::Literal(
+                LiteralExpr {
+                    span: Span::new(0, 5),
+                    literal: Literal::Object(Object {
+                        props: vec![
+                            PropertyDefinition::IdentifierReference(
+                                Ident::new("a", (2, 3)).into()
+                            )
+                        ]
+                    })
+                }
+            )
+        ]
+    );
+}

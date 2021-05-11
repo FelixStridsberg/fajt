@@ -58,7 +58,12 @@ impl Array {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Object {
-    pub props: Vec<Option<() /* TODO */>>,
+    pub props: Vec<PropertyDefinition>,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub enum PropertyDefinition {
+    IdentifierReference(IdentifierReference),
 }
 
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Clone)]

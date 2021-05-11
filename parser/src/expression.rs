@@ -1,4 +1,4 @@
-use crate::ast::{Expr, Ident, Literal, LiteralExpr, Object, ThisExpr};
+use crate::ast::{Expr, Ident, Literal, LiteralExpr, Object, PropertyDefinition, ThisExpr};
 use crate::error::Result;
 use crate::Parser;
 
@@ -114,11 +114,16 @@ impl Parser<'_> {
 
         let span_start = token.span.start;
 
+        let mut props = Vec::new();
         loop {
             match self.reader.current()? {
                 token_matches!(punct!("}")) => {
                     self.reader.consume()?;
                     break;
+                }
+                token_matches!(@ident) => {
+                    let ident: Ident = self.reader.consume()?.try_into()?;
+                    props.push(PropertyDefinition::IdentifierReference(ident.into()));
                 }
                 _ => unimplemented!(),
             }
@@ -128,7 +133,7 @@ impl Parser<'_> {
         let span = Span::new(span_start, span_end);
         Ok(LiteralExpr {
             span,
-            literal: Literal::Object(Object { props: vec![] }),
+            literal: Literal::Object(Object { props }),
         }
         .into())
     }
