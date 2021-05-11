@@ -251,29 +251,17 @@ fn mixed_element_array_literal() {
 
 #[test]
 fn empty_object_literal() {
-    // NOTE: A StatementExpression cannot start with `{` because of ambiguity between block and
-    // object literal. So to test object literals we must put them in the correct context. For
-    // example as an element in an array literal.
     parser_test!(
-        input: "[{}]",
-        output: [
+        input: "{}",
+        expr_output: [
             Expr::Literal(
                 LiteralExpr {
-                    span: Span::new(0, 4),
-                    literal: Literal::Array(
-                        Array::new(vec![
-                            Some(Expr::Literal(
-                                LiteralExpr {
-                                    span: Span::new(1, 3),
-                                    literal: Literal::Object(Object {
-                                        props: vec![]
-                                    })
-                                }
-                            ))
-                        ])
-                    ),
+                    span: Span::new(0, 2),
+                    literal: Literal::Object(Object {
+                        props: vec![]
+                    })
                 }
-            ).into()
+            )
         ]
     );
 }
