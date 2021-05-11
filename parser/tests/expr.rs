@@ -1,7 +1,10 @@
 mod lib;
 
-use fajt_lexer::token::Span;
+use fajt_lexer::punct;
+use fajt_lexer::token;
+use fajt_lexer::token::{Span, Token};
 use fajt_parser::ast::*;
+use fajt_parser::error::ErrorKind::UnexpectedToken;
 
 #[test]
 fn this() {
@@ -326,5 +329,21 @@ fn multiple_props_object_literal() {
                 }
             )
         ]
+    );
+}
+
+#[test]
+fn fail_object_literal_prefixing_comma() {
+    parser_test!(
+        input: "{ , a, b }",
+        expr_error: UnexpectedToken(Token::new(punct!(","), (2, 3)))
+    );
+}
+
+#[test]
+fn fail_object_literal_double_comma() {
+    parser_test!(
+        input: "{ a,, b }",
+        expr_error: UnexpectedToken(Token::new(punct!(","), (4, 5)))
     );
 }

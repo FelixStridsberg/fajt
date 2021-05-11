@@ -21,4 +21,11 @@ macro_rules! parser_test{
 
         assert_eq!(error.kind(), &$error)
     };
+    (input: $input:literal, expr_error: $error:expr) => {
+        let lexer = fajt_lexer::Lexer::new(&$input).unwrap();
+        let mut parser = fajt_parser::Parser::new(lexer).unwrap();
+        let error = parser.parse_expr().unwrap_err();
+
+        assert_eq!(error.kind(), &$error)
+    };
 }

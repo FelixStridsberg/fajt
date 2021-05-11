@@ -1,9 +1,10 @@
 use crate::ast::{Expr, Ident, Literal, LiteralExpr, Object, PropertyDefinition, ThisExpr};
-use crate::error::Result;
+use crate::error::{Error, Result};
 use crate::Parser;
 
 use crate::ast::Array;
 use crate::ast::Expr::IdentifierReference;
+use crate::error::ErrorKind::UnexpectedToken;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token::{Span, TokenValue};
@@ -114,6 +115,7 @@ impl Parser<'_> {
 
         let span_start = token.span.start;
 
+        let mut comma_allowed = false;
         let mut props = Vec::new();
         loop {
             match self.reader.current()? {
@@ -121,14 +123,17 @@ impl Parser<'_> {
                     self.reader.consume()?;
                     break;
                 }
-                token_matches!(punct!(",")) => {
+                token_matches!(punct!(",")) if comma_allowed => {
                     self.reader.consume()?;
+                    comma_allowed = false;
                 }
                 token_matches!(@ident) => {
                     let ident: Ident = self.reader.consume()?.try_into()?;
                     props.push(PropertyDefinition::IdentifierReference(ident.into()));
+
+                    comma_allowed = true;
                 }
-                _ => unimplemented!(),
+                _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
             }
         }
 
