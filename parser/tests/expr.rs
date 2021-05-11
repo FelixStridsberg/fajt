@@ -307,3 +307,24 @@ fn single_element_object_literal_trailing_comma() {
         ]
     );
 }
+
+#[test]
+fn multiple_element_object_literal() {
+    parser_test!(
+        input: "{ a,b, c }",
+        expr_output: [
+            Expr::Literal(
+                LiteralExpr {
+                    span: Span::new(0, 10),
+                    literal: Literal::Object(Object {
+                        props: vec![
+                            PropertyDefinition::IdentifierReference(Ident::new("a", (2, 3)).into()),
+                            PropertyDefinition::IdentifierReference(Ident::new("b", (4, 5)).into()),
+                            PropertyDefinition::IdentifierReference(Ident::new("c", (7, 8)).into()),
+                        ]
+                    })
+                }
+            )
+        ]
+    );
+}
