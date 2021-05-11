@@ -267,7 +267,7 @@ fn empty_object_literal() {
 }
 
 #[test]
-fn single_element_object_literal() {
+fn single_prop_object_literal() {
     parser_test!(
         input: "{ a }",
         expr_output: [
@@ -288,7 +288,7 @@ fn single_element_object_literal() {
 }
 
 #[test]
-fn single_element_object_literal_trailing_comma() {
+fn single_prop_object_literal_trailing_comma() {
     parser_test!(
         input: "{ a, }",
         expr_output: [
@@ -309,7 +309,7 @@ fn single_element_object_literal_trailing_comma() {
 }
 
 #[test]
-fn multiple_element_object_literal() {
+fn multiple_props_object_literal() {
     parser_test!(
         input: "{ a,b, c }",
         expr_output: [
