@@ -1,39 +1,39 @@
 use super::Ident;
-use crate::ast::Expr;
+use crate::ast::Expression;
 use fajt_lexer::token::Span;
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub enum Stmt {
-    Empty(EmptyStmt),
-    VariableStmt(VariableStmt),
-    ExpressionStmt(Expr),
+pub enum Statement {
+    Empty(EmptyStatement),
+    Variable(VariableStatement),
+    Expression(Expression),
 }
 
-impl From<EmptyStmt> for Stmt {
-    fn from(stmt: EmptyStmt) -> Self {
+impl From<EmptyStatement> for Statement {
+    fn from(stmt: EmptyStatement) -> Self {
         Self::Empty(stmt)
     }
 }
 
-impl From<VariableStmt> for Stmt {
-    fn from(stmt: VariableStmt) -> Self {
-        Self::VariableStmt(stmt)
+impl From<VariableStatement> for Statement {
+    fn from(stmt: VariableStatement) -> Self {
+        Self::Variable(stmt)
     }
 }
 
-impl From<Expr> for Stmt {
-    fn from(expr: Expr) -> Self {
-        Self::ExpressionStmt(expr)
+impl From<Expression> for Statement {
+    fn from(expr: Expression) -> Self {
+        Self::Expression(expr)
     }
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct EmptyStmt {
+pub struct EmptyStatement {
     pub span: Span,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct VariableStmt {
+pub struct VariableStatement {
     pub span: Span,
     pub kind: VariableKind,
     pub declarations: Vec<VariableDeclaration>,
@@ -43,7 +43,7 @@ pub struct VariableStmt {
 pub struct VariableDeclaration {
     pub span: Span,
     pub identifier: BindingPattern,
-    pub initializer: Option<Expr>,
+    pub initializer: Option<Expression>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]

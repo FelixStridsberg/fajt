@@ -1,5 +1,5 @@
-use crate::ast::Stmt::ExpressionStmt;
-use crate::ast::{EmptyStmt, Stmt, VariableKind};
+use crate::ast::Statement::Expression;
+use crate::ast::{EmptyStatement, Statement, VariableKind};
 use crate::error::Result;
 use crate::Parser;
 use fajt_lexer::keyword;
@@ -9,7 +9,7 @@ use fajt_lexer::token_matches;
 mod variable;
 
 impl Parser<'_> {
-    pub(crate) fn parse_statement(&mut self) -> Result<Stmt> {
+    pub(crate) fn parse_statement(&mut self) -> Result<Statement> {
         Ok(match self.reader.current()? {
             token_matches!(punct!(";")) => self.parse_empty_statement()?,
             token_matches!(punct!("{")) => unimplemented!("BlockStatement"),
@@ -50,13 +50,13 @@ impl Parser<'_> {
         Ok(true)
     }
 
-    fn parse_expression_statement(&mut self) -> Result<Stmt> {
+    fn parse_expression_statement(&mut self) -> Result<Statement> {
         let expr = self.parse_expression()?;
-        Ok(ExpressionStmt(expr).into())
+        Ok(Expression(expr).into())
     }
 
-    fn parse_empty_statement(&mut self) -> Result<Stmt> {
+    fn parse_empty_statement(&mut self) -> Result<Statement> {
         let token = self.reader.consume()?;
-        Ok(Stmt::Empty(EmptyStmt { span: token.span }))
+        Ok(Statement::Empty(EmptyStatement { span: token.span }))
     }
 }

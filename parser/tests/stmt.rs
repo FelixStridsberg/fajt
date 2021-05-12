@@ -8,7 +8,7 @@ fn parse_empty_statement() {
     parser_test!(
         input: ";",
         output: [
-            EmptyStmt {
+            EmptyStatement {
                 span: Span::new(0, 1)
             }.into()
         ]

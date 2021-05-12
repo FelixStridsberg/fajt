@@ -8,8 +8,8 @@ fn empty_array_literal() {
     parser_test!(
         input: "[]",
         output: [
-            Expr::Literal(
-                LiteralExpr {
+            Expression::Literal(
+                LiteralExpression {
                     span: Span::new(0, 2),
                     literal: Literal::Array(
                         Array::new(vec![])
@@ -25,8 +25,8 @@ fn elision_array_literal() {
     parser_test!(
         input: "[, ]",
         output: [
-            Expr::Literal(
-                LiteralExpr {
+            Expression::Literal(
+                LiteralExpression {
                     span: Span::new(0, 4),
                     literal: Literal::Array(
                         Array::new(vec![None])
@@ -42,12 +42,12 @@ fn single_element_array_literal() {
     parser_test!(
         input: "[ a ]",
         output: [
-            Expr::Literal(
-                LiteralExpr {
+            Expression::Literal(
+                LiteralExpression {
                     span: Span::new(0, 5),
                     literal: Literal::Array(
                         Array::new(vec![
-                            Some(Expr::IdentifierReference(Ident::new("a", (2, 3)).into()))
+                            Some(Expression::IdentifierReference(Ident::new("a", (2, 3)).into()))
                         ])
                     ),
                 }
@@ -61,14 +61,14 @@ fn mixed_element_array_literal() {
     parser_test!(
         input: "[ a,, b ]",
         output: [
-            Expr::Literal(
-                LiteralExpr {
+            Expression::Literal(
+                LiteralExpression {
                     span: Span::new(0, 9),
                     literal: Literal::Array(
                         Array::new(vec![
-                            Some(Expr::IdentifierReference(Ident::new("a", (2, 3)).into())),
+                            Some(Expression::IdentifierReference(Ident::new("a", (2, 3)).into())),
                             None,
-                            Some(Expr::IdentifierReference(Ident::new("b", (6, 7)).into())),
+                            Some(Expression::IdentifierReference(Ident::new("b", (6, 7)).into())),
                         ]),
                     ),
                 }

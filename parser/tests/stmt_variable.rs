@@ -3,7 +3,7 @@ mod lib;
 use fajt_lexer::punct;
 use fajt_lexer::token;
 use fajt_lexer::token::{Span, Token};
-use fajt_parser::ast::Expr::IdentifierReference;
+use fajt_parser::ast::Expression::IdentifierReference;
 use fajt_parser::ast::VariableKind::*;
 use fajt_parser::ast::*;
 use fajt_parser::error::ErrorKind::{SyntaxError, UnexpectedToken};
@@ -13,7 +13,7 @@ fn parse_var_statement_no_init() {
     parser_test!(
         input: "var foo;",
         output: [
-            VariableStmt {
+            VariableStatement {
                 span: Span::new(0, 8),
                 kind: Var,
                 declarations: vec![
@@ -33,7 +33,7 @@ fn parse_var_statement() {
     parser_test!(
         input: "var foo = a;",
         output: [
-            VariableStmt {
+            VariableStatement {
                 span: Span::new(0, 12),
                 kind: Var,
                 declarations: vec![
@@ -61,7 +61,7 @@ fn parse_var_stmt_empty_obj_binding() {
     parser_test!(
         input: "var {} = a;",
         output: [
-            VariableStmt {
+            VariableStatement {
                 span: Span::new(0, 11),
                 kind: Var,
                 declarations: vec![
@@ -85,7 +85,7 @@ fn parse_var_stmt_single_obj_binding() {
     parser_test!(
         input: "var { a } = b;",
         output: [
-            VariableStmt {
+            VariableStatement {
                 span: Span::new(0, 14),
                 kind: Var,
                 declarations: vec![
@@ -109,7 +109,7 @@ fn parse_var_stmt_multiple_obj_binding() {
     parser_test!(
         input: "var { a, b } = c;",
         output: [
-            VariableStmt {
+            VariableStatement {
                 span: Span::new(0, 17),
                 kind: Var,
                 declarations: vec![
@@ -136,7 +136,7 @@ fn parse_var_stmt_obj_binding_rest() {
     parser_test!(
         input: "var { ...rest } = c;",
         output: [
-            VariableStmt {
+            VariableStatement {
                 span: Span::new(0, 20),
                 kind: Var,
                 declarations: vec![
@@ -162,7 +162,7 @@ fn parse_var_stmt_obj_binding_await() {
     parser_test!(
         input: "var { await, ...await } = c;",
         output: [
-            VariableStmt {
+            VariableStatement {
                 span: Span::new(0, 28),
                 kind: Var,
                 declarations: vec![
@@ -190,7 +190,7 @@ fn parse_var_stmt_obj_binding_yield() {
     parser_test!(
         input: "var { yield, ...yield } = c;",
         output: [
-            VariableStmt {
+            VariableStatement {
                 span: Span::new(0, 28),
                 kind: Var,
                 declarations: vec![
@@ -232,7 +232,7 @@ fn parse_var_stmt_empty_array_binding() {
     parser_test!(
         input: "var [] = a;",
         output: [
-            VariableStmt {
+            VariableStatement {
                 span: Span::new(0, 11),
                 kind: Var,
                 declarations: vec![
@@ -258,7 +258,7 @@ fn parse_var_stmt_single_elem_array_binding() {
     parser_test!(
         input: "var [ a ] = b;",
         output: [
-            VariableStmt {
+            VariableStatement {
                 span: Span::new(0, 14),
                 kind: Var,
                 declarations: vec![
@@ -286,7 +286,7 @@ fn parse_var_stmt_single_elem_array_binding_trailing_comma() {
     parser_test!(
         input: "var [ a, ] = b;",
         output: [
-            VariableStmt {
+            VariableStatement {
                 span: Span::new(0, 15),
                 kind: Var,
                 declarations: vec![
@@ -314,7 +314,7 @@ fn parse_var_stmt_single_elision_array_binding() {
     parser_test!(
         input: "var [ , ] = b;",
         output: [
-            VariableStmt {
+            VariableStatement {
                 span: Span::new(0, 14),
                 kind: Var,
                 declarations: vec![
@@ -340,7 +340,7 @@ fn parse_var_stmt_single_rest_array_binding() {
     parser_test!(
         input: "var [ ...a ] = b;",
         output: [
-            VariableStmt {
+            VariableStatement {
                 span: Span::new(0, 17),
                 kind: Var,
                 declarations: vec![
@@ -366,7 +366,7 @@ fn parse_var_stmt_array_binding_mixed() {
     parser_test!(
         input: "var [ , a,,b ] = c;",
         output: [
-            VariableStmt {
+            VariableStatement {
                 span: Span::new(0, 19),
                 kind: Var,
                 declarations: vec![
@@ -399,7 +399,7 @@ fn parse_var_stmt_array_binding_await() {
     parser_test!(
         input: "var [ await, ...await ] = c;",
         output: [
-            VariableStmt {
+            VariableStatement {
                 span: Span::new(0, 28),
                 kind: Var,
                 declarations: vec![
@@ -429,7 +429,7 @@ fn parse_var_stmt_array_binding_yield() {
     parser_test!(
         input: "var [ yield, ...yield ] = c;",
         output: [
-            VariableStmt {
+            VariableStatement {
                 span: Span::new(0, 28),
                 kind: Var,
                 declarations: vec![
@@ -465,7 +465,7 @@ fn parse_var_stmt_array_binding_with_obj_binding() {
     parser_test!(
         input: "var [ { a } ] = b;",
         output: [
-            VariableStmt {
+            VariableStatement {
                 span: Span::new(0, 18),
                 kind: Var,
                 declarations: vec![

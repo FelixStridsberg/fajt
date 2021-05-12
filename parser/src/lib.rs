@@ -4,7 +4,7 @@ pub mod error;
 mod expression;
 mod statement;
 
-use crate::ast::{Expr, Program};
+use crate::ast::{Expression, Program};
 use crate::error::Result;
 use fajt_common::io::PeekReader;
 use fajt_lexer::token;
@@ -27,7 +27,7 @@ impl<'a> Parser<'a> {
     }
 
     // TODO probably not appropriate, used for testing parsing expressions currently.
-    pub fn parse_expr(&mut self) -> Result<Expr> {
+    pub fn parse_expr(&mut self) -> Result<Expression> {
         self.parse_expression()
     }
 }

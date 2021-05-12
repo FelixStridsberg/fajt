@@ -1,9 +1,11 @@
-use crate::ast::{Expr, Ident, Literal, LiteralExpr, Object, PropertyDefinition, ThisExpr};
+use crate::ast::{
+    Expression, Ident, Literal, LiteralExpression, Object, PropertyDefinition, ThisExpression,
+};
 use crate::error::{Error, Result};
 use crate::Parser;
 
 use crate::ast::Array;
-use crate::ast::Expr::IdentifierReference;
+use crate::ast::Expression::IdentifierReference;
 use crate::error::ErrorKind::UnexpectedToken;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
@@ -12,16 +14,16 @@ use fajt_lexer::token_matches;
 use std::convert::TryInto;
 
 impl Parser<'_> {
-    pub(crate) fn parse_expression(&mut self) -> Result<Expr> {
+    pub(crate) fn parse_expression(&mut self) -> Result<Expression> {
         self.parse_assignment_expression()
     }
 
-    pub(crate) fn parse_assignment_expression(&mut self) -> Result<Expr> {
+    pub(crate) fn parse_assignment_expression(&mut self) -> Result<Expression> {
         // TODO other than primary expressions
         self.parse_primary_expression()
     }
 
-    fn parse_primary_expression(&mut self) -> Result<Expr> {
+    fn parse_primary_expression(&mut self) -> Result<Expression> {
         Ok(match self.reader.current()? {
             token_matches!(keyword!("this")) => self.parse_this_expression()?,
             token_matches!(keyword!("yield")) => unimplemented!(),
@@ -45,21 +47,21 @@ impl Parser<'_> {
         })
     }
 
-    fn consume_literal(&mut self, literal: Literal) -> Result<Expr> {
+    fn consume_literal(&mut self, literal: Literal) -> Result<Expression> {
         let token = self.reader.consume()?;
-        Ok(LiteralExpr {
+        Ok(LiteralExpression {
             span: token.span,
             literal,
         }
         .into())
     }
 
-    fn parse_literal(&mut self) -> Result<Expr> {
+    fn parse_literal(&mut self) -> Result<Expression> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, @literal));
 
         if let TokenValue::Literal(literal) = token.value {
-            Ok(LiteralExpr {
+            Ok(LiteralExpression {
                 span: token.span,
                 literal: literal.into(),
             }
@@ -69,7 +71,7 @@ impl Parser<'_> {
         }
     }
 
-    fn parse_array_literal(&mut self) -> Result<Expr> {
+    fn parse_array_literal(&mut self) -> Result<Expression> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("[")));
 
@@ -102,14 +104,14 @@ impl Parser<'_> {
 
         let span_end = self.reader.position();
         let span = Span::new(span_start, span_end);
-        Ok(LiteralExpr {
+        Ok(LiteralExpression {
             span,
             literal: Literal::Array(Array::new(elements)),
         }
         .into())
     }
 
-    fn parse_object_literal(&mut self) -> Result<Expr> {
+    fn parse_object_literal(&mut self) -> Result<Expression> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("{")));
 
@@ -139,19 +141,19 @@ impl Parser<'_> {
 
         let span_end = self.reader.position();
         let span = Span::new(span_start, span_end);
-        Ok(LiteralExpr {
+        Ok(LiteralExpression {
             span,
             literal: Literal::Object(Object { props }),
         }
         .into())
     }
 
-    fn parse_this_expression(&mut self) -> Result<Expr> {
+    fn parse_this_expression(&mut self) -> Result<Expression> {
         let token = self.reader.consume()?;
-        Ok(ThisExpr::new(token.span).into())
+        Ok(ThisExpression::new(token.span).into())
     }
 
-    fn parse_identifier_reference(&mut self) -> Result<Expr> {
+    fn parse_identifier_reference(&mut self) -> Result<Expression> {
         let token = self.reader.consume()?;
         let ident: Ident = token.try_into().unwrap();
 

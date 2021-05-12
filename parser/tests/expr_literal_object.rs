@@ -11,8 +11,8 @@ fn empty_object_literal() {
     parser_test!(
         input: "{}",
         expr_output: [
-            Expr::Literal(
-                LiteralExpr {
+            Expression::Literal(
+                LiteralExpression {
                     span: Span::new(0, 2),
                     literal: Literal::Object(Object {
                         props: vec![]
@@ -28,8 +28,8 @@ fn single_prop_object_literal() {
     parser_test!(
         input: "{ a }",
         expr_output: [
-            Expr::Literal(
-                LiteralExpr {
+            Expression::Literal(
+                LiteralExpression {
                     span: Span::new(0, 5),
                     literal: Literal::Object(Object {
                         props: vec![
@@ -47,8 +47,8 @@ fn single_prop_object_literal_trailing_comma() {
     parser_test!(
         input: "{ a, }",
         expr_output: [
-            Expr::Literal(
-                LiteralExpr {
+            Expression::Literal(
+                LiteralExpression {
                     span: Span::new(0, 6),
                     literal: Literal::Object(Object {
                         props: vec![
@@ -66,8 +66,8 @@ fn multiple_props_object_literal() {
     parser_test!(
         input: "{ a,b, c }",
         expr_output: [
-            Expr::Literal(
-                LiteralExpr {
+            Expression::Literal(
+                LiteralExpression {
                     span: Span::new(0, 10),
                     literal: Literal::Object(Object {
                         props: vec![

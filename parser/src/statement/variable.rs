@@ -1,6 +1,6 @@
 use crate::ast::{
-    ArrayBinding, BindingPattern, Expr, Ident, ObjectBinding, ObjectBindingProp, Stmt,
-    VariableDeclaration, VariableKind, VariableStmt,
+    ArrayBinding, BindingPattern, Expression, Ident, ObjectBinding, ObjectBindingProp, Statement,
+    VariableDeclaration, VariableKind, VariableStatement,
 };
 use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::{Error, Result};
@@ -18,7 +18,7 @@ impl Parser<'_> {
     /// Example:
     /// var a = 2 + b, c = 2;
     /// ^~~~~~~~~~~~~~~~~~~~^
-    pub(crate) fn parse_variable_statement(&mut self, kind: VariableKind) -> Result<Stmt> {
+    pub(crate) fn parse_variable_statement(&mut self, kind: VariableKind) -> Result<Statement> {
         let token = self.reader.consume()?;
         let start = token.span.start;
 
@@ -27,7 +27,7 @@ impl Parser<'_> {
         let end = self.reader.position();
 
         let span = Span::new(start, end);
-        Ok(VariableStmt {
+        Ok(VariableStatement {
             span,
             kind,
             declarations,
@@ -79,7 +79,7 @@ impl Parser<'_> {
     /// Example:
     /// var a = 1 + 2, b = 100;
     ///         ^~~~^      ^~^
-    fn parse_variable_initializer(&mut self) -> Result<Expr> {
+    fn parse_variable_initializer(&mut self) -> Result<Expression> {
         self.reader.consume()?; // Skip =
         self.parse_assignment_expression()
     }

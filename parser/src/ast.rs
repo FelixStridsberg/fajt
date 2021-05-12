@@ -17,12 +17,12 @@ pub struct Body<T> {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Program {
-    Script(Body<Stmt>),
+    Script(Body<Statement>),
     Module(Body<ModuleItem>),
 }
 
 impl Program {
-    pub fn from_body(body: Vec<Stmt>) -> Self {
+    pub fn from_body(body: Vec<Statement>) -> Self {
         Program::Script(Body {
             span: (0, 0).into(),
             body,
@@ -31,7 +31,11 @@ impl Program {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub enum ModuleItem {}
+pub enum ModuleItem {
+    ImportDeclaration(/* TODO */),
+    ExportDeclaration(/* TODO */),
+    Statement(Statement),
+}
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Ident {
