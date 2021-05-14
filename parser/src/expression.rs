@@ -1,6 +1,4 @@
-use crate::ast::{
-    Expression, Ident, Literal, LiteralExpression, Object, PropertyDefinition, ThisExpression,
-};
+use crate::ast::{Expression, Ident, Literal, LiteralExpression, Object, PropertyDefinition, ThisExpression, ArrayElement};
 use crate::error::{Error, Result};
 use crate::Parser;
 
@@ -89,13 +87,20 @@ impl Parser<'_> {
                     self.reader.consume()?;
 
                     if !comma_delimiter {
-                        elements.push(None);
+                        elements.push(ArrayElement::None);
                     }
                     comma_delimiter = false;
                 }
+                token_matches!(punct!("...")) => {
+                    self.reader.consume()?;
+                    let expr = self.parse_expression()?;
+                    elements.push(ArrayElement::Spread(expr));
+
+                    comma_delimiter = true;
+                }
                 _ => {
                     let expr = self.parse_expression()?;
-                    elements.push(Some(expr));
+                    elements.push(ArrayElement::Expr(expr));
 
                     comma_delimiter = true;
                 }
@@ -106,7 +111,7 @@ impl Parser<'_> {
         let span = Span::new(span_start, span_end);
         Ok(LiteralExpression {
             span,
-            literal: Literal::Array(Array::new(elements)),
+            literal: Literal::Array(Array { elements }),
         }
         .into())
     }

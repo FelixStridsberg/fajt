@@ -16,13 +16,14 @@ pub enum Literal {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Array {
-    elements: Vec<Option<Expression>>,
+    pub elements: Vec<ArrayElement>,
 }
 
-impl Array {
-    pub fn new(elements: Vec<Option<Expression>>) -> Self {
-        Self { elements }
-    }
+#[derive(Debug, PartialOrd, PartialEq)]
+pub enum ArrayElement {
+    None,
+    Expr(Expression),
+    Spread(Expression),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
