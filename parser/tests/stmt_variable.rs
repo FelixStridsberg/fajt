@@ -2,7 +2,7 @@ mod lib;
 
 use fajt_lexer::punct;
 use fajt_lexer::token;
-use fajt_lexer::token::{Span, Token};
+use fajt_lexer::token::{Span, Token, TokenValue};
 use fajt_parser::ast::Expression::IdentifierReference;
 use fajt_parser::ast::VariableKind::*;
 use fajt_parser::ast::*;
@@ -457,6 +457,14 @@ fn fail_var_stmt_array_biding_rest_not_last() {
     parser_test!(
         input: "var [ ...rest, b ] = c;",
         error: SyntaxError("Rest element must be last element".to_owned(), (9, 13).into())
+    );
+}
+
+#[test]
+fn fail_var_stmt_array_biding_missing_comma() {
+    parser_test!(
+        input: "var [ a b ] = c;",
+        error: UnexpectedToken(Token::new(TokenValue::Identifier("b".to_owned()), (8, 9)))
     );
 }
 

@@ -149,7 +149,6 @@ impl Parser<'_> {
         let mut elements = Vec::new();
 
         let mut rest = None;
-        let mut comma_delimiter = false;
         loop {
             match self.reader.current()? {
                 token_matches!(punct!("]")) => {
@@ -158,16 +157,11 @@ impl Parser<'_> {
                 }
                 token_matches!(punct!("{")) => {
                     elements.push(Some(self.parse_object_binding_pattern()?));
-
-                    comma_delimiter = true;
+                    self.consume_array_delimiter()?;
                 }
                 token_matches!(punct!(",")) => {
                     self.reader.consume()?;
-                    if !comma_delimiter {
-                        elements.push(None);
-                    }
-
-                    comma_delimiter = false;
+                    elements.push(None);
                 }
                 token_matches!(punct!("...")) => {
                     self.reader.consume()?;
@@ -178,8 +172,8 @@ impl Parser<'_> {
                 | token_matches!(keyword!("await"))
                 | token_matches!(keyword!("yield")) => {
                     let token = self.reader.consume()?;
-                    comma_delimiter = true;
-                    elements.push(Some(BindingPattern::Ident(token.try_into()?)))
+                    elements.push(Some(BindingPattern::Ident(token.try_into()?)));
+                    self.consume_array_delimiter()?;
                 }
                 _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
             }
