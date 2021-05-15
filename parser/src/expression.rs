@@ -58,7 +58,7 @@ impl Parser<'_> {
         .into())
     }
 
-    /// Parses the `ArrayLiteral` goal symbol, which is part of `PrimaryExpression`.
+    /// Parses the `Literal` goal symbol, which is part of `PrimaryExpression`.
     ///
     /// Example:
     /// ```no_rust
