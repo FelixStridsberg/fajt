@@ -131,8 +131,6 @@ fn rest_binding() {
     );
 }
 
-/// `await` is a valid identifier in the parser context.
-/// See the goal symbol `BindingIdentifier` specification.
 #[test]
 fn await_as_identifier() {
     parser_test!(
