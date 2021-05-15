@@ -8,6 +8,7 @@ use crate::ast::{Expression, Ident, Program};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Error, Result};
 use fajt_common::io::PeekReader;
+use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token;
 use fajt_lexer::token::Token;
@@ -35,10 +36,21 @@ impl<'a> Parser<'a> {
         self.parse_expression()
     }
 
+    fn is_binding_identifier(&self) -> Result<bool> {
+        let token = self.reader.current()?;
+        Ok(token_matches!(token, @ident)
+            || token_matches!(token, keyword!("await"))
+            || token_matches!(token, keyword!("yield")))
+    }
+
     fn parse_binding_identifier(&mut self) -> Result<Ident> {
         match self.reader.current()? {
             token_matches!(@ident) => self.reader.consume()?.try_into(),
-            _ => todo!(),
+            token_matches!(keyword!("await")) | token_matches!(keyword!("yield")) => {
+                // TODO fail depending on context
+                self.reader.consume()?.try_into()
+            }
+            _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
         }
     }
 

@@ -117,11 +117,9 @@ impl Parser<'_> {
                     rest = self.parse_rest_binding_ident(BracketClose)?;
                     break;
                 }
-                token_matches!(@ident)
-                | token_matches!(keyword!("await")) // TODO parse_binding_identifier instead of these
-                | token_matches!(keyword!("yield")) => {
-                    let token = self.reader.consume()?;
-                    props.push(ObjectBindingProp::Assign(token.try_into()?));
+                _ if self.is_binding_identifier()? => {
+                    let ident = self.parse_binding_identifier()?;
+                    props.push(ObjectBindingProp::Assign(ident));
                     self.consume_object_delimiter()?;
                 }
                 _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
@@ -173,11 +171,9 @@ impl Parser<'_> {
                     rest = self.parse_rest_binding_ident(BraceClose)?;
                     break;
                 }
-                token_matches!(@ident)
-                | token_matches!(keyword!("await"))
-                | token_matches!(keyword!("yield")) => {
-                    let token = self.reader.consume()?;
-                    elements.push(Some(BindingPattern::Ident(token.try_into()?)));
+                _ if self.is_binding_identifier()? => {
+                    let ident = self.parse_binding_identifier()?;
+                    elements.push(Some(BindingPattern::Ident(ident)));
                     self.consume_array_delimiter()?;
                 }
                 _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
