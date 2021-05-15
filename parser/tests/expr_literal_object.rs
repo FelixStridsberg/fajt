@@ -97,3 +97,27 @@ fn fail_object_literal_double_comma() {
         expr_error: UnexpectedToken(Token::new(punct!(","), (4, 5)))
     );
 }
+
+#[test]
+fn object_literal_spread() {
+    parser_test!(
+        input: "{ ...a, ...b }",
+        expr_output: [
+            Expression::Literal(
+                LiteralExpression {
+                    span: Span::new(0, 14),
+                    literal: Literal::Object(Object {
+                        props: vec![
+                            PropertyDefinition::Spread(
+                                Expression::IdentifierReference(Ident::new("a", (5, 6)).into())
+                            ),
+                            PropertyDefinition::Spread(
+                                Expression::IdentifierReference(Ident::new("b", (11, 12)).into())
+                            )
+                        ]
+                    })
+                }
+            )
+        ]
+    );
+}

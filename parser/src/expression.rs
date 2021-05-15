@@ -130,6 +130,12 @@ impl Parser<'_> {
                     self.reader.consume()?;
                     comma_allowed = false;
                 }
+                token_matches!(punct!("...")) => {
+                    self.reader.consume()?;
+                    let expr = self.parse_expression()?;
+                    props.push(PropertyDefinition::Spread(expr));
+                    comma_allowed = true;
+                }
                 token_matches!(@ident) => {
                     let ident: Ident = self.reader.consume()?.try_into()?;
                     props.push(PropertyDefinition::IdentifierReference(ident.into()));

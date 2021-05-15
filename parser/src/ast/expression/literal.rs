@@ -34,6 +34,7 @@ pub struct Object {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum PropertyDefinition {
     IdentifierReference(IdentifierReference),
+    Spread(Expression),
 }
 
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Clone)]
