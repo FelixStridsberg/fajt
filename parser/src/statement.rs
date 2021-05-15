@@ -52,7 +52,7 @@ impl Parser<'_> {
 
     fn parse_expression_statement(&mut self) -> Result<Statement> {
         let expr = self.parse_expression()?;
-        Ok(Expression(expr).into())
+        Ok(Expression(expr))
     }
 
     /// Parses the `EmptyStatement` goal symbol.
