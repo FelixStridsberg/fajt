@@ -44,4 +44,15 @@ impl<'a> Parser<'a> {
             _ => Err(Error::of(UnexpectedToken(self.reader.consume()?))),
         }
     }
+
+    fn consume_object_delimiter(&mut self) -> Result<()> {
+        match self.reader.current()? {
+            token_matches!(punct!(",")) => {
+                self.reader.consume()?;
+                Ok(())
+            }
+            token_matches!(punct!("}")) => Ok(()),
+            _ => Err(Error::of(UnexpectedToken(self.reader.consume()?))),
+        }
+    }
 }

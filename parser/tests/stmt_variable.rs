@@ -228,6 +228,14 @@ fn fail_var_statement_double_comma() {
 }
 
 #[test]
+fn fail_var_statement_missing_comma() {
+    parser_test!(
+        input: "var { a b } = c;",
+        error: UnexpectedToken(Token::new(TokenValue::Identifier("b".to_owned()), (8, 9)))
+    );
+}
+
+#[test]
 fn parse_var_stmt_empty_array_binding() {
     parser_test!(
         input: "var [] = a;",

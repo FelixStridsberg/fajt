@@ -98,16 +98,11 @@ impl Parser<'_> {
         let mut props = Vec::new();
 
         let mut rest = None;
-        let mut comma_allowed = false;
         loop {
             match self.reader.current()? {
                 token_matches!(punct!("}")) => {
                     self.reader.consume()?;
                     break;
-                }
-                token_matches!(punct!(",")) if comma_allowed => {
-                    self.reader.consume()?;
-                    comma_allowed = false
                 }
                 token_matches!(punct!("...")) => {
                     self.reader.consume()?;
@@ -118,8 +113,8 @@ impl Parser<'_> {
                 | token_matches!(keyword!("await"))
                 | token_matches!(keyword!("yield")) => {
                     let token = self.reader.consume()?;
-                    comma_allowed = true;
-                    props.push(ObjectBindingProp::Assign(token.try_into()?))
+                    props.push(ObjectBindingProp::Assign(token.try_into()?));
+                    self.consume_object_delimiter()?;
                 }
                 _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
             }

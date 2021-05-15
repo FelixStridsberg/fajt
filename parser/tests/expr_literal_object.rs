@@ -2,7 +2,7 @@ mod lib;
 
 use fajt_lexer::punct;
 use fajt_lexer::token;
-use fajt_lexer::token::{Span, Token};
+use fajt_lexer::token::{Span, Token, TokenValue};
 use fajt_parser::ast::*;
 use fajt_parser::error::ErrorKind::UnexpectedToken;
 
@@ -95,6 +95,14 @@ fn fail_object_literal_double_comma() {
     parser_test!(
         input: "{ a,, b }",
         expr_error: UnexpectedToken(Token::new(punct!(","), (4, 5)))
+    );
+}
+
+#[test]
+fn fail_object_missing_comma() {
+    parser_test!(
+        input: "{ a b }",
+        expr_error: UnexpectedToken(Token::new(TokenValue::Identifier("b".to_owned()), (4, 5)))
     );
 }
 

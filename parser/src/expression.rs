@@ -118,7 +118,6 @@ impl Parser<'_> {
 
         let span_start = token.span.start;
 
-        let mut comma_allowed = false;
         let mut props = Vec::new();
         loop {
             match self.reader.current()? {
@@ -126,21 +125,16 @@ impl Parser<'_> {
                     self.reader.consume()?;
                     break;
                 }
-                token_matches!(punct!(",")) if comma_allowed => {
-                    self.reader.consume()?;
-                    comma_allowed = false;
-                }
                 token_matches!(punct!("...")) => {
                     self.reader.consume()?;
                     let expr = self.parse_expression()?;
                     props.push(PropertyDefinition::Spread(expr));
-                    comma_allowed = true;
+                    self.consume_object_delimiter()?;
                 }
                 token_matches!(@ident) => {
                     let ident: Ident = self.reader.consume()?.try_into()?;
                     props.push(PropertyDefinition::IdentifierReference(ident.into()));
-
-                    comma_allowed = true;
+                    self.consume_object_delimiter()?;
                 }
                 _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
             }
