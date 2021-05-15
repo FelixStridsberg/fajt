@@ -4,9 +4,16 @@ use fajt_lexer::token::Span;
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Statement {
+    Block(BlockStatement),
     Empty(EmptyStatement),
     Variable(VariableStatement),
     Expression(Expression),
+}
+
+impl From<BlockStatement> for Statement {
+    fn from(stmt: BlockStatement) -> Self {
+        Self::Block(stmt)
+    }
 }
 
 impl From<EmptyStatement> for Statement {
@@ -25,6 +32,12 @@ impl From<Expression> for Statement {
     fn from(expr: Expression) -> Self {
         Self::Expression(expr)
     }
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct BlockStatement {
+    pub span: Span,
+    pub statements: Vec<Statement>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]

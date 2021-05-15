@@ -1,9 +1,10 @@
 use crate::ast::Statement::Expression;
-use crate::ast::{EmptyStatement, Statement, VariableKind};
+use crate::ast::{BlockStatement, EmptyStatement, Statement, VariableKind};
 use crate::error::Result;
 use crate::Parser;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
+use fajt_lexer::token::Span;
 use fajt_lexer::token_matches;
 
 mod variable;
@@ -12,7 +13,7 @@ impl Parser<'_> {
     pub(crate) fn parse_statement(&mut self) -> Result<Statement> {
         Ok(match self.reader.current()? {
             token_matches!(punct!(";")) => self.parse_empty_statement()?,
-            token_matches!(punct!("{")) => unimplemented!("BlockStatement"),
+            token_matches!(punct!("{")) => self.parse_block_statement()?,
             token_matches!(keyword!("var")) => self.parse_variable_statement(VariableKind::Var)?,
             token_matches!(keyword!("if")) => unimplemented!("IfStatement"),
             token_matches!(keyword!("break")) => unimplemented!("BreakStatement"),
@@ -47,6 +48,28 @@ impl Parser<'_> {
         }
 
         Ok(true)
+    }
+
+    fn parse_block_statement(&mut self) -> Result<Statement> {
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, punct!("{")));
+
+        let span_start = token.span.start;
+
+        let statements = Vec::new();
+        loop {
+            match self.reader.current()? {
+                token_matches!(punct!("}")) => {
+                    self.reader.consume()?;
+                    break;
+                }
+                _ => todo!(),
+            }
+        }
+
+        let span_end = self.reader.position();
+        let span = Span::new(span_start, span_end);
+        Ok(BlockStatement { span, statements }.into())
     }
 
     fn parse_expression_statement(&mut self) -> Result<Statement> {
