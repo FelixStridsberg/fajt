@@ -1,4 +1,7 @@
-use crate::ast::{Expression, Ident, Literal, LiteralExpression, Object, PropertyDefinition, ThisExpression, ArrayElement};
+use crate::ast::{
+    ArrayElement, Expression, Ident, Literal, LiteralExpression, Object, PropertyDefinition,
+    ThisExpression,
+};
 use crate::error::{Error, Result};
 use crate::Parser;
 
@@ -76,7 +79,6 @@ impl Parser<'_> {
         let span_start = token.span.start;
 
         let mut elements = Vec::new();
-        let mut comma_delimiter = false;
         loop {
             match self.reader.current()? {
                 token_matches!(punct!("]")) => {
@@ -85,24 +87,18 @@ impl Parser<'_> {
                 }
                 token_matches!(punct!(",")) => {
                     self.reader.consume()?;
-
-                    if !comma_delimiter {
-                        elements.push(ArrayElement::None);
-                    }
-                    comma_delimiter = false;
+                    elements.push(ArrayElement::None);
                 }
                 token_matches!(punct!("...")) => {
                     self.reader.consume()?;
                     let expr = self.parse_expression()?;
                     elements.push(ArrayElement::Spread(expr));
-
-                    comma_delimiter = true;
+                    self.consume_array_delimiter()?;
                 }
                 _ => {
                     let expr = self.parse_expression()?;
                     elements.push(ArrayElement::Expr(expr));
-
-                    comma_delimiter = true;
+                    self.consume_array_delimiter()?;
                 }
             }
         }

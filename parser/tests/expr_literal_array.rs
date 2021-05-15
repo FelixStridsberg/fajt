@@ -1,7 +1,8 @@
 mod lib;
 
-use fajt_lexer::token::Span;
+use fajt_lexer::token::{Span, Token, TokenValue};
 use fajt_parser::ast::*;
+use fajt_parser::error::ErrorKind::UnexpectedToken;
 
 #[test]
 fn empty_array_literal() {
@@ -17,6 +18,14 @@ fn empty_array_literal() {
                 }
             ).into()
         ]
+    );
+}
+
+#[test]
+fn fail_array_literal_missing_comma() {
+    parser_test!(
+        input: "[a b]",
+        error: UnexpectedToken(Token::new(TokenValue::Identifier("b".to_owned()), (3, 4)))
     );
 }
 

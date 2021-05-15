@@ -5,10 +5,13 @@ mod expression;
 mod statement;
 
 use crate::ast::{Expression, Program};
-use crate::error::Result;
+use crate::error::ErrorKind::UnexpectedToken;
+use crate::error::{Error, Result};
 use fajt_common::io::PeekReader;
+use fajt_lexer::punct;
 use fajt_lexer::token;
 use fajt_lexer::token::Token;
+use fajt_lexer::token_matches;
 use fajt_lexer::Lexer;
 
 pub struct Parser<'a> {
@@ -29,5 +32,16 @@ impl<'a> Parser<'a> {
     // TODO probably not appropriate, used for testing parsing expressions currently.
     pub fn parse_expr(&mut self) -> Result<Expression> {
         self.parse_expression()
+    }
+
+    fn consume_array_delimiter(&mut self) -> Result<()> {
+        match self.reader.current()? {
+            token_matches!(punct!(",")) => {
+                self.reader.consume()?;
+                Ok(())
+            }
+            token_matches!(punct!("]")) => Ok(()),
+            _ => Err(Error::of(UnexpectedToken(self.reader.consume()?))),
+        }
     }
 }
