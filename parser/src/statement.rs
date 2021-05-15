@@ -23,7 +23,6 @@ impl Parser<'_> {
             token_matches!(keyword!("throw")) => unimplemented!("ThrowStatement"),
             token_matches!(keyword!("try")) => unimplemented!("TryStatement"),
             token_matches!(keyword!("debugger")) => unimplemented!("DebuggerStatement"),
-            // TODO ExpressionStatement
             // TODO LabelledStatement
             _ if self.is_expression_statement()? => self.parse_expression_statement()?,
             t => unimplemented!("Invalid statement error handling {:?}", t),
