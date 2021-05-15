@@ -56,14 +56,17 @@ impl Parser<'_> {
 
         let span_start = token.span.start;
 
-        let statements = Vec::new();
+        let mut statements = Vec::new();
         loop {
             match self.reader.current()? {
                 token_matches!(punct!("}")) => {
                     self.reader.consume()?;
                     break;
                 }
-                _ => todo!(),
+                _ => {
+                    let statement = self.parse_statement()?;
+                    statements.push(statement)
+                },
             }
         }
 

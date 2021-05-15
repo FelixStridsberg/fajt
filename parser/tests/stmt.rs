@@ -27,3 +27,23 @@ fn empty_block_statement() {
         ]
     );
 }
+
+#[test]
+fn block_statement() {
+    parser_test!(
+        input: "{ ;; }",
+        output: [
+            BlockStatement {
+                span: Span::new(0, 6),
+                statements: vec![
+                    EmptyStatement {
+                        span: Span::new(2, 3),
+                    }.into(),
+                    EmptyStatement {
+                        span: Span::new(3, 4),
+                    }.into()
+                ]
+            }.into()
+        ]
+    );
+}
