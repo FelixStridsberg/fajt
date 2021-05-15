@@ -6,7 +6,7 @@ use fajt_lexer::token::{Span, Token, TokenValue};
 use fajt_parser::ast::Expression::IdentifierReference;
 use fajt_parser::ast::VariableKind::*;
 use fajt_parser::ast::*;
-use fajt_parser::error::ErrorKind::UnexpectedToken;
+use fajt_parser::error::ErrorKind::{SyntaxError, UnexpectedToken};
 
 #[test]
 fn empty() {
@@ -208,5 +208,13 @@ fn fail_missing_comma() {
     parser_test!(
         input: "var { a b } = c;",
         error: UnexpectedToken(Token::new(TokenValue::Identifier("b".to_owned()), (8, 9)))
+    );
+}
+
+#[test]
+fn fail_rest_binding_must_be_last() {
+    parser_test!(
+        input: "var { ...rest, b } = c;",
+        error: SyntaxError("Rest element must be last element".to_owned(), (9, 13).into())
     );
 }
