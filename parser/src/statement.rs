@@ -50,6 +50,13 @@ impl Parser<'_> {
         Ok(true)
     }
 
+    /// Parses the `BlockStatement` goal symbol.
+    ///
+    /// Example:
+    /// ```no_rust
+    /// if (true) { return "success"; } else { return "fail"; }
+    ///           ^~~~~~~~~~~~~~~~~~~~^      ^~~~~~~~~~~~~~~~~^
+    /// ```
     fn parse_block_statement(&mut self) -> Result<Statement> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("{")));
