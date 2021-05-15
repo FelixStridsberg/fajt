@@ -118,7 +118,7 @@ impl Parser<'_> {
                     break;
                 }
                 token_matches!(@ident)
-                | token_matches!(keyword!("await"))
+                | token_matches!(keyword!("await")) // TODO parse_binding_identifier instead of these
                 | token_matches!(keyword!("yield")) => {
                     let token = self.reader.consume()?;
                     props.push(ObjectBindingProp::Assign(token.try_into()?));

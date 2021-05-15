@@ -1,5 +1,5 @@
 use crate::ast::Statement::Expression;
-use crate::ast::{BlockStatement, EmptyStatement, Statement, VariableKind};
+use crate::ast::{BlockStatement, EmptyStatement, FunctionDeclaration, Statement, VariableKind};
 use crate::error::Result;
 use crate::Parser;
 use fajt_lexer::keyword;
@@ -26,6 +26,10 @@ impl Parser<'_> {
             token_matches!(keyword!("debugger")) => unimplemented!("DebuggerStatement"),
             // TODO LabelledStatement
             _ if self.is_expression_statement()? => self.parse_expression_statement()?,
+
+            // Declarations are handles as statements
+            token_matches!(keyword!("function")) => self.parse_function_declaration()?,
+
             t => unimplemented!("Invalid statement error handling {:?}", t),
         })
     }
@@ -48,6 +52,59 @@ impl Parser<'_> {
         }
 
         Ok(true)
+    }
+
+    /// Parses the `FunctionDeclaration` goal symbol.
+    ///
+    /// Example:
+    /// ```no_rust
+    /// function fn( ...args ) { return 1 };
+    /// ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+    /// ```
+    fn parse_function_declaration(&mut self) -> Result<Statement> {
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, keyword!("function")));
+
+        let span_start = token.span.start;
+        let parameters = Vec::new();
+        let body = Vec::new();
+
+        let ident = self.parse_binding_identifier()?;
+
+        let token = self.reader.consume()?;
+        if !token_matches!(token, punct!("(")) {
+            todo!("Error handling")
+        }
+
+        // TODO read argument list
+
+        let token = self.reader.consume()?;
+        if !token_matches!(token, punct!(")")) {
+            todo!("Error handling")
+        }
+
+        let token = self.reader.consume()?;
+        if !token_matches!(token, punct!("{")) {
+            todo!("Error handling")
+        }
+
+        // TODO read body
+
+        let token = self.reader.consume()?;
+        if !token_matches!(token, punct!("}")) {
+            todo!("Error handling")
+        }
+
+        let span_end = self.reader.position();
+        let span = Span::new(span_start, span_end);
+
+        return Ok(FunctionDeclaration {
+            span,
+            ident,
+            parameters,
+            body,
+        }
+        .into());
     }
 
     /// Parses the `BlockStatement` goal symbol.
@@ -73,7 +130,7 @@ impl Parser<'_> {
                 _ => {
                     let statement = self.parse_statement()?;
                     statements.push(statement)
-                },
+                }
             }
         }
 

@@ -2,12 +2,14 @@ use super::Ident;
 use crate::ast::Expression;
 use fajt_lexer::token::Span;
 
+/// Note: Declarations are handles as statements since they can appear in the same contexts.
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Statement {
     Block(BlockStatement),
     Empty(EmptyStatement),
     Variable(VariableStatement),
     Expression(Expression),
+    FunctionDeclaration(FunctionDeclaration),
 }
 
 impl From<BlockStatement> for Statement {
@@ -32,6 +34,20 @@ impl From<Expression> for Statement {
     fn from(expr: Expression) -> Self {
         Self::Expression(expr)
     }
+}
+
+impl From<FunctionDeclaration> for Statement {
+    fn from(expr: FunctionDeclaration) -> Self {
+        Self::FunctionDeclaration(expr)
+    }
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct FunctionDeclaration {
+    pub span: Span,
+    pub ident: Ident,
+    pub parameters: Vec<()>, // TODO
+    pub body: Vec<Statement>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
