@@ -16,8 +16,10 @@ impl Parser<'_> {
     /// Parses the `VariableStatement` and `LexicalDeclaration` goal symbols.
     ///
     /// Example:
+    /// ```no_rust
     /// var a = 2 + b, c = 2;
     /// ^~~~~~~~~~~~~~~~~~~~^
+    /// ```
     pub(crate) fn parse_variable_statement(&mut self, kind: VariableKind) -> Result<Statement> {
         let token = self.reader.consume()?;
         let start = token.span.start;
@@ -38,8 +40,10 @@ impl Parser<'_> {
     /// Parses the `VariableDeclaration` and `LexicalBinding` goal symbols.
     ///
     /// Example:
+    /// ```no_rust
     /// var a = 2 + b, c = 2;
     ///     ^~~~~~~~^  ^~~~~^
+    /// ```
     fn parse_variable_declaration(&mut self) -> Result<VariableDeclaration> {
         let token = self.reader.current()?;
         let span_start = token.span.start;
@@ -77,8 +81,10 @@ impl Parser<'_> {
     /// Parses the `Initializer` goal symbol.
     ///
     /// Example:
+    /// ```no_rust
     /// var a = 1 + 2, b = 100;
     ///         ^~~~^      ^~^
+    /// ```
     fn parse_variable_initializer(&mut self) -> Result<Expression> {
         self.reader.consume()?; // Skip =
         self.parse_assignment_expression()
@@ -87,8 +93,10 @@ impl Parser<'_> {
     /// Parses the `ObjectBindingPattern` goal symbol.
     ///
     /// Example:
+    /// ```no_rust
     /// var { a, b, ...rest} = c;
     ///     ^~~~~~~~~~~~~~~^
+    /// ```
     fn parse_object_binding_pattern(&mut self) -> Result<BindingPattern> {
         let token = self.reader.consume()?;
         debug_assert_eq!(token.value, punct!("{"));
@@ -133,8 +141,10 @@ impl Parser<'_> {
     /// Parses the `ArrayBindingPattern` goal symbol.
     ///
     /// Example:
+    /// ```no_rust
     /// var [ a, b, ...rest ] = c;
     ///     ^~~~~~~~~~~~~~~~^
+    /// ```
     fn parse_array_binding_pattern(&mut self) -> Result<BindingPattern> {
         let token = self.reader.consume()?;
         debug_assert_eq!(token.value, punct!("["));
@@ -189,10 +199,12 @@ impl Parser<'_> {
     /// This also consumes the expected end punctuator.
     ///
     /// Examples:
+    /// ```no_rust
     /// var { ...rest } = a;
     ///          ^~~~~^
     /// var [ ...rest ] = a;
     ///          ^~~~~^
+    /// ```
     fn parse_rest_binding_ident(&mut self, expected_end: Punct) -> Result<Option<Ident>> {
         let ident_token = self.reader.consume()?;
         if !token_matches!(ident_token, @ident)

@@ -55,8 +55,17 @@ impl Parser<'_> {
         Ok(Expression(expr).into())
     }
 
+    /// Parses the `EmptyStatement` goal symbol.
+    ///
+    /// Example:
+    /// ```no_rust
+    /// ;
+    /// ^
+    /// ```
     fn parse_empty_statement(&mut self) -> Result<Statement> {
         let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, punct!(";")));
+
         Ok(Statement::Empty(EmptyStatement { span: token.span }))
     }
 }

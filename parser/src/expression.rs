@@ -24,6 +24,7 @@ impl Parser<'_> {
         self.parse_primary_expression()
     }
 
+    /// Parses the `PrimaryExpression` goal symbol.
     fn parse_primary_expression(&mut self) -> Result<Expression> {
         Ok(match self.reader.current()? {
             token_matches!(keyword!("this")) => self.parse_this_expression()?,
@@ -57,6 +58,13 @@ impl Parser<'_> {
         .into())
     }
 
+    /// Parses the `ArrayLiteral` goal symbol, which is part of `PrimaryExpression`.
+    ///
+    /// Example:
+    /// ```no_rust
+    /// return ["success", 200, 0x6A, true];
+    ///         ^~~~~~~~^  ^~^  ^~~^  ^~~^
+    /// ```
     fn parse_literal(&mut self) -> Result<Expression> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, @literal));
@@ -72,6 +80,13 @@ impl Parser<'_> {
         }
     }
 
+    /// Parses the `ArrayLiteral` goal symbol, which is part of `PrimaryExpression`.
+    ///
+    /// Example:
+    /// ```no_rust
+    /// var a = [ a, 1, ...spread ];
+    ///         ^~~~~~~~~~~~~~~~~~^
+    /// ```
     fn parse_array_literal(&mut self) -> Result<Expression> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("[")));
@@ -112,6 +127,13 @@ impl Parser<'_> {
         .into())
     }
 
+    /// Parses the `ObjectLiteral` goal symbol, which is part of `PrimaryExpression`.
+    ///
+    /// Example:
+    /// ```no_rust
+    /// var a = { a, b: 1, ...spread };
+    ///         ^~~~~~~~~~~~~~~~~~~~~^
+    /// ```
     fn parse_object_literal(&mut self) -> Result<Expression> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("{")));
@@ -149,11 +171,27 @@ impl Parser<'_> {
         .into())
     }
 
+    /// Parses the `this` expression which is part of the `PrimaryExpression` goal symbol.
+    ///
+    /// Example:
+    /// ```no_rust
+    /// this
+    /// ^~~^
+    /// ```
     fn parse_this_expression(&mut self) -> Result<Expression> {
         let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, keyword!("this")));
+
         Ok(ThisExpression::new(token.span).into())
     }
 
+    /// Parses the `IdentifierReference` goal symbol, which is part of the `PrimaryExpression`.
+    ///
+    /// Example:
+    /// ```no_rust
+    /// var foo = bar;
+    ///           ^~^
+    /// ```
     fn parse_identifier_reference(&mut self) -> Result<Expression> {
         let token = self.reader.consume()?;
         let ident: Ident = token.try_into().unwrap();
