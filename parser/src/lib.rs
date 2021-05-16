@@ -17,12 +17,11 @@ use fajt_lexer::Lexer;
 use std::convert::TryInto;
 
 pub struct Parser<'a> {
-    reader: PeekReader<Token, Lexer<'a>>,
+    reader: &'a mut PeekReader<Token, Lexer<'a>>,
 }
 
 impl<'a> Parser<'a> {
-    pub fn new(lexer: Lexer<'a>) -> Result<Self> {
-        let reader = PeekReader::new(lexer)?;
+    pub fn new(reader: &'a mut PeekReader<Token, Lexer<'a>>) -> Result<Self> {
         Ok(Parser { reader })
     }
 
