@@ -49,7 +49,7 @@ impl Parser<'_> {
         let identifier = match &token.value {
             punct!("{") => self.parse_object_binding_pattern()?,
             punct!("[") => self.parse_array_binding_pattern()?,
-            TokenValue::Identifier(_) => BindingPattern::Ident(self.parse_binding_identifier()?),
+            TokenValue::Identifier(_) => BindingPattern::Ident(self.parse_identifier()?),
             _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
         };
 
@@ -110,8 +110,8 @@ impl Parser<'_> {
                     rest = self.parse_rest_binding_ident(BracketClose)?;
                     break;
                 }
-                _ if self.is_binding_identifier()? => {
-                    let ident = self.parse_binding_identifier()?;
+                _ if self.is_identifier()? => {
+                    let ident = self.parse_identifier()?;
                     props.push(ObjectBindingProp::Assign(ident));
                     self.consume_object_delimiter()?;
                 }
@@ -164,8 +164,8 @@ impl Parser<'_> {
                     rest = self.parse_rest_binding_ident(BraceClose)?;
                     break;
                 }
-                _ if self.is_binding_identifier()? => {
-                    let ident = self.parse_binding_identifier()?;
+                _ if self.is_identifier()? => {
+                    let ident = self.parse_identifier()?;
                     elements.push(Some(BindingPattern::Ident(ident)));
                     self.consume_array_delimiter()?;
                 }
@@ -195,7 +195,7 @@ impl Parser<'_> {
     ///          ^~~~~^
     /// ```
     fn parse_rest_binding_ident(&mut self, expected_end: Punct) -> Result<Option<Ident>> {
-        let ident = self.parse_binding_identifier()?;
+        let ident = self.parse_identifier()?;
         let end_token = self.reader.consume()?;
 
         if let TokenValue::Punct(p) = end_token.value {

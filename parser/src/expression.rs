@@ -152,8 +152,8 @@ impl Parser<'_> {
                     props.push(PropertyDefinition::Spread(expr));
                     self.consume_object_delimiter()?;
                 }
-                _ if self.is_binding_identifier()? => {
-                    let ident = self.parse_binding_identifier()?;
+                _ if self.is_identifier()? => {
+                    let ident = self.parse_identifier()?;
                     props.push(PropertyDefinition::IdentifierReference(ident.into()));
                     self.consume_object_delimiter()?;
                 }
@@ -192,7 +192,7 @@ impl Parser<'_> {
     ///           ^~^
     /// ```
     fn parse_identifier_reference(&mut self) -> Result<Expression> {
-        let ident: Ident = self.parse_binding_identifier()?;
+        let ident: Ident = self.parse_identifier()?;
 
         // Consume potential trailing semi colon TODO how to handle these in general?
         if self.reader.current()?.value == punct!(";") {

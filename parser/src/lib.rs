@@ -45,7 +45,7 @@ impl<'a> Parser<'a> {
         self.parse_expression()
     }
 
-    fn is_binding_identifier(&self) -> Result<bool> {
+    fn is_identifier(&self) -> Result<bool> {
         let token = self.reader.current()?;
         Ok(match &token.value {
             TokenValue::Identifier(_) => true,
@@ -54,7 +54,7 @@ impl<'a> Parser<'a> {
         })
     }
 
-    fn parse_binding_identifier(&mut self) -> Result<Ident> {
+    fn parse_identifier(&mut self) -> Result<Ident> {
         let token = self.reader.consume()?;
         Ok(match token.value {
             TokenValue::Identifier(s) => Ident::new(s, token.span),

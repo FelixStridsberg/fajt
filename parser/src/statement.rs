@@ -94,7 +94,7 @@ impl Parser<'_> {
         let parameters = Vec::new();
         let body = Vec::new();
 
-        let ident = self.parse_binding_identifier()?;
+        let ident = self.parse_identifier()?;
 
         let token = self.reader.consume()?;
         if !token_matches!(token, punct!("(")) {
