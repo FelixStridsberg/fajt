@@ -56,6 +56,7 @@ impl Ident {
     }
 }
 
+// TODO remove this
 impl TryFrom<Token> for Ident {
     type Error = Error;
 

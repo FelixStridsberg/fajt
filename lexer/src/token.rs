@@ -119,6 +119,15 @@ impl Keyword {
     /// Tries to turn a keyword into an identifier string.
     /// Succeeds only if that keyword is not reserved in the provided context.
     pub fn into_identifier_string(self, ctx: KeywordContext) -> Result<String, Error> {
+        if self.is_allows_as_identifier(ctx) {
+            Ok(self.to_string())
+        } else {
+            Err(Error::of(ErrorKind::ForbiddenIdentifier(self)))
+        }
+    }
+
+    /// True if the keyword is allowed to be an identifier in the context provided.
+    pub fn is_allows_as_identifier(&self, ctx: KeywordContext) -> bool {
         match self {
             Self::As
             | Self::Async
@@ -126,9 +135,9 @@ impl Keyword {
             | Self::Get
             | Self::Of
             | Self::Set
-            | Self::Target => Ok(self.to_string()),
-            Self::Await if !ctx.contains(KeywordContext::AWAIT) => Ok(self.to_string()),
-            Self::Yield if !ctx.contains(KeywordContext::YIELD) => Ok(self.to_string()),
+            | Self::Target => true,
+            Self::Await if !ctx.contains(KeywordContext::AWAIT) => true,
+            Self::Yield if !ctx.contains(KeywordContext::YIELD) => true,
             Self::Implements
             | Self::Interface
             | Self::Let
@@ -139,9 +148,9 @@ impl Keyword {
             | Self::Static
                 if !ctx.contains(KeywordContext::STRICT) =>
             {
-                Ok(self.to_string())
+                true
             }
-            _ => Err(Error::of(ErrorKind::ForbiddenIdentifier(self))),
+            _ => false,
         }
     }
 }

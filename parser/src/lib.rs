@@ -8,21 +8,31 @@ use crate::ast::{Expression, Ident, Program};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Error, Result};
 use fajt_common::io::PeekReader;
-use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token;
-use fajt_lexer::token::Token;
+use fajt_lexer::token::{KeywordContext, Token, TokenValue};
 use fajt_lexer::token_matches;
 use fajt_lexer::Lexer;
-use std::convert::TryInto;
 
 pub struct Parser<'a> {
+    keyword_context: KeywordContext,
     reader: &'a mut PeekReader<Token, Lexer<'a>>,
 }
 
 impl<'a> Parser<'a> {
     pub fn new(reader: &'a mut PeekReader<Token, Lexer<'a>>) -> Result<Self> {
-        Ok(Parser { reader })
+        Ok(Parser {
+            keyword_context: KeywordContext::empty(),
+            reader,
+        })
+    }
+
+    // TODO with parser context and not KeywordContext
+    pub fn with_context(&'a mut self, context: KeywordContext) -> Self {
+        Parser {
+            keyword_context: context,
+            reader: &mut self.reader,
+        }
     }
 
     pub fn parse(&mut self) -> Result<Program> {
@@ -37,21 +47,24 @@ impl<'a> Parser<'a> {
 
     fn is_binding_identifier(&self) -> Result<bool> {
         let token = self.reader.current()?;
-        // TODO in lexer, add information if a keyword is reserved, and if it is in which contexts
-        Ok(token_matches!(token, @ident)
-            || token_matches!(token, keyword!("await"))
-            || token_matches!(token, keyword!("yield")))
+        Ok(match &token.value {
+            TokenValue::Identifier(_) => true,
+            TokenValue::Keyword(k) => k.is_allows_as_identifier(self.keyword_context),
+            _ => false,
+        })
     }
 
     fn parse_binding_identifier(&mut self) -> Result<Ident> {
-        match self.reader.current()? {
-            token_matches!(@ident) => self.reader.consume()?.try_into(),
-            token_matches!(keyword!("await")) | token_matches!(keyword!("yield")) => {
-                // TODO fail depending on context
-                self.reader.consume()?.try_into()
+        let token = self.reader.consume()?;
+        Ok(match token.value {
+            TokenValue::Identifier(s) => Ident::new(s, token.span),
+            TokenValue::Keyword(k) => {
+                // TODO error handling
+                let str = k.into_identifier_string(self.keyword_context).unwrap();
+                Ident::new(str, token.span)
             }
-            _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
-        }
+            _ => return Err(Error::of(UnexpectedToken(token))),
+        })
     }
 
     fn consume_array_delimiter(&mut self) -> Result<()> {
