@@ -1,4 +1,5 @@
-use proc_macro2::{Ident, Span, TokenStream, TokenTree};
+use crate::map_variants;
+use proc_macro2::{Span, TokenStream, TokenTree};
 use quote::quote;
 use syn::{Attribute, DataEnum, DeriveInput, Variant};
 
@@ -14,7 +15,9 @@ pub fn enum_from_string(input: &DeriveInput, enum_data: &DataEnum) -> TokenStrea
 
 fn generate_from_str_impl(input: &DeriveInput, enum_data: &DataEnum) -> TokenStream {
     let ident = &input.ident;
-    let match_branches = map_variants(enum_data, |variant_ident, variant_string| {
+    let match_branches = map_variants(enum_data, |v| {
+        let variant_ident = &v.ident;
+        let variant_string = variant_string(v);
         quote! {
             #variant_string => Ok(#ident::#variant_ident)
         }
@@ -44,7 +47,9 @@ fn generate_macro(input: &DeriveInput, enum_data: &DataEnum) -> Option<TokenStre
 
     macro_name.map(|name| {
         let macro_name = syn::Ident::new(&name, Span::call_site());
-        let macro_rules = map_variants(enum_data, |variant_ident, variant_string| {
+        let macro_rules = map_variants(enum_data, |v| {
+            let variant_ident = &v.ident;
+            let variant_string = variant_string(v);
             quote! {
                 (#variant_string) => { #macro_name!(#variant_ident) }
             }
@@ -93,31 +98,17 @@ fn get_group_content(tokens: &TokenStream) -> TokenStream {
         .collect()
 }
 
-fn map_variants<F: Fn(&Ident, &str) -> TokenStream>(
-    enum_data: &DataEnum,
-    map: F,
-) -> Vec<TokenStream> {
-    enum_data
-        .variants
-        .iter()
-        .map(|v| {
-            let variant_ident = &v.ident;
-            let variant_string =
-                variant_string(v).unwrap_or_else(|| v.ident.to_string().to_lowercase());
-            map(variant_ident, &variant_string)
-        })
-        .collect()
-}
-
-fn variant_string(variant: &Variant) -> Option<String> {
+fn variant_string(variant: &Variant) -> String {
     let attribute = variant
         .attrs
         .iter()
         .find(|a| a.path.is_ident("from_string"));
-    attribute.map(|a| {
-        let string_literal: syn::LitStr = a
-            .parse_args()
-            .expect("Could not parse #[from_string(..)] attribute.");
-        string_literal.value()
-    })
+    attribute
+        .map(|a| {
+            let string_literal: syn::LitStr = a
+                .parse_args()
+                .expect("Could not parse #[from_string(..)] attribute.");
+            string_literal.value()
+        })
+        .unwrap_or_else(|| variant.ident.to_string().to_lowercase())
 }

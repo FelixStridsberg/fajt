@@ -3,11 +3,13 @@ extern crate quote;
 extern crate syn;
 
 mod enum_from_string;
+mod enum_keyword;
 
 use proc_macro::TokenStream;
-use syn::{parse_macro_input, Data, DeriveInput};
+use syn::{parse_macro_input, Data, DataEnum, DeriveInput, Variant};
 
 use enum_from_string::enum_from_string;
+use enum_keyword::enum_keyword;
 
 /// Generates FromStr implementation for enum.
 /// It can also generate a macro for translating strings to enum variants.
@@ -72,10 +74,23 @@ pub fn enum_from_string_derive(input: TokenStream) -> TokenStream {
     TokenStream::from(tokens)
 }
 
-#[proc_macro_derive(
-Keyword,
-attributes(reserved_in, not_reserved)
-)]
-pub fn keyword_enum(_input: TokenStream) -> TokenStream {
-    TokenStream::new()
+#[proc_macro_derive(Keyword, attributes(keyword_context, reserved_in, not_reserved))]
+pub fn keyword_enum(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+
+    let tokens = if let Data::Enum(enum_data) = &input.data {
+        enum_keyword(&input, &enum_data)
+    } else {
+        panic!("Keyword is only applicable for enums.");
+    };
+
+    TokenStream::from(tokens)
+}
+
+/// Map over each variant of a enum and calls function.
+fn map_variants<F: Fn(&Variant) -> proc_macro2::TokenStream>(
+    enum_data: &DataEnum,
+    map: F,
+) -> Vec<proc_macro2::TokenStream> {
+    enum_data.variants.iter().map(map).collect()
 }
