@@ -49,7 +49,7 @@ impl Parser<'_> {
         let identifier = match &token.value {
             punct!("{") => self.parse_object_binding_pattern()?,
             punct!("[") => self.parse_array_binding_pattern()?,
-            TokenValue::Identifier(_) => BindingPattern::Ident(self.parse_identifier()?),
+            _ if self.is_identifier()? => BindingPattern::Ident(self.parse_identifier()?),
             _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
         };
 

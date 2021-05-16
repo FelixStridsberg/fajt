@@ -101,3 +101,11 @@ fn async_function_declaration_with_body() {
         ]
     );
 }
+
+#[test]
+fn await_keyword_inside_function() {
+    parser_test!(
+        input: "function fn() { var await = 1 }",
+        success
+    );
+}

@@ -1,5 +1,12 @@
+// TODO dry up
 #[macro_export]
 macro_rules! parser_test{
+    (input: $input:literal, success) => {
+        let lexer = fajt_lexer::Lexer::new(&$input).unwrap();
+        let mut reader = fajt_common::io::PeekReader::new(lexer).unwrap();
+        let mut parser = fajt_parser::Parser::new(&mut reader).unwrap();
+        parser.parse().expect("Expected success but got fail.");
+    };
     (input: $input:literal, output:[$($output:expr),*]) => {
         let lexer = fajt_lexer::Lexer::new(&$input).unwrap();
         let mut reader = fajt_common::io::PeekReader::new(lexer).unwrap();
