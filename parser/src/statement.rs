@@ -1,5 +1,7 @@
 use crate::ast::Statement::Expression;
-use crate::ast::{BlockStatement, EmptyStatement, FunctionDeclaration, Statement, VariableKind};
+use crate::ast::{
+    BlockStatement, EmptyStatement, FunctionDeclaration, Ident, Statement, VariableKind,
+};
 use crate::error::Result;
 use crate::Parser;
 use fajt_lexer::keyword;
@@ -28,11 +30,11 @@ impl Parser<'_, '_> {
             _ if self.is_expression_statement()? => self.parse_expression_statement()?,
 
             // Declarations are handles as statements
-            token_matches!(keyword!("function")) => self.parse_function_declaration(false)?,
+            token_matches!(keyword!("function")) => self.parse_function_declaration()?,
             token_matches!(keyword!("async"))
                 if token_matches!(self.reader.peek(), opt: keyword!("function")) =>
             {
-                self.parse_function_declaration(true)?
+                self.parse_async_function_declaration()?
             }
 
             t => unimplemented!("Invalid statement error handling {:?}", t),
@@ -63,46 +65,63 @@ impl Parser<'_, '_> {
         Ok(true)
     }
 
-    /// Parses the `FunctionDeclaration` or `AsyncFunctionDeclaration` goal symbol depending on the
-    /// `asynchronous` parameter.
+    /// Parses the `AsyncFunctionDeclaration` goal symbol.
+    ///
+    /// Example:
+    /// ```no_rust
+    /// async function fn( ...args ) { return 1 };
+    /// ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+    /// ```
+    fn parse_async_function_declaration(&mut self) -> Result<Statement> {
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, keyword!("async")));
+
+        let function_token = self.reader.consume()?;
+        debug_assert!(token_matches!(function_token, keyword!("function")));
+        debug_assert_eq!(function_token.first_on_line, false);
+
+        let span_start = token.span.start;
+        let ident = self.parse_identifier()?;
+
+        self.with_context(KeywordContext::AWAIT)
+            .parse_function_implementation(span_start, ident, true)
+    }
+
+    /// Parses the `FunctionDeclaration` goal symbol.
     ///
     /// Example:
     /// ```no_rust
     /// function fn( ...args ) { return 1 };
     /// ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-    ///
-    /// async function fn( ...args ) { return 1 };
-    /// ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
     /// ```
-    fn parse_function_declaration(&mut self, asynchronous: bool) -> Result<Statement> {
-        let first_token = if asynchronous {
-            let token = self.reader.consume()?;
-            debug_assert!(token_matches!(token, keyword!("async")));
+    fn parse_function_declaration(&mut self) -> Result<Statement> {
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, keyword!("function")));
 
-            let function_token = self.reader.consume()?;
-            debug_assert!(token_matches!(function_token, keyword!("function")));
-            debug_assert_eq!(function_token.first_on_line, false);
-
-            token
-        } else {
-            let token = self.reader.consume()?;
-            debug_assert!(token_matches!(token, keyword!("function")));
-            token
-        };
-
-        let span_start = first_token.span.start;
-
+        let span_start = token.span.start;
         let ident = self.parse_identifier()?;
 
-        let context = if asynchronous {
-            self.keyword_context | KeywordContext::AWAIT
-        } else {
-            self.keyword_context
-        };
+        self.parse_function_implementation(span_start, ident, false)
+    }
 
-        let mut parser = self.with_context(context);
-        let parameters = parser.parse_function_parameters()?;
-        let body = parser.parse_function_body()?;
+    /// Parses the part after the identifier of a function declaration.
+    ///
+    /// Example:
+    /// ```no_rust
+    /// function fn( ...args ) { return 1 };
+    ///            ^~~~~~~~~~~~~~~~~~~~~~~~^
+    ///
+    /// async function fn( ...args ) { return 1 };
+    ///                  ^~~~~~~~~~~~~~~~~~~~~~~~^
+    /// ```
+    fn parse_function_implementation(
+        &mut self,
+        span_start: usize,
+        ident: Ident,
+        asynchronous: bool,
+    ) -> Result<Statement> {
+        let parameters = self.parse_function_parameters()?;
+        let body = self.parse_function_body()?;
 
         let span_end = self.reader.position();
         let span = Span::new(span_start, span_end);
@@ -117,6 +136,13 @@ impl Parser<'_, '_> {
         .into());
     }
 
+    /// Parses the `FormalParameters` goal symbol.
+    ///
+    /// Example:
+    /// ```no_rust
+    /// function fn(a, b, ...c) {}
+    ///             ^~~~~~~~~^
+    /// ```
     fn parse_function_parameters(&mut self) -> Result<Vec<() /* TODO */>> {
         let token = self.reader.consume()?;
         if !token_matches!(token, punct!("(")) {
@@ -133,6 +159,15 @@ impl Parser<'_, '_> {
         Ok(Vec::new())
     }
 
+    /// Parses the `FunctionBody` or `AsyncFunctionBody` goal symbol.
+    /// Note: Only the +Await and ~Yield is different between async an non async, that is implicit
+    /// by the context.
+    ///
+    /// Example:
+    /// ```no_rust
+    /// function fn() { var a = 1; }
+    ///               ^~~~~~~~~~~~~^
+    /// ```
     fn parse_function_body(&mut self) -> Result<Vec<Statement>> {
         let token = self.reader.consume()?;
         if !token_matches!(token, punct!("{")) {
