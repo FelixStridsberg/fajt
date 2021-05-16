@@ -1,6 +1,5 @@
 use crate::error::{Error, ErrorKind};
 use fajt_macros::FromString;
-use fajt_macros::Keyword;
 
 #[macro_export]
 macro_rules! token_matches {
@@ -55,14 +54,13 @@ bitflags! {
 /// ```
 ///
 /// Some keywords are reserved only in specific contexts.
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, FromString, Clone, Keyword)]
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, FromString, Clone)]
 #[from_string_macro("keyword")]
 #[from_string_macro_rules(
     ($variant:ident) => {
         crate::token::TokenValue::Keyword(crate::token::Keyword::$variant)
     };
 )]
-#[keyword_context(KeywordContext)]
 pub enum Keyword {
     Await,
     As,

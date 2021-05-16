@@ -1,4 +1,3 @@
-use crate::map_variants;
 use proc_macro2::{Span, TokenStream, TokenTree};
 use quote::quote;
 use syn::{Attribute, DataEnum, DeriveInput, Variant};
@@ -134,4 +133,11 @@ fn variant_string(variant: &Variant) -> String {
             string_literal.value()
         })
         .unwrap_or_else(|| variant.ident.to_string().to_lowercase())
+}
+
+fn map_variants<F: Fn(&Variant) -> proc_macro2::TokenStream>(
+    enum_data: &DataEnum,
+    map: F,
+) -> Vec<proc_macro2::TokenStream> {
+    enum_data.variants.iter().map(map).collect()
 }
