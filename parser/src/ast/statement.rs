@@ -45,6 +45,7 @@ impl From<FunctionDeclaration> for Statement {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct FunctionDeclaration {
     pub span: Span,
+    pub asynchronous: bool,
     pub ident: Ident,
     pub parameters: Vec<()>, // TODO
     pub body: Vec<Statement>,

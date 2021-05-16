@@ -38,6 +38,7 @@ impl<'a> Parser<'a> {
 
     fn is_binding_identifier(&self) -> Result<bool> {
         let token = self.reader.current()?;
+        // TODO in lexer, add information if a keyword is reserved, and if it is in which contexts
         Ok(token_matches!(token, @ident)
             || token_matches!(token, keyword!("await"))
             || token_matches!(token, keyword!("yield")))

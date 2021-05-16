@@ -28,7 +28,12 @@ impl Parser<'_> {
             _ if self.is_expression_statement()? => self.parse_expression_statement()?,
 
             // Declarations are handles as statements
-            token_matches!(keyword!("function")) => self.parse_function_declaration()?,
+            token_matches!(keyword!("function")) => self.parse_function_declaration(false)?,
+            token_matches!(keyword!("async"))
+                if token_matches!(self.reader.peek(), opt: keyword!("function")) =>
+            {
+                self.parse_function_declaration(true)?
+            }
 
             t => unimplemented!("Invalid statement error handling {:?}", t),
         })
@@ -43,29 +48,49 @@ impl Parser<'_> {
             return Ok(false);
         }
 
-        // TODO async [no LineTerminator here] function, "async function" as a single token from lexer?
-
         if matches!(token.value, keyword!("let"))
             && token_matches!(self.reader.peek(), opt: punct!("["))
         {
             return Ok(false);
         }
 
+        if matches!(token.value, keyword!("async"))
+            && token_matches!(self.reader.peek(), opt: keyword!("function"))
+        {
+            return Ok(self.reader.peek().unwrap().first_on_line);
+        }
+
         Ok(true)
     }
 
-    /// Parses the `FunctionDeclaration` goal symbol.
+    /// Parses the `FunctionDeclaration` or `AsyncFunctionDeclaration` goal symbol depending on the
+    /// `asynchronous` parameter.
     ///
     /// Example:
     /// ```no_rust
     /// function fn( ...args ) { return 1 };
     /// ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+    ///
+    /// async function fn( ...args ) { return 1 };
+    /// ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
     /// ```
-    fn parse_function_declaration(&mut self) -> Result<Statement> {
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, keyword!("function")));
+    fn parse_function_declaration(&mut self, asynchronous: bool) -> Result<Statement> {
+        let first_token = if asynchronous {
+            let token = self.reader.consume()?;
+            debug_assert!(token_matches!(token, keyword!("async")));
 
-        let span_start = token.span.start;
+            let function_token = self.reader.consume()?;
+            debug_assert!(token_matches!(function_token, keyword!("function")));
+            debug_assert_eq!(function_token.first_on_line, false);
+
+            token
+        } else {
+            let token = self.reader.consume()?;
+            debug_assert!(token_matches!(token, keyword!("function")));
+            token
+        };
+
+        let span_start = first_token.span.start;
         let parameters = Vec::new();
         let body = Vec::new();
 
@@ -100,6 +125,7 @@ impl Parser<'_> {
 
         return Ok(FunctionDeclaration {
             span,
+            asynchronous,
             ident,
             parameters,
             body,
