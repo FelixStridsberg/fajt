@@ -14,23 +14,89 @@ use fajt_lexer::token::{KeywordContext, Token, TokenValue};
 use fajt_lexer::token_matches;
 use fajt_lexer::Lexer;
 
+pub struct ContextModify {
+    is_await: Option<bool>,
+    is_yield: Option<bool>,
+}
+
+impl ContextModify {
+    pub fn new() -> Self {
+        Self {
+            is_await: None,
+            is_yield: None,
+        }
+    }
+
+    pub fn set_yield(&mut self, value: bool) -> &mut Self {
+        self.is_yield = Some(value);
+        self
+    }
+
+    pub fn set_await(&mut self, value: bool) -> &mut Self {
+        self.is_await = Some(value);
+        self
+    }
+}
+
+#[derive(Clone)]
+pub struct Context {
+    is_await: bool,
+    is_yield: bool,
+}
+
+impl Context {
+    pub fn modify(&mut self, modify: &ContextModify) -> Self {
+        let mut context = self.clone();
+        if let Some(is_await) = modify.is_await {
+            context.is_await = is_await;
+        }
+
+        if let Some(is_yield) = modify.is_yield {
+            context.is_yield = is_yield;
+        }
+
+        context
+    }
+
+    fn keyword_context(&self) -> KeywordContext {
+        let mut keyword_context = KeywordContext::empty();
+        if self.is_await {
+            keyword_context |= KeywordContext::AWAIT;
+        }
+
+        if self.is_yield {
+            keyword_context |= KeywordContext::YIELD;
+        }
+
+        keyword_context
+    }
+}
+
+impl Default for Context {
+    fn default() -> Self {
+        Self {
+            is_await: false,
+            is_yield: false,
+        }
+    }
+}
+
 pub struct Parser<'a, 'b> {
-    keyword_context: KeywordContext,
+    context: Context,
     reader: &'a mut PeekReader<Token, Lexer<'b>>,
 }
 
 impl<'a, 'b> Parser<'a, 'b> {
     pub fn new(reader: &'a mut PeekReader<Token, Lexer<'b>>) -> Result<Self> {
         Ok(Parser {
-            keyword_context: KeywordContext::empty(),
+            context: Context::default(),
             reader,
         })
     }
 
-    // TODO with parser context and not KeywordContext
-    pub fn with_context(&mut self, context: KeywordContext) -> Parser<'_, 'b> {
+    pub fn with_context(&mut self, modify: &ContextModify) -> Parser<'_, 'b> {
         Parser {
-            keyword_context: context,
+            context: self.context.modify(modify),
             reader: &mut self.reader,
         }
     }
@@ -49,7 +115,7 @@ impl<'a, 'b> Parser<'a, 'b> {
         let token = self.reader.current()?;
         Ok(match &token.value {
             TokenValue::Identifier(_) => true,
-            TokenValue::Keyword(k) => k.is_allows_as_identifier(self.keyword_context),
+            TokenValue::Keyword(k) => k.is_allows_as_identifier(self.context.keyword_context()),
             _ => false,
         })
     }
@@ -60,7 +126,9 @@ impl<'a, 'b> Parser<'a, 'b> {
             TokenValue::Identifier(s) => Ident::new(s, token.span),
             TokenValue::Keyword(k) => {
                 // TODO error handling
-                let str = k.into_identifier_string(self.keyword_context).unwrap();
+                let str = k
+                    .into_identifier_string(self.context.keyword_context())
+                    .unwrap();
                 Ident::new(str, token.span)
             }
             _ => return Err(Error::of(UnexpectedToken(token))),

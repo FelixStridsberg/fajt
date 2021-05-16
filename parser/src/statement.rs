@@ -3,10 +3,10 @@ use crate::ast::{
     BlockStatement, EmptyStatement, FunctionDeclaration, Ident, Statement, VariableKind,
 };
 use crate::error::Result;
-use crate::Parser;
+use crate::{ContextModify, Parser};
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
-use fajt_lexer::token::{KeywordContext, Span};
+use fajt_lexer::token::Span;
 use fajt_lexer::token_matches;
 
 mod variable;
@@ -83,7 +83,7 @@ impl Parser<'_, '_> {
         let span_start = token.span.start;
         let ident = self.parse_identifier()?;
 
-        self.with_context(KeywordContext::AWAIT)
+        self.with_context(ContextModify::new().set_yield(false).set_await(true))
             .parse_function_implementation(span_start, ident, true)
     }
 
@@ -101,7 +101,8 @@ impl Parser<'_, '_> {
         let span_start = token.span.start;
         let ident = self.parse_identifier()?;
 
-        self.parse_function_implementation(span_start, ident, false)
+        self.with_context(ContextModify::new().set_yield(false).set_await(false))
+            .parse_function_implementation(span_start, ident, false)
     }
 
     /// Parses the part after the identifier of a function declaration.
