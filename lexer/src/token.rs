@@ -1,4 +1,5 @@
 use fajt_macros::FromString;
+use fajt_macros::Keyword;
 
 #[macro_export]
 macro_rules! token_matches {
@@ -41,7 +42,7 @@ macro_rules! token_matches {
 /// assert_eq!(keyword!("const"), TokenValue::Keyword(Keyword::Const))
 /// # }
 /// ```
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, FromString, Clone)]
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, FromString, Clone, Keyword)]
 #[from_string_macro("keyword")]
 #[from_string_macro_rules(
     ($variant:ident) => {
@@ -49,7 +50,11 @@ macro_rules! token_matches {
     };
 )]
 pub enum Keyword {
+    #[reserved_in(Await)]
     Await,
+    #[not_reserved]
+    As,
+    #[not_reserved]
     Async,
     Break,
     Case,
@@ -68,25 +73,42 @@ pub enum Keyword {
     False,
     Finally,
     For,
+    #[not_reserved]
+    From,
     Function,
+    #[not_reserved]
+    Get,
     If,
+    #[reserved_in(Strict)]
     Implements,
     Import,
     In,
     Instanceof,
+    #[reserved_in(Strict)]
     Interface,
+    #[reserved_in(Strict)]
     Let,
     New,
     Null,
+    #[not_reserved]
     Of,
+    #[reserved_in(Strict)]
     Package,
+    #[reserved_in(Strict)]
     Private,
+    #[reserved_in(Strict)]
     Protected,
+    #[reserved_in(Strict)]
     Public,
     Return,
+    #[not_reserved]
+    Set,
+    #[reserved_in(Strict)]
     Static,
     Super,
     Switch,
+    #[not_reserved]
+    Target,
     This,
     Throw,
     True,
@@ -96,6 +118,7 @@ pub enum Keyword {
     Void,
     While,
     With,
+    #[reserved_in(Yield)]
     Yield,
 }
 

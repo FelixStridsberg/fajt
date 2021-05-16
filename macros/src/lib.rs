@@ -71,3 +71,11 @@ pub fn enum_from_string_derive(input: TokenStream) -> TokenStream {
 
     TokenStream::from(tokens)
 }
+
+#[proc_macro_derive(
+Keyword,
+attributes(reserved_in, not_reserved)
+)]
+pub fn keyword_enum(_input: TokenStream) -> TokenStream {
+    TokenStream::new()
+}
