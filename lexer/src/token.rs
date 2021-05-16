@@ -52,8 +52,6 @@ bitflags! {
 /// assert_eq!(keyword!("const"), TokenValue::Keyword(Keyword::Const))
 /// # }
 /// ```
-///
-/// Some keywords are reserved only in specific contexts.
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, FromString, Clone)]
 #[from_string_macro("keyword")]
 #[from_string_macro_rules(
@@ -118,6 +116,8 @@ pub enum Keyword {
 }
 
 impl Keyword {
+    /// Tries to turn a keyword into an identifier string.
+    /// Succeeds only if that keyword is not reserved in the provided context.
     pub fn into_identifier_string(self, ctx: KeywordContext) -> Result<String, Error> {
         match self {
             Self::As
@@ -141,7 +141,6 @@ impl Keyword {
             {
                 Ok(self.to_string())
             }
-
             _ => Err(Error::of(ErrorKind::ForbiddenIdentifier(self))),
         }
     }
