@@ -92,7 +92,7 @@ impl Parser<'_> {
 
         let span_start = first_token.span.start;
         let parameters = Vec::new();
-        let body = Vec::new();
+        let mut body = Vec::new();
 
         let ident = self.parse_identifier()?;
 
@@ -115,9 +115,13 @@ impl Parser<'_> {
 
         // TODO read body
 
-        let token = self.reader.consume()?;
-        if !token_matches!(token, punct!("}")) {
-            todo!("Error handling")
+        loop {
+            if token_matches!(self.reader.current()?, punct!("}")) {
+                self.reader.consume()?;
+                break;
+            }
+
+            body.push(self.parse_statement()?);
         }
 
         let span_end = self.reader.position();
