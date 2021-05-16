@@ -1,8 +1,11 @@
 mod lib;
 
-use fajt_lexer::token::Span;
+use fajt_lexer::token::Keyword;
+use fajt_lexer::token::TokenValue;
+use fajt_lexer::token::{Span, Token};
 use fajt_parser::ast::Base::Decimal;
 use fajt_parser::ast::*;
+use fajt_parser::error::ErrorKind::UnexpectedToken;
 
 #[test]
 fn function_declaration() {
@@ -107,5 +110,13 @@ fn await_keyword_inside_function() {
     parser_test!(
         input: "function fn() { var await = 1 }",
         success
+    );
+}
+
+#[test]
+fn fail_await_keyword_inside_async_function() {
+    parser_test!(
+        input: "async function fn() { var await = 1 }",
+        error: UnexpectedToken(Token::new(TokenValue::Keyword(Keyword::Await), false, (26, 31)))
     );
 }

@@ -4,12 +4,12 @@ use crate::error::Result;
 use crate::Parser;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
-use fajt_lexer::token::Span;
+use fajt_lexer::token::{KeywordContext, Span};
 use fajt_lexer::token_matches;
 
 mod variable;
 
-impl Parser<'_> {
+impl Parser<'_, '_> {
     pub(crate) fn parse_statement(&mut self) -> Result<Statement> {
         Ok(match self.reader.current()? {
             token_matches!(punct!(";")) => self.parse_empty_statement()?,
@@ -91,38 +91,18 @@ impl Parser<'_> {
         };
 
         let span_start = first_token.span.start;
-        let parameters = Vec::new();
-        let mut body = Vec::new();
 
         let ident = self.parse_identifier()?;
 
-        let token = self.reader.consume()?;
-        if !token_matches!(token, punct!("(")) {
-            todo!("Error handling")
-        }
+        let context = if asynchronous {
+            self.keyword_context | KeywordContext::AWAIT
+        } else {
+            self.keyword_context
+        };
 
-        // TODO read argument list
-
-        let token = self.reader.consume()?;
-        if !token_matches!(token, punct!(")")) {
-            todo!("Error handling")
-        }
-
-        let token = self.reader.consume()?;
-        if !token_matches!(token, punct!("{")) {
-            todo!("Error handling")
-        }
-
-        // TODO read body
-
-        loop {
-            if token_matches!(self.reader.current()?, punct!("}")) {
-                self.reader.consume()?;
-                break;
-            }
-
-            body.push(self.parse_statement()?);
-        }
+        let mut parser = self.with_context(context);
+        let parameters = parser.parse_function_parameters()?;
+        let body = parser.parse_function_body()?;
 
         let span_end = self.reader.position();
         let span = Span::new(span_start, span_end);
@@ -135,6 +115,40 @@ impl Parser<'_> {
             body,
         }
         .into());
+    }
+
+    fn parse_function_parameters(&mut self) -> Result<Vec<() /* TODO */>> {
+        let token = self.reader.consume()?;
+        if !token_matches!(token, punct!("(")) {
+            todo!("Error handling")
+        }
+
+        // TODO read argument list
+
+        let token = self.reader.consume()?;
+        if !token_matches!(token, punct!(")")) {
+            todo!("Error handling")
+        }
+
+        Ok(Vec::new())
+    }
+
+    fn parse_function_body(&mut self) -> Result<Vec<Statement>> {
+        let token = self.reader.consume()?;
+        if !token_matches!(token, punct!("{")) {
+            todo!("Error handling")
+        }
+
+        let mut body = Vec::new();
+        loop {
+            if token_matches!(self.reader.current()?, punct!("}")) {
+                self.reader.consume()?;
+                break;
+            }
+
+            body.push(self.parse_statement()?);
+        }
+        Ok(body)
     }
 
     /// Parses the `BlockStatement` goal symbol.

@@ -10,7 +10,7 @@ use fajt_lexer::token::Punct::{BraceClose, BracketClose};
 use fajt_lexer::token::{Punct, Span, TokenValue};
 use fajt_lexer::token_matches;
 
-impl Parser<'_> {
+impl Parser<'_, '_> {
     /// Parses the `VariableStatement` and `LexicalDeclaration` goal symbols.
     ///
     /// Example:

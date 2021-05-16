@@ -14,13 +14,13 @@ use fajt_lexer::token::{KeywordContext, Token, TokenValue};
 use fajt_lexer::token_matches;
 use fajt_lexer::Lexer;
 
-pub struct Parser<'a> {
+pub struct Parser<'a, 'b> {
     keyword_context: KeywordContext,
-    reader: &'a mut PeekReader<Token, Lexer<'a>>,
+    reader: &'a mut PeekReader<Token, Lexer<'b>>,
 }
 
-impl<'a> Parser<'a> {
-    pub fn new(reader: &'a mut PeekReader<Token, Lexer<'a>>) -> Result<Self> {
+impl<'a, 'b> Parser<'a, 'b> {
+    pub fn new(reader: &'a mut PeekReader<Token, Lexer<'b>>) -> Result<Self> {
         Ok(Parser {
             keyword_context: KeywordContext::empty(),
             reader,
@@ -28,7 +28,7 @@ impl<'a> Parser<'a> {
     }
 
     // TODO with parser context and not KeywordContext
-    pub fn with_context(&'a mut self, context: KeywordContext) -> Self {
+    pub fn with_context(&mut self, context: KeywordContext) -> Parser<'_, 'b> {
         Parser {
             keyword_context: context,
             reader: &mut self.reader,
