@@ -1,4 +1,4 @@
-use crate::token::Span;
+use crate::token::{Keyword, Span};
 use std::fmt::Formatter;
 use std::{error, fmt};
 
@@ -23,6 +23,7 @@ impl Error {
 #[non_exhaustive]
 pub enum ErrorKind {
     InvalidOrUnexpectedToken(Span),
+    ForbiddenIdentifier(Keyword),
     EndOfFile,
 }
 
@@ -32,6 +33,13 @@ impl fmt::Display for Error {
             ErrorKind::EndOfFile => write!(f, "End of file reached."),
             ErrorKind::InvalidOrUnexpectedToken(p) => {
                 write!(f, "Invalid or unexpected token at {}:{}", p.start, p.end)
+            }
+            ErrorKind::ForbiddenIdentifier(k) => {
+                write!(
+                    f,
+                    "Keyword '{:?}' is not allowed as identifier in this context.",
+                    k
+                )
             }
         }
     }

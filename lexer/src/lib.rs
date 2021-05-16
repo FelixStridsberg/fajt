@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate bitflags;
+
 extern crate fajt_macros;
 
 mod code_point;

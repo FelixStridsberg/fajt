@@ -5,11 +5,13 @@ use syn::{Attribute, DataEnum, DeriveInput, Variant};
 
 pub fn enum_from_string(input: &DeriveInput, enum_data: &DataEnum) -> TokenStream {
     let from_str_impl_tokens = generate_from_str_impl(input, enum_data);
+    let to_str_impl_tokens = generate_to_str_impl(input, enum_data);
     let macro_tokens = generate_macro(input, enum_data);
 
     quote! {
         #macro_tokens
         #from_str_impl_tokens
+        #to_str_impl_tokens
     }
 }
 
@@ -31,6 +33,27 @@ fn generate_from_str_impl(input: &DeriveInput, enum_data: &DataEnum) -> TokenStr
                 match s {
                     #(#match_branches,)*
                     _ => Err("No matching enum found."),
+                }
+            }
+        }
+    }
+}
+
+fn generate_to_str_impl(input: &DeriveInput, enum_data: &DataEnum) -> TokenStream {
+    let ident = &input.ident;
+    let match_branches = map_variants(enum_data, |v| {
+        let variant_ident = &v.ident;
+        let variant_string = variant_string(v);
+        quote! {
+            #ident::#variant_ident => #variant_string.to_owned()
+        }
+    });
+
+    quote! {
+        impl std::string::ToString for #ident {
+            fn to_string(&self) -> String {
+                match self {
+                    #(#match_branches,)*
                 }
             }
         }
