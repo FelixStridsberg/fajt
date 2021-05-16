@@ -12,7 +12,6 @@ use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token::{Span, TokenValue};
 use fajt_lexer::token_matches;
-use std::convert::TryInto;
 
 impl Parser<'_> {
     pub(crate) fn parse_expression(&mut self) -> Result<Expression> {
@@ -153,8 +152,8 @@ impl Parser<'_> {
                     props.push(PropertyDefinition::Spread(expr));
                     self.consume_object_delimiter()?;
                 }
-                token_matches!(@ident) => {
-                    let ident: Ident = self.reader.consume()?.try_into()?;
+                _ if self.is_binding_identifier()? => {
+                    let ident = self.parse_binding_identifier()?;
                     props.push(PropertyDefinition::IdentifierReference(ident.into()));
                     self.consume_object_delimiter()?;
                 }
@@ -193,8 +192,7 @@ impl Parser<'_> {
     ///           ^~^
     /// ```
     fn parse_identifier_reference(&mut self) -> Result<Expression> {
-        let token = self.reader.consume()?;
-        let ident: Ident = token.try_into().unwrap();
+        let ident: Ident = self.parse_binding_identifier()?;
 
         // Consume potential trailing semi colon TODO how to handle these in general?
         if self.reader.current()?.value == punct!(";") {

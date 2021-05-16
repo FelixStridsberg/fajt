@@ -5,12 +5,10 @@ use crate::ast::{
 use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::{Error, Result};
 use crate::Parser;
-use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token::Punct::{BraceClose, BracketClose};
 use fajt_lexer::token::{Punct, Span, TokenValue};
 use fajt_lexer::token_matches;
-use std::convert::TryInto;
 
 impl Parser<'_> {
     /// Parses the `VariableStatement` and `LexicalDeclaration` goal symbols.
@@ -51,12 +49,7 @@ impl Parser<'_> {
         let identifier = match &token.value {
             punct!("{") => self.parse_object_binding_pattern()?,
             punct!("[") => self.parse_array_binding_pattern()?,
-            TokenValue::Identifier(_) => BindingPattern::Ident(
-                self.reader
-                    .consume()?
-                    .try_into()
-                    .expect("Expected identifier"),
-            ),
+            TokenValue::Identifier(_) => BindingPattern::Ident(self.parse_binding_identifier()?),
             _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
         };
 
@@ -202,25 +195,18 @@ impl Parser<'_> {
     ///          ^~~~~^
     /// ```
     fn parse_rest_binding_ident(&mut self, expected_end: Punct) -> Result<Option<Ident>> {
-        let ident_token = self.reader.consume()?;
-        if !token_matches!(ident_token, @ident)
-            && !token_matches!(ident_token, keyword!("await"))
-            && !token_matches!(ident_token, keyword!("yield"))
-        {
-            return Err(Error::of(UnexpectedToken(ident_token)));
-        }
-
+        let ident = self.parse_binding_identifier()?;
         let end_token = self.reader.consume()?;
 
         if let TokenValue::Punct(p) = end_token.value {
             if p == expected_end {
-                return Ok(Some(ident_token.try_into().unwrap()));
+                return Ok(Some(ident));
             }
         }
 
         Err(Error::of(SyntaxError(
             "Rest element must be last element".to_owned(),
-            ident_token.span,
+            ident.span,
         )))
     }
 }

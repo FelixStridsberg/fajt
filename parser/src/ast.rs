@@ -4,10 +4,7 @@ pub mod statement;
 pub use expression::*;
 pub use statement::*;
 
-use crate::error::Error;
-use crate::error::ErrorKind::SyntaxError;
-use fajt_lexer::token::{Keyword, Span, Token, TokenValue};
-use std::convert::TryFrom;
+use fajt_lexer::token::Span;
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Body<T> {
@@ -52,34 +49,6 @@ impl Ident {
         Ident {
             name: name.into(),
             span: span.into(),
-        }
-    }
-}
-
-// TODO remove this
-impl TryFrom<Token> for Ident {
-    type Error = Error;
-
-    fn try_from(token: Token) -> Result<Self, Self::Error> {
-        match token.value {
-            TokenValue::Identifier(name) => Ok(Ident {
-                span: token.span.clone(),
-                name,
-            }),
-            // Await can be used as a keyword in the parser context.
-            TokenValue::Keyword(Keyword::Await) => Ok(Ident {
-                name: "await".to_owned(),
-                span: token.span,
-            }),
-            // Yield can be used as a keyword in the parser context.
-            TokenValue::Keyword(Keyword::Yield) => Ok(Ident {
-                name: "yield".to_owned(),
-                span: token.span,
-            }),
-            _ => Err(Error::of(SyntaxError(
-                format!("Tried to use '{:?}' as an identifier.", token.value),
-                token.span,
-            ))),
         }
     }
 }
