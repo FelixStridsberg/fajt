@@ -52,6 +52,6 @@ fn with_initializer() {
 fn fail_invalid_identifier() {
     parser_test!(
         input: "var * = c;",
-        error: UnexpectedToken(Token::new(punct!("*"), (4, 5)))
+        error: UnexpectedToken(Token::new(punct!("*"), false, (4, 5)))
     );
 }

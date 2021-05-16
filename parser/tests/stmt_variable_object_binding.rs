@@ -189,7 +189,7 @@ fn yield_as_identifier() {
 fn fail_prefixing_comma() {
     parser_test!(
         input: "var { , a, b } = c;",
-        error: UnexpectedToken(Token::new(punct!(","), (6, 7)))
+        error: UnexpectedToken(Token::new(punct!(","), false, (6, 7)))
     );
 }
 
@@ -197,7 +197,7 @@ fn fail_prefixing_comma() {
 fn fail_double_comma() {
     parser_test!(
         input: "var { a,, b } = c;",
-        error: UnexpectedToken(Token::new(punct!(","), (8, 9)))
+        error: UnexpectedToken(Token::new(punct!(","), false, (8, 9)))
     );
 }
 
@@ -205,7 +205,7 @@ fn fail_double_comma() {
 fn fail_missing_comma() {
     parser_test!(
         input: "var { a b } = c;",
-        error: UnexpectedToken(Token::new(TokenValue::Identifier("b".to_owned()), (8, 9)))
+        error: UnexpectedToken(Token::new(TokenValue::Identifier("b".to_owned()), false, (8, 9)))
     );
 }
 

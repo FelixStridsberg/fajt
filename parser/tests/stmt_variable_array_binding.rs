@@ -241,7 +241,7 @@ fn fail_rest_element_must_be_last() {
 fn fail_missing_delimiter() {
     parser_test!(
         input: "var [ a b ] = c;",
-        error: UnexpectedToken(Token::new(TokenValue::Identifier("b".to_owned()), (8, 9)))
+        error: UnexpectedToken(Token::new(TokenValue::Identifier("b".to_owned()), false, (8, 9)))
     );
 }
 

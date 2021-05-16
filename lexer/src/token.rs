@@ -50,6 +50,7 @@ macro_rules! token_matches {
 )]
 pub enum Keyword {
     Await,
+    Async,
     Break,
     Case,
     Catch,
@@ -317,13 +318,15 @@ impl From<(usize, usize)> for Span {
 #[derive(Debug, PartialOrd, PartialEq, Clone)]
 pub struct Token {
     pub value: TokenValue,
+    pub first_on_line: bool,
     pub span: Span,
 }
 
 impl Token {
-    pub fn new<S: Into<Span>>(value: TokenValue, span: S) -> Self {
+    pub fn new<S: Into<Span>>(value: TokenValue, first_on_line: bool, span: S) -> Self {
         Token {
             value,
+            first_on_line,
             span: span.into(),
         }
     }

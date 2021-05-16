@@ -87,8 +87,7 @@ impl<'a> Lexer<'a> {
     }
 
     pub fn read(&mut self) -> Result<Token> {
-        self.skip_whitespaces()?;
-
+        let new_line = self.skip_whitespaces()?;
         let current = self.reader.current()?;
 
         let start = self.reader.position();
@@ -184,7 +183,7 @@ impl<'a> Lexer<'a> {
         }?;
         let end = self.reader.position();
 
-        Ok(Token::new(value, (start, end)))
+        Ok(Token::new(value, new_line, (start, end)))
     }
 
     fn read_identifier_or_keyword(&mut self) -> Result<TokenValue> {
@@ -267,15 +266,25 @@ impl<'a> Lexer<'a> {
         Ok(i64::from_str_radix(&number_str, base).unwrap())
     }
 
-    fn skip_whitespaces(&mut self) -> Result<usize> {
-        let mut count = 0;
+    fn skip_whitespaces(&mut self) -> Result<bool> {
+        let mut line_terminator = self.reader.position() == 0;
 
-        while self.reader.current()?.is_ecma_whitespace() {
-            count += 1;
-            self.reader.consume()?;
+        loop {
+            if self.reader.current()?.is_ecma_line_terminator() {
+                line_terminator = true;
+                self.reader.consume()?;
+                continue;
+            }
+
+            if self.reader.current()?.is_ecma_whitespace() {
+                self.reader.consume()?;
+                continue;
+            }
+
+            break;
         }
 
-        Ok(count)
+        Ok(line_terminator)
     }
 }
 

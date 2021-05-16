@@ -25,7 +25,7 @@ fn empty_array_literal() {
 fn fail_array_literal_missing_comma() {
     parser_test!(
         input: "[a b]",
-        error: UnexpectedToken(Token::new(TokenValue::Identifier("b".to_owned()), (3, 4)))
+        error: UnexpectedToken(Token::new(TokenValue::Identifier("b".to_owned()), false, (3, 4)))
     );
 }
 

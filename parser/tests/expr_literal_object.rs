@@ -86,7 +86,7 @@ fn multiple_props_object_literal() {
 fn fail_object_literal_prefixing_comma() {
     parser_test!(
         input: "{ , a, b }",
-        expr_error: UnexpectedToken(Token::new(punct!(","), (2, 3)))
+        expr_error: UnexpectedToken(Token::new(punct!(","), false, (2, 3)))
     );
 }
 
@@ -94,7 +94,7 @@ fn fail_object_literal_prefixing_comma() {
 fn fail_object_literal_double_comma() {
     parser_test!(
         input: "{ a,, b }",
-        expr_error: UnexpectedToken(Token::new(punct!(","), (4, 5)))
+        expr_error: UnexpectedToken(Token::new(punct!(","), false, (4, 5)))
     );
 }
 
@@ -102,7 +102,7 @@ fn fail_object_literal_double_comma() {
 fn fail_object_missing_comma() {
     parser_test!(
         input: "{ a b }",
-        expr_error: UnexpectedToken(Token::new(TokenValue::Identifier("b".to_owned()), (4, 5)))
+        expr_error: UnexpectedToken(Token::new(TokenValue::Identifier("b".to_owned()), false, (4, 5)))
     );
 }
 

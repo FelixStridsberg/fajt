@@ -21,11 +21,14 @@
 /// TODO, syntax not finalized
 #[macro_export]
 macro_rules! assert_lexer {
-    (input: $input:expr, output: [$(($token:expr, ($col1:expr, $col2:expr)),)*]) => {
+    (input: $input:expr, output: [$(($token:expr, ($col1:expr, $col2:expr)),)+]) => {
         let mut lexer = fajt_lexer::Lexer::new($input).expect("Could not create lexer, empty input?");
         let tokens = lexer.read_all().unwrap();
 
-        assert_eq!(tokens, vec![$(fajt_lexer::token::Token::new($token, ($col1, $col2))),*]);
+        let mut expected = vec![$(fajt_lexer::token::Token::new($token, false, ($col1, $col2))),*];
+        expected[0].first_on_line = true;
+
+        assert_eq!(tokens, expected);
     };
     (input: $input:expr, error: $error:expr) => {
         let mut lexer = fajt_lexer::Lexer::new($input).expect("Could not create lexer, empty input?");
