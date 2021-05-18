@@ -125,14 +125,14 @@ impl Parser<'_, '_> {
         let body = self.parse_function_body()?;
 
         let span = self.span_from(span_start);
-        return Ok(FunctionDeclaration {
+        Ok(FunctionDeclaration {
             span,
             asynchronous,
             ident,
             parameters,
             body,
         }
-        .into());
+        .into())
     }
 
     /// Parses the `FormalParameters` goal symbol.

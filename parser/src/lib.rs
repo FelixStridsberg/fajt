@@ -14,6 +14,7 @@ use fajt_lexer::token::{KeywordContext, Span, Token, TokenValue};
 use fajt_lexer::token_matches;
 use fajt_lexer::Lexer;
 
+#[derive(Default)]
 pub struct ContextModify {
     is_await: Option<bool>,
     is_yield: Option<bool>,

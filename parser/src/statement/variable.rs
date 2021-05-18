@@ -221,7 +221,7 @@ impl Parser<'_, '_> {
     pub(crate) fn parse_binding_rest_element(&mut self) -> Result<BindingPattern> {
         let token = self.reader.consume()?;
         debug_assert_eq!(token.value, punct!("..."));
-        Ok(self.parse_binding_pattern()?)
+        self.parse_binding_pattern()
     }
 
     /// Parses the `BindingIdentifier` goal symbol.
