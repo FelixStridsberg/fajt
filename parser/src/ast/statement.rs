@@ -72,7 +72,7 @@ pub struct VariableStatement {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct VariableDeclaration {
     pub span: Span,
-    pub identifier: BindingPattern,
+    pub pattern: BindingPattern,
     pub initializer: Option<Expression>,
 }
 
@@ -130,6 +130,13 @@ impl From<Ident> for ObjectBindingProp {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ArrayBinding {
     pub span: Span,
-    pub elements: Vec<Option<BindingPattern>>,
+    pub elements: Vec<Option<BindingElement>>,
     pub rest: Option<Ident>,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct BindingElement {
+    pub span: Span,
+    pub pattern: BindingPattern,
+    pub initializer: Option<Expression>,
 }

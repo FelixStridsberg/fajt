@@ -40,7 +40,7 @@ fn function_declaration_with_body() {
                         declarations: vec![
                             VariableDeclaration {
                                 span: Span::new(20, 25),
-                                identifier: Ident::new("a", (20, 21)).into(),
+                                pattern: Ident::new("a", (20, 21)).into(),
                                 initializer: Some(
                                     LiteralExpression {
                                         span: Span::new(24, 25),
@@ -89,7 +89,7 @@ fn async_function_declaration_with_body() {
                         declarations: vec![
                             VariableDeclaration {
                                 span: Span::new(26, 31),
-                                identifier: Ident::new("a", (26, 27)).into(),
+                                pattern: Ident::new("a", (26, 27)).into(),
                                 initializer: Some(
                                     LiteralExpression {
                                         span: Span::new(30, 31),
@@ -118,5 +118,21 @@ fn fail_await_keyword_inside_async_function() {
     parser_test!(
         input: "async function fn() { var await = 1 }",
         error: UnexpectedToken(Token::new(TokenValue::Keyword(Keyword::Await), false, (26, 31)))
+    );
+}
+
+#[test]
+fn function_declaration_with_rest_parameter() {
+    parser_test!(
+        input: "function fn(...a) { }",
+        output: [
+            FunctionDeclaration {
+                span: Span::new(0, 17),
+                asynchronous: false,
+                ident: Ident::new("fn", (9, 11)),
+                parameters: vec![],
+                body: vec![],
+            }.into()
+        ]
     );
 }

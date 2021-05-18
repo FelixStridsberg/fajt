@@ -19,7 +19,7 @@ fn empty() {
                 declarations: vec![
                     VariableDeclaration {
                         span: Span::new(4, 11),
-                        identifier: ObjectBinding {
+                        pattern: ObjectBinding {
                             span: Span::new(4, 6),
                             props: vec![],
                             rest: None,
@@ -43,7 +43,7 @@ fn identifier_binding() {
                 declarations: vec![
                     VariableDeclaration {
                         span: Span::new(4, 14),
-                        identifier: ObjectBinding {
+                        pattern: ObjectBinding {
                             span: Span::new(4, 9),
                             props: vec![Ident::new("a", (6, 7)).into()],
                             rest: None,
@@ -67,7 +67,7 @@ fn trailing_comma() {
                 declarations: vec![
                     VariableDeclaration {
                         span: Span::new(4, 15),
-                        identifier: ObjectBinding {
+                        pattern: ObjectBinding {
                             span: Span::new(4, 10),
                             props: vec![Ident::new("a", (6, 7)).into()],
                             rest: None,
@@ -91,7 +91,7 @@ fn multiple_identifier_bindings() {
                 declarations: vec![
                     VariableDeclaration {
                         span: Span::new(4, 17),
-                        identifier: ObjectBinding {
+                        pattern: ObjectBinding {
                             span: Span::new(4, 12),
                             props: vec![
                                 Ident::new("a", (6, 7)).into(),
@@ -118,7 +118,7 @@ fn rest_binding() {
                 declarations: vec![
                     VariableDeclaration {
                        span: Span::new(4, 20),
-                        identifier: ObjectBinding {
+                        pattern: ObjectBinding {
                             span: Span::new(4, 15),
                             props: vec![],
                             rest: Some(Ident::new("rest", (9, 13))),
@@ -142,7 +142,7 @@ fn await_as_identifier() {
                 declarations: vec![
                     VariableDeclaration {
                         span: Span::new(4, 28),
-                        identifier: ObjectBinding {
+                        pattern: ObjectBinding {
                             span: Span::new(4, 23),
                             props: vec![
                                 Ident::new("await", (6, 11)).into(),
@@ -170,7 +170,7 @@ fn yield_as_identifier() {
                 declarations: vec![
                     VariableDeclaration {
                         span: Span::new(4, 28),
-                        identifier: ObjectBinding {
+                        pattern: ObjectBinding {
                             span: Span::new(4, 23),
                             props: vec![
                                 Ident::new("yield", (6, 11)).into(),

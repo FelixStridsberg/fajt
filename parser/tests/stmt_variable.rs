@@ -19,7 +19,7 @@ fn no_initializer() {
                 declarations: vec![
                     VariableDeclaration {
                         span: Span::new(4, 8),
-                        identifier: Ident::new("foo", (4, 7)).into(),
+                        pattern: Ident::new("foo", (4, 7)).into(),
                         initializer: None,
                     },
                 ]
@@ -39,7 +39,7 @@ fn with_initializer() {
                 declarations: vec![
                     VariableDeclaration {
                         span: Span::new(4, 12),
-                        identifier: Ident::new("foo", (4, 7)).into(),
+                        pattern: Ident::new("foo", (4, 7)).into(),
                         initializer: Some(IdentifierReference(Ident::new("a", (10, 11)).into()))
                     }
                 ]

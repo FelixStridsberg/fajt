@@ -17,7 +17,7 @@ fn empty() {
                 declarations: vec![
                     VariableDeclaration {
                         span: Span::new(4, 11),
-                        identifier: BindingPattern::Array(
+                        pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 6),
                                 elements: vec![],
@@ -43,11 +43,15 @@ fn identifier_binding() {
                 declarations: vec![
                     VariableDeclaration {
                         span: Span::new(4, 14),
-                        identifier: BindingPattern::Array(
+                        pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 9),
                                 elements: vec![
-                                    Some(BindingPattern::Ident(Ident::new("a", (6, 7)).into()))
+                                    Some(BindingElement {
+                                        span: Span::new(6, 7),
+                                        pattern: BindingPattern::Ident(Ident::new("a", (6, 7)).into()),
+                                        initializer: None,
+                                    })
                                 ],
                                 rest: None,
                             }
@@ -71,11 +75,15 @@ fn trailing_comma() {
                 declarations: vec![
                     VariableDeclaration {
                         span: Span::new(4, 15),
-                        identifier: BindingPattern::Array(
+                        pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 10),
                                 elements: vec![
-                                    Some(BindingPattern::Ident(Ident::new("a", (6, 7)).into()))
+                                    Some(BindingElement {
+                                        span: Span::new(6, 7),
+                                        pattern: BindingPattern::Ident(Ident::new("a", (6, 7)).into()),
+                                        initializer: None,
+                                    })
                                 ],
                                 rest: None,
                             }
@@ -99,7 +107,7 @@ fn single_elision() {
                 declarations: vec![
                     VariableDeclaration {
                         span: Span::new(4, 14),
-                        identifier: BindingPattern::Array(
+                        pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 9),
                                 elements: vec![ None ],
@@ -125,7 +133,7 @@ fn rest_element() {
                 declarations: vec![
                     VariableDeclaration {
                         span: Span::new(4, 17),
-                        identifier: BindingPattern::Array(
+                        pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 12),
                                 elements: vec![],
@@ -151,14 +159,24 @@ fn mixed_elision_and_identifiers() {
                 declarations: vec![
                     VariableDeclaration {
                         span: Span::new(4, 19),
-                        identifier: BindingPattern::Array(
+                        pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 14),
                                 elements: vec![
                                     None,
-                                    Some(BindingPattern::Ident(Ident::new("a", (8, 9)).into())),
+                                    Some(BindingElement {
+                                        span: Span::new(8, 9),
+                                        pattern: BindingPattern::Ident(Ident::new("a", (8, 9)).into()),
+                                        initializer: None,
+                                    }),
                                     None,
-                                    Some(BindingPattern::Ident(Ident::new("b", (11, 12)).into())),
+                                    Some(
+                                        BindingElement {
+                                            span: Span::new(11, 12),
+                                            pattern: BindingPattern::Ident(Ident::new("b", (11, 12)).into()),
+                                            initializer: None,
+                                        }
+                                    ),
                                 ],
                                 rest: None,
                             }
@@ -182,11 +200,17 @@ fn await_as_identifier() {
                 declarations: vec![
                     VariableDeclaration {
                         span: Span::new(4, 28),
-                        identifier: BindingPattern::Array(
+                        pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 23),
                                 elements: vec![
-                                    Some(BindingPattern::Ident(Ident::new("await", (6, 11)).into())),
+                                    Some(
+                                        BindingElement {
+                                            span: Span::new(6, 11),
+                                            pattern: BindingPattern::Ident(Ident::new("await", (6, 11)).into()),
+                                            initializer: None,
+                                        }
+                                    ),
                                 ],
                                 rest: Some(Ident::new("await", (16, 21)).into()),
                             }
@@ -199,8 +223,8 @@ fn await_as_identifier() {
     );
 }
 
-/// `yield` is a valid identifier in the parser context.
-/// See the goal symbol `BindingIdentifier` specification.
+// `yield` is a valid identifier in the parser context.
+// See the goal symbol `BindingIdentifier` specification.
 #[test]
 fn yield_as_identifier() {
     parser_test!(
@@ -212,11 +236,17 @@ fn yield_as_identifier() {
                 declarations: vec![
                     VariableDeclaration {
                         span: Span::new(4, 28),
-                        identifier: BindingPattern::Array(
+                        pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 23),
                                 elements: vec![
-                                    Some(BindingPattern::Ident(Ident::new("yield", (6, 11)).into())),
+                                    Some(
+                                        BindingElement {
+                                            span: Span::new(6, 11),
+                                            pattern: BindingPattern::Ident(Ident::new("yield", (6, 11)).into()),
+                                            initializer: None,
+                                        }
+                                    ),
                                 ],
                                 rest: Some(Ident::new("yield", (16, 21)).into()),
                             }
@@ -256,17 +286,23 @@ fn nested_object_binding() {
                 declarations: vec![
                     VariableDeclaration {
                         span: Span::new(4, 18),
-                        identifier: BindingPattern::Array(
+                        pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 13),
                                 elements: vec![
-                                    Some(BindingPattern::Object(
-                                        ObjectBinding {
+                                    Some(
+                                        BindingElement {
                                             span: Span::new(6, 11),
-                                            props: vec![Ident::new("a", (8, 9)).into()],
-                                            rest: None,
+                                            pattern: BindingPattern::Object(
+                                                ObjectBinding {
+                                                    span: Span::new(6, 11),
+                                                    props: vec![Ident::new("a", (8, 9)).into()],
+                                                    rest: None,
+                                                }
+                                            ),
+                                            initializer: None,
                                         }
-                                    ))
+                                    )
                                 ],
                                 rest: None,
                             }
