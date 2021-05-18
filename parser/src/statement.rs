@@ -1,8 +1,9 @@
 use crate::ast::Statement::Expression;
 use crate::ast::{
-    BlockStatement, EmptyStatement, FunctionDeclaration, Ident, Statement, VariableKind,
+    BlockStatement, EmptyStatement, FormalParameters, FunctionDeclaration, Ident, Statement,
+    VariableKind,
 };
-use crate::error::Result;
+use crate::error::{Error, ErrorKind, Result};
 use crate::{ContextModify, Parser};
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
@@ -121,7 +122,7 @@ impl Parser<'_, '_> {
         ident: Ident,
         asynchronous: bool,
     ) -> Result<Statement> {
-        let parameters = self.parse_function_parameters()?;
+        let parameters = self.parse_formal_parameters()?;
         let body = self.parse_function_body()?;
 
         let span_end = self.reader.position();
@@ -144,20 +145,40 @@ impl Parser<'_, '_> {
     /// function fn(a, b, ...c) {}
     ///             ^~~~~~~~~^
     /// ```
-    fn parse_function_parameters(&mut self) -> Result<Vec<() /* TODO */>> {
+    fn parse_formal_parameters(&mut self) -> Result<Option<FormalParameters>> {
         let token = self.reader.consume()?;
         if !token_matches!(token, punct!("(")) {
-            todo!("Error handling")
+            return Err(Error::of(ErrorKind::UnexpectedToken(token)));
         }
 
-        // TODO read argument list
-
-        let token = self.reader.consume()?;
-        if !token_matches!(token, punct!(")")) {
-            todo!("Error handling")
+        if token_matches!(self.reader.current()?, punct!(")")) {
+            self.reader.consume()?;
+            return Ok(None);
         }
 
-        Ok(Vec::new())
+        let span_start = token.span.start;
+
+        let mut rest = None;
+        loop {
+            match self.reader.current()? {
+                token_matches!(punct!(")")) => {
+                    self.reader.consume()?;
+                    break;
+                }
+                token_matches!(punct!("...")) => {
+                    rest = Some(self.parse_binding_rest_element()?);
+                }
+                _ => {
+                    return Err(Error::of(ErrorKind::UnexpectedToken(
+                        self.reader.consume()?,
+                    )))
+                }
+            }
+        }
+
+        let span_end = self.reader.position();
+        let span = Span::new(span_start, span_end);
+        Ok(Some(FormalParameters { span, rest }))
     }
 
     /// Parses the `FunctionBody` or `AsyncFunctionBody` goal symbol.

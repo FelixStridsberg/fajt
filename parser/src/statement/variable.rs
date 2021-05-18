@@ -3,7 +3,7 @@ use crate::ast::{
     ObjectBindingProp, Statement, VariableDeclaration, VariableKind, VariableStatement,
 };
 use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
-use crate::error::{Error, ErrorKind, Result};
+use crate::error::{Error, Result};
 use crate::Parser;
 use fajt_lexer::punct;
 use fajt_lexer::token::Punct::{BraceClose, BracketClose};
@@ -80,7 +80,7 @@ impl Parser<'_, '_> {
     /// Parses the `BindingPattern` goal symbol.
     ///
     /// TODO move out of here, use for other than vars.
-    fn parse_binding_pattern(&mut self) -> Result<BindingPattern> {
+    pub(crate) fn parse_binding_pattern(&mut self) -> Result<BindingPattern> {
         Ok(match self.reader.current()? {
             token_matches!(punct!("{")) => self.parse_object_binding_pattern()?,
             token_matches!(punct!("[")) => self.parse_array_binding_pattern()?,
@@ -228,20 +228,10 @@ impl Parser<'_, '_> {
     /// function fn(...a) {}
     ///             ^~~^
     /// ```
-    fn parse_rest_binding_element(&mut self) -> Result<BindingPattern> {
+    pub(crate) fn parse_binding_rest_element(&mut self) -> Result<BindingPattern> {
         let token = self.reader.consume()?;
         debug_assert_eq!(token.value, punct!("..."));
-
-        Ok(match self.reader.current()? {
-            token_matches!(punct!("{")) => todo!(),
-            token_matches!(punct!("[")) => todo!(),
-            _ if self.is_identifier()? => BindingPattern::Ident(self.parse_identifier()?),
-            _ => {
-                return Err(Error::of(ErrorKind::UnexpectedToken(
-                    self.reader.consume()?,
-                )))
-            }
-        })
+        Ok(self.parse_binding_pattern()?)
     }
 
     /// Parses the `BindingIdentifier` goal symbol.

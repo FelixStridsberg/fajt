@@ -16,7 +16,7 @@ fn function_declaration() {
                 span: Span::new(0, 16),
                 asynchronous: false,
                 ident: Ident::new("fn", (9, 11)),
-                parameters: vec![],
+                parameters: None,
                 body: vec![],
             }.into()
         ]
@@ -32,7 +32,7 @@ fn function_declaration_with_body() {
                 span: Span::new(0, 27),
                 asynchronous: false,
                 ident: Ident::new("fn", (9, 11)),
-                parameters: vec![],
+                parameters: None,
                 body: vec![
                     VariableStatement {
                         span: Span::new(16, 25),
@@ -65,7 +65,7 @@ fn async_function_declaration() {
                 span: Span::new(0, 22),
                 asynchronous: true,
                 ident: Ident::new("fn", (15, 17)),
-                parameters: vec![],
+                parameters: None,
                 body: vec![],
             }.into()
         ]
@@ -81,7 +81,7 @@ fn async_function_declaration_with_body() {
                 span: Span::new(0, 33),
                 asynchronous: true,
                 ident: Ident::new("fn", (15, 17)),
-                parameters: vec![],
+                parameters: None,
                 body: vec![
                     VariableStatement {
                         span: Span::new(22, 31),
@@ -127,10 +127,13 @@ fn function_declaration_with_rest_parameter() {
         input: "function fn(...a) { }",
         output: [
             FunctionDeclaration {
-                span: Span::new(0, 17),
+                span: Span::new(0, 21),
                 asynchronous: false,
                 ident: Ident::new("fn", (9, 11)),
-                parameters: vec![],
+                parameters: Some(FormalParameters {
+                    span: Span::new(11, 17),
+                    rest: Some(BindingPattern::Ident(Ident::new("a", (15, 16))))
+                }),
                 body: vec![],
             }.into()
         ]

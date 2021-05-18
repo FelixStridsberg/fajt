@@ -47,8 +47,14 @@ pub struct FunctionDeclaration {
     pub span: Span,
     pub asynchronous: bool,
     pub ident: Ident,
-    pub parameters: Vec<()>, // TODO
+    pub parameters: Option<FormalParameters>,
     pub body: Vec<Statement>,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct FormalParameters {
+    pub span: Span,
+    pub rest: Option<BindingPattern>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
