@@ -10,7 +10,7 @@ use crate::ast::Expression::IdentifierReference;
 use crate::error::ErrorKind::UnexpectedToken;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
-use fajt_lexer::token::{Span, TokenValue};
+use fajt_lexer::token::TokenValue;
 use fajt_lexer::token_matches;
 
 impl Parser<'_, '_> {
@@ -87,10 +87,9 @@ impl Parser<'_, '_> {
     ///         ^~~~~~~~~~~~~~~~~~^
     /// ```
     fn parse_array_literal(&mut self) -> Result<Expression> {
+        let span_start = self.position();
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("[")));
-
-        let span_start = token.span.start;
 
         let mut elements = Vec::new();
         loop {
@@ -117,8 +116,7 @@ impl Parser<'_, '_> {
             }
         }
 
-        let span_end = self.reader.position();
-        let span = Span::new(span_start, span_end);
+        let span = self.span_from(span_start);
         Ok(LiteralExpression {
             span,
             literal: Literal::Array(Array { elements }),
@@ -134,10 +132,9 @@ impl Parser<'_, '_> {
     ///         ^~~~~~~~~~~~~~~~~~~~~^
     /// ```
     fn parse_object_literal(&mut self) -> Result<Expression> {
+        let span_start = self.position();
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("{")));
-
-        let span_start = token.span.start;
 
         let mut props = Vec::new();
         loop {
@@ -161,8 +158,7 @@ impl Parser<'_, '_> {
             }
         }
 
-        let span_end = self.reader.position();
-        let span = Span::new(span_start, span_end);
+        let span = self.span_from(span_start);
         Ok(LiteralExpression {
             span,
             literal: Literal::Object(Object { props }),

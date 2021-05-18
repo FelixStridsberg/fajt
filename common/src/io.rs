@@ -51,7 +51,7 @@ where
         })
     }
 
-    /// Position of the current item, or position of end of stream if there are no items left.
+    /// Current position of reader, i.e. end position of last consumed item.
     pub fn position(&self) -> usize {
         self.position
     }

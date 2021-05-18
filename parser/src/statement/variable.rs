@@ -43,9 +43,7 @@ impl Parser<'_, '_> {
     ///     ^~~~~~~~^  ^~~~~^
     /// ```
     fn parse_variable_declaration(&mut self) -> Result<VariableDeclaration> {
-        let token = self.reader.current()?;
-        let span_start = token.span.start;
-
+        let span_start = self.position();
         let pattern = self.parse_binding_pattern()?;
         let initializer = match self.reader.current()? {
             token_matches!(punct!("=")) => Some(self.parse_initializer()?),
@@ -56,8 +54,7 @@ impl Parser<'_, '_> {
             _ => None,
         };
 
-        let span_end = self.reader.position();
-        let span = Span::new(span_start, span_end);
+        let span = self.span_from(span_start);
         Ok(VariableDeclaration {
             span,
             pattern,
@@ -97,10 +94,9 @@ impl Parser<'_, '_> {
     ///     ^~~~~~~~~~~~~~~^
     /// ```
     fn parse_object_binding_pattern(&mut self) -> Result<BindingPattern> {
+        let span_start = self.position();
         let token = self.reader.consume()?;
         debug_assert_eq!(token.value, punct!("{"));
-
-        let span_start = token.span.start;
 
         let mut props = Vec::new();
 
@@ -129,9 +125,7 @@ impl Parser<'_, '_> {
             self.reader.consume()?;
         }
 
-        let span_end = self.reader.position();
-        let span = Span::new(span_start, span_end);
-
+        let span = self.span_from(span_start);
         Ok(ObjectBinding { span, props, rest }.into())
     }
 
@@ -143,10 +137,9 @@ impl Parser<'_, '_> {
     ///     ^~~~~~~~~~~~~~~~^
     /// ```
     fn parse_array_binding_pattern(&mut self) -> Result<BindingPattern> {
+        let span_start = self.position();
         let token = self.reader.consume()?;
         debug_assert_eq!(token.value, punct!("["));
-
-        let span_start = token.span.start;
 
         let mut elements = Vec::new();
 
@@ -180,9 +173,7 @@ impl Parser<'_, '_> {
             }
         }
 
-        let span_end = self.reader.position();
-        let span = Span::new(span_start, span_end);
-
+        let span = self.span_from(span_start);
         Ok(ArrayBinding {
             span,
             elements,
@@ -196,15 +187,14 @@ impl Parser<'_, '_> {
     /// Examples:
     /// TODO
     fn parse_binding_element(&mut self) -> Result<BindingElement> {
-        let span_start = self.reader.current()?.span.start;
+        let span_start = self.position();
         let pattern = self.parse_binding_pattern()?;
 
         if token_matches!(self.reader.current()?, punct!("=")) {
             todo!("= Initializer")
         }
 
-        let span_end = self.reader.position();
-        let span = Span::new(span_start, span_end);
+        let span = self.span_from(span_start);
         Ok(BindingElement {
             span,
             pattern,

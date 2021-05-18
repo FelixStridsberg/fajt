@@ -7,7 +7,6 @@ use crate::error::{Error, ErrorKind, Result};
 use crate::{ContextModify, Parser};
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
-use fajt_lexer::token::Span;
 use fajt_lexer::token_matches;
 
 mod variable;
@@ -74,6 +73,7 @@ impl Parser<'_, '_> {
     /// ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
     /// ```
     fn parse_async_function_declaration(&mut self) -> Result<Statement> {
+        let span_start = self.position();
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, keyword!("async")));
 
@@ -81,7 +81,6 @@ impl Parser<'_, '_> {
         debug_assert!(token_matches!(function_token, keyword!("function")));
         debug_assert_eq!(function_token.first_on_line, false);
 
-        let span_start = token.span.start;
         let ident = self.parse_identifier()?;
 
         self.with_context(ContextModify::new().set_yield(false).set_await(true))
@@ -96,10 +95,10 @@ impl Parser<'_, '_> {
     /// ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
     /// ```
     fn parse_function_declaration(&mut self) -> Result<Statement> {
+        let span_start = self.position();
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, keyword!("function")));
 
-        let span_start = token.span.start;
         let ident = self.parse_identifier()?;
 
         self.with_context(ContextModify::new().set_yield(false).set_await(false))
@@ -125,9 +124,7 @@ impl Parser<'_, '_> {
         let parameters = self.parse_formal_parameters()?;
         let body = self.parse_function_body()?;
 
-        let span_end = self.reader.position();
-        let span = Span::new(span_start, span_end);
-
+        let span = self.span_from(span_start);
         return Ok(FunctionDeclaration {
             span,
             asynchronous,
@@ -146,6 +143,7 @@ impl Parser<'_, '_> {
     ///             ^~~~~~~~~^
     /// ```
     fn parse_formal_parameters(&mut self) -> Result<Option<FormalParameters>> {
+        let span_start = self.position();
         let token = self.reader.consume()?;
         if !token_matches!(token, punct!("(")) {
             return Err(Error::of(ErrorKind::UnexpectedToken(token)));
@@ -155,8 +153,6 @@ impl Parser<'_, '_> {
             self.reader.consume()?;
             return Ok(None);
         }
-
-        let span_start = token.span.start;
 
         let mut rest = None;
         loop {
@@ -176,8 +172,7 @@ impl Parser<'_, '_> {
             }
         }
 
-        let span_end = self.reader.position();
-        let span = Span::new(span_start, span_end);
+        let span = self.span_from(span_start);
         Ok(Some(FormalParameters { span, rest }))
     }
 
@@ -216,10 +211,9 @@ impl Parser<'_, '_> {
     ///           ^~~~~~~~~~~~~~~~~~~~^      ^~~~~~~~~~~~~~~~~^
     /// ```
     fn parse_block_statement(&mut self) -> Result<Statement> {
+        let span_start = self.position();
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("{")));
-
-        let span_start = token.span.start;
 
         let mut statements = Vec::new();
         loop {
@@ -235,8 +229,7 @@ impl Parser<'_, '_> {
             }
         }
 
-        let span_end = self.reader.position();
-        let span = Span::new(span_start, span_end);
+        let span = self.span_from(span_start);
         Ok(BlockStatement { span, statements }.into())
     }
 

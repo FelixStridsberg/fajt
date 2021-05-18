@@ -10,7 +10,7 @@ use crate::error::{Error, Result};
 use fajt_common::io::PeekReader;
 use fajt_lexer::punct;
 use fajt_lexer::token;
-use fajt_lexer::token::{KeywordContext, Token, TokenValue};
+use fajt_lexer::token::{KeywordContext, Span, Token, TokenValue};
 use fajt_lexer::token_matches;
 use fajt_lexer::Lexer;
 
@@ -92,6 +92,17 @@ impl<'a, 'b> Parser<'a, 'b> {
             context: Context::default(),
             reader,
         })
+    }
+
+    pub(crate) fn position(&self) -> usize {
+        self.reader
+            .current()
+            .map(|t| t.span.start)
+            .unwrap_or_else(|_| self.reader.position())
+    }
+
+    pub(crate) fn span_from(&self, start: usize) -> Span {
+        Span::new(start, self.reader.position())
     }
 
     pub fn with_context(&mut self, modify: &ContextModify) -> Parser<'_, 'b> {
