@@ -4,12 +4,11 @@ use crate::ast::{
     VariableKind,
 };
 use crate::error::{Error, ErrorKind, Result};
-use crate::{ContextModify, Parser};
+use crate::parser::ContextModify;
+use crate::Parser;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token_matches;
-
-mod variable;
 
 impl Parser<'_, '_> {
     pub(crate) fn parse_statement(&mut self) -> Result<Statement> {

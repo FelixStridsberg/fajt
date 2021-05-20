@@ -1,7 +1,6 @@
 mod lib;
 
 use fajt_lexer::punct;
-use fajt_lexer::token;
 use fajt_lexer::token::{Span, Token, TokenValue};
 use fajt_parser::ast::*;
 use fajt_parser::error::ErrorKind::UnexpectedToken;

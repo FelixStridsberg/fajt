@@ -1,7 +1,6 @@
 mod lib;
 
 use fajt_lexer::punct;
-use fajt_lexer::token;
 use fajt_lexer::token::{Span, Token};
 use fajt_parser::ast::Expression::IdentifierReference;
 use fajt_parser::ast::VariableKind::*;

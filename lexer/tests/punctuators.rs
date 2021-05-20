@@ -1,7 +1,6 @@
 mod lib;
 
 use fajt_lexer::punct;
-use fajt_lexer::token;
 
 #[test]
 fn parentheses() {

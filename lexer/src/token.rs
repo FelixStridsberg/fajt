@@ -4,28 +4,28 @@ use fajt_macros::FromString;
 #[macro_export]
 macro_rules! token_matches {
     ($token:expr, $value:pat) => {
-        matches!($token, crate::token::Token { value: $value, .. });
+        matches!($token, $crate::token::Token { value: $value, .. });
     };
     ($token:expr, @ident) => {
-        token_matches!($token, crate::token::TokenValue::Identifier(_))
+        token_matches!($token, $crate::token::TokenValue::Identifier(_))
     };
     ($token:expr, @literal) => {
-        token_matches!($token, crate::token::TokenValue::Literal(_))
+        token_matches!($token, $crate::token::TokenValue::Literal(_))
     };
     ($value:pat) => {
-        crate::token::Token { value: $value, .. }
+        $crate::token::Token { value: $value, .. }
     };
     (@ident) => {
-        token_matches!(crate::token::TokenValue::Identifier(_))
+        token_matches!($crate::token::TokenValue::Identifier(_))
     };
     (@literal) => {
-        token_matches!(crate::token::TokenValue::Literal(_))
+        token_matches!($crate::token::TokenValue::Literal(_))
     };
     ($token:expr, opt: $value:pat) => {
-        matches!($token, Some(crate::token::Token { value: $value, .. }));
+        matches!($token, Some($crate::token::Token { value: $value, .. }));
     };
     (opt: $value:pat) => {
-        Some(crate::token::Token { value: $value, .. })
+        Some($crate::token::Token { value: $value, .. })
     };
 }
 
@@ -46,7 +46,6 @@ bitflags! {
 /// ```
 /// # #[macro_use]
 /// # extern crate fajt_lexer;
-/// # use fajt_lexer::token;
 /// # use fajt_lexer::token::{TokenValue, Keyword};
 /// # fn main() {
 /// assert_eq!(keyword!("const"), TokenValue::Keyword(Keyword::Const))
@@ -56,7 +55,7 @@ bitflags! {
 #[from_string_macro("keyword")]
 #[from_string_macro_rules(
     ($variant:ident) => {
-        crate::token::TokenValue::Keyword(crate::token::Keyword::$variant)
+        $crate::token::TokenValue::Keyword($crate::token::Keyword::$variant)
     };
 )]
 pub enum Keyword {
@@ -176,7 +175,6 @@ pub enum Number {
 /// ```
 /// # #[macro_use]
 /// # extern crate fajt_lexer;
-/// # use fajt_lexer::token;
 /// # use fajt_lexer::token::{TokenValue, Punct};
 /// # fn main() {
 /// assert_eq!(punct!("["), TokenValue::Punct(Punct::BraceOpen))
@@ -186,7 +184,7 @@ pub enum Number {
 #[from_string_macro("punct")]
 #[from_string_macro_rules(
     ($variant:ident) => {
-        crate::token::TokenValue::Punct(crate::token::Punct::$variant)
+        $crate::token::TokenValue::Punct($crate::token::Punct::$variant)
     };
 )]
 pub enum Punct {
