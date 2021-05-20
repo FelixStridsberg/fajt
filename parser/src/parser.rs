@@ -9,6 +9,7 @@ use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Error, Result};
 
 mod expression;
+mod literal;
 mod statement;
 mod variable;
 
