@@ -1,5 +1,3 @@
-mod lib;
-
 use fajt_lexer::token::Span;
 use fajt_parser::ast::*;
 

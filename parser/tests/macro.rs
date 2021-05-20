@@ -1,4 +1,3 @@
-// TODO dry up
 #[macro_export]
 macro_rules! parser_test{
     (input: $input:literal, success) => {

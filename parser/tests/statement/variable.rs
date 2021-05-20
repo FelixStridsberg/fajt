@@ -1,4 +1,5 @@
-mod lib;
+mod array_binding;
+mod object_binding;
 
 use fajt_lexer::punct;
 use fajt_lexer::token::{Span, Token};

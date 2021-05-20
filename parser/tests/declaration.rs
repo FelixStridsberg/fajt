@@ -1,4 +1,4 @@
-mod lib;
+mod r#macro;
 
 use fajt_lexer::token::Keyword;
 use fajt_lexer::token::TokenValue;

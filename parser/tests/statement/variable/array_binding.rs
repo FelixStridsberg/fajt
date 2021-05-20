@@ -1,5 +1,3 @@
-mod lib;
-
 use fajt_lexer::token::{Span, Token, TokenValue};
 use fajt_parser::ast::Expression::IdentifierReference;
 use fajt_parser::ast::VariableKind::*;
