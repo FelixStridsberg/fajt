@@ -9,11 +9,11 @@ use fajt_lexer::punct;
 use fajt_lexer::token_matches;
 
 impl Parser<'_, '_> {
-    pub(crate) fn parse_expression(&mut self) -> Result<Expression> {
+    pub(super) fn parse_expression(&mut self) -> Result<Expression> {
         self.parse_assignment_expression()
     }
 
-    pub(crate) fn parse_assignment_expression(&mut self) -> Result<Expression> {
+    pub(super) fn parse_assignment_expression(&mut self) -> Result<Expression> {
         // TODO other than primary expressions
         self.parse_primary_expression()
     }

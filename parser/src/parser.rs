@@ -95,24 +95,6 @@ impl<'a, 'b> Parser<'a, 'b> {
         })
     }
 
-    pub(crate) fn position(&self) -> usize {
-        self.reader
-            .current()
-            .map(|t| t.span.start)
-            .unwrap_or_else(|_| self.reader.position())
-    }
-
-    pub(crate) fn span_from(&self, start: usize) -> Span {
-        Span::new(start, self.reader.position())
-    }
-
-    pub fn with_context(&mut self, modify: &ContextModify) -> Parser<'_, 'b> {
-        Parser {
-            context: self.context.modify(modify),
-            reader: &mut self.reader,
-        }
-    }
-
     pub fn parse(&mut self) -> Result<Program> {
         let stmt = self.parse_statement()?;
         Ok(Program::from_body(vec![stmt]))
@@ -121,6 +103,24 @@ impl<'a, 'b> Parser<'a, 'b> {
     // TODO probably not appropriate, used for testing parsing expressions currently.
     pub fn parse_expr(&mut self) -> Result<Expression> {
         self.parse_expression()
+    }
+
+    fn position(&self) -> usize {
+        self.reader
+            .current()
+            .map(|t| t.span.start)
+            .unwrap_or_else(|_| self.reader.position())
+    }
+
+    fn span_from(&self, start: usize) -> Span {
+        Span::new(start, self.reader.position())
+    }
+
+    fn with_context(&mut self, modify: &ContextModify) -> Parser<'_, 'b> {
+        Parser {
+            context: self.context.modify(modify),
+            reader: &mut self.reader,
+        }
     }
 
     fn is_identifier(&self) -> Result<bool> {

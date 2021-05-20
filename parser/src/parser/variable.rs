@@ -13,7 +13,7 @@ impl Parser<'_, '_> {
     /// var a = 2 + b, c = 2;
     /// ^~~~~~~~~~~~~~~~~~~~^
     /// ```
-    pub(crate) fn parse_variable_statement(&mut self, kind: VariableKind) -> Result<Statement> {
+    pub(super) fn parse_variable_statement(&mut self, kind: VariableKind) -> Result<Statement> {
         let token = self.reader.consume()?;
         let start = token.span.start;
 

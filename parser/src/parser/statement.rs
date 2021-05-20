@@ -11,7 +11,7 @@ use fajt_lexer::punct;
 use fajt_lexer::token_matches;
 
 impl Parser<'_, '_> {
-    pub(crate) fn parse_statement(&mut self) -> Result<Statement> {
+    pub(super) fn parse_statement(&mut self) -> Result<Statement> {
         Ok(match self.reader.current()? {
             token_matches!(punct!(";")) => self.parse_empty_statement()?,
             token_matches!(punct!("{")) => self.parse_block_statement()?,
