@@ -10,6 +10,7 @@ use crate::error::{Error, Result};
 
 mod binding;
 mod expression;
+mod function;
 mod literal;
 mod statement;
 mod variable;
