@@ -74,4 +74,16 @@ impl Parser<'_, '_> {
 
         Ok(IdentifierReference(ident.into()))
     }
+
+    /// Parses the `Initializer` goal symbol.
+    ///
+    /// Example:
+    /// ```no_rust
+    /// var a = 1 + 2, b = 100;
+    ///         ^~~~^      ^~^
+    /// ```
+    pub(super) fn parse_initializer(&mut self) -> Result<Expression> {
+        self.reader.consume()?; // Skip =
+        self.parse_assignment_expression()
+    }
 }

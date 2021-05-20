@@ -8,6 +8,7 @@ use crate::ast::{Expression, Ident, Program};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Error, Result};
 
+mod binding;
 mod expression;
 mod literal;
 mod statement;
