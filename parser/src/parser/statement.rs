@@ -36,6 +36,8 @@ impl Parser<'_, '_> {
         })
     }
 
+    /// Check if current position matches the start of an expression statement as specified in the
+    /// `ExpressionStatement` goal symbol.
     fn is_expression_statement(&self) -> Result<bool> {
         let token = self.reader.current()?;
         if matches!(
