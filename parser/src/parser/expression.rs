@@ -1,16 +1,11 @@
-use crate::ast::{
-    ArrayElement, Expression, Ident, Literal, LiteralExpression, Object, PropertyDefinition,
-    ThisExpression,
-};
-use crate::error::{Error, Result};
+use crate::ast::Expression::IdentifierReference;
+use crate::ast::{Expression, Ident, Literal, ThisExpression};
+use crate::error::Result;
 use crate::Parser;
 
-use crate::ast::Array;
-use crate::ast::Expression::IdentifierReference;
-use crate::error::ErrorKind::UnexpectedToken;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
-use fajt_lexer::token::TokenValue;
+
 use fajt_lexer::token_matches;
 
 impl Parser<'_, '_> {

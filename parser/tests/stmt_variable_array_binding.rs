@@ -23,7 +23,7 @@ fn empty() {
                                 elements: vec![],
                                 rest: None,
                             }
-                        ).into(),
+                        ),
                         initializer: Some(IdentifierReference(Ident::new("a", (9, 10)).into())),
                     },
                 ],
@@ -49,13 +49,13 @@ fn identifier_binding() {
                                 elements: vec![
                                     Some(BindingElement {
                                         span: Span::new(6, 7),
-                                        pattern: BindingPattern::Ident(Ident::new("a", (6, 7)).into()),
+                                        pattern: BindingPattern::Ident(Ident::new("a", (6, 7))),
                                         initializer: None,
                                     })
                                 ],
                                 rest: None,
                             }
-                        ).into(),
+                        ),
                         initializer: Some(IdentifierReference(Ident::new("b", (12, 13)).into())),
                     },
                 ],
@@ -81,13 +81,13 @@ fn trailing_comma() {
                                 elements: vec![
                                     Some(BindingElement {
                                         span: Span::new(6, 7),
-                                        pattern: BindingPattern::Ident(Ident::new("a", (6, 7)).into()),
+                                        pattern: BindingPattern::Ident(Ident::new("a", (6, 7))),
                                         initializer: None,
                                     })
                                 ],
                                 rest: None,
                             }
-                        ).into(),
+                        ),
                         initializer: Some(IdentifierReference(Ident::new("b", (13, 14)).into())),
                     },
                 ],
@@ -113,7 +113,7 @@ fn single_elision() {
                                 elements: vec![ None ],
                                 rest: None,
                             }
-                        ).into(),
+                        ),
                         initializer: Some(IdentifierReference(Ident::new("b", (12, 13)).into())),
                     },
                 ],
@@ -139,7 +139,7 @@ fn rest_element() {
                                 elements: vec![],
                                 rest: Some(Ident::new("a", (9, 10))),
                             }
-                        ).into(),
+                        ),
                         initializer: Some(IdentifierReference(Ident::new("b", (15, 16)).into())),
                     },
                 ],
@@ -166,21 +166,21 @@ fn mixed_elision_and_identifiers() {
                                     None,
                                     Some(BindingElement {
                                         span: Span::new(8, 9),
-                                        pattern: BindingPattern::Ident(Ident::new("a", (8, 9)).into()),
+                                        pattern: BindingPattern::Ident(Ident::new("a", (8, 9))),
                                         initializer: None,
                                     }),
                                     None,
                                     Some(
                                         BindingElement {
                                             span: Span::new(11, 12),
-                                            pattern: BindingPattern::Ident(Ident::new("b", (11, 12)).into()),
+                                            pattern: BindingPattern::Ident(Ident::new("b", (11, 12))),
                                             initializer: None,
                                         }
                                     ),
                                 ],
                                 rest: None,
                             }
-                        ).into(),
+                        ),
                         initializer: Some(IdentifierReference(Ident::new("c", (17, 18)).into())),
                     },
                 ],
@@ -207,14 +207,14 @@ fn await_as_identifier() {
                                     Some(
                                         BindingElement {
                                             span: Span::new(6, 11),
-                                            pattern: BindingPattern::Ident(Ident::new("await", (6, 11)).into()),
+                                            pattern: BindingPattern::Ident(Ident::new("await", (6, 11))),
                                             initializer: None,
                                         }
                                     ),
                                 ],
-                                rest: Some(Ident::new("await", (16, 21)).into()),
+                                rest: Some(Ident::new("await", (16, 21))),
                             }
-                        ).into(),
+                        ),
                         initializer: Some(IdentifierReference(Ident::new("c", (26, 27)).into())),
                     },
                 ],
@@ -243,14 +243,14 @@ fn yield_as_identifier() {
                                     Some(
                                         BindingElement {
                                             span: Span::new(6, 11),
-                                            pattern: BindingPattern::Ident(Ident::new("yield", (6, 11)).into()),
+                                            pattern: BindingPattern::Ident(Ident::new("yield", (6, 11))),
                                             initializer: None,
                                         }
                                     ),
                                 ],
-                                rest: Some(Ident::new("yield", (16, 21)).into()),
+                                rest: Some(Ident::new("yield", (16, 21))),
                             }
-                        ).into(),
+                        ),
                         initializer: Some(IdentifierReference(Ident::new("c", (26, 27)).into())),
                     },
                 ],
