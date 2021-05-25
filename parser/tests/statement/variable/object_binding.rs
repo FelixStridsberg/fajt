@@ -59,17 +59,26 @@ fn key_value_binding() {
         input: "var { a: b } = c;",
         output: [
             VariableStatement {
-                span: Span::new(0, 14),
+                span: Span::new(0, 17),
                 kind: Var,
                 declarations: vec![
                     VariableDeclaration {
-                        span: Span::new(4, 14),
+                        span: Span::new(4, 17),
                         pattern: ObjectBinding {
-                            span: Span::new(4, 9),
-                            props: vec![Ident::new("a", (6, 7)).into()],
+                            span: Span::new(4, 12),
+                            props: vec![
+                                ObjectBindingProp::KeyValue(
+                                    PropertyName::Ident(Ident::new("a", (6, 7)).into()),
+                                    BindingElement {
+                                        span: Span::new(9, 10),
+                                        pattern: BindingPattern::Ident(Ident::new("b", (9, 10)).into()),
+                                        initializer: None,
+                                    }
+                                )
+                            ],
                             rest: None,
                         }.into(),
-                        initializer: Some(IdentifierReference(Ident::new("b", (12, 13)).into())),
+                        initializer: Some(IdentifierReference(Ident::new("c", (15, 16)).into())),
                     }
                 ]
             }.into()

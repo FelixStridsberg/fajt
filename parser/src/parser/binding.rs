@@ -26,8 +26,8 @@ impl Parser<'_, '_> {
     ///
     /// Example:
     /// ```no_rust
-    /// var { a, b, ...rest} = c;
-    ///     ^~~~~~~~~~~~~~~^
+    /// var { a, b: c, ...rest} = d;
+    ///     ^~~~~~~~~~~~~~~~~~~~~~~^
     /// ```
     fn parse_object_binding_pattern(&mut self) -> Result<BindingPattern> {
         let span_start = self.position();
@@ -48,9 +48,19 @@ impl Parser<'_, '_> {
                     rest = self.parse_rest_binding_ident(BracketClose)?;
                     break;
                 }
+                _ if token_matches!(self.reader.peek(), opt: punct!(":")) => {
+                    let property_name = self.parse_property_name()?;
+                    debug_assert!(token_matches!(self.reader.consume()?, punct!(":")));
+
+                    let binding_element = self.parse_binding_element()?;
+                    props.push(ObjectBindingProp::KeyValue(property_name, binding_element));
+
+                    self.consume_object_delimiter()?;
+                }
                 _ if self.is_identifier()? => {
                     let ident = self.parse_identifier()?;
                     props.push(ObjectBindingProp::Assign(ident));
+
                     self.consume_object_delimiter()?;
                 }
                 _ => return err!(UnexpectedToken(self.reader.consume()?)),

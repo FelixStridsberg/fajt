@@ -4,7 +4,7 @@ use fajt_lexer::token::{KeywordContext, Span, Token, TokenValue};
 use fajt_lexer::token_matches;
 use fajt_lexer::Lexer;
 
-use crate::ast::{Expression, Ident, Program};
+use crate::ast::{Expression, Ident, Program, PropertyName};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 
@@ -146,6 +146,16 @@ impl<'a, 'b> Parser<'a, 'b> {
             }
             _ => return err!(UnexpectedToken(token)),
         })
+    }
+
+    /// Parses the `LiteralProperty` goal symbol.
+    fn parse_property_name(&mut self) -> Result<PropertyName> {
+        match self.reader.current()? {
+            token_matches!(@ident) => Ok(PropertyName::Ident(self.parse_identifier()?)),
+            token_matches!(@literal) => todo!(),
+            token_matches!(punct!("[")) => todo!(),
+            _ => return err!(UnexpectedToken(self.reader.consume()?)),
+        }
     }
 
     fn consume_array_delimiter(&mut self) -> Result<()> {
