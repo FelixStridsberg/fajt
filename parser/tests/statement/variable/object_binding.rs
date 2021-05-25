@@ -67,7 +67,7 @@ fn identifier_binding_with_initializer() {
                         pattern: ObjectBinding {
                             span: Span::new(4, 13),
                             props: vec![
-                                ObjectBindingProp::Assign(
+                                ObjectBindingProp::Single(
                                     Ident::new("a", (6, 7)),
                                     Some(IdentifierReference(Ident::new("b", (10, 11)).into()))
                                 )

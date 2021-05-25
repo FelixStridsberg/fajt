@@ -65,7 +65,7 @@ impl Parser<'_, '_> {
                         None
                     };
 
-                    props.push(ObjectBindingProp::Assign(ident, initializer));
+                    props.push(ObjectBindingProp::Single(ident, initializer));
 
                     self.consume_object_delimiter()?;
                 }

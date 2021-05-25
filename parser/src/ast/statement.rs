@@ -124,7 +124,7 @@ pub struct ObjectBinding {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum ObjectBindingProp {
-    Assign(Ident, Option<Expression>),
+    Single(Ident, Option<Expression>),
     KeyValue(PropertyName, BindingElement),
 }
 
@@ -138,7 +138,7 @@ pub enum PropertyName {
 
 impl From<Ident> for ObjectBindingProp {
     fn from(ident: Ident) -> Self {
-        Self::Assign(ident, None)
+        Self::Single(ident, None)
     }
 }
 
