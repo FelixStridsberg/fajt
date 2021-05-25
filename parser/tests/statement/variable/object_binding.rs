@@ -54,6 +54,35 @@ fn identifier_binding() {
 }
 
 #[test]
+fn identifier_binding_with_initializer() {
+    parser_test!(
+        input: "var { a = b } = c;",
+        output: [
+            VariableStatement {
+                span: Span::new(0, 18),
+                kind: Var,
+                declarations: vec![
+                    VariableDeclaration {
+                        span: Span::new(4, 18),
+                        pattern: ObjectBinding {
+                            span: Span::new(4, 13),
+                            props: vec![
+                                ObjectBindingProp::Assign(
+                                    Ident::new("a", (6, 7)),
+                                    Some(IdentifierReference(Ident::new("b", (10, 11)).into()))
+                                )
+                            ],
+                            rest: None,
+                        }.into(),
+                        initializer: Some(IdentifierReference(Ident::new("c", (16, 17)).into())),
+                    }
+                ]
+            }.into()
+        ]
+    );
+}
+
+#[test]
 fn key_value_binding() {
     parser_test!(
         input: "var { a: b } = c;",
@@ -87,27 +116,37 @@ fn key_value_binding() {
 }
 
 #[test]
-fn key_value_binding_with_initializer() {
+fn key_value_binding_with_object_binding() {
     parser_test!(
-        input: "var { a = b } = c;",
+        input: "var { a: { b } } = c;",
         output: [
             VariableStatement {
-                span: Span::new(0, 18),
+                span: Span::new(0, 21),
                 kind: Var,
                 declarations: vec![
                     VariableDeclaration {
-                        span: Span::new(4, 18),
+                        span: Span::new(4, 21),
                         pattern: ObjectBinding {
-                            span: Span::new(4, 13),
+                            span: Span::new(4, 16),
                             props: vec![
-                                ObjectBindingProp::Assign(
-                                    Ident::new("a", (6, 7)),
-                                    Some(IdentifierReference(Ident::new("b", (10, 11)).into()))
+                                ObjectBindingProp::KeyValue(
+                                    PropertyName::Ident(Ident::new("a", (6, 7)).into()),
+                                    BindingElement {
+                                        span: Span::new(9, 14),
+                                        pattern: ObjectBinding {
+                                            span: Span::new(9, 14),
+                                            props: vec![
+                                                Ident::new("b", (11, 12)).into()
+                                            ],
+                                            rest: None,
+                                        }.into(),
+                                        initializer: None,
+                                    }
                                 )
                             ],
                             rest: None,
                         }.into(),
-                        initializer: Some(IdentifierReference(Ident::new("c", (16, 17)).into())),
+                        initializer: Some(IdentifierReference(Ident::new("c", (19, 20)).into())),
                     }
                 ]
             }.into()
