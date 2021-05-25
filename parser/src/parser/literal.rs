@@ -2,7 +2,7 @@ use crate::ast::{
     Array, ArrayElement, Expression, Literal, LiteralExpression, Object, PropertyDefinition,
 };
 use crate::error::ErrorKind::UnexpectedToken;
-use crate::error::{Error, Result};
+use crate::error::Result;
 use crate::Parser;
 use fajt_lexer::punct;
 use fajt_lexer::token::TokenValue;
@@ -116,7 +116,7 @@ impl Parser<'_, '_> {
                     props.push(PropertyDefinition::IdentifierReference(ident.into()));
                     self.consume_object_delimiter()?;
                 }
-                _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
+                _ => return err!(UnexpectedToken(self.reader.consume()?)),
             }
         }
 

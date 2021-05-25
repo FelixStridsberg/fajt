@@ -2,7 +2,7 @@ use crate::ast::{
     ArrayBinding, BindingElement, BindingPattern, Ident, ObjectBinding, ObjectBindingProp,
 };
 use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
-use crate::error::{Error, Result};
+use crate::error::Result;
 use crate::Parser;
 use fajt_lexer::punct;
 use fajt_lexer::token::Punct::{BraceClose, BracketClose};
@@ -18,7 +18,7 @@ impl Parser<'_, '_> {
             token_matches!(punct!("{")) => self.parse_object_binding_pattern()?,
             token_matches!(punct!("[")) => self.parse_array_binding_pattern()?,
             _ if self.is_identifier()? => BindingPattern::Ident(self.parse_identifier()?),
-            _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
+            _ => return err!(UnexpectedToken(self.reader.consume()?)),
         })
     }
 
@@ -53,7 +53,7 @@ impl Parser<'_, '_> {
                     props.push(ObjectBindingProp::Assign(ident));
                     self.consume_object_delimiter()?;
                 }
-                _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
+                _ => return err!(UnexpectedToken(self.reader.consume()?)),
             }
         }
 
@@ -103,7 +103,7 @@ impl Parser<'_, '_> {
                     elements.push(Some(self.parse_binding_element()?));
                     self.consume_array_delimiter()?;
                 }
-                _ => return Err(Error::of(UnexpectedToken(self.reader.consume()?))),
+                _ => return err!(UnexpectedToken(self.reader.consume()?)),
             }
         }
 
@@ -178,9 +178,9 @@ impl Parser<'_, '_> {
             }
         }
 
-        Err(Error::of(SyntaxError(
+        err!(SyntaxError(
             "Rest element must be last element".to_owned(),
             ident.span,
-        )))
+        ))
     }
 }

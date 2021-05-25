@@ -7,10 +7,14 @@ use fajt_lexer::token::Span;
 
 // TODO this macro should expand without debug info for optimized build.
 #[macro_export]
-macro_rules! error {
+macro_rules! err {
     ($expr:expr) => {
-        Err(crate::error::Error::with_debug($expr, file!(), (line!(), column!())))
-    }
+        Err(crate::error::Error::with_debug(
+            $expr,
+            file!(),
+            (line!(), column!()),
+        ))
+    };
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -24,12 +28,18 @@ pub struct Error {
 
 impl Error {
     pub(crate) fn of(kind: ErrorKind) -> Self {
-        Error { kind, file: None, location: None }
+        Error {
+            kind,
+            file: None,
+            location: None,
+        }
     }
 
     pub(crate) fn with_debug(kind: ErrorKind, file: &'static str, location: (u32, u32)) -> Self {
         Error {
-            kind, file: Some(file), location: Some(location)
+            kind,
+            file: Some(file),
+            location: Some(location),
         }
     }
 

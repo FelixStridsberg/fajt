@@ -6,7 +6,7 @@ use fajt_lexer::Lexer;
 
 use crate::ast::{Expression, Ident, Program};
 use crate::error::ErrorKind::UnexpectedToken;
-use crate::error::{Error, Result};
+use crate::error::Result;
 
 mod binding;
 mod expression;
@@ -144,7 +144,7 @@ impl<'a, 'b> Parser<'a, 'b> {
                     .unwrap();
                 Ident::new(str, token.span)
             }
-            _ => return Err(Error::of(UnexpectedToken(token))),
+            _ => return err!(UnexpectedToken(token)),
         })
     }
 
@@ -155,7 +155,7 @@ impl<'a, 'b> Parser<'a, 'b> {
                 Ok(())
             }
             token_matches!(punct!("]")) => Ok(()),
-            _ => Err(Error::of(UnexpectedToken(self.reader.consume()?))),
+            _ => err!(UnexpectedToken(self.reader.consume()?)),
         }
     }
 
@@ -166,7 +166,7 @@ impl<'a, 'b> Parser<'a, 'b> {
                 Ok(())
             }
             token_matches!(punct!("}")) => Ok(()),
-            _ => Err(Error::of(UnexpectedToken(self.reader.consume()?))),
+            _ => err!(UnexpectedToken(self.reader.consume()?)),
         }
     }
 }

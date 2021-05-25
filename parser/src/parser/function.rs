@@ -1,5 +1,5 @@
 use crate::ast::{FormalParameters, FunctionDeclaration, Ident, Statement};
-use crate::error::{Error, ErrorKind, Result};
+use crate::error::{ErrorKind, Result};
 use crate::parser::ContextModify;
 use crate::Parser;
 use fajt_lexer::keyword;
@@ -88,7 +88,7 @@ impl Parser<'_, '_> {
         let span_start = self.position();
         let token = self.reader.consume()?;
         if !token_matches!(token, punct!("(")) {
-            return Err(Error::of(ErrorKind::UnexpectedToken(token)));
+            return err!(ErrorKind::UnexpectedToken(token));
         }
 
         if token_matches!(self.reader.current()?, punct!(")")) {
@@ -106,11 +106,7 @@ impl Parser<'_, '_> {
                 token_matches!(punct!("...")) => {
                     rest = Some(self.parse_binding_rest_element()?);
                 }
-                _ => {
-                    return Err(Error::of(ErrorKind::UnexpectedToken(
-                        self.reader.consume()?,
-                    )))
-                }
+                _ => return err!(ErrorKind::UnexpectedToken(self.reader.consume()?,)),
             }
         }
 
