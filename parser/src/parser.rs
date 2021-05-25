@@ -148,7 +148,7 @@ impl<'a, 'b> Parser<'a, 'b> {
         })
     }
 
-    /// Parses the `LiteralProperty` goal symbol.
+    /// Parses the `PropertyName` goal symbol.
     fn parse_property_name(&mut self) -> Result<PropertyName> {
         match self.reader.current()? {
             token_matches!(@ident) => Ok(PropertyName::Ident(self.parse_identifier()?)),
