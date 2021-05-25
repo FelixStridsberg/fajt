@@ -140,15 +140,17 @@ impl Parser<'_, '_> {
         let span_start = self.position();
         let pattern = self.parse_binding_pattern()?;
 
-        if token_matches!(self.reader.current()?, punct!("=")) {
-            todo!("= Initializer")
-        }
+        let initializer = if token_matches!(self.reader.current()?, punct!("=")) {
+            Some(self.parse_initializer()?)
+        } else {
+            None
+        };
 
         let span = self.span_from(span_start);
         Ok(BindingElement {
             span,
             pattern,
-            initializer: None,
+            initializer,
         })
     }
 

@@ -63,6 +63,40 @@ fn identifier_binding() {
 }
 
 #[test]
+fn identifier_binding_with_initializer() {
+    parser_test!(
+        input: "var [ a = b ] = c;",
+        output: [
+            VariableStatement {
+                span: Span::new(0, 18),
+                kind: Var,
+                declarations: vec![
+                    VariableDeclaration {
+                        span: Span::new(4, 18),
+                        pattern: BindingPattern::Array(
+                            ArrayBinding {
+                                span: Span::new(4, 13),
+                                elements: vec![
+                                    Some(BindingElement {
+                                        span: Span::new(6, 11),
+                                        pattern: BindingPattern::Ident(Ident::new("a", (6, 7))),
+                                        initializer: Some(
+                                            IdentifierReference(Ident::new("b", (10, 11)).into())
+                                        ),
+                                    })
+                                ],
+                                rest: None,
+                            }
+                        ),
+                        initializer: Some(IdentifierReference(Ident::new("c", (16, 17)).into())),
+                    },
+                ],
+            }.into()
+        ]
+    );
+}
+
+#[test]
 fn trailing_comma() {
     parser_test!(
         input: "var [ a, ] = b;",
