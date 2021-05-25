@@ -1,5 +1,5 @@
 use super::Ident;
-use crate::ast::Expression;
+use crate::ast::{Expression, Number};
 use fajt_lexer::token::Span;
 
 /// Note: Declarations are handles as statements since they can appear in the same contexts.
@@ -123,8 +123,16 @@ pub struct ObjectBinding {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum ObjectBindingProp {
-    Assign(Ident), // TODO this can have Initializer as well
-                   // KeyValue
+    Assign(Ident), // TODO this can have Initializer as well: , Option<Expression>
+    KeyValue(PropertyName, BindingElement),
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub enum PropertyName {
+    Ident(Ident),
+    String(String, char),
+    Number(Number),
+    Computed(Expression),
 }
 
 impl From<Ident> for ObjectBindingProp {
