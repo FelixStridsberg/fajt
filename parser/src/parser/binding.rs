@@ -59,7 +59,13 @@ impl Parser<'_, '_> {
                 }
                 _ if self.is_identifier()? => {
                     let ident = self.parse_identifier()?;
-                    props.push(ObjectBindingProp::Assign(ident));
+                    let initializer = if token_matches!(self.reader.current()?, punct!("=")) {
+                        Some(self.parse_initializer()?)
+                    } else {
+                        None
+                    };
+
+                    props.push(ObjectBindingProp::Assign(ident, initializer));
 
                     self.consume_object_delimiter()?;
                 }
