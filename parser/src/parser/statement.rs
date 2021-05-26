@@ -12,6 +12,8 @@ impl Parser<'_, '_> {
             token_matches!(punct!(";")) => self.parse_empty_statement()?,
             token_matches!(punct!("{")) => self.parse_block_statement()?,
             token_matches!(keyword!("var")) => self.parse_variable_statement(VariableKind::Var)?,
+            token_matches!(keyword!("const")) => self.parse_variable_statement(VariableKind::Const)?,
+            token_matches!(keyword!("let")) => self.parse_variable_statement(VariableKind::Let)?,
             token_matches!(keyword!("if")) => unimplemented!("IfStatement"),
             token_matches!(keyword!("break")) => unimplemented!("BreakStatement"),
             token_matches!(keyword!("continue")) => unimplemented!("ContinueStatement"),
