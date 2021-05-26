@@ -111,11 +111,7 @@ impl Parser<'_, '_> {
                     rest = self.parse_rest_binding_ident(BraceClose)?;
                     break;
                 }
-                token_matches!(punct!("{")) | token_matches!(punct!("[")) => {
-                    elements.push(Some(self.parse_binding_element()?));
-                    self.consume_array_delimiter()?;
-                }
-                _ if self.is_identifier()? => {
+                _ if self.is_binding_element()? => {
                     elements.push(Some(self.parse_binding_element()?));
                     self.consume_array_delimiter()?;
                 }
@@ -132,11 +128,19 @@ impl Parser<'_, '_> {
         .into())
     }
 
+    pub(super) fn is_binding_element(&self) -> Result<bool> {
+        match self.reader.current()? {
+            token_matches!(punct!("{")) | token_matches!(punct!("[")) => Ok(true),
+            _ if self.is_identifier()? => Ok(true),
+            _ => Ok(false),
+        }
+    }
+
     /// Parses the `BindingElement` goal symbol.
     ///
     /// Examples:
     /// TODO
-    fn parse_binding_element(&mut self) -> Result<BindingElement> {
+    pub(super) fn parse_binding_element(&mut self) -> Result<BindingElement> {
         let span_start = self.position();
         let pattern = self.parse_binding_pattern()?;
 

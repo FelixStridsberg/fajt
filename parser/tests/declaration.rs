@@ -4,6 +4,7 @@ use fajt_lexer::token::Keyword;
 use fajt_lexer::token::TokenValue;
 use fajt_lexer::token::{Span, Token};
 use fajt_parser::ast::Base::Decimal;
+use fajt_parser::ast::Expression::IdentifierReference;
 use fajt_parser::ast::*;
 use fajt_parser::error::ErrorKind::UnexpectedToken;
 
@@ -122,6 +123,37 @@ fn fail_await_keyword_inside_async_function() {
 }
 
 #[test]
+fn function_declaration_with_parameters() {
+    parser_test!(
+        input: "function fn(a, b = c) { }",
+        output: [
+            FunctionDeclaration {
+                span: Span::new(0, 25),
+                asynchronous: false,
+                ident: Ident::new("fn", (9, 11)),
+                parameters: Some(FormalParameters {
+                    span: Span::new(11, 21),
+                    parameters: vec![
+                        BindingElement {
+                            span: Span::new(12, 13),
+                            pattern: BindingPattern::Ident(Ident::new("a", (12, 13))),
+                            initializer: None,
+                        },
+                        BindingElement {
+                            span: Span::new(15, 20),
+                            pattern: BindingPattern::Ident(Ident::new("b", (15, 16))),
+                            initializer: Some(IdentifierReference(Ident::new("c", (19, 20)).into())),
+                        }
+                    ],
+                    rest: None
+                }),
+                body: vec![],
+            }.into()
+        ]
+    );
+}
+
+#[test]
 fn function_declaration_with_rest_parameter() {
     parser_test!(
         input: "function fn(...a) { }",
@@ -132,6 +164,7 @@ fn function_declaration_with_rest_parameter() {
                 ident: Ident::new("fn", (9, 11)),
                 parameters: Some(FormalParameters {
                     span: Span::new(11, 17),
+                    parameters: vec![],
                     rest: Some(BindingPattern::Ident(Ident::new("a", (15, 16))))
                 }),
                 body: vec![],

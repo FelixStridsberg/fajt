@@ -33,8 +33,8 @@ impl Parser<'_, '_> {
     ///
     /// Example:
     /// ```no_rust
-    /// function fn( ...args ) { return 1 };
-    /// ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+    /// function fn( a, ...args ) { return 1 };
+    /// ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
     /// ```
     pub(super) fn parse_function_declaration(&mut self) -> Result<Statement> {
         let span_start = self.position();
@@ -51,11 +51,11 @@ impl Parser<'_, '_> {
     ///
     /// Example:
     /// ```no_rust
-    /// function fn( ...args ) { return 1 };
-    ///            ^~~~~~~~~~~~~~~~~~~~~~~~^
+    /// function fn( a, ...args ) { return 1 };
+    ///            ^~~~~~~~~~~~~~~~~~~~~~~~~~~^
     ///
-    /// async function fn( ...args ) { return 1 };
-    ///                  ^~~~~~~~~~~~~~~~~~~~~~~~^
+    /// async function fn( a, ...args ) { return 1 };
+    ///                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~^
     /// ```
     pub(super) fn parse_function_implementation(
         &mut self,
@@ -96,6 +96,7 @@ impl Parser<'_, '_> {
             return Ok(None);
         }
 
+        let mut parameters = Vec::new();
         let mut rest = None;
         loop {
             match self.reader.current()? {
@@ -105,13 +106,21 @@ impl Parser<'_, '_> {
                 }
                 token_matches!(punct!("...")) => {
                     rest = Some(self.parse_binding_rest_element()?);
+                    self.consume_parameter_delimiter()?;
                 }
-                _ => return err!(ErrorKind::UnexpectedToken(self.reader.consume()?,)),
+                _ => {
+                    parameters.push(self.parse_binding_element()?);
+                    self.consume_parameter_delimiter()?;
+                }
             }
         }
 
         let span = self.span_from(span_start);
-        Ok(Some(FormalParameters { span, rest }))
+        Ok(Some(FormalParameters {
+            span,
+            parameters,
+            rest,
+        }))
     }
 
     /// Parses the `FunctionBody` or `AsyncFunctionBody` goal symbol.

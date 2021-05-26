@@ -158,6 +158,7 @@ impl<'a, 'b> Parser<'a, 'b> {
         }
     }
 
+    /// TODO 3 similar functions, merge them to one (consume_*_delimiter)
     fn consume_array_delimiter(&mut self) -> Result<()> {
         match self.reader.current()? {
             token_matches!(punct!(",")) => {
@@ -176,6 +177,17 @@ impl<'a, 'b> Parser<'a, 'b> {
                 Ok(())
             }
             token_matches!(punct!("}")) => Ok(()),
+            _ => err!(UnexpectedToken(self.reader.consume()?)),
+        }
+    }
+
+    fn consume_parameter_delimiter(&mut self) -> Result<()> {
+        match self.reader.current()? {
+            token_matches!(punct!(",")) => {
+                self.reader.consume()?;
+                Ok(())
+            }
+            token_matches!(punct!(")")) => Ok(()),
             _ => err!(UnexpectedToken(self.reader.consume()?)),
         }
     }

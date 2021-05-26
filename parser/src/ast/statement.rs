@@ -1,5 +1,5 @@
 use super::Ident;
-use crate::ast::{BindingPattern, Expression};
+use crate::ast::{BindingElement, BindingPattern, Expression};
 use fajt_lexer::token::Span;
 
 /// Note: Declarations are handles as statements since they can appear in the same contexts.
@@ -54,6 +54,7 @@ pub struct FunctionDeclaration {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct FormalParameters {
     pub span: Span,
+    pub parameters: Vec<BindingElement>,
     pub rest: Option<BindingPattern>,
 }
 
