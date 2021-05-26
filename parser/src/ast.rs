@@ -1,10 +1,14 @@
-pub mod expression;
-pub mod statement;
-
+pub use binding::*;
 pub use expression::*;
+pub use literal::*;
 pub use statement::*;
 
 use fajt_lexer::token::Span;
+
+mod binding;
+mod expression;
+mod literal;
+mod statement;
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Body<T> {

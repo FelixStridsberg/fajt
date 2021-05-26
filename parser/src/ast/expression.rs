@@ -1,9 +1,7 @@
-pub mod literal;
-
-pub use literal::*;
-
-use crate::ast::Ident;
 use fajt_lexer::token::Span;
+
+use crate::ast::literal::*;
+use crate::ast::Ident;
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Expression {

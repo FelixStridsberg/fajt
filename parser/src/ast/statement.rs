@@ -1,6 +1,5 @@
-// TODO refactor the files of the ast, this file don't only contains stuff related to "statement"
 use super::Ident;
-use crate::ast::{Expression, Number};
+use crate::ast::{BindingPattern, Expression};
 use fajt_lexer::token::Span;
 
 /// Note: Declarations are handles as statements since they can appear in the same contexts.
@@ -88,70 +87,4 @@ pub enum VariableKind {
     Const,
     Let,
     Var,
-}
-
-impl From<Ident> for BindingPattern {
-    fn from(ident: Ident) -> Self {
-        Self::Ident(ident)
-    }
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum BindingPattern {
-    Ident(Ident),
-    Object(ObjectBinding),
-    Array(ArrayBinding),
-}
-
-impl From<ObjectBinding> for BindingPattern {
-    fn from(binding: ObjectBinding) -> Self {
-        Self::Object(binding)
-    }
-}
-
-impl From<ArrayBinding> for BindingPattern {
-    fn from(binding: ArrayBinding) -> Self {
-        Self::Array(binding)
-    }
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
-pub struct ObjectBinding {
-    pub span: Span,
-    pub props: Vec<ObjectBindingProp>,
-    pub rest: Option<Ident>,
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum ObjectBindingProp {
-    Single(Ident, Option<Expression>),
-    KeyValue(PropertyName, BindingElement),
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum PropertyName {
-    Ident(Ident),
-    String(String, char),
-    Number(Number),
-    Computed(Expression),
-}
-
-impl From<Ident> for ObjectBindingProp {
-    fn from(ident: Ident) -> Self {
-        Self::Single(ident, None)
-    }
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
-pub struct ArrayBinding {
-    pub span: Span,
-    pub elements: Vec<Option<BindingElement>>,
-    pub rest: Option<Ident>,
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
-pub struct BindingElement {
-    pub span: Span,
-    pub pattern: BindingPattern,
-    pub initializer: Option<Expression>,
 }
