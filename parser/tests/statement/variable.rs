@@ -3,7 +3,6 @@ mod object_binding;
 
 use fajt_lexer::punct;
 use fajt_lexer::token::{Span, Token};
-use fajt_parser::ast::Expression::IdentifierReference;
 use fajt_parser::ast::VariableKind::*;
 use fajt_parser::ast::*;
 use fajt_parser::error::ErrorKind::UnexpectedToken;
@@ -80,7 +79,7 @@ fn with_initializer() {
                     VariableDeclaration {
                         span: Span::new(4, 12),
                         pattern: Ident::new("foo", (4, 7)).into(),
-                        initializer: Some(IdentifierReference(Ident::new("a", (10, 11)).into()))
+                        initializer: Some(Expression::reference(Ident::new("a", (10, 11)).into()))
                     }
                 ]
             }.into()

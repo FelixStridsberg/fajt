@@ -72,7 +72,7 @@ impl Parser<'_, '_> {
             self.reader.consume()?;
         }
 
-        Ok(IdentifierReference(ident.into()))
+        Ok(IdentifierReference(Box::new(ident.into())))
     }
 
     /// Parses the `Initializer` goal symbol.

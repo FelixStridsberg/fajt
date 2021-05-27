@@ -9,8 +9,8 @@ fn this() {
     parser_test!(
         input: "this",
         output: [
-            Expression::ThisExpression(ThisExpression {
-                span: Span::new(0, 4)
+            Expression::this(ThisExpression {
+                span: Span::new(0, 4),
             }).into()
         ]
     );
@@ -21,7 +21,7 @@ fn null_literal() {
     parser_test!(
         input: "null",
         output: [
-            Expression::Literal(
+            Expression::literal(
                 LiteralExpression {
                     span: Span::new(0, 4),
                     literal: Literal::Null,
@@ -36,7 +36,7 @@ fn boolean_true_literal() {
     parser_test!(
         input: "true",
         output: [
-            Expression::Literal(
+            Expression::literal(
                 LiteralExpression {
                     span: Span::new(0, 4),
                     literal: Literal::Boolean(true),
@@ -51,7 +51,7 @@ fn boolean_false_literal() {
     parser_test!(
         input: "false",
         output: [
-            Expression::Literal(
+            Expression::literal(
                 LiteralExpression {
                     span: Span::new(0, 5),
                     literal: Literal::Boolean(false),
@@ -66,7 +66,7 @@ fn string_literal_double_quote() {
     parser_test!(
         input: r#""this is string""#,
         output: [
-            Expression::Literal(
+            Expression::literal(
                 LiteralExpression {
                     span: Span::new(0, 16),
                     literal: Literal::String("this is string".to_owned(), '"'),
@@ -81,7 +81,7 @@ fn string_literal_single_quote() {
     parser_test!(
         input: "'this is string'",
         output: [
-            Expression::Literal(
+            Expression::literal(
                 LiteralExpression {
                     span: Span::new(0, 16),
                     literal: Literal::String("this is string".to_owned(), '\''),
@@ -96,7 +96,7 @@ fn decimal_integer_literal() {
     parser_test!(
         input: "1234",
         output: [
-            Expression::Literal(
+            Expression::literal(
                 LiteralExpression {
                     span: Span::new(0, 4),
                     literal: Literal::Number(
@@ -113,7 +113,7 @@ fn decimal_hex_literal() {
     parser_test!(
         input: "0xff",
         output: [
-            Expression::Literal(
+            Expression::literal(
                 LiteralExpression {
                     span: Span::new(0, 4),
                     literal: Literal::Number(
@@ -130,7 +130,7 @@ fn decimal_octal_literal() {
     parser_test!(
         input: "0o77",
         output: [
-            Expression::Literal(
+            Expression::literal(
                 LiteralExpression {
                     span: Span::new(0, 4),
                     literal: Literal::Number(
@@ -147,7 +147,7 @@ fn decimal_binary_literal() {
     parser_test!(
         input: "0b11110000",
         output: [
-            Expression::Literal(
+            Expression::literal(
                 LiteralExpression {
                     span: Span::new(0, 10),
                     literal: Literal::Number(
@@ -164,7 +164,7 @@ fn decimal_literal() {
     parser_test!(
         input: "1234.5",
         output: [
-            Expression::Literal(
+            Expression::literal(
                 LiteralExpression {
                     span: Span::new(0, 6),
                     literal: Literal::Number(

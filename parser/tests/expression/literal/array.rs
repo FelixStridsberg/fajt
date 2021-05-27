@@ -7,7 +7,7 @@ fn empty_array_literal() {
     parser_test!(
         input: "[]",
         output: [
-            Expression::Literal(
+            Expression::literal(
                 LiteralExpression {
                     span: Span::new(0, 2),
                     literal: Literal::Array(
@@ -32,7 +32,7 @@ fn elision_array_literal() {
     parser_test!(
         input: "[, ]",
         output: [
-            Expression::Literal(
+            Expression::literal(
                 LiteralExpression {
                     span: Span::new(0, 4),
                     literal: Literal::Array(
@@ -49,14 +49,14 @@ fn single_element_array_literal() {
     parser_test!(
         input: "[ a ]",
         output: [
-            Expression::Literal(
+            Expression::literal(
                 LiteralExpression {
                     span: Span::new(0, 5),
                     literal: Literal::Array(
                         Array {
                             elements: vec![
                                 ArrayElement::Expr(
-                                    Expression::IdentifierReference(Ident::new("a", (2, 3)).into())
+                                    Expression::reference(Ident::new("a", (2, 3)).into())
                                 )
                             ]
                         }
@@ -72,18 +72,18 @@ fn mixed_element_array_literal() {
     parser_test!(
         input: "[ a,, b ]",
         output: [
-            Expression::Literal(
+            Expression::literal(
                 LiteralExpression {
                     span: Span::new(0, 9),
                     literal: Literal::Array(
                         Array {
                             elements: vec![
                                 ArrayElement::Expr(
-                                    Expression::IdentifierReference(Ident::new("a", (2, 3)).into())
+                                    Expression::reference(Ident::new("a", (2, 3)).into())
                                 ),
                                 ArrayElement::None,
                                 ArrayElement::Expr(
-                                    Expression::IdentifierReference(Ident::new("b", (6, 7)).into())
+                                    Expression::reference(Ident::new("b", (6, 7)).into())
                                 ),
                             ]
                         },
@@ -99,14 +99,14 @@ fn array_literal_spread_element() {
     parser_test!(
         input: "[ ...a ]",
         output: [
-            Expression::Literal(
+            Expression::literal(
                 LiteralExpression {
                     span: Span::new(0, 8),
                     literal: Literal::Array(
                         Array {
                             elements: vec![
                                 ArrayElement::Spread(
-                                    Expression::IdentifierReference(Ident::new("a", (5, 6)).into())
+                                    Expression::reference(Ident::new("a", (5, 6)).into())
                                 )
                             ]
                         },

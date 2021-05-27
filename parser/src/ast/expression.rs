@@ -5,26 +5,47 @@ use crate::ast::Ident;
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Expression {
-    ThisExpression(ThisExpression),
-    IdentifierReference(IdentifierReference),
-    Literal(LiteralExpression),
+    ThisExpression(Box<ThisExpression>),
+    IdentifierReference(Box<IdentifierReference>),
+    Literal(Box<LiteralExpression>),
+    BinaryExpression(Box<BinaryExpression>),
+}
+
+impl Expression {
+    pub fn this(expr: ThisExpression) -> Self {
+        Self::ThisExpression(Box::new(expr))
+    }
+
+    pub fn reference(expr: IdentifierReference) -> Self {
+        Self::IdentifierReference(Box::new(expr))
+    }
+
+    pub fn literal(expr: LiteralExpression) -> Self {
+        Self::Literal(Box::new(expr))
+    }
 }
 
 impl From<ThisExpression> for Expression {
     fn from(expr: ThisExpression) -> Self {
-        Self::ThisExpression(expr)
+        Self::ThisExpression(Box::new(expr))
     }
 }
 
 impl From<LiteralExpression> for Expression {
     fn from(expr: LiteralExpression) -> Self {
-        Self::Literal(expr)
+        Self::Literal(Box::new(expr))
     }
 }
 
 impl From<IdentifierReference> for Expression {
     fn from(expr: IdentifierReference) -> Self {
-        Self::IdentifierReference(expr)
+        Self::IdentifierReference(Box::new(expr))
+    }
+}
+
+impl From<BinaryExpression> for Expression {
+    fn from(expr: BinaryExpression) -> Self {
+        Self::BinaryExpression(Box::new(expr))
     }
 }
 
@@ -59,4 +80,17 @@ impl From<Ident> for IdentifierReference {
     fn from(ident: Ident) -> Self {
         Self::Ident(ident)
     }
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct BinaryExpression {
+    pub span: Span,
+    pub operator: BinaryOperator,
+    pub left: Expression,
+    pub right: Expression,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub enum BinaryOperator {
+    Plus,
 }
