@@ -9,13 +9,155 @@ use fajt_lexer::punct;
 use fajt_lexer::token_matches;
 
 impl Parser<'_, '_> {
+    /// Parses the `Expression` goal symbol.
     pub(super) fn parse_expression(&mut self) -> Result<Expression> {
         self.parse_assignment_expression()
+        // TODO comma separated expressions: Expression::Sequence(Vec<Expression>)?
     }
 
+    /// Parses the `AssignmentExpression` goal symbol.
     pub(super) fn parse_assignment_expression(&mut self) -> Result<Expression> {
-        // TODO other than primary expressions
+        self.parse_conditional_expression()
+        // TODO YieldExpression
+        // TODO ArrowFunction
+        // TODO AsyncArrowFunction
+        // TODO LeftHandSideExpression
+    }
+
+    /// Parses the `ConditionalExpression` goal symbol.
+    fn parse_conditional_expression(&mut self) -> Result<Expression> {
+        self.parse_short_circuit_expression()
+        // TODO ShortCircuitExpression ? AssignmentExpression : AssignmentExpression
+    }
+
+    /// Parses the `ShortCircuitExpression` goal symbol.
+    fn parse_short_circuit_expression(&mut self) -> Result<Expression> {
+        self.parse_logical_or_expression()
+        // TODO CoalesceExpression
+    }
+
+    /// Parses the `LogicalORExpression` goal symbol.
+    fn parse_logical_or_expression(&mut self) -> Result<Expression> {
+        self.parse_logical_and_expression()
+        // TODO LogicalORExpression || LogicalANDExpression
+    }
+
+    /// Parses the `LogicalANDExpression` goal symbol.
+    fn parse_logical_and_expression(&mut self) -> Result<Expression> {
+        self.parse_bitwise_or_expression()
+        // TODO LogicalANDExpression && BitwiseORExpression
+    }
+
+    /// Parses the `BitwiseORExpression` goal symbol.
+    fn parse_bitwise_or_expression(&mut self) -> Result<Expression> {
+        self.parse_bitwise_xor_expression()
+        // TODO BitwiseORExpression | BitwiseXORExpression
+    }
+
+    /// Parses the `BitwiseXORExpression` goal symbol.
+    fn parse_bitwise_xor_expression(&mut self) -> Result<Expression> {
+        self.parse_bitwise_and_expression()
+        // TODO BitwiseXORExpression ^ BitwiseANDExpression
+    }
+
+    /// Parses the `BitwiseANDExpression` goal symbol.
+    fn parse_bitwise_and_expression(&mut self) -> Result<Expression> {
+        self.parse_equality_expression()
+        // TODO BitwiseANDExpression & EqualityExpression
+    }
+
+    /// Parses the `EqualityExpression` goal symbol.
+    fn parse_equality_expression(&mut self) -> Result<Expression> {
+        self.parse_relational_expression()
+        // TODO EqualityExpression == RelationalExpression
+        // TODO EqualityExpression != RelationalExpression
+        // TODO EqualityExpression === RelationalExpression
+        // TODO EqualityExpression !== RelationalExpression
+    }
+
+    /// Parses the `RelationalExpression` goal symbol.
+    fn parse_relational_expression(&mut self) -> Result<Expression> {
+        self.parse_shift_expression()
+        // TODO RelationalExpression < ShiftExpression
+        // TODO RelationalExpression > ShiftExpression
+        // TODO RelationalExpression <= ShiftExpression
+        // TODO RelationalExpression >= ShiftExpression
+        // TODO RelationalExpression instanceof ShiftExpression
+        // TODO RelationalExpression in ShiftExpression
+    }
+
+    /// Parses the `ShiftExpression` goal symbol.
+    fn parse_shift_expression(&mut self) -> Result<Expression> {
+        self.parse_additive_expression()
+        // TODO ShiftExpression << AdditiveExpression
+        // TODO ShiftExpression >> AdditiveExpression
+        // TODO ShiftExpression >>> AdditiveExpression
+    }
+
+    /// Parses the `AdditiveExpression` goal symbol.
+    fn parse_additive_expression(&mut self) -> Result<Expression> {
+        self.parse_multiplicative_expression()
+        // TODO AdditiveExpression + MultiplicativeExpression
+        // TODO AdditiveExpression - MultiplicativeExpression
+    }
+
+    /// Parses the `MultiplicativeExpression` goal symbol.
+    fn parse_multiplicative_expression(&mut self) -> Result<Expression> {
+        self.parse_exponentiation_expression()
+        // TODO MultiplicativeExpression * ExponentiationExpression
+        // TODO MultiplicativeExpression / ExponentiationExpression
+        // TODO MultiplicativeExpression % ExponentiationExpression
+    }
+
+    /// Parses the `ExponentiationExpression` goal symbol.
+    fn parse_exponentiation_expression(&mut self) -> Result<Expression> {
+        self.parse_unary_expression()
+        //  TODO UpdateExpression ** ExponentiationExpression
+    }
+
+    /// Parses the `UnaryExpression` goal symbol.
+    fn parse_unary_expression(&mut self) -> Result<Expression> {
         self.parse_primary_expression()
+        // TODO delete UnaryExpression
+        // TODO typeof UnaryExpression
+        // TODO + UnaryExpression
+        // TODO - UnaryExpression
+        // TODO ~ UnaryExpression
+        // TODO ! UnaryExpression
+        // TODO AwaitExpression (await UnaryExpression)
+    }
+
+    /// Parses the `UpdateExpression` goal symbol.
+    fn parse_update_expression(&mut self) -> Result<Expression> {
+        self.parse_left_hand_side_expression()
+        // TODO LeftHandSideExpression [no LineTerminator] ++
+        // TODO LeftHandSideExpression [no LineTerminator] --
+        // TODO ++ UnaryExpression
+        // TODO -- UnaryExpression
+    }
+
+    /// Parses the `LeftHandSideExpression` goal symbol.
+    fn parse_left_hand_side_expression(&mut self) -> Result<Expression> {
+        self.parse_new_expression()
+        // TODO CallExpression
+        // TODO OptionalExpression
+    }
+
+    /// Parses the `NewExpression` goal symbol.
+    fn parse_new_expression(&mut self) -> Result<Expression> {
+        self.parse_member_expression()
+        // TODO new NewExpression
+    }
+
+    /// Parses the `MemberExpression` goal symbol.
+    fn parse_member_expression(&mut self) -> Result<Expression> {
+        self.parse_primary_expression()
+        // TODO MemberExpression [ Expression ]
+        // TODO MemberExpression . IdentifierName
+        // TODO MemberExpression TemplateLiteral
+        // TODO SuperProperty
+        // TODO MetaProperty
+        // TODO new MemberExpression Arguments
     }
 
     /// Parses the `PrimaryExpression` goal symbol.
