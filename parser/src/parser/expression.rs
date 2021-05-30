@@ -1,11 +1,10 @@
 use crate::ast::Expression::IdentifierReference;
-use crate::ast::{Expression, Ident, Literal, ThisExpression};
+use crate::ast::{BinaryExpression, BinaryOperator, Expression, Ident, Literal, ThisExpression};
 use crate::error::Result;
 use crate::Parser;
 
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
-
 use fajt_lexer::token_matches;
 
 impl Parser<'_, '_> {
@@ -96,9 +95,23 @@ impl Parser<'_, '_> {
 
     /// Parses the `AdditiveExpression` goal symbol.
     fn parse_additive_expression(&mut self) -> Result<Expression> {
-        self.parse_multiplicative_expression()
-        // TODO AdditiveExpression + MultiplicativeExpression
-        // TODO AdditiveExpression - MultiplicativeExpression
+        let span_start = self.position();
+        let left = self.parse_multiplicative_expression()?;
+        match self.reader.current()? {
+            token_matches!(punct!("+")) => {
+                self.reader.consume()?;
+                let right = self.parse_multiplicative_expression()?;
+
+                Ok(Expression::BinaryExpression(Box::new(BinaryExpression {
+                    span: self.span_from(span_start),
+                    left,
+                    right,
+                    operator: BinaryOperator::Plus,
+                })))
+            }
+            token_matches!(punct!("-")) => todo!("AdditiveExpression - MultiplicativeExpression"),
+            _ => Ok(left),
+        }
     }
 
     /// Parses the `MultiplicativeExpression` goal symbol.
@@ -117,7 +130,7 @@ impl Parser<'_, '_> {
 
     /// Parses the `UnaryExpression` goal symbol.
     fn parse_unary_expression(&mut self) -> Result<Expression> {
-        self.parse_primary_expression()
+        self.parse_update_expression()
         // TODO delete UnaryExpression
         // TODO typeof UnaryExpression
         // TODO + UnaryExpression
@@ -210,7 +223,7 @@ impl Parser<'_, '_> {
         let ident: Ident = self.parse_identifier()?;
 
         // Consume potential trailing semi colon TODO how to handle these in general?
-        if self.reader.current()?.value == punct!(";") {
+        if token_matches!(self.reader.current(), ok: punct!(";")) {
             self.reader.consume()?;
         }
 

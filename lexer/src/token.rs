@@ -24,6 +24,9 @@ macro_rules! token_matches {
     ($token:expr, opt: $value:pat) => {
         matches!($token, Some($crate::token::Token { value: $value, .. }));
     };
+    ($token:expr, ok: $value:pat) => {
+        matches!($token, Ok($crate::token::Token { value: $value, .. }));
+    };
     (opt: $value:pat) => {
         Some($crate::token::Token { value: $value, .. })
     };
