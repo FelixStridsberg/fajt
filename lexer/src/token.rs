@@ -30,6 +30,9 @@ macro_rules! token_matches {
     (opt: $value:pat) => {
         Some($crate::token::Token { value: $value, .. })
     };
+    (ok: $value:pat) => {
+        Ok($crate::token::Token { value: $value, .. })
+    };
 }
 
 bitflags! {

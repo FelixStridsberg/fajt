@@ -142,7 +142,9 @@ fn function_declaration_with_parameters() {
                         BindingElement {
                             span: Span::new(15, 20),
                             pattern: BindingPattern::Ident(Ident::new("b", (15, 16))),
-                            initializer: Some(IdentifierReference(Ident::new("c", (19, 20)).into())),
+                            initializer: Some(IdentifierReference(
+                                Box::new(Ident::new("c", (19, 20)).into())
+                            )),
                         }
                     ],
                     rest: None

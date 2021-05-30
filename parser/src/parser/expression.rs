@@ -97,20 +97,35 @@ impl Parser<'_, '_> {
     fn parse_additive_expression(&mut self) -> Result<Expression> {
         let span_start = self.position();
         let left = self.parse_multiplicative_expression()?;
-        match self.reader.current()? {
-            token_matches!(punct!("+")) => {
+        let expression = match self.reader.current() {
+            token_matches!(ok: punct!("+")) => {
                 self.reader.consume()?;
                 let right = self.parse_multiplicative_expression()?;
 
-                Ok(Expression::BinaryExpression(Box::new(BinaryExpression {
+                Expression::BinaryExpression(Box::new(BinaryExpression {
                     span: self.span_from(span_start),
                     left,
                     right,
                     operator: BinaryOperator::Plus,
-                })))
+                }))
             }
-            token_matches!(punct!("-")) => todo!("AdditiveExpression - MultiplicativeExpression"),
-            _ => Ok(left),
+            token_matches!(ok: punct!("-")) => {
+                todo!("AdditiveExpression - MultiplicativeExpression")
+            }
+            _ => return Ok(left),
+        };
+
+        if token_matches!(self.reader.current(), ok: punct!("+")) {
+            self.reader.consume()?;
+            let right = self.parse_multiplicative_expression()?;
+            Ok(Expression::BinaryExpression(Box::new(BinaryExpression {
+                span: self.span_from(span_start),
+                left: expression,
+                right,
+                operator: BinaryOperator::Plus,
+            })))
+        } else {
+            Ok(expression)
         }
     }
 
