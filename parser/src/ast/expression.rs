@@ -93,4 +93,5 @@ pub struct BinaryExpression {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum BinaryOperator {
     Plus,
+    Minus,
 }

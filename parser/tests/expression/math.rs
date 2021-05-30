@@ -17,7 +17,7 @@ fn addition() {
 }
 
 #[test]
-fn addition_multiple() {
+fn addition_nested() {
     parser_test!(
         input: "a + b + c",
         expr_output: [
@@ -27,6 +27,41 @@ fn addition_multiple() {
                 left: BinaryExpression {
                     span: Span::new(0, 5),
                     operator: BinaryOperator::Plus,
+                    left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                    right: IdentifierReference::Ident(Ident::new("b", (4, 5))).into(),
+                }.into(),
+                right: IdentifierReference::Ident(Ident::new("c", (8, 9))).into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn subtraction() {
+    parser_test!(
+        input: "a - b",
+        expr_output: [
+            BinaryExpression {
+                span: Span::new(0, 5),
+                operator: BinaryOperator::Minus,
+                left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                right: IdentifierReference::Ident(Ident::new("b", (4, 5))).into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn subtraction_nested() {
+    parser_test!(
+        input: "a - b - c",
+        expr_output: [
+            BinaryExpression {
+                span: Span::new(0, 9),
+                operator: BinaryOperator::Minus,
+                left: BinaryExpression {
+                    span: Span::new(0, 5),
+                    operator: BinaryOperator::Minus,
                     left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
                     right: IdentifierReference::Ident(Ident::new("b", (4, 5))).into(),
                 }.into(),

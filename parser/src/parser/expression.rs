@@ -110,22 +110,41 @@ impl Parser<'_, '_> {
                 }))
             }
             token_matches!(ok: punct!("-")) => {
-                todo!("AdditiveExpression - MultiplicativeExpression")
+                self.reader.consume()?;
+                let right = self.parse_multiplicative_expression()?;
+
+                Expression::BinaryExpression(Box::new(BinaryExpression {
+                    span: self.span_from(span_start),
+                    left,
+                    right,
+                    operator: BinaryOperator::Minus,
+                }))
             }
             _ => return Ok(left),
         };
 
-        if token_matches!(self.reader.current(), ok: punct!("+")) {
-            self.reader.consume()?;
-            let right = self.parse_multiplicative_expression()?;
-            Ok(Expression::BinaryExpression(Box::new(BinaryExpression {
-                span: self.span_from(span_start),
-                left: expression,
-                right,
-                operator: BinaryOperator::Plus,
-            })))
-        } else {
-            Ok(expression)
+        match self.reader.current() {
+            token_matches!(ok: punct!("+")) => {
+                self.reader.consume()?;
+                let right = self.parse_multiplicative_expression()?;
+                Ok(Expression::BinaryExpression(Box::new(BinaryExpression {
+                    span: self.span_from(span_start),
+                    left: expression,
+                    right,
+                    operator: BinaryOperator::Plus,
+                })))
+            }
+            token_matches!(ok: punct!("-")) => {
+                self.reader.consume()?;
+                let right = self.parse_multiplicative_expression()?;
+                Ok(Expression::BinaryExpression(Box::new(BinaryExpression {
+                    span: self.span_from(span_start),
+                    left: expression,
+                    right,
+                    operator: BinaryOperator::Minus,
+                })))
+            }
+            _ => return Ok(expression),
         }
     }
 
