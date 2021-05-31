@@ -143,4 +143,8 @@ pub enum BinaryOperator {
     BitwiseXOR,
     #[from_string("|")]
     BitwiseOR,
+    #[from_string("&&")]
+    And,
+    #[from_string("||")]
+    Or,
 }

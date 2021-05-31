@@ -38,14 +38,24 @@ impl Parser<'_, '_> {
 
     /// Parses the `LogicalORExpression` goal symbol.
     fn parse_logical_or_expression(&mut self) -> Result<Expression> {
-        self.parse_logical_and_expression()
-        // TODO LogicalORExpression || LogicalANDExpression
+        self.parse_binary_expression(Self::parse_logical_and_expression, |token| {
+            if token_matches!(token, punct!("||")) {
+                Some(binary_op!("||"))
+            } else {
+                None
+            }
+        })
     }
 
     /// Parses the `LogicalANDExpression` goal symbol.
     fn parse_logical_and_expression(&mut self) -> Result<Expression> {
-        self.parse_bitwise_or_expression()
-        // TODO LogicalANDExpression && BitwiseORExpression
+        self.parse_binary_expression(Self::parse_bitwise_or_expression, |token| {
+            if token_matches!(token, punct!("&&")) {
+                Some(binary_op!("&&"))
+            } else {
+                None
+            }
+        })
     }
 
     /// Parses the `BitwiseORExpression` goal symbol.
