@@ -50,8 +50,13 @@ impl Parser<'_, '_> {
 
     /// Parses the `BitwiseORExpression` goal symbol.
     fn parse_bitwise_or_expression(&mut self) -> Result<Expression> {
-        self.parse_bitwise_xor_expression()
-        // TODO BitwiseORExpression | BitwiseXORExpression
+        self.parse_binary_expression(Self::parse_bitwise_xor_expression, |token| {
+            if token_matches!(token, punct!("|")) {
+                Some(binary_op!("|"))
+            } else {
+                None
+            }
+        })
     }
 
     /// Parses the `BitwiseXORExpression` goal symbol.
