@@ -10,6 +10,7 @@ pub enum Expression {
     IdentifierReference(Box<IdentifierReference>),
     Literal(Box<LiteralExpression>),
     BinaryExpression(Box<BinaryExpression>),
+    LogicalExpression(Box<LogicalExpression>),
 }
 
 impl Expression {
@@ -47,6 +48,12 @@ impl From<IdentifierReference> for Expression {
 impl From<BinaryExpression> for Expression {
     fn from(expr: BinaryExpression) -> Self {
         Self::BinaryExpression(Box::new(expr))
+    }
+}
+
+impl From<LogicalExpression> for Expression {
+    fn from(expr: LogicalExpression) -> Self {
+        Self::LogicalExpression(Box::new(expr))
     }
 }
 
@@ -143,6 +150,24 @@ pub enum BinaryOperator {
     BitwiseXOR,
     #[from_string("|")]
     BitwiseOR,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct LogicalExpression {
+    pub span: Span,
+    pub operator: LogicalOperator,
+    pub left: Expression,
+    pub right: Expression,
+}
+
+#[derive(Debug, PartialOrd, PartialEq, FromString)]
+#[from_string_macro("logical_op")]
+#[from_string_macro_rules(
+    ($variant:ident) => {
+        $crate::ast::LogicalOperator::$variant
+    };
+)]
+pub enum LogicalOperator {
     #[from_string("&&")]
     And,
     #[from_string("||")]

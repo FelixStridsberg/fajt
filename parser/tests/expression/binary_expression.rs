@@ -481,12 +481,12 @@ fn logical_or() {
     parser_test!(
         input: "a || b || c",
         expr_output: [
-            BinaryExpression {
+            LogicalExpression {
                 span: Span::new(0, 11),
-                operator: BinaryOperator::Or,
-                left: BinaryExpression {
+                operator: LogicalOperator::Or,
+                left: LogicalExpression {
                     span: Span::new(0, 6),
-                    operator: BinaryOperator::Or,
+                    operator: LogicalOperator::Or,
                     left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
                     right: IdentifierReference::Ident(Ident::new("b", (5, 6))).into(),
                 }.into(),
@@ -501,12 +501,12 @@ fn logical_and() {
     parser_test!(
         input: "a && b && c",
         expr_output: [
-            BinaryExpression {
+            LogicalExpression {
                 span: Span::new(0, 11),
-                operator: BinaryOperator::And,
-                left: BinaryExpression {
+                operator: LogicalOperator::And,
+                left: LogicalExpression {
                     span: Span::new(0, 6),
-                    operator: BinaryOperator::And,
+                    operator: LogicalOperator::And,
                     left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
                     right: IdentifierReference::Ident(Ident::new("b", (5, 6))).into(),
                 }.into(),
@@ -521,12 +521,12 @@ fn coalesce() {
     parser_test!(
         input: "a ?? b ?? c",
         expr_output: [
-            BinaryExpression {
+            LogicalExpression {
                 span: Span::new(0, 11),
-                operator: BinaryOperator::Coalesce,
-                left: BinaryExpression {
+                operator: LogicalOperator::Coalesce,
+                left: LogicalExpression {
                     span: Span::new(0, 6),
-                    operator: BinaryOperator::Coalesce,
+                    operator: LogicalOperator::Coalesce,
                     left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
                     right: IdentifierReference::Ident(Ident::new("b", (5, 6))).into(),
                 }.into(),

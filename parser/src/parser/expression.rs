@@ -1,11 +1,14 @@
 use crate::ast::Expression::IdentifierReference;
-use crate::ast::{BinaryExpression, BinaryOperator, Expression, Ident, Literal, ThisExpression};
+use crate::ast::{
+    BinaryExpression, BinaryOperator, Expression, Ident, Literal, LogicalExpression,
+    LogicalOperator, ThisExpression,
+};
 use crate::error::Result;
 use crate::Parser;
 
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
-use fajt_lexer::token::Token;
+use fajt_lexer::token::{Span, Token};
 use fajt_lexer::token_matches;
 
 impl Parser<'_, '_> {
@@ -32,9 +35,9 @@ impl Parser<'_, '_> {
 
     /// Parses the `ShortCircuitExpression` goal symbol.
     fn parse_short_circuit_expression(&mut self) -> Result<Expression> {
-        self.parse_binary_expression(Self::parse_logical_or_expression, |token| {
+        self.parse_logical_expression(Self::parse_logical_or_expression, |token| {
             if token_matches!(token, punct!("??")) {
-                Some(binary_op!("??"))
+                Some(logical_op!("??"))
             } else {
                 None
             }
@@ -43,9 +46,9 @@ impl Parser<'_, '_> {
 
     /// Parses the `LogicalORExpression` goal symbol.
     fn parse_logical_or_expression(&mut self) -> Result<Expression> {
-        self.parse_binary_expression(Self::parse_logical_and_expression, |token| {
+        self.parse_logical_expression(Self::parse_logical_and_expression, |token| {
             if token_matches!(token, punct!("||")) {
-                Some(binary_op!("||"))
+                Some(logical_op!("||"))
             } else {
                 None
             }
@@ -54,9 +57,9 @@ impl Parser<'_, '_> {
 
     /// Parses the `LogicalANDExpression` goal symbol.
     fn parse_logical_and_expression(&mut self) -> Result<Expression> {
-        self.parse_binary_expression(Self::parse_bitwise_or_expression, |token| {
+        self.parse_logical_expression(Self::parse_bitwise_or_expression, |token| {
             if token_matches!(token, punct!("&&")) {
-                Some(binary_op!("&&"))
+                Some(logical_op!("&&"))
             } else {
                 None
             }
@@ -171,6 +174,49 @@ impl Parser<'_, '_> {
         next: fn(&mut Self) -> Result<Expression>,
         map_operator: fn(&Token) -> Option<BinaryOperator>,
     ) -> Result<Expression> {
+        self.parse_recursive_binary_expression(next, map_operator, |span, left, right, operator| {
+            Expression::BinaryExpression(Box::new(BinaryExpression {
+                span,
+                left,
+                right,
+                operator,
+            }))
+        })
+    }
+
+    /// All binary expressions are parsed the same way, they are broken up into multiple goal
+    /// symbols for precedence. This is the common parse method for all of them.
+    ///
+    /// `next` is a method for retrieving the result of the _next_ goal symbol (i.e. right hand).
+    /// `map_operator` is a function for mapping a token to a binary operator.
+    #[inline]
+    fn parse_logical_expression(
+        &mut self,
+        next: fn(&mut Self) -> Result<Expression>,
+        map_operator: fn(&Token) -> Option<LogicalOperator>,
+    ) -> Result<Expression> {
+        self.parse_recursive_binary_expression(next, map_operator, |span, left, right, operator| {
+            Expression::LogicalExpression(Box::new(LogicalExpression {
+                span,
+                left,
+                right,
+                operator,
+            }))
+        })
+    }
+
+    #[inline]
+    fn parse_recursive_binary_expression<T>(
+        &mut self,
+        next: fn(&mut Self) -> Result<Expression>,
+        map_operator: fn(&Token) -> Option<T>,
+        create_expression: fn(
+            span: Span,
+            left: Expression,
+            right: Expression,
+            operator: T,
+        ) -> Expression,
+    ) -> Result<Expression> {
         let span_start = self.position();
         let mut expression = next(self)?;
         loop {
@@ -179,13 +225,9 @@ impl Parser<'_, '_> {
             if let Ok(Some(operator)) = operator {
                 self.reader.consume()?;
                 let right = next(self)?;
+                let span = self.span_from(span_start);
 
-                expression = Expression::BinaryExpression(Box::new(BinaryExpression {
-                    span: self.span_from(span_start),
-                    left: expression,
-                    right,
-                    operator,
-                }))
+                expression = create_expression(span, expression, right, operator);
             } else {
                 break;
             }
