@@ -515,3 +515,23 @@ fn logical_and() {
         ]
     );
 }
+
+#[test]
+fn coalesce() {
+    parser_test!(
+        input: "a ?? b ?? c",
+        expr_output: [
+            BinaryExpression {
+                span: Span::new(0, 11),
+                operator: BinaryOperator::Coalesce,
+                left: BinaryExpression {
+                    span: Span::new(0, 6),
+                    operator: BinaryOperator::Coalesce,
+                    left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                    right: IdentifierReference::Ident(Ident::new("b", (5, 6))).into(),
+                }.into(),
+                right: IdentifierReference::Ident(Ident::new("c", (10, 11))).into(),
+            }.into()
+        ]
+    );
+}

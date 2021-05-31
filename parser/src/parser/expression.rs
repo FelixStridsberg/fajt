@@ -32,8 +32,13 @@ impl Parser<'_, '_> {
 
     /// Parses the `ShortCircuitExpression` goal symbol.
     fn parse_short_circuit_expression(&mut self) -> Result<Expression> {
-        self.parse_logical_or_expression()
-        // TODO CoalesceExpression
+        self.parse_binary_expression(Self::parse_logical_or_expression, |token| {
+            if token_matches!(token, punct!("??")) {
+                Some(binary_op!("??"))
+            } else {
+                None
+            }
+        })
     }
 
     /// Parses the `LogicalORExpression` goal symbol.

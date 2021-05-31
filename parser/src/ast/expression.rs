@@ -147,4 +147,6 @@ pub enum BinaryOperator {
     And,
     #[from_string("||")]
     Or,
+    #[from_string("??")]
+    Coalesce,
 }
