@@ -98,4 +98,7 @@ pub enum BinaryOperator {
     Division,
     Modulus,
     Exponent,
+    ShiftLeft,
+    ShiftRight,
+    ShiftRightUnsigned,
 }

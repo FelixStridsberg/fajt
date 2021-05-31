@@ -88,10 +88,12 @@ impl Parser<'_, '_> {
 
     /// Parses the `ShiftExpression` goal symbol.
     fn parse_shift_expression(&mut self) -> Result<Expression> {
-        self.parse_additive_expression()
-        // TODO ShiftExpression << AdditiveExpression
-        // TODO ShiftExpression >> AdditiveExpression
-        // TODO ShiftExpression >>> AdditiveExpression
+        self.parse_binary_expression(Self::parse_additive_expression, |token| match token {
+            token_matches!(punct!("<<")) => Some(BinaryOperator::ShiftLeft),
+            token_matches!(punct!(">>")) => Some(BinaryOperator::ShiftRight),
+            token_matches!(punct!(">>>")) => Some(BinaryOperator::ShiftRightUnsigned),
+            _ => None,
+        })
     }
 
     /// Parses the `AdditiveExpression` goal symbol.
