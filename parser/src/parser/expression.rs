@@ -62,8 +62,13 @@ impl Parser<'_, '_> {
 
     /// Parses the `BitwiseANDExpression` goal symbol.
     fn parse_bitwise_and_expression(&mut self) -> Result<Expression> {
-        self.parse_equality_expression()
-        // TODO BitwiseANDExpression & EqualityExpression
+        self.parse_binary_expression(Self::parse_equality_expression, |token| {
+            if token_matches!(token, punct!("&")) {
+                Some(binary_op!("&"))
+            } else {
+                None
+            }
+        })
     }
 
     /// Parses the `EqualityExpression` goal symbol.

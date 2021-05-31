@@ -137,4 +137,6 @@ pub enum BinaryOperator {
     StrictEqual,
     #[from_string("!==")]
     StrictNotEqual,
+    #[from_string("&")]
+    BitwiseAnd,
 }
