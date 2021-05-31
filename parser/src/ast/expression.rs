@@ -97,4 +97,5 @@ pub enum BinaryOperator {
     Multiplication,
     Division,
     Modulus,
+    Exponent,
 }

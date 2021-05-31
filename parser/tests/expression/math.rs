@@ -135,3 +135,23 @@ fn modulus() {
         ]
     );
 }
+
+#[test]
+fn exponent() {
+    parser_test!(
+        input: "a ** b ** c",
+        expr_output: [
+            BinaryExpression {
+                span: Span::new(0, 11),
+                operator: BinaryOperator::Exponent,
+                left: BinaryExpression {
+                    span: Span::new(0, 6),
+                    operator: BinaryOperator::Exponent,
+                    left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                    right: IdentifierReference::Ident(Ident::new("b", (5, 6))).into(),
+                }.into(),
+                right: IdentifierReference::Ident(Ident::new("c", (10, 11))).into(),
+            }.into()
+        ]
+    );
+}

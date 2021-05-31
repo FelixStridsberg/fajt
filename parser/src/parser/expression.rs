@@ -5,6 +5,7 @@ use crate::Parser;
 
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
+use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
 
 impl Parser<'_, '_> {
@@ -95,61 +96,66 @@ impl Parser<'_, '_> {
 
     /// Parses the `AdditiveExpression` goal symbol.
     fn parse_additive_expression(&mut self) -> Result<Expression> {
-        let span_start = self.position();
-
-        let mut expression = self.parse_multiplicative_expression()?;
-        loop {
-            let operator = match self.reader.current() {
-                token_matches!(ok: punct!("+")) => BinaryOperator::Plus,
-                token_matches!(ok: punct!("-")) => BinaryOperator::Minus,
-                _ => break,
-            };
-
-            self.reader.consume()?;
-            let right = self.parse_multiplicative_expression()?;
-
-            expression = Expression::BinaryExpression(Box::new(BinaryExpression {
-                span: self.span_from(span_start),
-                left: expression,
-                right,
-                operator,
-            }))
-        }
-
-        Ok(expression)
+        self.parse_binary_expression(Self::parse_multiplicative_expression, |token| match token {
+            token_matches!(punct!("+")) => Some(BinaryOperator::Plus),
+            token_matches!(punct!("-")) => Some(BinaryOperator::Minus),
+            _ => None,
+        })
     }
 
     /// Parses the `MultiplicativeExpression` goal symbol.
     fn parse_multiplicative_expression(&mut self) -> Result<Expression> {
-        let span_start = self.position();
-
-        let mut expression = self.parse_exponentiation_expression()?;
-        loop {
-            let operator = match self.reader.current() {
-                token_matches!(ok: punct!("*")) => BinaryOperator::Multiplication,
-                token_matches!(ok: punct!("/")) => BinaryOperator::Division,
-                token_matches!(ok: punct!("%")) => BinaryOperator::Modulus,
-                _ => break,
-            };
-
-            self.reader.consume()?;
-            let right = self.parse_exponentiation_expression()?;
-
-            expression = Expression::BinaryExpression(Box::new(BinaryExpression {
-                span: self.span_from(span_start),
-                left: expression,
-                right,
-                operator,
-            }))
-        }
-
-        Ok(expression)
+        self.parse_binary_expression(Self::parse_exponentiation_expression, |token| match token {
+            token_matches!(punct!("*")) => Some(BinaryOperator::Multiplication),
+            token_matches!(punct!("/")) => Some(BinaryOperator::Division),
+            token_matches!(punct!("%")) => Some(BinaryOperator::Modulus),
+            _ => None,
+        })
     }
 
     /// Parses the `ExponentiationExpression` goal symbol.
     fn parse_exponentiation_expression(&mut self) -> Result<Expression> {
-        self.parse_unary_expression()
-        //  TODO UpdateExpression ** ExponentiationExpression
+        self.parse_binary_expression(Self::parse_unary_expression, |token| {
+            if token_matches!(token, punct!("**")) {
+                Some(BinaryOperator::Exponent)
+            } else {
+                None
+            }
+        })
+    }
+
+    /// All binary expressions are parsed the same way, they are broken up into multiple goal
+    /// symbols for precedence. This is the common parse method for all of them.
+    ///
+    /// `next` is a method for retrieving the result of the _next_ goal symbol (i.e. right hand).
+    /// `map_operator` is a function for mapping a token to a binary operator.
+    #[inline]
+    fn parse_binary_expression(
+        &mut self,
+        next: fn(&mut Self) -> Result<Expression>,
+        map_operator: fn(&Token) -> Option<BinaryOperator>,
+    ) -> Result<Expression> {
+        let span_start = self.position();
+        let mut expression = next(self)?;
+        loop {
+            let operator = self.reader.current().map(|t| map_operator(t));
+
+            if let Ok(Some(operator)) = operator {
+                self.reader.consume()?;
+                let right = next(self)?;
+
+                expression = Expression::BinaryExpression(Box::new(BinaryExpression {
+                    span: self.span_from(span_start),
+                    left: expression,
+                    right,
+                    operator,
+                }))
+            } else {
+                break;
+            }
+        }
+
+        Ok(expression)
     }
 
     /// Parses the `UnaryExpression` goal symbol.
