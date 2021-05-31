@@ -78,12 +78,12 @@ impl Parser<'_, '_> {
     /// Parses the `RelationalExpression` goal symbol.
     fn parse_relational_expression(&mut self) -> Result<Expression> {
         self.parse_binary_expression(Self::parse_shift_expression, |token| match token {
-            token_matches!(punct!("<")) => Some(BinaryOperator::LessThan),
-            token_matches!(punct!(">")) => Some(BinaryOperator::MoreThan),
-            token_matches!(punct!("<=")) => Some(BinaryOperator::LessThanEquals),
-            token_matches!(punct!(">=")) => Some(BinaryOperator::MoreThanEquals),
-            token_matches!(keyword!("instanceof")) => Some(BinaryOperator::InstanceOf),
-            token_matches!(keyword!("in")) => Some(BinaryOperator::In),
+            token_matches!(punct!("<")) => Some(binary_op!("<")),
+            token_matches!(punct!(">")) => Some(binary_op!(">")),
+            token_matches!(punct!("<=")) => Some(binary_op!("<=")),
+            token_matches!(punct!(">=")) => Some(binary_op!(">=")),
+            token_matches!(keyword!("instanceof")) => Some(binary_op!("instanceof")),
+            token_matches!(keyword!("in")) => Some(binary_op!("in")),
             _ => None,
         })
     }
@@ -91,9 +91,9 @@ impl Parser<'_, '_> {
     /// Parses the `ShiftExpression` goal symbol.
     fn parse_shift_expression(&mut self) -> Result<Expression> {
         self.parse_binary_expression(Self::parse_additive_expression, |token| match token {
-            token_matches!(punct!("<<")) => Some(BinaryOperator::ShiftLeft),
-            token_matches!(punct!(">>")) => Some(BinaryOperator::ShiftRight),
-            token_matches!(punct!(">>>")) => Some(BinaryOperator::ShiftRightUnsigned),
+            token_matches!(punct!("<<")) => Some(binary_op!("<<")),
+            token_matches!(punct!(">>")) => Some(binary_op!(">>")),
+            token_matches!(punct!(">>>")) => Some(binary_op!(">>>")),
             _ => None,
         })
     }
@@ -101,8 +101,8 @@ impl Parser<'_, '_> {
     /// Parses the `AdditiveExpression` goal symbol.
     fn parse_additive_expression(&mut self) -> Result<Expression> {
         self.parse_binary_expression(Self::parse_multiplicative_expression, |token| match token {
-            token_matches!(punct!("+")) => Some(BinaryOperator::Plus),
-            token_matches!(punct!("-")) => Some(BinaryOperator::Minus),
+            token_matches!(punct!("+")) => Some(binary_op!("+")),
+            token_matches!(punct!("-")) => Some(binary_op!("-")),
             _ => None,
         })
     }
@@ -110,9 +110,9 @@ impl Parser<'_, '_> {
     /// Parses the `MultiplicativeExpression` goal symbol.
     fn parse_multiplicative_expression(&mut self) -> Result<Expression> {
         self.parse_binary_expression(Self::parse_exponentiation_expression, |token| match token {
-            token_matches!(punct!("*")) => Some(BinaryOperator::Multiplication),
-            token_matches!(punct!("/")) => Some(BinaryOperator::Division),
-            token_matches!(punct!("%")) => Some(BinaryOperator::Modulus),
+            token_matches!(punct!("*")) => Some(binary_op!("*")),
+            token_matches!(punct!("/")) => Some(binary_op!("/")),
+            token_matches!(punct!("%")) => Some(binary_op!("%")),
             _ => None,
         })
     }
@@ -121,7 +121,7 @@ impl Parser<'_, '_> {
     fn parse_exponentiation_expression(&mut self) -> Result<Expression> {
         self.parse_binary_expression(Self::parse_unary_expression, |token| {
             if token_matches!(token, punct!("**")) {
-                Some(BinaryOperator::Exponent)
+                Some(binary_op!("**"))
             } else {
                 None
             }

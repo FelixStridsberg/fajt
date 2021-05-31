@@ -1,4 +1,5 @@
 use fajt_lexer::token::Span;
+use fajt_macros::FromString;
 
 use crate::ast::literal::*;
 use crate::ast::Ident;
@@ -90,21 +91,42 @@ pub struct BinaryExpression {
     pub right: Expression,
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
+#[derive(Debug, PartialOrd, PartialEq, FromString)]
+#[from_string_macro("binary_op")]
+#[from_string_macro_rules(
+    ($variant:ident) => {
+        $crate::ast::BinaryOperator::$variant
+    };
+)]
 pub enum BinaryOperator {
+    #[from_string("+")]
     Plus,
+    #[from_string("-")]
     Minus,
+    #[from_string("*")]
     Multiplication,
+    #[from_string("/")]
     Division,
+    #[from_string("%")]
     Modulus,
+    #[from_string("**")]
     Exponent,
+    #[from_string("<<")]
     ShiftLeft,
+    #[from_string(">>")]
     ShiftRight,
+    #[from_string(">>>")]
     ShiftRightUnsigned,
+    #[from_string("<")]
     LessThan,
+    #[from_string(">")]
     MoreThan,
+    #[from_string("<=")]
     LessThanEquals,
+    #[from_string(">=")]
     MoreThanEquals,
+    #[from_string("instanceof")]
     InstanceOf,
+    #[from_string("in")]
     In,
 }
