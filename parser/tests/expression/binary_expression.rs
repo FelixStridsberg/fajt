@@ -435,3 +435,23 @@ fn bitwise_and() {
         ]
     );
 }
+
+#[test]
+fn bitwise_xor() {
+    parser_test!(
+        input: "a ^ b ^ c",
+        expr_output: [
+            BinaryExpression {
+                span: Span::new(0, 9),
+                operator: BinaryOperator::BitwiseXOR,
+                left: BinaryExpression {
+                    span: Span::new(0, 5),
+                    operator: BinaryOperator::BitwiseXOR,
+                    left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                    right: IdentifierReference::Ident(Ident::new("b", (4, 5))).into(),
+                }.into(),
+                right: IdentifierReference::Ident(Ident::new("c", (8, 9))).into(),
+            }.into()
+        ]
+    );
+}
