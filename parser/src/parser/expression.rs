@@ -99,26 +99,21 @@ impl Parser<'_, '_> {
 
         let mut expression = self.parse_multiplicative_expression()?;
         loop {
-            match self.reader.current() {
-                token_matches!(ok: punct!("+")) | token_matches!(ok: punct!("-")) => {
-                    let token = self.reader.consume()?;
-                    let right = self.parse_multiplicative_expression()?;
-
-                    let operator = if token_matches!(token, punct!("+")) {
-                        BinaryOperator::Plus
-                    } else {
-                        BinaryOperator::Minus
-                    };
-
-                    expression = Expression::BinaryExpression(Box::new(BinaryExpression {
-                        span: self.span_from(span_start),
-                        left: expression,
-                        right,
-                        operator,
-                    }))
-                }
+            let operator = match self.reader.current() {
+                token_matches!(ok: punct!("+")) => BinaryOperator::Plus,
+                token_matches!(ok: punct!("-")) => BinaryOperator::Minus,
                 _ => break,
             };
+
+            self.reader.consume()?;
+            let right = self.parse_multiplicative_expression()?;
+
+            expression = Expression::BinaryExpression(Box::new(BinaryExpression {
+                span: self.span_from(span_start),
+                left: expression,
+                right,
+                operator,
+            }))
         }
 
         Ok(expression)
@@ -126,10 +121,29 @@ impl Parser<'_, '_> {
 
     /// Parses the `MultiplicativeExpression` goal symbol.
     fn parse_multiplicative_expression(&mut self) -> Result<Expression> {
-        self.parse_exponentiation_expression()
-        // TODO MultiplicativeExpression * ExponentiationExpression
-        // TODO MultiplicativeExpression / ExponentiationExpression
-        // TODO MultiplicativeExpression % ExponentiationExpression
+        let span_start = self.position();
+
+        let mut expression = self.parse_exponentiation_expression()?;
+        loop {
+            let operator = match self.reader.current() {
+                token_matches!(ok: punct!("*")) => BinaryOperator::Multiplication,
+                token_matches!(ok: punct!("/")) => BinaryOperator::Division,
+                token_matches!(ok: punct!("%")) => BinaryOperator::Modulus,
+                _ => break,
+            };
+
+            self.reader.consume()?;
+            let right = self.parse_exponentiation_expression()?;
+
+            expression = Expression::BinaryExpression(Box::new(BinaryExpression {
+                span: self.span_from(span_start),
+                left: expression,
+                right,
+                operator,
+            }))
+        }
+
+        Ok(expression)
     }
 
     /// Parses the `ExponentiationExpression` goal symbol.

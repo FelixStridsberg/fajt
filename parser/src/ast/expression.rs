@@ -94,4 +94,7 @@ pub struct BinaryExpression {
 pub enum BinaryOperator {
     Plus,
     Minus,
+    Multiplication,
+    Division,
+    Modulus,
 }
