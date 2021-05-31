@@ -3,7 +3,7 @@ mod r#macro;
 
 mod expression {
     mod literal;
-    mod math;
+    mod binary_expression;
 }
 
 mod statement {
