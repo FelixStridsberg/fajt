@@ -68,11 +68,13 @@ impl Parser<'_, '_> {
 
     /// Parses the `EqualityExpression` goal symbol.
     fn parse_equality_expression(&mut self) -> Result<Expression> {
-        self.parse_relational_expression()
-        // TODO EqualityExpression == RelationalExpression
-        // TODO EqualityExpression != RelationalExpression
-        // TODO EqualityExpression === RelationalExpression
-        // TODO EqualityExpression !== RelationalExpression
+        self.parse_binary_expression(Self::parse_relational_expression, |token| match token {
+            token_matches!(punct!("==")) => Some(binary_op!("==")),
+            token_matches!(punct!("!=")) => Some(binary_op!("!=")),
+            token_matches!(punct!("===")) => Some(binary_op!("===")),
+            token_matches!(punct!("!==")) => Some(binary_op!("!==")),
+            _ => None,
+        })
     }
 
     /// Parses the `RelationalExpression` goal symbol.

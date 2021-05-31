@@ -335,3 +335,83 @@ fn in_() {
         ]
     );
 }
+
+#[test]
+fn equal() {
+    parser_test!(
+        input: "a == b == c",
+        expr_output: [
+            BinaryExpression {
+                span: Span::new(0, 11),
+                operator: BinaryOperator::Equal,
+                left: BinaryExpression {
+                    span: Span::new(0, 6),
+                    operator: BinaryOperator::Equal,
+                    left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                    right: IdentifierReference::Ident(Ident::new("b", (5, 6))).into(),
+                }.into(),
+                right: IdentifierReference::Ident(Ident::new("c", (10, 11))).into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn not_equal() {
+    parser_test!(
+        input: "a != b != c",
+        expr_output: [
+            BinaryExpression {
+                span: Span::new(0, 11),
+                operator: BinaryOperator::NotEqual,
+                left: BinaryExpression {
+                    span: Span::new(0, 6),
+                    operator: BinaryOperator::NotEqual,
+                    left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                    right: IdentifierReference::Ident(Ident::new("b", (5, 6))).into(),
+                }.into(),
+                right: IdentifierReference::Ident(Ident::new("c", (10, 11))).into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn strict_equal() {
+    parser_test!(
+        input: "a === b === c",
+        expr_output: [
+            BinaryExpression {
+                span: Span::new(0, 13),
+                operator: BinaryOperator::StrictEqual,
+                left: BinaryExpression {
+                    span: Span::new(0, 7),
+                    operator: BinaryOperator::StrictEqual,
+                    left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                    right: IdentifierReference::Ident(Ident::new("b", (6, 7))).into(),
+                }.into(),
+                right: IdentifierReference::Ident(Ident::new("c", (12, 13))).into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn strict_not_equal() {
+    parser_test!(
+        input: "a !== b !== c",
+        expr_output: [
+            BinaryExpression {
+                span: Span::new(0, 13),
+                operator: BinaryOperator::StrictNotEqual,
+                left: BinaryExpression {
+                    span: Span::new(0, 7),
+                    operator: BinaryOperator::StrictNotEqual,
+                    left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                    right: IdentifierReference::Ident(Ident::new("b", (6, 7))).into(),
+                }.into(),
+                right: IdentifierReference::Ident(Ident::new("c", (12, 13))).into(),
+            }.into()
+        ]
+    );
+}

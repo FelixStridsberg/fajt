@@ -129,4 +129,12 @@ pub enum BinaryOperator {
     InstanceOf,
     #[from_string("in")]
     In,
+    #[from_string("==")]
+    Equal,
+    #[from_string("!=")]
+    NotEqual,
+    #[from_string("===")]
+    StrictEqual,
+    #[from_string("!==")]
+    StrictNotEqual,
 }

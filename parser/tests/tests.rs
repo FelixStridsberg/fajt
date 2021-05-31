@@ -2,8 +2,8 @@
 mod r#macro;
 
 mod expression {
-    mod literal;
     mod binary_expression;
+    mod literal;
 }
 
 mod statement {
