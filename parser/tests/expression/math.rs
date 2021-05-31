@@ -215,3 +215,123 @@ fn shift_right_unsigned() {
         ]
     );
 }
+
+#[test]
+fn less_than() {
+    parser_test!(
+        input: "a < b < c",
+        expr_output: [
+            BinaryExpression {
+                span: Span::new(0, 9),
+                operator: BinaryOperator::LessThan,
+                left: BinaryExpression {
+                    span: Span::new(0, 5),
+                    operator: BinaryOperator::LessThan,
+                    left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                    right: IdentifierReference::Ident(Ident::new("b", (4, 5))).into(),
+                }.into(),
+                right: IdentifierReference::Ident(Ident::new("c", (8, 9))).into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn more_than() {
+    parser_test!(
+        input: "a > b > c",
+        expr_output: [
+            BinaryExpression {
+                span: Span::new(0, 9),
+                operator: BinaryOperator::MoreThan,
+                left: BinaryExpression {
+                    span: Span::new(0, 5),
+                    operator: BinaryOperator::MoreThan,
+                    left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                    right: IdentifierReference::Ident(Ident::new("b", (4, 5))).into(),
+                }.into(),
+                right: IdentifierReference::Ident(Ident::new("c", (8, 9))).into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn less_than_equals() {
+    parser_test!(
+        input: "a <= b <= c",
+        expr_output: [
+            BinaryExpression {
+                span: Span::new(0, 11),
+                operator: BinaryOperator::LessThanEquals,
+                left: BinaryExpression {
+                    span: Span::new(0, 6),
+                    operator: BinaryOperator::LessThanEquals,
+                    left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                    right: IdentifierReference::Ident(Ident::new("b", (5, 6))).into(),
+                }.into(),
+                right: IdentifierReference::Ident(Ident::new("c", (10, 11))).into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn more_than_equals() {
+    parser_test!(
+        input: "a >= b >= c",
+        expr_output: [
+            BinaryExpression {
+                span: Span::new(0, 11),
+                operator: BinaryOperator::MoreThanEquals,
+                left: BinaryExpression {
+                    span: Span::new(0, 6),
+                    operator: BinaryOperator::MoreThanEquals,
+                    left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                    right: IdentifierReference::Ident(Ident::new("b", (5, 6))).into(),
+                }.into(),
+                right: IdentifierReference::Ident(Ident::new("c", (10, 11))).into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn instance_of() {
+    parser_test!(
+        input: "a instanceof b instanceof c",
+        expr_output: [
+            BinaryExpression {
+                span: Span::new(0, 27),
+                operator: BinaryOperator::InstanceOf,
+                left: BinaryExpression {
+                    span: Span::new(0, 14),
+                    operator: BinaryOperator::InstanceOf,
+                    left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                    right: IdentifierReference::Ident(Ident::new("b", (13, 14))).into(),
+                }.into(),
+                right: IdentifierReference::Ident(Ident::new("c", (26, 27))).into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn in_() {
+    parser_test!(
+        input: "a in b in c",
+        expr_output: [
+            BinaryExpression {
+                span: Span::new(0, 11),
+                operator: BinaryOperator::In,
+                left: BinaryExpression {
+                    span: Span::new(0, 6),
+                    operator: BinaryOperator::In,
+                    left: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                    right: IdentifierReference::Ident(Ident::new("b", (5, 6))).into(),
+                }.into(),
+                right: IdentifierReference::Ident(Ident::new("c", (10, 11))).into(),
+            }.into()
+        ]
+    );
+}

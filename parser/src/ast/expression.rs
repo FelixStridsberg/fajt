@@ -101,4 +101,10 @@ pub enum BinaryOperator {
     ShiftLeft,
     ShiftRight,
     ShiftRightUnsigned,
+    LessThan,
+    MoreThan,
+    LessThanEquals,
+    MoreThanEquals,
+    InstanceOf,
+    In,
 }

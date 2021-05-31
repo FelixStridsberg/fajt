@@ -77,13 +77,15 @@ impl Parser<'_, '_> {
 
     /// Parses the `RelationalExpression` goal symbol.
     fn parse_relational_expression(&mut self) -> Result<Expression> {
-        self.parse_shift_expression()
-        // TODO RelationalExpression < ShiftExpression
-        // TODO RelationalExpression > ShiftExpression
-        // TODO RelationalExpression <= ShiftExpression
-        // TODO RelationalExpression >= ShiftExpression
-        // TODO RelationalExpression instanceof ShiftExpression
-        // TODO RelationalExpression in ShiftExpression
+        self.parse_binary_expression(Self::parse_shift_expression, |token| match token {
+            token_matches!(punct!("<")) => Some(BinaryOperator::LessThan),
+            token_matches!(punct!(">")) => Some(BinaryOperator::MoreThan),
+            token_matches!(punct!("<=")) => Some(BinaryOperator::LessThanEquals),
+            token_matches!(punct!(">=")) => Some(BinaryOperator::MoreThanEquals),
+            token_matches!(keyword!("instanceof")) => Some(BinaryOperator::InstanceOf),
+            token_matches!(keyword!("in")) => Some(BinaryOperator::In),
+            _ => None,
+        })
     }
 
     /// Parses the `ShiftExpression` goal symbol.
