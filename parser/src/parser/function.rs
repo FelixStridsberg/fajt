@@ -8,12 +8,6 @@ use fajt_lexer::token_matches;
 
 impl Parser<'_, '_> {
     /// Parses the `AsyncFunctionDeclaration` goal symbol.
-    ///
-    /// Example:
-    /// ```no_rust
-    /// async function fn( ...args ) { return 1 };
-    /// ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-    /// ```
     pub(super) fn parse_async_function_declaration(&mut self) -> Result<Statement> {
         let span_start = self.position();
         let token = self.reader.consume()?;
@@ -30,12 +24,6 @@ impl Parser<'_, '_> {
     }
 
     /// Parses the `FunctionDeclaration` goal symbol.
-    ///
-    /// Example:
-    /// ```no_rust
-    /// function fn( a, ...args ) { return 1 };
-    /// ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-    /// ```
     pub(super) fn parse_function_declaration(&mut self) -> Result<Statement> {
         let span_start = self.position();
         let token = self.reader.consume()?;
@@ -78,12 +66,6 @@ impl Parser<'_, '_> {
     }
 
     /// Parses the `FormalParameters` goal symbol.
-    ///
-    /// Example:
-    /// ```no_rust
-    /// function fn(a, b, ...c) {}
-    ///             ^~~~~~~~~^
-    /// ```
     pub(super) fn parse_formal_parameters(&mut self) -> Result<Option<FormalParameters>> {
         let span_start = self.position();
         let token = self.reader.consume()?;
@@ -124,14 +106,6 @@ impl Parser<'_, '_> {
     }
 
     /// Parses the `FunctionBody` or `AsyncFunctionBody` goal symbol.
-    /// Note: Only the +Await and ~Yield is different between async an non async, that is implicit
-    /// by the context.
-    ///
-    /// Example:
-    /// ```no_rust
-    /// function fn() { var a = 1; }
-    ///               ^~~~~~~~~~~~~^
-    /// ```
     pub(super) fn parse_function_body(&mut self) -> Result<Vec<Statement>> {
         let token = self.reader.consume()?;
         if !token_matches!(token, punct!("{")) {

@@ -11,8 +11,6 @@ use fajt_lexer::token_matches;
 
 impl Parser<'_, '_> {
     /// Parses the `BindingPattern` goal symbol.
-    ///
-    /// TODO move out of here, use for other than vars.
     pub(super) fn parse_binding_pattern(&mut self) -> Result<BindingPattern> {
         Ok(match self.reader.current()? {
             token_matches!(punct!("{")) => self.parse_object_binding_pattern()?,
@@ -23,12 +21,6 @@ impl Parser<'_, '_> {
     }
 
     /// Parses the `ObjectBindingPattern` goal symbol.
-    ///
-    /// Example:
-    /// ```no_rust
-    /// var { a, b: c, ...rest} = d;
-    ///     ^~~~~~~~~~~~~~~~~~~~~~~^
-    /// ```
     fn parse_object_binding_pattern(&mut self) -> Result<BindingPattern> {
         let span_start = self.position();
         let token = self.reader.consume()?;
@@ -82,12 +74,6 @@ impl Parser<'_, '_> {
     }
 
     /// Parses the `ArrayBindingPattern` goal symbol.
-    ///
-    /// Example:
-    /// ```no_rust
-    /// var [ a, b, ...rest ] = c;
-    ///     ^~~~~~~~~~~~~~~~^
-    /// ```
     fn parse_array_binding_pattern(&mut self) -> Result<BindingPattern> {
         let span_start = self.position();
         let token = self.reader.consume()?;
@@ -137,9 +123,6 @@ impl Parser<'_, '_> {
     }
 
     /// Parses the `BindingElement` goal symbol.
-    ///
-    /// Examples:
-    /// TODO
     pub(super) fn parse_binding_element(&mut self) -> Result<BindingElement> {
         let span_start = self.position();
         let pattern = self.parse_binding_pattern()?;
@@ -159,21 +142,6 @@ impl Parser<'_, '_> {
     }
 
     /// Parses the `BindingRestElement` goal symbol.
-    ///
-    /// Examples:
-    /// ```no_rust
-    /// var [a, ...b] = c;
-    ///         ^~~^
-    ///
-    /// var [a, ...[b, c]] = d;
-    ///         ^~~~~~~~^
-    ///
-    /// var [ ...{a}] = b;
-    ///       ^~~~~^
-    ///
-    /// function fn(...a) {}
-    ///             ^~~^
-    /// ```
     pub(super) fn parse_binding_rest_element(&mut self) -> Result<BindingPattern> {
         let token = self.reader.consume()?;
         debug_assert_eq!(token.value, punct!("..."));
@@ -182,14 +150,6 @@ impl Parser<'_, '_> {
 
     /// Parses the `BindingIdentifier` goal symbol.
     /// This also consumes the expected end punctuator.
-    ///
-    /// Examples:
-    /// ```no_rust
-    /// var { ...rest } = a;
-    ///          ^~~~~^
-    /// var [ ...rest ] = a;
-    ///          ^~~~~^
-    /// ```
     fn parse_rest_binding_ident(&mut self, expected_end: Punct) -> Result<Option<Ident>> {
         let ident = self.parse_identifier()?;
         let end_token = self.reader.consume()?;

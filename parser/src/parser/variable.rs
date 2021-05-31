@@ -6,13 +6,7 @@ use fajt_lexer::token::Span;
 use fajt_lexer::token_matches;
 
 impl Parser<'_, '_> {
-    /// Parses the `VariableStatement` and `LexicalDeclaration` goal symbols.
-    ///
-    /// Example:
-    /// ```no_rust
-    /// var a = 2 + b, c = 2;
-    /// ^~~~~~~~~~~~~~~~~~~~^
-    /// ```
+    /// Parses the `VariableStatement` or `LexicalDeclaration` goal symbol.
     pub(super) fn parse_variable_statement(&mut self, kind: VariableKind) -> Result<Statement> {
         let token = self.reader.consume()?;
         let start = token.span.start;
@@ -30,13 +24,7 @@ impl Parser<'_, '_> {
         .into())
     }
 
-    /// Parses the `VariableDeclaration` and `LexicalBinding` goal symbols.
-    ///
-    /// Example:
-    /// ```no_rust
-    /// var a = 2 + b, c = 2;
-    ///     ^~~~~~~~^  ^~~~~^
-    /// ```
+    /// Parses the `VariableDeclaration` or `LexicalBinding` goal symbol.
     fn parse_variable_declaration(&mut self) -> Result<VariableDeclaration> {
         let span_start = self.position();
         let pattern = self.parse_binding_pattern()?;

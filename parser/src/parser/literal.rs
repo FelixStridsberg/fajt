@@ -19,13 +19,7 @@ impl Parser<'_, '_> {
         .into())
     }
 
-    /// Parses the `Literal` goal symbol, which is part of `PrimaryExpression`.
-    ///
-    /// Example:
-    /// ```no_rust
-    /// return ["success", 200, 0x6A, true];
-    ///         ^~~~~~~~^  ^~^  ^~~^  ^~~^
-    /// ```
+    /// Parses the `Literal` goal symbol.
     pub(super) fn parse_literal(&mut self) -> Result<Expression> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, @literal));
@@ -41,13 +35,7 @@ impl Parser<'_, '_> {
         }
     }
 
-    /// Parses the `ArrayLiteral` goal symbol, which is part of `PrimaryExpression`.
-    ///
-    /// Example:
-    /// ```no_rust
-    /// var a = [ a, 1, ...spread ];
-    ///         ^~~~~~~~~~~~~~~~~~^
-    /// ```
+    /// Parses the `ArrayLiteral` goal symbol.
     pub(super) fn parse_array_literal(&mut self) -> Result<Expression> {
         let span_start = self.position();
         let token = self.reader.consume()?;
@@ -86,13 +74,7 @@ impl Parser<'_, '_> {
         .into())
     }
 
-    /// Parses the `ObjectLiteral` goal symbol, which is part of `PrimaryExpression`.
-    ///
-    /// Example:
-    /// ```no_rust
-    /// var a = { a, b: 1, ...spread };
-    ///         ^~~~~~~~~~~~~~~~~~~~~^
-    /// ```
+    /// Parses the `ObjectLiteral` goal symbol.
     pub(super) fn parse_object_literal(&mut self) -> Result<Expression> {
         let span_start = self.position();
         let token = self.reader.consume()?;

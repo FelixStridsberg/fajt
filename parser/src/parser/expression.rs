@@ -100,12 +100,6 @@ impl Parser<'_, '_> {
     }
 
     /// Parses the `this` expression which is part of the `PrimaryExpression` goal symbol.
-    ///
-    /// Example:
-    /// ```no_rust
-    /// this
-    /// ^~~^
-    /// ```
     fn parse_this_expression(&mut self) -> Result<Expression> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, keyword!("this")));
@@ -113,13 +107,7 @@ impl Parser<'_, '_> {
         Ok(ThisExpression::new(token.span).into())
     }
 
-    /// Parses the `IdentifierReference` goal symbol, which is part of the `PrimaryExpression`.
-    ///
-    /// Example:
-    /// ```no_rust
-    /// var foo = bar;
-    ///           ^~^
-    /// ```
+    /// Parses the `IdentifierReference` goal symbol.
     fn parse_identifier_reference(&mut self) -> Result<Expression> {
         let ident = self.parse_identifier()?;
 
@@ -132,12 +120,6 @@ impl Parser<'_, '_> {
     }
 
     /// Parses the `Initializer` goal symbol.
-    ///
-    /// Example:
-    /// ```no_rust
-    /// var a = 1 + 2, b = 100;
-    ///         ^~~~^      ^~^
-    /// ```
     pub(super) fn parse_initializer(&mut self) -> Result<Expression> {
         self.reader.consume()?; // Skip =
         self.parse_assignment_expression()
