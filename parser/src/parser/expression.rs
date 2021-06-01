@@ -1,5 +1,7 @@
 use crate::ast::Expression::IdentifierReference;
-use crate::ast::{Expression, Literal, ThisExpression, UnaryExpression, UpdateExpression};
+use crate::ast::{
+    Expression, Literal, ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
+};
 use crate::error::Result;
 use crate::Parser;
 
@@ -16,11 +18,32 @@ impl Parser<'_, '_> {
 
     /// Parses the `AssignmentExpression` goal symbol.
     pub(super) fn parse_assignment_expression(&mut self) -> Result<Expression> {
-        self.parse_conditional_expression()
-        // TODO YieldExpression
+        match self.reader.current() {
+            token_matches!(ok: keyword!("yield")) => self.parse_yield_expression(),
+            _ => self.parse_conditional_expression(),
+        }
+
         // TODO ArrowFunction
         // TODO AsyncArrowFunction
         // TODO LeftHandSideExpression
+    }
+
+    // Parses the `YieldExpression` goal symbol.
+    fn parse_yield_expression(&mut self) -> Result<Expression> {
+        let span_start = self.position();
+        let yield_token = self.reader.consume()?;
+        debug_assert!(token_matches!(yield_token, keyword!("yield")));
+
+        if let Ok(_token) = self.reader.current() {
+            todo!("rest of YieldExpression")
+        } else {
+            let span = self.span_from(span_start);
+            Ok(Expression::YieldExpression(Box::new(YieldExpression {
+                span,
+                argument: None,
+                delegate: false,
+            })))
+        }
     }
 
     /// Parses the `ConditionalExpression` goal symbol.
@@ -115,8 +138,11 @@ impl Parser<'_, '_> {
 
     /// Parses the `NewExpression` goal symbol.
     fn parse_new_expression(&mut self) -> Result<Expression> {
-        self.parse_member_expression()
-        // TODO new NewExpression
+        if token_matches!(self.reader.current(), ok: keyword!("new")) {
+            todo!("NewExpression")
+        } else {
+            self.parse_member_expression()
+        }
     }
 
     /// Parses the `MemberExpression` goal symbol.

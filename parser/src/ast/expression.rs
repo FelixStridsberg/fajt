@@ -13,6 +13,7 @@ pub enum Expression {
     LogicalExpression(Box<LogicalExpression>),
     UnaryExpression(Box<UnaryExpression>),
     UpdateExpression(Box<UpdateExpression>),
+    YieldExpression(Box<YieldExpression>),
 }
 
 impl Expression {
@@ -68,6 +69,12 @@ impl From<UnaryExpression> for Expression {
 impl From<UpdateExpression> for Expression {
     fn from(expr: UpdateExpression) -> Self {
         Self::UpdateExpression(Box::new(expr))
+    }
+}
+
+impl From<YieldExpression> for Expression {
+    fn from(expr: YieldExpression) -> Self {
+        Self::YieldExpression(Box::new(expr))
     }
 }
 
@@ -241,4 +248,11 @@ pub enum UpdateOperator {
     Increase,
     #[from_string("--")]
     Decrease,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct YieldExpression {
+    pub span: Span,
+    pub argument: Option<Expression>,
+    pub delegate: bool,
 }
