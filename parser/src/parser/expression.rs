@@ -1,5 +1,5 @@
 use crate::ast::Expression::IdentifierReference;
-use crate::ast::{Expression, Literal, ThisExpression, UnaryExpression};
+use crate::ast::{Expression, Literal, ThisExpression, UnaryExpression, UpdateExpression};
 use crate::error::Result;
 use crate::Parser;
 
@@ -61,6 +61,24 @@ impl Parser<'_, '_> {
 
     /// Parses the `UpdateExpression` goal symbol.
     fn parse_update_expression(&mut self) -> Result<Expression> {
+        let prefix_operator = match self.reader.current()? {
+            token_matches!(punct!("++")) => Some(update_op!("++")),
+            _ => None,
+        };
+
+        if let Some(operator) = prefix_operator {
+            let span_start = self.position();
+            self.reader.consume()?;
+            let argument = self.parse_unary_expression()?;
+            let span = self.span_from(span_start);
+            return Ok(Expression::UpdateExpression(Box::new(UpdateExpression {
+                span,
+                operator,
+                prefix: true,
+                argument,
+            })));
+        }
+
         self.parse_left_hand_side_expression()
         // TODO LeftHandSideExpression [no LineTerminator] ++
         // TODO LeftHandSideExpression [no LineTerminator] --

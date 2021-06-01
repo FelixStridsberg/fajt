@@ -12,6 +12,7 @@ pub enum Expression {
     BinaryExpression(Box<BinaryExpression>),
     LogicalExpression(Box<LogicalExpression>),
     UnaryExpression(Box<UnaryExpression>),
+    UpdateExpression(Box<UpdateExpression>),
 }
 
 impl Expression {
@@ -61,6 +62,12 @@ impl From<LogicalExpression> for Expression {
 impl From<UnaryExpression> for Expression {
     fn from(expr: UnaryExpression) -> Self {
         Self::UnaryExpression(Box::new(expr))
+    }
+}
+
+impl From<UpdateExpression> for Expression {
+    fn from(expr: UpdateExpression) -> Self {
+        Self::UpdateExpression(Box::new(expr))
     }
 }
 
@@ -212,4 +219,26 @@ pub enum UnaryOperator {
     BitwiseNot,
     #[from_string("!")]
     Not,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct UpdateExpression {
+    pub span: Span,
+    pub operator: UpdateOperator,
+    pub prefix: bool,
+    pub argument: Expression,
+}
+
+#[derive(Debug, PartialOrd, PartialEq, FromString)]
+#[from_string_macro("update_op")]
+#[from_string_macro_rules(
+    ($variant:ident) => {
+        $crate::ast::UpdateOperator::$variant
+    };
+)]
+pub enum UpdateOperator {
+    #[from_string("++")]
+    Increase,
+    #[from_string("--")]
+    Decrease,
 }
