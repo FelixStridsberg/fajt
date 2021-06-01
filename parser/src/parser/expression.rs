@@ -34,33 +34,28 @@ impl Parser<'_, '_> {
         let yield_token = self.reader.consume()?;
         debug_assert!(token_matches!(yield_token, keyword!("yield")));
 
-        if let Ok(token) = self.reader.current() {
-            if token_matches!(token, punct!("*")) {
-                self.reader.consume()?;
-                let argument = self.parse_assignment_expression()?;
-                let span = self.span_from(span_start);
-                Ok(Expression::YieldExpression(Box::new(YieldExpression {
-                    span,
-                    argument: Some(argument),
-                    delegate: true,
-                })))
-            } else {
-                let argument = self.parse_assignment_expression()?;
-                let span = self.span_from(span_start);
-                Ok(Expression::YieldExpression(Box::new(YieldExpression {
-                    span,
-                    argument: Some(argument),
-                    delegate: false,
-                })))
-            }
-        } else {
+        if self.reader.is_end() {
             let span = self.span_from(span_start);
-            Ok(Expression::YieldExpression(Box::new(YieldExpression {
+            return Ok(Expression::YieldExpression(Box::new(YieldExpression {
                 span,
                 argument: None,
                 delegate: false,
-            })))
+            })));
         }
+
+        let next_token = self.reader.current()?;
+        let delegate = token_matches!(next_token, punct!("*"));
+        if delegate {
+            self.reader.consume()?;
+        }
+
+        let argument = self.parse_assignment_expression()?;
+        let span = self.span_from(span_start);
+        Ok(Expression::YieldExpression(Box::new(YieldExpression {
+            span,
+            argument: Some(argument),
+            delegate,
+        })))
     }
 
     /// Parses the `ConditionalExpression` goal symbol.
