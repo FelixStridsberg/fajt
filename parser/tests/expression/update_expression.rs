@@ -30,3 +30,33 @@ fn prefix_decrease() {
         ]
     );
 }
+
+#[test]
+fn suffix_increase() {
+    parser_test!(
+        input: "a++",
+        expr_output: [
+            UpdateExpression {
+                span: Span::new(0, 3),
+                operator: UpdateOperator::Increase,
+                prefix: false,
+                argument: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn suffix_decrease() {
+    parser_test!(
+        input: "a--",
+        expr_output: [
+            UpdateExpression {
+                span: Span::new(0, 3),
+                operator: UpdateOperator::Decrease,
+                prefix: false,
+                argument: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+            }.into()
+        ]
+    );
+}

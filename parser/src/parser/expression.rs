@@ -80,9 +80,26 @@ impl Parser<'_, '_> {
             })));
         }
 
-        self.parse_left_hand_side_expression()
-        // TODO LeftHandSideExpression [no LineTerminator] ++
-        // TODO LeftHandSideExpression [no LineTerminator] --
+        let span_start = self.position();
+        let argument = self.parse_left_hand_side_expression()?;
+        let suffix_operator = match self.reader.current() {
+            token_matches!(ok: punct!("++")) => Some(update_op!("++")),
+            token_matches!(ok: punct!("--")) => Some(update_op!("--")),
+            _ => None,
+        };
+
+        if let Some(operator) = suffix_operator {
+            self.reader.consume()?;
+            let span = self.span_from(span_start);
+            Ok(Expression::UpdateExpression(Box::new(UpdateExpression {
+                span,
+                operator,
+                prefix: false,
+                argument,
+            })))
+        } else {
+            Ok(argument)
+        }
     }
 
     /// Parses the `LeftHandSideExpression` goal symbol.
