@@ -56,3 +56,45 @@ fn not() {
         ]
     );
 }
+
+#[test]
+fn delete() {
+    parser_test!(
+        input: "delete a",
+        expr_output: [
+            UnaryExpression {
+                span: Span::new(0, 8),
+                operator: UnaryOperator::Delete,
+                argument: IdentifierReference::Ident(Ident::new("a", (7, 8))).into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn void() {
+    parser_test!(
+        input: "void a",
+        expr_output: [
+            UnaryExpression {
+                span: Span::new(0, 6),
+                operator: UnaryOperator::Void,
+                argument: IdentifierReference::Ident(Ident::new("a", (5, 6))).into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn typeof_() {
+    parser_test!(
+        input: "typeof a",
+        expr_output: [
+            UnaryExpression {
+                span: Span::new(0, 8),
+                operator: UnaryOperator::Typeof,
+                argument: IdentifierReference::Ident(Ident::new("a", (7, 8))).into(),
+            }.into()
+        ]
+    );
+}

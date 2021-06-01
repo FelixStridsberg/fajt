@@ -198,6 +198,12 @@ pub struct UnaryExpression {
     };
 )]
 pub enum UnaryOperator {
+    #[from_string("delete")]
+    Delete,
+    #[from_string("void")]
+    Void,
+    #[from_string("typeof")]
+    Typeof,
     #[from_string("+")]
     Plus,
     #[from_string("-")]

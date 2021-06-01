@@ -36,6 +36,9 @@ impl Parser<'_, '_> {
             token_matches!(punct!("-")) => Some(unary_op!("-")),
             token_matches!(punct!("~")) => Some(unary_op!("~")),
             token_matches!(punct!("!")) => Some(unary_op!("!")),
+            token_matches!(keyword!("delete")) => Some(unary_op!("delete")),
+            token_matches!(keyword!("void")) => Some(unary_op!("void")),
+            token_matches!(keyword!("typeof")) => Some(unary_op!("typeof")),
             _ => None,
         };
 
@@ -53,8 +56,6 @@ impl Parser<'_, '_> {
             self.parse_update_expression()
         }
 
-        // TODO delete UnaryExpression
-        // TODO typeof UnaryExpression
         // TODO AwaitExpression (await UnaryExpression)
     }
 
