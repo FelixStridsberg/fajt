@@ -63,6 +63,7 @@ impl Parser<'_, '_> {
     fn parse_update_expression(&mut self) -> Result<Expression> {
         let prefix_operator = match self.reader.current()? {
             token_matches!(punct!("++")) => Some(update_op!("++")),
+            token_matches!(punct!("--")) => Some(update_op!("--")),
             _ => None,
         };
 
@@ -82,8 +83,6 @@ impl Parser<'_, '_> {
         self.parse_left_hand_side_expression()
         // TODO LeftHandSideExpression [no LineTerminator] ++
         // TODO LeftHandSideExpression [no LineTerminator] --
-        // TODO ++ UnaryExpression
-        // TODO -- UnaryExpression
     }
 
     /// Parses the `LeftHandSideExpression` goal symbol.

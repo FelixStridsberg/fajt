@@ -15,3 +15,18 @@ fn prefix_increase() {
         ]
     );
 }
+
+#[test]
+fn prefix_decrease() {
+    parser_test!(
+        input: "--a",
+        expr_output: [
+            UpdateExpression {
+                span: Span::new(0, 3),
+                operator: UpdateOperator::Decrease,
+                prefix: true,
+                argument: IdentifierReference::Ident(Ident::new("a", (2, 3))).into(),
+            }.into()
+        ]
+    );
+}
