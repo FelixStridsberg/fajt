@@ -11,6 +11,7 @@ pub enum Expression {
     Literal(Box<LiteralExpression>),
     BinaryExpression(Box<BinaryExpression>),
     LogicalExpression(Box<LogicalExpression>),
+    UnaryExpression(Box<UnaryExpression>),
 }
 
 impl Expression {
@@ -54,6 +55,12 @@ impl From<BinaryExpression> for Expression {
 impl From<LogicalExpression> for Expression {
     fn from(expr: LogicalExpression) -> Self {
         Self::LogicalExpression(Box::new(expr))
+    }
+}
+
+impl From<UnaryExpression> for Expression {
+    fn from(expr: UnaryExpression) -> Self {
+        Self::UnaryExpression(Box::new(expr))
     }
 }
 
@@ -174,4 +181,23 @@ pub enum LogicalOperator {
     Or,
     #[from_string("??")]
     Coalesce,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct UnaryExpression {
+    pub span: Span,
+    pub operator: UnaryOperator,
+    pub argument: Expression,
+}
+
+#[derive(Debug, PartialOrd, PartialEq, FromString)]
+#[from_string_macro("unary_op")]
+#[from_string_macro_rules(
+    ($variant:ident) => {
+        $crate::ast::UnaryOperator::$variant
+    };
+)]
+pub enum UnaryOperator {
+    #[from_string("+")]
+    Plus,
 }

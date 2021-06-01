@@ -1,5 +1,5 @@
 use crate::ast::Expression::IdentifierReference;
-use crate::ast::{Expression, Literal, ThisExpression};
+use crate::ast::{Expression, Literal, ThisExpression, UnaryExpression};
 use crate::error::Result;
 use crate::Parser;
 
@@ -31,10 +31,27 @@ impl Parser<'_, '_> {
 
     /// Parses the `UnaryExpression` goal symbol.
     pub(super) fn parse_unary_expression(&mut self) -> Result<Expression> {
-        self.parse_update_expression()
+        let operator = match self.reader.current()? {
+            token_matches!(punct!("+")) => Some(unary_op!("+")),
+            _ => None,
+        };
+
+        if let Some(operator) = operator {
+            let span_start = self.position();
+            self.reader.consume()?;
+            let argument = self.parse_unary_expression()?;
+            let span = self.span_from(span_start);
+            Ok(Expression::UnaryExpression(Box::new(UnaryExpression {
+                span,
+                operator,
+                argument,
+            })))
+        } else {
+            self.parse_update_expression()
+        }
+
         // TODO delete UnaryExpression
         // TODO typeof UnaryExpression
-        // TODO + UnaryExpression
         // TODO - UnaryExpression
         // TODO ~ UnaryExpression
         // TODO ! UnaryExpression

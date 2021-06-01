@@ -4,6 +4,7 @@ mod r#macro;
 mod expression {
     mod binary_expression;
     mod literal;
+    mod unary_expression;
 }
 
 mod statement {
