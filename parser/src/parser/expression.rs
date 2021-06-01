@@ -1,10 +1,12 @@
 use crate::ast::Expression::IdentifierReference;
 use crate::ast::{
-    Expression, Literal, ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
+    ConditionalExpression, Expression, Literal, ThisExpression, UnaryExpression, UpdateExpression,
+    YieldExpression,
 };
 use crate::error::Result;
 use crate::Parser;
 
+use crate::error::ErrorKind::UnexpectedToken;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token_matches;
@@ -65,8 +67,31 @@ impl Parser<'_, '_> {
 
     /// Parses the `ConditionalExpression` goal symbol.
     fn parse_conditional_expression(&mut self) -> Result<Expression> {
-        self.parse_short_circuit_expression()
-        // TODO ShortCircuitExpression ? AssignmentExpression : AssignmentExpression
+        let span_start = self.position();
+        let expression = self.parse_short_circuit_expression()?;
+
+        if token_matches!(self.reader.current(), ok: punct!("?")) {
+            self.reader.consume()?;
+            let consequent = self.parse_assignment_expression()?;
+
+            let token = self.reader.consume()?;
+            if !token_matches!(token, punct!(":")) {
+                return err!(UnexpectedToken(token));
+            }
+
+            let alternate = self.parse_assignment_expression()?;
+            let span = self.span_from(span_start);
+            Ok(Expression::ConditionalExpression(Box::new(
+                ConditionalExpression {
+                    span,
+                    condition: expression,
+                    consequent,
+                    alternate,
+                },
+            )))
+        } else {
+            Ok(expression)
+        }
     }
 
     /// Parses the `UnaryExpression` goal symbol.

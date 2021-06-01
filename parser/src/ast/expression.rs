@@ -14,6 +14,7 @@ pub enum Expression {
     UnaryExpression(Box<UnaryExpression>),
     UpdateExpression(Box<UpdateExpression>),
     YieldExpression(Box<YieldExpression>),
+    ConditionalExpression(Box<ConditionalExpression>),
 }
 
 impl Expression {
@@ -69,6 +70,12 @@ impl From<UnaryExpression> for Expression {
 impl From<UpdateExpression> for Expression {
     fn from(expr: UpdateExpression) -> Self {
         Self::UpdateExpression(Box::new(expr))
+    }
+}
+
+impl From<ConditionalExpression> for Expression {
+    fn from(expr: ConditionalExpression) -> Self {
+        Self::ConditionalExpression(Box::new(expr))
     }
 }
 
@@ -255,4 +262,12 @@ pub struct YieldExpression {
     pub span: Span,
     pub argument: Option<Expression>,
     pub delegate: bool,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct ConditionalExpression {
+    pub span: Span,
+    pub condition: Expression,
+    pub consequent: Expression,
+    pub alternate: Expression,
 }
