@@ -34,8 +34,18 @@ impl Parser<'_, '_> {
         let yield_token = self.reader.consume()?;
         debug_assert!(token_matches!(yield_token, keyword!("yield")));
 
-        if let Ok(_token) = self.reader.current() {
-            todo!("rest of YieldExpression")
+        if let Ok(token) = self.reader.current() {
+            if token_matches!(token, punct!("*")) {
+                todo!("delegated YieldExpression")
+            } else {
+                let argument = self.parse_assignment_expression()?;
+                let span = self.span_from(span_start);
+                Ok(Expression::YieldExpression(Box::new(YieldExpression {
+                    span,
+                    argument: Some(argument),
+                    delegate: false,
+                })))
+            }
         } else {
             let span = self.span_from(span_start);
             Ok(Expression::YieldExpression(Box::new(YieldExpression {

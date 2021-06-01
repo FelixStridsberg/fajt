@@ -14,3 +14,17 @@ fn empty_yield() {
         ]
     );
 }
+
+#[test]
+fn yield_a() {
+    parser_test!(
+        input: "yield a",
+        expr_output: [
+            YieldExpression {
+                span: Span::new(0, 7),
+                argument: Some(IdentifierReference::Ident(Ident::new("a", (6, 7))).into()),
+                delegate: false,
+            }.into()
+        ]
+    );
+}
