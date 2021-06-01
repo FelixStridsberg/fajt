@@ -200,4 +200,10 @@ pub struct UnaryExpression {
 pub enum UnaryOperator {
     #[from_string("+")]
     Plus,
+    #[from_string("-")]
+    Minus,
+    #[from_string("~")]
+    BitwiseNot,
+    #[from_string("!")]
+    Not,
 }

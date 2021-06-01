@@ -33,6 +33,9 @@ impl Parser<'_, '_> {
     pub(super) fn parse_unary_expression(&mut self) -> Result<Expression> {
         let operator = match self.reader.current()? {
             token_matches!(punct!("+")) => Some(unary_op!("+")),
+            token_matches!(punct!("-")) => Some(unary_op!("-")),
+            token_matches!(punct!("~")) => Some(unary_op!("~")),
+            token_matches!(punct!("!")) => Some(unary_op!("!")),
             _ => None,
         };
 
@@ -52,9 +55,6 @@ impl Parser<'_, '_> {
 
         // TODO delete UnaryExpression
         // TODO typeof UnaryExpression
-        // TODO - UnaryExpression
-        // TODO ~ UnaryExpression
-        // TODO ! UnaryExpression
         // TODO AwaitExpression (await UnaryExpression)
     }
 
