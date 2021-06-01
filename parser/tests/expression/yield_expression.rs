@@ -28,3 +28,17 @@ fn yield_a() {
         ]
     );
 }
+
+#[test]
+fn delegated_yield() {
+    parser_test!(
+        input: "yield* a",
+        expr_output: [
+            YieldExpression {
+                span: Span::new(0, 8),
+                argument: Some(IdentifierReference::Ident(Ident::new("a", (7, 8))).into()),
+                delegate: true,
+            }.into()
+        ]
+    );
+}
