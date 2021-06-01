@@ -66,6 +66,11 @@ where
         }
     }
 
+    /// Returns true if the next token would result in `Error::EndOfStream`.
+    pub fn is_end(&self) -> bool {
+        self.current.is_none()
+    }
+
     /// Peek at the item that will become current after next consume.
     pub fn peek(&self) -> Option<&T> {
         self.next.as_ref().map(|(_, item)| item)
