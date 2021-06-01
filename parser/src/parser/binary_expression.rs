@@ -152,12 +152,13 @@ impl Parser<'_, '_> {
         map_operator: fn(&Token) -> Option<BinaryOperator>,
     ) -> Result<Expression> {
         self.parse_recursive_binary_expression(next, map_operator, |span, left, right, operator| {
-            Expression::BinaryExpression(Box::new(BinaryExpression {
+            BinaryExpression {
                 span,
                 left,
                 right,
                 operator,
-            }))
+            }
+            .into()
         })
     }
 
@@ -173,12 +174,13 @@ impl Parser<'_, '_> {
         map_operator: fn(&Token) -> Option<LogicalOperator>,
     ) -> Result<Expression> {
         self.parse_recursive_binary_expression(next, map_operator, |span, left, right, operator| {
-            Expression::LogicalExpression(Box::new(LogicalExpression {
+            LogicalExpression {
                 span,
                 left,
                 right,
                 operator,
-            }))
+            }
+            .into()
         })
     }
 

@@ -1,12 +1,11 @@
-use crate::ast::Expression::IdentifierReference;
 use crate::ast::{
     ConditionalExpression, Expression, Literal, ThisExpression, UnaryExpression, UpdateExpression,
     YieldExpression,
 };
+use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 use crate::Parser;
 
-use crate::error::ErrorKind::UnexpectedToken;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token_matches;
@@ -38,11 +37,12 @@ impl Parser<'_, '_> {
 
         if self.reader.is_end() {
             let span = self.span_from(span_start);
-            return Ok(Expression::YieldExpression(Box::new(YieldExpression {
+            return Ok(YieldExpression {
                 span,
                 argument: None,
                 delegate: false,
-            })));
+            }
+            .into());
         }
 
         let next_token = self.reader.current()?;
@@ -58,11 +58,12 @@ impl Parser<'_, '_> {
             None
         };
         let span = self.span_from(span_start);
-        Ok(Expression::YieldExpression(Box::new(YieldExpression {
+        Ok(YieldExpression {
             span,
             argument,
             delegate,
-        })))
+        }
+        .into())
     }
 
     /// Parses the `ConditionalExpression` goal symbol.
@@ -81,14 +82,13 @@ impl Parser<'_, '_> {
 
             let alternate = self.parse_assignment_expression()?;
             let span = self.span_from(span_start);
-            Ok(Expression::ConditionalExpression(Box::new(
-                ConditionalExpression {
-                    span,
-                    condition: expression,
-                    consequent,
-                    alternate,
-                },
-            )))
+            Ok(ConditionalExpression {
+                span,
+                condition: expression,
+                consequent,
+                alternate,
+            }
+            .into())
         } else {
             Ok(expression)
         }
@@ -112,11 +112,12 @@ impl Parser<'_, '_> {
             self.reader.consume()?;
             let argument = self.parse_unary_expression()?;
             let span = self.span_from(span_start);
-            Ok(Expression::UnaryExpression(Box::new(UnaryExpression {
+            Ok(UnaryExpression {
                 span,
                 operator,
                 argument,
-            })))
+            }
+            .into())
         } else {
             self.parse_update_expression()
         }
@@ -137,12 +138,13 @@ impl Parser<'_, '_> {
             self.reader.consume()?;
             let argument = self.parse_unary_expression()?;
             let span = self.span_from(span_start);
-            return Ok(Expression::UpdateExpression(Box::new(UpdateExpression {
+            return Ok(UpdateExpression {
                 span,
                 operator,
                 prefix: true,
                 argument,
-            })));
+            }
+            .into());
         }
 
         let span_start = self.position();
@@ -160,12 +162,13 @@ impl Parser<'_, '_> {
 
             self.reader.consume()?;
             let span = self.span_from(span_start);
-            Ok(Expression::UpdateExpression(Box::new(UpdateExpression {
+            Ok(UpdateExpression {
                 span,
                 operator,
                 prefix: false,
                 argument,
-            })))
+            }
+            .into())
         } else {
             Ok(argument)
         }
@@ -240,7 +243,7 @@ impl Parser<'_, '_> {
             self.reader.consume()?;
         }
 
-        Ok(IdentifierReference(Box::new(ident.into())))
+        Ok(ident.into())
     }
 
     /// Parses the `Initializer` goal symbol.

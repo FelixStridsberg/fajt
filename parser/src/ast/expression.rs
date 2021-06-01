@@ -43,6 +43,12 @@ impl From<LiteralExpression> for Expression {
     }
 }
 
+impl From<Ident> for Expression {
+    fn from(ident: Ident) -> Self {
+        Self::IdentifierReference(Box::new(ident.into()))
+    }
+}
+
 impl From<IdentifierReference> for Expression {
     fn from(expr: IdentifierReference) -> Self {
         Self::IdentifierReference(Box::new(expr))
