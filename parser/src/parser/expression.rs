@@ -44,16 +44,21 @@ impl Parser<'_, '_> {
         }
 
         let next_token = self.reader.current()?;
-        let delegate = token_matches!(next_token, punct!("*"));
+        let has_argument = !next_token.first_on_line;
+        let delegate = has_argument && token_matches!(next_token, punct!("*"));
         if delegate {
             self.reader.consume()?;
         }
 
-        let argument = self.parse_assignment_expression()?;
+        let argument = if has_argument {
+            Some(self.parse_assignment_expression()?)
+        } else {
+            None
+        };
         let span = self.span_from(span_start);
         Ok(Expression::YieldExpression(Box::new(YieldExpression {
             span,
-            argument: Some(argument),
+            argument,
             delegate,
         })))
     }

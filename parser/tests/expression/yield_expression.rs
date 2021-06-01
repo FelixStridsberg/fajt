@@ -42,3 +42,31 @@ fn delegated_yield() {
         ]
     );
 }
+
+#[test]
+fn yield_new_line() {
+    parser_test!(
+        input: "yield\na",
+        expr_output: [
+            YieldExpression {
+                span: Span::new(0, 5),
+                argument: None,
+                delegate: false,
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn yield_new_line_delegate() {
+    parser_test!(
+        input: "yield\n* a",
+        expr_output: [
+            YieldExpression {
+                span: Span::new(0, 5),
+                argument: None,
+                delegate: false,
+            }.into()
+        ]
+    );
+}
