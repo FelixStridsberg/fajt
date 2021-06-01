@@ -97,7 +97,6 @@ pub enum Keyword {
     Let,
     New,
     Null,
-    Of,
     Package,
     Private,
     Protected,
@@ -112,7 +111,7 @@ pub enum Keyword {
     Throw,
     True,
     Try,
-    Type,
+    Typeof,
     Var,
     Void,
     While,
@@ -134,13 +133,7 @@ impl Keyword {
     /// True if the keyword is allowed to be an identifier in the context provided.
     pub fn is_allows_as_identifier(&self, ctx: KeywordContext) -> bool {
         match self {
-            Self::As
-            | Self::Async
-            | Self::From
-            | Self::Get
-            | Self::Of
-            | Self::Set
-            | Self::Target => true,
+            Self::As | Self::Async | Self::From | Self::Get | Self::Set | Self::Target => true,
             Self::Await if !ctx.contains(KeywordContext::AWAIT) => true,
             Self::Yield if !ctx.contains(KeywordContext::YIELD) => true,
             Self::Implements
