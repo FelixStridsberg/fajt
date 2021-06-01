@@ -1,5 +1,15 @@
 #[macro_export]
-macro_rules! parser_test{
+macro_rules! parse {
+    (expr: $input:literal) => {{
+        let lexer = fajt_lexer::Lexer::new(&$input).unwrap();
+        let mut reader = fajt_common::io::PeekReader::new(lexer).unwrap();
+        let mut parser = fajt_parser::Parser::new(&mut reader).unwrap();
+        parser.parse_expr().unwrap()
+    }};
+}
+
+#[macro_export]
+macro_rules! parser_test {
     (input: $input:literal, success) => {
         let lexer = fajt_lexer::Lexer::new(&$input).unwrap();
         let mut reader = fajt_common::io::PeekReader::new(lexer).unwrap();

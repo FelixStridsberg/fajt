@@ -89,6 +89,10 @@ impl Parser<'_, '_> {
         };
 
         if let Some(operator) = suffix_operator {
+            if self.reader.current()?.first_on_line {
+                return Ok(argument)
+            }
+
             self.reader.consume()?;
             let span = self.span_from(span_start);
             Ok(Expression::UpdateExpression(Box::new(UpdateExpression {
