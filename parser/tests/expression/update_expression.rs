@@ -63,12 +63,12 @@ fn suffix_decrease() {
 
 #[test]
 fn suffix_increase_no_new_line() {
-    let a = parse!(expr: "a\n++");
+    let a = parse!(expr: "a\n++").unwrap();
     assert!(!matches!(a, Expression::UpdateExpression(_)))
 }
 
 #[test]
 fn suffix_decrease_no_new_line() {
-    let a = parse!(expr: "a\n--");
+    let a = parse!(expr: "a\n--").unwrap();
     assert!(!matches!(a, Expression::UpdateExpression(_)))
 }

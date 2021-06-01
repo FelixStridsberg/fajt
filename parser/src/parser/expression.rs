@@ -90,7 +90,7 @@ impl Parser<'_, '_> {
 
         if let Some(operator) = suffix_operator {
             if self.reader.current()?.first_on_line {
-                return Ok(argument)
+                return Ok(argument);
             }
 
             self.reader.consume()?;
