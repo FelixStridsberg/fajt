@@ -1,6 +1,6 @@
 use crate::ast::{
-    ConditionalExpression, Expression, Literal, ThisExpression, UnaryExpression, UpdateExpression,
-    YieldExpression,
+    AwaitExpression, ConditionalExpression, Expression, Literal, ThisExpression, UnaryExpression,
+    UpdateExpression, YieldExpression,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
@@ -104,6 +104,13 @@ impl Parser<'_, '_> {
             token_matches!(keyword!("delete")) => Some(unary_op!("delete")),
             token_matches!(keyword!("void")) => Some(unary_op!("void")),
             token_matches!(keyword!("typeof")) => Some(unary_op!("typeof")),
+            token_matches!(keyword!("await")) => {
+                let span_start = self.position();
+                self.reader.consume()?;
+                let argument = self.parse_unary_expression()?;
+                let span = self.span_from(span_start);
+                return Ok(AwaitExpression { span, argument }.into());
+            }
             _ => None,
         };
 
@@ -121,8 +128,6 @@ impl Parser<'_, '_> {
         } else {
             self.parse_update_expression()
         }
-
-        // TODO AwaitExpression (await UnaryExpression)
     }
 
     /// Parses the `UpdateExpression` goal symbol.
@@ -206,7 +211,6 @@ impl Parser<'_, '_> {
         Ok(match self.reader.current()? {
             token_matches!(keyword!("this")) => self.parse_this_expression()?,
             token_matches!(keyword!("yield")) => unimplemented!(),
-            token_matches!(keyword!("await")) => unimplemented!(),
             token_matches!(keyword!("null")) => self.consume_literal(Literal::Null)?,
             token_matches!(keyword!("true")) => self.consume_literal(Literal::Boolean(true))?,
             token_matches!(keyword!("false")) => self.consume_literal(Literal::Boolean(false))?,
