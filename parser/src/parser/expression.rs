@@ -217,14 +217,24 @@ impl Parser<'_, '_> {
             token_matches!(@literal) => self.parse_literal()?,
             token_matches!(punct!("[")) => self.parse_array_literal()?,
             token_matches!(punct!("{")) => self.parse_object_literal()?,
-            // TODO FunctionExpression
-            // TODO ClassExpression
-            // TODO GeneratorExpression
-            // TODO AsyncFunctionExpression
-            // TODO AsyncGeneratorExpression
-            // TODO RegularExpressionLiteral
-            // TODO TemplateLiteral
-            // TODO CoverParenthesizedExpressionAndArrowParameterList
+            token_matches!(keyword!("function")) => {
+                if token_matches!(self.reader.peek(), opt: punct!("*")) {
+                    todo!("GeneratorExpression")
+                } else {
+                    todo!("FunctionExpression")
+                }
+            }
+            token_matches!(keyword!("class")) => todo!("ClassExpression"),
+            token_matches!(keyword!("async"))
+                if self.reader.peek().map_or(false, |t| !t.first_on_line) =>
+            {
+                todo!("AsyncFunctionExpression and AsyncGeneratorExpression")
+            }
+            token_matches!(punct!("/")) => todo!("RegularExpressionLiteral"),
+            // token_matches!(punct!("`")) => todo!("TemplateLiteral"), TODO missing from lexer
+            token_matches!(punct!("(")) => {
+                todo!("CoverParenthesizedExpressionAndArrowParameterList")
+            }
             _ if self.is_identifier()? => self.parse_identifier_reference()?,
             r => unimplemented!("TOKEN: {:?}", r),
         })
