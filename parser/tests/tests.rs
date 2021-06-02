@@ -2,12 +2,13 @@
 mod r#macro;
 
 mod expression {
-    mod binary_expression;
+    mod binary;
     mod flow_control;
     mod literal;
-    mod unary_expression;
-    mod update_expression;
-    mod yield_expression;
+    mod unary;
+    mod update;
+    mod yield_expr;
+    mod async_expr;
 }
 
 mod statement {
