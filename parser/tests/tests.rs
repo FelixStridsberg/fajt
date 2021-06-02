@@ -4,6 +4,7 @@ mod r#macro;
 mod expression {
     mod async_expr;
     mod binary;
+    mod expression;
     mod flow_control;
     mod literal;
     mod unary;

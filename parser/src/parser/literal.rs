@@ -54,12 +54,12 @@ impl Parser<'_, '_> {
                 }
                 token_matches!(punct!("...")) => {
                     self.reader.consume()?;
-                    let expr = self.parse_expression()?;
+                    let expr = self.parse_assignment_expression()?;
                     elements.push(ArrayElement::Spread(expr));
                     self.consume_array_delimiter()?;
                 }
                 _ => {
-                    let expr = self.parse_expression()?;
+                    let expr = self.parse_assignment_expression()?;
                     elements.push(ArrayElement::Expr(expr));
                     self.consume_array_delimiter()?;
                 }
@@ -89,7 +89,7 @@ impl Parser<'_, '_> {
                 }
                 token_matches!(punct!("...")) => {
                     self.reader.consume()?;
-                    let expr = self.parse_expression()?;
+                    let expr = self.parse_assignment_expression()?;
                     props.push(PropertyDefinition::Spread(expr));
                     self.consume_object_delimiter()?;
                 }

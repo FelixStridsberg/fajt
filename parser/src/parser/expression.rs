@@ -1,6 +1,6 @@
 use crate::ast::{
-    AwaitExpression, ConditionalExpression, Expression, Literal, ThisExpression, UnaryExpression,
-    UpdateExpression, YieldExpression,
+    AwaitExpression, ConditionalExpression, Expression, Literal, SequenceExpression,
+    ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
@@ -13,8 +13,36 @@ use fajt_lexer::token_matches;
 impl Parser<'_, '_> {
     /// Parses the `Expression` goal symbol.
     pub(super) fn parse_expression(&mut self) -> Result<Expression> {
-        self.parse_assignment_expression()
-        // TODO comma separated expressions: Expression::Sequence(Vec<Expression>)?
+        let span_start = self.position();
+        let mut sequence: Option<Vec<Expression>> = None;
+
+        // TODO clean up
+        loop {
+            let expression = self.parse_assignment_expression()?;
+            if !token_matches!(self.reader.current(), ok: punct!(",")) {
+                if sequence.is_none() {
+                    println!("RETURN");
+                    return Ok(expression);
+                } else {
+                    sequence.as_mut().unwrap().push(expression);
+                }
+                break;
+            }
+
+            self.reader.consume()?;
+            if sequence.is_none() {
+                sequence = Some(Vec::new());
+            }
+
+            sequence.as_mut().unwrap().push(expression);
+        }
+
+        let span = self.span_from(span_start);
+        Ok(SequenceExpression {
+            span,
+            expressions: sequence.unwrap(),
+        }
+        .into())
     }
 
     /// Parses the `AssignmentExpression` goal symbol.

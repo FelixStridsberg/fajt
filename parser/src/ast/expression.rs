@@ -16,6 +16,7 @@ pub enum Expression {
     YieldExpression(Box<YieldExpression>),
     ConditionalExpression(Box<ConditionalExpression>),
     AwaitExpression(Box<AwaitExpression>),
+    SequenceExpression(Box<SequenceExpression>),
 }
 
 impl Expression {
@@ -95,6 +96,12 @@ impl From<YieldExpression> for Expression {
 impl From<AwaitExpression> for Expression {
     fn from(expr: AwaitExpression) -> Self {
         Self::AwaitExpression(Box::new(expr))
+    }
+}
+
+impl From<SequenceExpression> for Expression {
+    fn from(expr: SequenceExpression) -> Self {
+        Self::SequenceExpression(Box::new(expr))
     }
 }
 
@@ -289,4 +296,10 @@ pub struct ConditionalExpression {
 pub struct AwaitExpression {
     pub span: Span,
     pub argument: Expression,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct SequenceExpression {
+    pub span: Span,
+    pub expressions: Vec<Expression>,
 }
