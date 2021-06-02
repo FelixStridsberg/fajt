@@ -118,7 +118,7 @@ impl<'a, 'b> Parser<'a, 'b> {
         Span::new(start, self.reader.position())
     }
 
-    fn with_context(&mut self, modify: &ContextModify) -> Parser<'_, 'b> {
+    pub fn with_context(&mut self, modify: &ContextModify) -> Parser<'_, 'b> {
         Parser {
             context: self.context.modify(modify),
             reader: &mut self.reader,

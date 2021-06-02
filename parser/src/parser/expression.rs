@@ -104,7 +104,7 @@ impl Parser<'_, '_> {
             token_matches!(keyword!("delete")) => Some(unary_op!("delete")),
             token_matches!(keyword!("void")) => Some(unary_op!("void")),
             token_matches!(keyword!("typeof")) => Some(unary_op!("typeof")),
-            token_matches!(keyword!("await")) => {
+            token_matches!(keyword!("await")) if self.context.is_await => {
                 let span_start = self.position();
                 self.reader.consume()?;
                 let argument = self.parse_unary_expression()?;
@@ -225,7 +225,7 @@ impl Parser<'_, '_> {
             // TODO RegularExpressionLiteral
             // TODO TemplateLiteral
             // TODO CoverParenthesizedExpressionAndArrowParameterList
-            token_matches!(@ident) => self.parse_identifier_reference()?,
+            _ if self.is_identifier()? => self.parse_identifier_reference()?,
             r => unimplemented!("TOKEN: {:?}", r),
         })
     }
