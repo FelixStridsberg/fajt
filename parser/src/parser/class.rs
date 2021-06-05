@@ -16,9 +16,12 @@ impl Parser<'_, '_> {
             .is_identifier()
             .then(|| self.parse_identifier().unwrap());
 
-        if token_matches!(self.reader.current(), ok: keyword!("extends")) {
-            todo!()
-        }
+        let super_class = if token_matches!(self.reader.current(), ok: keyword!("extends")) {
+            self.reader.consume()?;
+            Some(self.parse_left_hand_side_expression()?)
+        } else {
+            None
+        };
 
         if token_matches!(self.reader.current(), ok: punct!("{")) {
             self.reader.consume()?;
@@ -33,7 +36,7 @@ impl Parser<'_, '_> {
         Ok(ClassExpression {
             span,
             identifier,
-            super_class: None,
+            super_class,
             body: vec![],
         }
         .into())

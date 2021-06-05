@@ -30,3 +30,18 @@ fn anonymous_empty_class() {
         ]
     );
 }
+
+#[test]
+fn empty_class_extends() {
+    parser_test!(
+        input: "class MyClass extends SuperClass {}",
+        expr_output: [
+            ClassExpression {
+                span: Span::new(0, 35),
+                identifier: Some(Ident::new("MyClass", (6, 13))),
+                super_class: Some(Ident::new("SuperClass", (22, 32)).into()),
+                body: vec![],
+            }.into()
+        ]
+    );
+}

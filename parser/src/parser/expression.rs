@@ -208,7 +208,7 @@ impl Parser<'_, '_> {
     }
 
     /// Parses the `LeftHandSideExpression` goal symbol.
-    fn parse_left_hand_side_expression(&mut self) -> Result<Expression> {
+    pub(super) fn parse_left_hand_side_expression(&mut self) -> Result<Expression> {
         self.parse_new_expression()
         // TODO CallExpression
         // TODO OptionalExpression
