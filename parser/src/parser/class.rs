@@ -12,9 +12,9 @@ impl Parser<'_, '_> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, keyword!("class")));
 
-        if self.is_identifier() {
-            todo!();
-        }
+        let identifier = self
+            .is_identifier()
+            .then(|| self.parse_identifier().unwrap());
 
         if token_matches!(self.reader.current(), ok: keyword!("extends")) {
             todo!()
@@ -32,6 +32,7 @@ impl Parser<'_, '_> {
         let span = self.span_from(span_start);
         Ok(ClassExpression {
             span,
+            identifier,
             super_class: None,
             body: vec![],
         }
