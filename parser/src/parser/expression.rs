@@ -14,35 +14,35 @@ impl Parser<'_, '_> {
     /// Parses the `Expression` goal symbol.
     pub(super) fn parse_expression(&mut self) -> Result<Expression> {
         let span_start = self.position();
-        let mut sequence: Option<Vec<Expression>> = None;
+        let expression = self.parse_assignment_expression()?;
 
-        // TODO clean up
+        if token_matches!(self.reader.current(), ok: punct!(",")) {
+            return self.parse_expression_sequence(span_start, expression);
+        }
+
+        Ok(expression)
+    }
+
+    /// Continues parsing of `Expression` if the current expression is a sequence.
+    fn parse_expression_sequence(
+        &mut self,
+        span_start: usize,
+        initial_expression: Expression,
+    ) -> Result<Expression> {
+        let mut expressions = Vec::with_capacity(5);
+        expressions.push(initial_expression);
+
         loop {
-            let expression = self.parse_assignment_expression()?;
-            if !token_matches!(self.reader.current(), ok: punct!(",")) {
-                if sequence.is_none() {
-                    println!("RETURN");
-                    return Ok(expression);
-                } else {
-                    sequence.as_mut().unwrap().push(expression);
-                }
+            if token_matches!(self.reader.current(), ok: punct!(",")) {
+                self.reader.consume()?;
+                expressions.push(self.parse_assignment_expression()?);
+            } else {
                 break;
             }
-
-            self.reader.consume()?;
-            if sequence.is_none() {
-                sequence = Some(Vec::new());
-            }
-
-            sequence.as_mut().unwrap().push(expression);
         }
 
         let span = self.span_from(span_start);
-        Ok(SequenceExpression {
-            span,
-            expressions: sequence.unwrap(),
-        }
-        .into())
+        Ok(SequenceExpression { span, expressions }.into())
     }
 
     /// Parses the `AssignmentExpression` goal symbol.
