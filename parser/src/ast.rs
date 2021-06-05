@@ -1,4 +1,5 @@
 pub use binding::*;
+pub use class::*;
 pub use expression::*;
 pub use literal::*;
 pub use statement::*;
@@ -8,6 +9,7 @@ use fajt_lexer::token::Span;
 mod binding;
 #[macro_use]
 mod expression;
+mod class;
 mod literal;
 mod statement;
 

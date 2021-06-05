@@ -1,6 +1,7 @@
 use fajt_lexer::token::Span;
 use fajt_macros::FromString;
 
+use crate::ast::class::ClassExpression;
 use crate::ast::literal::*;
 use crate::ast::Ident;
 
@@ -17,6 +18,7 @@ pub enum Expression {
     ConditionalExpression(Box<ConditionalExpression>),
     AwaitExpression(Box<AwaitExpression>),
     SequenceExpression(Box<SequenceExpression>),
+    ClassExpression(Box<ClassExpression>),
 }
 
 impl Expression {
@@ -102,6 +104,12 @@ impl From<AwaitExpression> for Expression {
 impl From<SequenceExpression> for Expression {
     fn from(expr: SequenceExpression) -> Self {
         Self::SequenceExpression(Box::new(expr))
+    }
+}
+
+impl From<ClassExpression> for Expression {
+    fn from(expr: ClassExpression) -> Self {
+        Self::ClassExpression(Box::new(expr))
     }
 }
 

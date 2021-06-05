@@ -251,7 +251,7 @@ impl Parser<'_, '_> {
                     todo!("FunctionExpression")
                 }
             }
-            token_matches!(keyword!("class")) => todo!("ClassExpression"),
+            token_matches!(keyword!("class")) => self.parse_class_expression()?,
             token_matches!(keyword!("async"))
                 if self.reader.peek().map_or(false, |t| !t.first_on_line) =>
             {
