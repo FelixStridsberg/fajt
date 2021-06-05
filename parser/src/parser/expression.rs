@@ -57,7 +57,7 @@ impl Parser<'_, '_> {
         // TODO LeftHandSideExpression
     }
 
-    // Parses the `YieldExpression` goal symbol.
+    /// Parses the `YieldExpression` goal symbol.
     fn parse_yield_expression(&mut self) -> Result<Expression> {
         let span_start = self.position();
         let yield_token = self.reader.consume()?;
@@ -238,7 +238,6 @@ impl Parser<'_, '_> {
     fn parse_primary_expression(&mut self) -> Result<Expression> {
         Ok(match self.reader.current()? {
             token_matches!(keyword!("this")) => self.parse_this_expression()?,
-            token_matches!(keyword!("yield")) => unimplemented!(),
             token_matches!(keyword!("null")) => self.consume_literal(Literal::Null)?,
             token_matches!(keyword!("true")) => self.consume_literal(Literal::Boolean(true))?,
             token_matches!(keyword!("false")) => self.consume_literal(Literal::Boolean(false))?,
