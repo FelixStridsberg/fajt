@@ -15,7 +15,7 @@ impl Parser<'_, '_> {
         Ok(match self.reader.current()? {
             token_matches!(punct!("{")) => self.parse_object_binding_pattern()?,
             token_matches!(punct!("[")) => self.parse_array_binding_pattern()?,
-            _ if self.is_identifier()? => BindingPattern::Ident(self.parse_identifier()?),
+            _ if self.is_identifier() => BindingPattern::Ident(self.parse_identifier()?),
             _ => return err!(UnexpectedToken(self.reader.consume()?)),
         })
     }
@@ -49,7 +49,7 @@ impl Parser<'_, '_> {
 
                     self.consume_object_delimiter()?;
                 }
-                _ if self.is_identifier()? => {
+                _ if self.is_identifier() => {
                     let ident = self.parse_identifier()?;
                     let initializer = if token_matches!(self.reader.current()?, punct!("=")) {
                         Some(self.parse_initializer()?)
@@ -117,7 +117,7 @@ impl Parser<'_, '_> {
     pub(super) fn is_binding_element(&self) -> Result<bool> {
         match self.reader.current()? {
             token_matches!(punct!("{")) | token_matches!(punct!("[")) => Ok(true),
-            _ if self.is_identifier()? => Ok(true),
+            _ if self.is_identifier() => Ok(true),
             _ => Ok(false),
         }
     }

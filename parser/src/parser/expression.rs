@@ -262,7 +262,7 @@ impl Parser<'_, '_> {
             token_matches!(punct!("(")) => {
                 todo!("CoverParenthesizedExpressionAndArrowParameterList")
             }
-            _ if self.is_identifier()? => self.parse_identifier_reference()?,
+            _ if self.is_identifier() => self.parse_identifier_reference()?,
             r => unimplemented!("TOKEN: {:?}", r),
         })
     }

@@ -93,7 +93,7 @@ impl Parser<'_, '_> {
                     props.push(PropertyDefinition::Spread(expr));
                     self.consume_object_delimiter()?;
                 }
-                _ if self.is_identifier()? => {
+                _ if self.is_identifier() => {
                     let ident = self.parse_identifier()?;
                     props.push(PropertyDefinition::IdentifierReference(ident.into()));
                     self.consume_object_delimiter()?;

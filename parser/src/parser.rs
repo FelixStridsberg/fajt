@@ -126,13 +126,18 @@ impl<'a, 'b> Parser<'a, 'b> {
         }
     }
 
-    fn is_identifier(&self) -> Result<bool> {
-        let token = self.reader.current()?;
-        Ok(match &token.value {
-            TokenValue::Identifier(_) => true,
-            TokenValue::Keyword(k) => k.is_allows_as_identifier(self.context.keyword_context()),
+    fn is_identifier(&self) -> bool {
+        match self.reader.current() {
+            Ok(Token {
+                value: TokenValue::Identifier(_),
+                ..
+            }) => true,
+            Ok(Token {
+                value: TokenValue::Keyword(k),
+                ..
+            }) => k.is_allows_as_identifier(self.context.keyword_context()),
             _ => false,
-        })
+        }
     }
 
     fn parse_identifier(&mut self) -> Result<Ident> {
