@@ -1,5 +1,5 @@
-use crate::ast::{ClassExpression, Expression};
-use crate::error::Result;
+use crate::ast::{ClassElement, ClassExpression, ClassMethod, Expression};
+use crate::error::{ErrorKind, Result};
 use crate::Parser;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
@@ -23,22 +23,63 @@ impl Parser<'_, '_> {
             None
         };
 
-        if token_matches!(self.reader.current(), ok: punct!("{")) {
-            self.reader.consume()?;
-            if !token_matches!(self.reader.current(), ok: punct!("}")) {
-                todo!();
-            }
-
-            self.reader.consume()?;
-        }
-
+        let body = self.parse_class_body()?;
         let span = self.span_from(span_start);
         Ok(ClassExpression {
             span,
             identifier,
             super_class,
-            body: vec![],
+            body,
         }
         .into())
+    }
+
+    fn parse_class_body(&mut self) -> Result<Vec<ClassElement>> {
+        if !token_matches!(self.reader.current(), ok: punct!("{")) {
+            return err!(ErrorKind::UnexpectedToken(self.reader.consume()?));
+        }
+
+        self.reader.consume()?;
+        let mut class_body = Vec::new();
+
+        loop {
+            match self.reader.current()? {
+                token_matches!(punct!("}")) => {
+                    self.reader.consume()?;
+                    break;
+                }
+                token_matches!(punct!("*")) => {
+                    todo!("Generator method")
+                }
+                token_matches!(keyword!("async")) => {
+                    todo!("Async method and async generator method")
+                }
+                token_matches!(keyword!("get")) => {
+                    todo!("Getter")
+                }
+                token_matches!(keyword!("set")) => {
+                    todo!("Setter")
+                }
+                _ => class_body.push(self.parse_class_method()?.into()),
+            }
+        }
+
+        Ok(class_body)
+    }
+
+    fn parse_class_method(&mut self) -> Result<ClassMethod> {
+        let span_start = self.position();
+        let name = self.parse_property_name()?;
+        // TODO this should be `UniqueFormalParameters`
+        let parameters = self.parse_formal_parameters()?;
+        let body = self.parse_function_body()?;
+
+        let span = self.span_from(span_start);
+        Ok(ClassMethod {
+            span,
+            name,
+            parameters,
+            body,
+        })
     }
 }

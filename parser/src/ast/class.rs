@@ -1,4 +1,4 @@
-use crate::ast::{Expression, Ident};
+use crate::ast::{Expression, FormalParameters, Ident, PropertyName, Statement};
 use fajt_lexer::token::Span;
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -10,4 +10,20 @@ pub struct ClassExpression {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct ClassElement {}
+pub enum ClassElement {
+    Method(ClassMethod),
+}
+
+impl From<ClassMethod> for ClassElement {
+    fn from(method: ClassMethod) -> Self {
+        Self::Method(method)
+    }
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct ClassMethod {
+    pub span: Span,
+    pub name: PropertyName,
+    pub parameters: Option<FormalParameters>,
+    pub body: Vec<Statement>,
+}

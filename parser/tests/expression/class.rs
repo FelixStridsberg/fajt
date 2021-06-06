@@ -45,3 +45,25 @@ fn empty_class_extends() {
         ]
     );
 }
+
+#[test]
+fn class_with_empty_method() {
+    parser_test!(
+        input: "class { method1() {} }",
+        expr_output: [
+            ClassExpression {
+                span: Span::new(0, 22),
+                identifier: None,
+                super_class: None,
+                body: vec![
+                    ClassMethod {
+                        span: Span::new(8, 20),
+                        name: PropertyName::Ident(Ident::new("method1", (8, 15))),
+                        parameters: None,
+                        body: vec![],
+                    }.into()
+                ],
+            }.into()
+        ]
+    );
+}
