@@ -252,9 +252,7 @@ impl Parser<'_, '_> {
                 }
             }
             token_matches!(keyword!("class")) => self.parse_class_expression()?,
-            token_matches!(keyword!("async"))
-                if self.reader.peek().map_or(false, |t| !t.first_on_line) =>
-            {
+            token_matches!(keyword!("async")) if !self.followed_by_new_lined() => {
                 todo!("AsyncFunctionExpression and AsyncGeneratorExpression")
             }
             token_matches!(punct!("/")) => todo!("RegularExpressionLiteral"),

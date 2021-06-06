@@ -126,6 +126,10 @@ impl<'a, 'b> Parser<'a, 'b> {
         }
     }
 
+    fn followed_by_new_lined(&self) -> bool {
+        self.reader.peek().map_or(false, |t| t.first_on_line)
+    }
+
     fn is_identifier(&self) -> bool {
         match self.reader.current() {
             Ok(Token {

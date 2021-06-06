@@ -60,7 +60,7 @@ impl Parser<'_, '_> {
         if matches!(token.value, keyword!("async"))
             && token_matches!(self.reader.peek(), opt: keyword!("function"))
         {
-            return Ok(self.reader.peek().unwrap().first_on_line);
+            return Ok(self.followed_by_new_lined());
         }
 
         Ok(true)

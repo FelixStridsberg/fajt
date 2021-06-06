@@ -49,8 +49,9 @@ impl Parser<'_, '_> {
                     break;
                 }
                 token_matches!(punct!("*")) => self.parse_class_generator_method()?.into(),
-                // TODO [no LineTerminator here] after async
-                token_matches!(keyword!("async")) => self.parse_class_async_method()?.into(),
+                token_matches!(keyword!("async")) if !self.followed_by_new_lined() => {
+                    self.parse_class_async_method()?.into()
+                }
                 token_matches!(keyword!("get")) => {
                     self.parse_class_get_set(ClassMethodKind::Get)?.into()
                 }
