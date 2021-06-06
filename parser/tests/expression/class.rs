@@ -59,6 +59,7 @@ fn class_with_empty_method() {
                     ClassMethod {
                         span: Span::new(8, 20),
                         name: PropertyName::Ident(Ident::new("method1", (8, 15))),
+                        kind: ClassMethodKind::Method,
                         parameters: None,
                         body: vec![],
                         generator: false,
@@ -83,6 +84,7 @@ fn class_with_empty_generator_method() {
                     ClassMethod {
                         span: Span::new(8, 21),
                         name: PropertyName::Ident(Ident::new("method1", (9, 16))),
+                        kind: ClassMethodKind::Method,
                         parameters: None,
                         body: vec![],
                         generator: true,
@@ -107,6 +109,7 @@ fn class_with_empty_async_method() {
                     ClassMethod {
                         span: Span::new(8, 26),
                         name: PropertyName::Ident(Ident::new("method1", (14, 21))),
+                        kind: ClassMethodKind::Method,
                         parameters: None,
                         body: vec![],
                         generator: false,
@@ -131,10 +134,36 @@ fn class_with_empty_async_generator_method() {
                     ClassMethod {
                         span: Span::new(8, 27),
                         name: PropertyName::Ident(Ident::new("method1", (15, 22))),
+                        kind: ClassMethodKind::Method,
                         parameters: None,
                         body: vec![],
                         generator: true,
                         asynchronous: true,
+                    }.into()
+                ],
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn class_getter_method() {
+    parser_test!(
+        input: "class { get getter() {} }",
+        expr_output: [
+            ClassExpression {
+                span: Span::new(0, 25),
+                identifier: None,
+                super_class: None,
+                body: vec![
+                    ClassMethod {
+                        span: Span::new(8, 23),
+                        name: PropertyName::Ident(Ident::new("getter", (12, 18))),
+                        kind: ClassMethodKind::Get,
+                        parameters: None,
+                        body: vec![],
+                        generator: false,
+                        asynchronous: false,
                     }.into()
                 ],
             }.into()

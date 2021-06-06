@@ -1,4 +1,4 @@
-use crate::ast::{ClassElement, ClassExpression, ClassMethod, Expression};
+use crate::ast::{ClassElement, ClassExpression, ClassMethod, ClassMethodKind, Expression};
 use crate::error::{ErrorKind, Result};
 use crate::Parser;
 use fajt_lexer::keyword;
@@ -51,7 +51,10 @@ impl Parser<'_, '_> {
                 token_matches!(punct!("*")) => {
                     let span_start = self.position();
                     self.reader.consume()?;
-                    class_body.push(self.parse_class_method(span_start, true, false)?.into())
+                    class_body.push(
+                        self.parse_class_method(span_start, ClassMethodKind::Method, true, false)?
+                            .into(),
+                    )
                 }
                 token_matches!(keyword!("async")) => {
                     // TODO [no LineTerminator here] after async
@@ -63,17 +66,35 @@ impl Parser<'_, '_> {
                         self.reader.consume()?;
                     }
 
-                    class_body.push(self.parse_class_method(span_start, generator, true)?.into())
+                    class_body.push(
+                        self.parse_class_method(
+                            span_start,
+                            ClassMethodKind::Method,
+                            generator,
+                            true,
+                        )?
+                        .into(),
+                    )
                 }
                 token_matches!(keyword!("get")) => {
-                    todo!("Getter")
+                    let span_start = self.position();
+                    self.reader.consume()?;
+                    class_body.push(
+                        self.parse_class_method(span_start, ClassMethodKind::Get, false, false)?
+                            .into(),
+                    )
                 }
                 token_matches!(keyword!("set")) => {
                     todo!("Setter")
                 }
                 _ => class_body.push(
-                    self.parse_class_method(self.position(), false, false)?
-                        .into(),
+                    self.parse_class_method(
+                        self.position(),
+                        ClassMethodKind::Method,
+                        false,
+                        false,
+                    )?
+                    .into(),
                 ),
             }
         }
@@ -84,11 +105,12 @@ impl Parser<'_, '_> {
     fn parse_class_method(
         &mut self,
         span_start: usize,
+        kind: ClassMethodKind,
         generator: bool,
         asynchronous: bool,
     ) -> Result<ClassMethod> {
         let name = self.parse_property_name()?;
-        // TODO this should be `UniqueFormalParameters`
+        // TODO this should be `UniqueFormalParameters` or `PropertySetParameterList` depending on kind.
         let parameters = self.parse_formal_parameters()?;
         let body = self.parse_function_body()?;
 
@@ -96,6 +118,7 @@ impl Parser<'_, '_> {
         Ok(ClassMethod {
             span,
             name,
+            kind,
             parameters,
             body,
             generator,

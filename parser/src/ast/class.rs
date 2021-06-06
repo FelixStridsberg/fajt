@@ -24,8 +24,16 @@ impl From<ClassMethod> for ClassElement {
 pub struct ClassMethod {
     pub span: Span,
     pub name: PropertyName,
+    pub kind: ClassMethodKind,
     pub parameters: Option<FormalParameters>,
     pub body: Vec<Statement>,
     pub generator: bool,
     pub asynchronous: bool,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub enum ClassMethodKind {
+    Method,
+    Get,
+    Set,
 }
