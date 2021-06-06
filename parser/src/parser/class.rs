@@ -43,68 +43,53 @@ impl Parser<'_, '_> {
         let mut class_body = Vec::new();
 
         loop {
-            match self.reader.current()? {
+            let element: ClassElement = match self.reader.current()? {
                 token_matches!(punct!("}")) => {
                     self.reader.consume()?;
                     break;
                 }
-                token_matches!(punct!("*")) => {
-                    let span_start = self.position();
-                    self.reader.consume()?;
-                    class_body.push(
-                        self.parse_class_method(span_start, ClassMethodKind::Method, true, false)?
-                            .into(),
-                    )
-                }
-                token_matches!(keyword!("async")) => {
-                    // TODO [no LineTerminator here] after async
-                    let span_start = self.position();
-                    self.reader.consume()?;
-
-                    let generator = token_matches!(self.reader.current(), ok: punct!("*"));
-                    if generator {
-                        self.reader.consume()?;
-                    }
-
-                    class_body.push(
-                        self.parse_class_method(
-                            span_start,
-                            ClassMethodKind::Method,
-                            generator,
-                            true,
-                        )?
-                        .into(),
-                    )
-                }
+                token_matches!(punct!("*")) => self.parse_class_generator_method()?.into(),
+                // TODO [no LineTerminator here] after async
+                token_matches!(keyword!("async")) => self.parse_class_async_method()?.into(),
                 token_matches!(keyword!("get")) => {
-                    let span_start = self.position();
-                    self.reader.consume()?;
-                    class_body.push(
-                        self.parse_class_method(span_start, ClassMethodKind::Get, false, false)?
-                            .into(),
-                    )
+                    self.parse_class_get_set(ClassMethodKind::Get)?.into()
                 }
                 token_matches!(keyword!("set")) => {
-                    let span_start = self.position();
-                    self.reader.consume()?;
-                    class_body.push(
-                        self.parse_class_method(span_start, ClassMethodKind::Set, false, false)?
-                            .into(),
-                    )
+                    self.parse_class_get_set(ClassMethodKind::Set)?.into()
                 }
-                _ => class_body.push(
-                    self.parse_class_method(
-                        self.position(),
-                        ClassMethodKind::Method,
-                        false,
-                        false,
-                    )?
+                _ => self
+                    .parse_class_method(self.position(), ClassMethodKind::Method, false, false)?
                     .into(),
-                ),
-            }
+            };
+
+            class_body.push(element);
         }
 
         Ok(class_body)
+    }
+
+    fn parse_class_get_set(&mut self, kind: ClassMethodKind) -> Result<ClassMethod> {
+        let span_start = self.position();
+        self.reader.consume()?;
+        self.parse_class_method(span_start, kind, false, false)
+    }
+
+    fn parse_class_generator_method(&mut self) -> Result<ClassMethod> {
+        let span_start = self.position();
+        self.reader.consume()?;
+        self.parse_class_method(span_start, ClassMethodKind::Method, true, false)
+    }
+
+    fn parse_class_async_method(&mut self) -> Result<ClassMethod> {
+        let span_start = self.position();
+        self.reader.consume()?;
+
+        let generator = token_matches!(self.reader.current(), ok: punct!("*"));
+        if generator {
+            self.reader.consume()?;
+        }
+
+        self.parse_class_method(span_start, ClassMethodKind::Method, generator, true)
     }
 
     fn parse_class_method(
