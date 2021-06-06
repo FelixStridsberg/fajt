@@ -85,7 +85,12 @@ impl Parser<'_, '_> {
                     )
                 }
                 token_matches!(keyword!("set")) => {
-                    todo!("Setter")
+                    let span_start = self.position();
+                    self.reader.consume()?;
+                    class_body.push(
+                        self.parse_class_method(span_start, ClassMethodKind::Set, false, false)?
+                            .into(),
+                    )
                 }
                 _ => class_body.push(
                     self.parse_class_method(

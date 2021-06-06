@@ -147,7 +147,7 @@ fn class_with_empty_async_generator_method() {
 }
 
 #[test]
-fn class_getter_method() {
+fn class_empty_getter_method() {
     parser_test!(
         input: "class { get getter() {} }",
         expr_output: [
@@ -161,6 +161,41 @@ fn class_getter_method() {
                         name: PropertyName::Ident(Ident::new("getter", (12, 18))),
                         kind: ClassMethodKind::Get,
                         parameters: None,
+                        body: vec![],
+                        generator: false,
+                        asynchronous: false,
+                    }.into()
+                ],
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn class_empty_setter_method() {
+    parser_test!(
+        input: "class { set setter(a) {} }",
+        expr_output: [
+            ClassExpression {
+                span: Span::new(0, 26),
+                identifier: None,
+                super_class: None,
+                body: vec![
+                    ClassMethod {
+                        span: Span::new(8, 24),
+                        name: PropertyName::Ident(Ident::new("setter", (12, 18))),
+                        kind: ClassMethodKind::Set,
+                        parameters: Some(FormalParameters {
+                            span: Span::new(18, 21),
+                            parameters: vec![
+                                BindingElement {
+                                    span: Span::new(19, 20),
+                                    pattern: BindingPattern::Ident(Ident::new("a", (19, 20))),
+                                    initializer: None,
+                                }
+                            ],
+                            rest: None,
+                        }),
                         body: vec![],
                         generator: false,
                         asynchronous: false,
