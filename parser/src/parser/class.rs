@@ -57,7 +57,13 @@ impl Parser<'_, '_> {
                     // TODO [no LineTerminator here] after async
                     let span_start = self.position();
                     self.reader.consume()?;
-                    class_body.push(self.parse_class_method(span_start, false, true)?.into())
+
+                    let generator = token_matches!(self.reader.current(), ok: punct!("*"));
+                    if generator {
+                        self.reader.consume()?;
+                    }
+
+                    class_body.push(self.parse_class_method(span_start, generator, true)?.into())
                 }
                 token_matches!(keyword!("get")) => {
                     todo!("Getter")

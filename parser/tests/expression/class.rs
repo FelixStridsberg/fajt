@@ -117,3 +117,27 @@ fn class_with_empty_async_method() {
         ]
     );
 }
+
+#[test]
+fn class_with_empty_async_generator_method() {
+    parser_test!(
+        input: "class { async *method1() {} }",
+        expr_output: [
+            ClassExpression {
+                span: Span::new(0, 29),
+                identifier: None,
+                super_class: None,
+                body: vec![
+                    ClassMethod {
+                        span: Span::new(8, 27),
+                        name: PropertyName::Ident(Ident::new("method1", (15, 22))),
+                        parameters: None,
+                        body: vec![],
+                        generator: true,
+                        asynchronous: true,
+                    }.into()
+                ],
+            }.into()
+        ]
+    );
+}
