@@ -51,10 +51,13 @@ impl Parser<'_, '_> {
                 token_matches!(punct!("*")) => {
                     let span_start = self.position();
                     self.reader.consume()?;
-                    class_body.push(self.parse_class_method(span_start, true)?.into())
+                    class_body.push(self.parse_class_method(span_start, true, false)?.into())
                 }
                 token_matches!(keyword!("async")) => {
-                    todo!("Async method and async generator method")
+                    // TODO [no LineTerminator here] after async
+                    let span_start = self.position();
+                    self.reader.consume()?;
+                    class_body.push(self.parse_class_method(span_start, false, true)?.into())
                 }
                 token_matches!(keyword!("get")) => {
                     todo!("Getter")
@@ -62,14 +65,22 @@ impl Parser<'_, '_> {
                 token_matches!(keyword!("set")) => {
                     todo!("Setter")
                 }
-                _ => class_body.push(self.parse_class_method(self.position(), false)?.into()),
+                _ => class_body.push(
+                    self.parse_class_method(self.position(), false, false)?
+                        .into(),
+                ),
             }
         }
 
         Ok(class_body)
     }
 
-    fn parse_class_method(&mut self, span_start: usize, generator: bool) -> Result<ClassMethod> {
+    fn parse_class_method(
+        &mut self,
+        span_start: usize,
+        generator: bool,
+        asynchronous: bool,
+    ) -> Result<ClassMethod> {
         let name = self.parse_property_name()?;
         // TODO this should be `UniqueFormalParameters`
         let parameters = self.parse_formal_parameters()?;
@@ -82,6 +93,7 @@ impl Parser<'_, '_> {
             parameters,
             body,
             generator,
+            asynchronous,
         })
     }
 }

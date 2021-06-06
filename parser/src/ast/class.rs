@@ -27,4 +27,5 @@ pub struct ClassMethod {
     pub parameters: Option<FormalParameters>,
     pub body: Vec<Statement>,
     pub generator: bool,
+    pub asynchronous: bool,
 }
