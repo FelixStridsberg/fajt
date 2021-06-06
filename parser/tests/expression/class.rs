@@ -61,6 +61,30 @@ fn class_with_empty_method() {
                         name: PropertyName::Ident(Ident::new("method1", (8, 15))),
                         parameters: None,
                         body: vec![],
+                        generator: false,
+                    }.into()
+                ],
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn class_with_empty_generator_method() {
+    parser_test!(
+        input: "class { *method1() {} }",
+        expr_output: [
+            ClassExpression {
+                span: Span::new(0, 23),
+                identifier: None,
+                super_class: None,
+                body: vec![
+                    ClassMethod {
+                        span: Span::new(8, 21),
+                        name: PropertyName::Ident(Ident::new("method1", (9, 16))),
+                        parameters: None,
+                        body: vec![],
+                        generator: true,
                     }.into()
                 ],
             }.into()

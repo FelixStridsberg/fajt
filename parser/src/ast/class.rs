@@ -26,4 +26,5 @@ pub struct ClassMethod {
     pub name: PropertyName,
     pub parameters: Option<FormalParameters>,
     pub body: Vec<Statement>,
+    pub generator: bool,
 }
