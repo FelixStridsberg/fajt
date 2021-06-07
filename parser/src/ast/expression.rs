@@ -323,5 +323,6 @@ pub struct SequenceExpression {
 pub struct FunctionExpression {
     pub span: Span,
     pub asynchronous: bool,
+    pub generator: bool,
     pub identifier: Option<Ident>,
 }

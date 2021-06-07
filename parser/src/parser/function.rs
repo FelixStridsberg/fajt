@@ -15,6 +15,7 @@ impl Parser<'_, '_> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, keyword!("function")));
 
+        let generator = self.consume_generator_token();
         let identifier = self.parse_optional_identifier()?;
         let _parameters = self.parse_formal_parameters()?;
         let _body = self.parse_function_body()?;
@@ -23,6 +24,7 @@ impl Parser<'_, '_> {
         Ok(FunctionExpression {
             span,
             asynchronous: false,
+            generator,
             identifier,
         }
         .into())
@@ -38,6 +40,7 @@ impl Parser<'_, '_> {
         debug_assert!(token_matches!(function_token, keyword!("function")));
         debug_assert_eq!(function_token.first_on_line, false);
 
+        let generator = self.consume_generator_token();
         let identifier = self.parse_optional_identifier()?;
         let _parameters = self.parse_formal_parameters()?;
         let _body = self.parse_function_body()?;
@@ -46,6 +49,7 @@ impl Parser<'_, '_> {
         Ok(FunctionExpression {
             span,
             asynchronous: true,
+            generator,
             identifier,
         }
         .into())
