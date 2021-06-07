@@ -322,5 +322,6 @@ pub struct SequenceExpression {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct FunctionExpression {
     pub span: Span,
+    pub asynchronous: bool,
     pub identifier: Option<Ident>,
 }

@@ -20,7 +20,35 @@ impl Parser<'_, '_> {
         let _body = self.parse_function_body()?;
 
         let span = self.span_from(span_start);
-        Ok(FunctionExpression { span, identifier }.into())
+        Ok(FunctionExpression {
+            span,
+            asynchronous: false,
+            identifier,
+        }
+        .into())
+    }
+
+    /// Parses the `AsyncFunctionExpression` goal symbol.
+    pub(super) fn parse_async_function_expression(&mut self) -> Result<Expression> {
+        let span_start = self.position();
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, keyword!("async")));
+
+        let function_token = self.reader.consume()?;
+        debug_assert!(token_matches!(function_token, keyword!("function")));
+        debug_assert_eq!(function_token.first_on_line, false);
+
+        let identifier = self.parse_optional_identifier()?;
+        let _parameters = self.parse_formal_parameters()?;
+        let _body = self.parse_function_body()?;
+
+        let span = self.span_from(span_start);
+        Ok(FunctionExpression {
+            span,
+            asynchronous: true,
+            identifier,
+        }
+        .into())
     }
 
     /// Parses the `FunctionDeclaration` goal symbol.

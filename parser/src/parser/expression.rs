@@ -247,7 +247,7 @@ impl Parser<'_, '_> {
             token_matches!(keyword!("function")) => self.parse_function_expression()?,
             token_matches!(keyword!("class")) => self.parse_class_expression()?,
             token_matches!(keyword!("async")) if !self.followed_by_new_lined() => {
-                todo!("AsyncFunctionExpression and AsyncGeneratorExpression")
+                self.parse_async_function_expression()?
             }
             token_matches!(punct!("/")) => todo!("RegularExpressionLiteral"),
             // token_matches!(punct!("`")) => todo!("TemplateLiteral"), TODO missing from lexer
