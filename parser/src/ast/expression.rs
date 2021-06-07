@@ -322,4 +322,5 @@ pub struct SequenceExpression {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct FunctionExpression {
     pub span: Span,
+    pub identifier: Option<Ident>,
 }

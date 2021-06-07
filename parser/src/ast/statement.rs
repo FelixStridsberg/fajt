@@ -47,7 +47,7 @@ pub struct FunctionDeclaration {
     pub span: Span,
     pub asynchronous: bool,
     pub generator: bool,
-    pub ident: Ident,
+    pub identifier: Ident,
     pub parameters: Option<FormalParameters>,
     pub body: Vec<Statement>,
 }

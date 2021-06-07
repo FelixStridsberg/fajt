@@ -159,6 +159,14 @@ impl<'a, 'b> Parser<'a, 'b> {
         })
     }
 
+    fn parse_optional_identifier(&mut self) -> Result<Option<Ident>> {
+        Ok(if self.is_identifier() {
+            Some(self.parse_identifier()?)
+        } else {
+            None
+        })
+    }
+
     /// Parses the `PropertyName` goal symbol.
     fn parse_property_name(&mut self) -> Result<PropertyName> {
         match self.reader.current()? {

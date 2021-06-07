@@ -15,11 +15,12 @@ impl Parser<'_, '_> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, keyword!("function")));
 
+        let identifier = self.parse_optional_identifier()?;
         let _parameters = self.parse_formal_parameters()?;
         let _body = self.parse_function_body()?;
 
         let span = self.span_from(span_start);
-        Ok(FunctionExpression { span }.into())
+        Ok(FunctionExpression { span, identifier }.into())
     }
 
     /// Parses the `FunctionDeclaration` goal symbol.
@@ -77,7 +78,7 @@ impl Parser<'_, '_> {
             span,
             asynchronous,
             generator,
-            ident,
+            identifier: ident,
             parameters,
             body,
         }
