@@ -1,4 +1,6 @@
-use crate::ast::{FormalParameters, FunctionDeclaration, Ident, Statement};
+use crate::ast::{
+    Expression, FormalParameters, FunctionDeclaration, FunctionExpression, Ident, Statement,
+};
 use crate::error::{ErrorKind, Result};
 use crate::parser::ContextModify;
 use crate::Parser;
@@ -7,6 +9,32 @@ use fajt_lexer::punct;
 use fajt_lexer::token_matches;
 
 impl Parser<'_, '_> {
+    /// Parses the `FunctionExpression` goal symbol.
+    pub(super) fn parse_function_expression(&mut self) -> Result<Expression> {
+        let span_start = self.position();
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, keyword!("function")));
+
+        let _parameters = self.parse_formal_parameters()?;
+        let _body = self.parse_function_body()?;
+
+        let span = self.span_from(span_start);
+        Ok(FunctionExpression { span }.into())
+    }
+
+    /// Parses the `FunctionDeclaration` goal symbol.
+    pub(super) fn parse_function_declaration(&mut self) -> Result<Statement> {
+        let span_start = self.position();
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, keyword!("function")));
+
+        let generator = self.consume_generator_token();
+        let ident = self.parse_identifier()?;
+
+        self.with_context(ContextModify::new().set_yield(false).set_await(false))
+            .parse_function_implementation(span_start, ident, generator, false)
+    }
+
     /// Parses the `AsyncFunctionDeclaration` goal symbol.
     pub(super) fn parse_async_function_declaration(&mut self) -> Result<Statement> {
         let span_start = self.position();
@@ -22,19 +50,6 @@ impl Parser<'_, '_> {
 
         self.with_context(ContextModify::new().set_yield(false).set_await(true))
             .parse_function_implementation(span_start, ident, generator, true)
-    }
-
-    /// Parses the `FunctionDeclaration` goal symbol.
-    pub(super) fn parse_function_declaration(&mut self) -> Result<Statement> {
-        let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, keyword!("function")));
-
-        let generator = self.consume_generator_token();
-        let ident = self.parse_identifier()?;
-
-        self.with_context(ContextModify::new().set_yield(false).set_await(false))
-            .parse_function_implementation(span_start, ident, generator, false)
     }
 
     /// Parses the part after the identifier of a function declaration.

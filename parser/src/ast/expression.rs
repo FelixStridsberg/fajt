@@ -19,6 +19,7 @@ pub enum Expression {
     AwaitExpression(Box<AwaitExpression>),
     SequenceExpression(Box<SequenceExpression>),
     ClassExpression(Box<ClassExpression>),
+    FunctionExpression(Box<FunctionExpression>),
 }
 
 impl Expression {
@@ -110,6 +111,12 @@ impl From<SequenceExpression> for Expression {
 impl From<ClassExpression> for Expression {
     fn from(expr: ClassExpression) -> Self {
         Self::ClassExpression(Box::new(expr))
+    }
+}
+
+impl From<FunctionExpression> for Expression {
+    fn from(expr: FunctionExpression) -> Self {
+        Self::FunctionExpression(Box::new(expr))
     }
 }
 
@@ -310,4 +317,9 @@ pub struct AwaitExpression {
 pub struct SequenceExpression {
     pub span: Span,
     pub expressions: Vec<Expression>,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct FunctionExpression {
+    pub span: Span,
 }

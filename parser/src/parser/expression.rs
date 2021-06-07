@@ -244,13 +244,7 @@ impl Parser<'_, '_> {
             token_matches!(@literal) => self.parse_literal()?,
             token_matches!(punct!("[")) => self.parse_array_literal()?,
             token_matches!(punct!("{")) => self.parse_object_literal()?,
-            token_matches!(keyword!("function")) => {
-                if token_matches!(self.reader.peek(), opt: punct!("*")) {
-                    todo!("GeneratorExpression")
-                } else {
-                    todo!("FunctionExpression")
-                }
-            }
+            token_matches!(keyword!("function")) => self.parse_function_expression()?,
             token_matches!(keyword!("class")) => self.parse_class_expression()?,
             token_matches!(keyword!("async")) if !self.followed_by_new_lined() => {
                 todo!("AsyncFunctionExpression and AsyncGeneratorExpression")

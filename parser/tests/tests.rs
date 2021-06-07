@@ -7,6 +7,7 @@ mod expression {
     mod class;
     mod expression;
     mod flow_control;
+    mod function;
     mod literal;
     mod unary;
     mod update;
