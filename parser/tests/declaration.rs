@@ -16,7 +16,25 @@ fn function_declaration() {
             FunctionDeclaration {
                 span: Span::new(0, 16),
                 asynchronous: false,
+                generator: false,
                 ident: Ident::new("fn", (9, 11)),
+                parameters: None,
+                body: vec![],
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn generator_declaration() {
+    parser_test!(
+        input: "function *fn() {}",
+        output: [
+            FunctionDeclaration {
+                span: Span::new(0, 17),
+                asynchronous: false,
+                generator: true,
+                ident: Ident::new("fn", (10, 12)),
                 parameters: None,
                 body: vec![],
             }.into()
@@ -32,6 +50,7 @@ fn function_declaration_with_body() {
             FunctionDeclaration {
                 span: Span::new(0, 27),
                 asynchronous: false,
+                generator: false,
                 ident: Ident::new("fn", (9, 11)),
                 parameters: None,
                 body: vec![
@@ -65,6 +84,7 @@ fn async_function_declaration() {
             FunctionDeclaration {
                 span: Span::new(0, 22),
                 asynchronous: true,
+                generator: false,
                 ident: Ident::new("fn", (15, 17)),
                 parameters: None,
                 body: vec![],
@@ -81,6 +101,7 @@ fn async_function_declaration_with_body() {
             FunctionDeclaration {
                 span: Span::new(0, 33),
                 asynchronous: true,
+                generator: false,
                 ident: Ident::new("fn", (15, 17)),
                 parameters: None,
                 body: vec![
@@ -130,6 +151,7 @@ fn function_declaration_with_parameters() {
             FunctionDeclaration {
                 span: Span::new(0, 25),
                 asynchronous: false,
+                generator: false,
                 ident: Ident::new("fn", (9, 11)),
                 parameters: Some(FormalParameters {
                     span: Span::new(11, 21),
@@ -163,6 +185,7 @@ fn function_declaration_with_rest_parameter() {
             FunctionDeclaration {
                 span: Span::new(0, 21),
                 asynchronous: false,
+                generator: false,
                 ident: Ident::new("fn", (9, 11)),
                 parameters: Some(FormalParameters {
                     span: Span::new(11, 17),

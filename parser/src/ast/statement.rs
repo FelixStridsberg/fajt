@@ -46,6 +46,7 @@ impl From<FunctionDeclaration> for Statement {
 pub struct FunctionDeclaration {
     pub span: Span,
     pub asynchronous: bool,
+    pub generator: bool,
     pub ident: Ident,
     pub parameters: Option<FormalParameters>,
     pub body: Vec<Statement>,

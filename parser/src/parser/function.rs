@@ -20,7 +20,7 @@ impl Parser<'_, '_> {
         let ident = self.parse_identifier()?;
 
         self.with_context(ContextModify::new().set_yield(false).set_await(true))
-            .parse_function_implementation(span_start, ident, true)
+            .parse_function_implementation(span_start, ident, false, true)
     }
 
     /// Parses the `FunctionDeclaration` goal symbol.
@@ -29,10 +29,15 @@ impl Parser<'_, '_> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, keyword!("function")));
 
+        let generator = token_matches!(self.reader.current(), ok: punct!("*"));
+        if generator {
+            self.reader.consume()?;
+        }
+
         let ident = self.parse_identifier()?;
 
         self.with_context(ContextModify::new().set_yield(false).set_await(false))
-            .parse_function_implementation(span_start, ident, false)
+            .parse_function_implementation(span_start, ident, generator, false)
     }
 
     /// Parses the part after the identifier of a function declaration.
@@ -49,6 +54,7 @@ impl Parser<'_, '_> {
         &mut self,
         span_start: usize,
         ident: Ident,
+        generator: bool,
         asynchronous: bool,
     ) -> Result<Statement> {
         let parameters = self.parse_formal_parameters()?;
@@ -58,6 +64,7 @@ impl Parser<'_, '_> {
         Ok(FunctionDeclaration {
             span,
             asynchronous,
+            generator,
             ident,
             parameters,
             body,
