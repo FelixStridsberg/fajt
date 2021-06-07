@@ -94,6 +94,23 @@ fn async_function_declaration() {
 }
 
 #[test]
+fn async_generator_declaration() {
+    parser_test!(
+        input: "async function *fn() {}",
+        output: [
+            FunctionDeclaration {
+                span: Span::new(0, 23),
+                asynchronous: true,
+                generator: true,
+                ident: Ident::new("fn", (16, 18)),
+                parameters: None,
+                body: vec![],
+            }.into()
+        ]
+    );
+}
+
+#[test]
 fn async_function_declaration_with_body() {
     parser_test!(
         input: "async function fn() { var a = 1 }",

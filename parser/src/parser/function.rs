@@ -17,10 +17,11 @@ impl Parser<'_, '_> {
         debug_assert!(token_matches!(function_token, keyword!("function")));
         debug_assert_eq!(function_token.first_on_line, false);
 
+        let generator = self.consume_generator_token();
         let ident = self.parse_identifier()?;
 
         self.with_context(ContextModify::new().set_yield(false).set_await(true))
-            .parse_function_implementation(span_start, ident, false, true)
+            .parse_function_implementation(span_start, ident, generator, true)
     }
 
     /// Parses the `FunctionDeclaration` goal symbol.
@@ -29,11 +30,7 @@ impl Parser<'_, '_> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, keyword!("function")));
 
-        let generator = token_matches!(self.reader.current(), ok: punct!("*"));
-        if generator {
-            self.reader.consume()?;
-        }
-
+        let generator = self.consume_generator_token();
         let ident = self.parse_identifier()?;
 
         self.with_context(ContextModify::new().set_yield(false).set_await(false))
@@ -129,5 +126,16 @@ impl Parser<'_, '_> {
             body.push(self.parse_statement()?);
         }
         Ok(body)
+    }
+
+    /// If the current token is '*', it is consumed and true is returned, otherwise false.
+    pub(super) fn consume_generator_token(&mut self) -> bool {
+        let generator = token_matches!(self.reader.current(), ok: punct!("*"));
+        if generator {
+            self.reader.consume().unwrap();
+            true
+        } else {
+            false
+        }
     }
 }

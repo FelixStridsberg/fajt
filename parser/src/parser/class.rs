@@ -85,11 +85,7 @@ impl Parser<'_, '_> {
         let span_start = self.position();
         self.reader.consume()?;
 
-        let generator = token_matches!(self.reader.current(), ok: punct!("*"));
-        if generator {
-            self.reader.consume()?;
-        }
-
+        let generator = self.consume_generator_token();
         self.parse_class_method(span_start, ClassMethodKind::Method, generator, true)
     }
 
