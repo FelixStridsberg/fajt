@@ -3,7 +3,7 @@ use fajt_macros::FromString;
 
 use crate::ast::class::ClassExpression;
 use crate::ast::literal::*;
-use crate::ast::Ident;
+use crate::ast::{FormalParameters, Ident};
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Expression {
@@ -325,4 +325,5 @@ pub struct FunctionExpression {
     pub asynchronous: bool,
     pub generator: bool,
     pub identifier: Option<Ident>,
+    pub parameters: Option<FormalParameters>,
 }

@@ -17,7 +17,7 @@ impl Parser<'_, '_> {
 
         let generator = self.consume_generator_token();
         let identifier = self.parse_optional_identifier()?;
-        let _parameters = self.parse_formal_parameters()?;
+        let parameters = self.parse_formal_parameters()?;
         let _body = self.parse_function_body()?;
 
         let span = self.span_from(span_start);
@@ -26,6 +26,7 @@ impl Parser<'_, '_> {
             asynchronous: false,
             generator,
             identifier,
+            parameters,
         }
         .into())
     }
@@ -42,7 +43,7 @@ impl Parser<'_, '_> {
 
         let generator = self.consume_generator_token();
         let identifier = self.parse_optional_identifier()?;
-        let _parameters = self.parse_formal_parameters()?;
+        let parameters = self.parse_formal_parameters()?;
         let _body = self.parse_function_body()?;
 
         let span = self.span_from(span_start);
@@ -51,6 +52,7 @@ impl Parser<'_, '_> {
             asynchronous: true,
             generator,
             identifier,
+            parameters,
         }
         .into())
     }
