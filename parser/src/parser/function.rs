@@ -18,7 +18,7 @@ impl Parser<'_, '_> {
         let generator = self.consume_generator_token();
         let identifier = self.parse_optional_identifier()?;
         let parameters = self.parse_formal_parameters()?;
-        let _body = self.parse_function_body()?;
+        let body = self.parse_function_body()?;
 
         let span = self.span_from(span_start);
         Ok(FunctionExpression {
@@ -27,6 +27,7 @@ impl Parser<'_, '_> {
             generator,
             identifier,
             parameters,
+            body,
         }
         .into())
     }
@@ -44,7 +45,7 @@ impl Parser<'_, '_> {
         let generator = self.consume_generator_token();
         let identifier = self.parse_optional_identifier()?;
         let parameters = self.parse_formal_parameters()?;
-        let _body = self.parse_function_body()?;
+        let body = self.parse_function_body()?;
 
         let span = self.span_from(span_start);
         Ok(FunctionExpression {
@@ -53,6 +54,7 @@ impl Parser<'_, '_> {
             generator,
             identifier,
             parameters,
+            body,
         }
         .into())
     }
@@ -162,9 +164,7 @@ impl Parser<'_, '_> {
     /// Parses the `FunctionBody` or `AsyncFunctionBody` goal symbol.
     pub(super) fn parse_function_body(&mut self) -> Result<Vec<Statement>> {
         let token = self.reader.consume()?;
-        if !token_matches!(token, punct!("{")) {
-            todo!("Error handling")
-        }
+        debug_assert!(token_matches!(token, punct!("{")));
 
         let mut body = Vec::new();
         loop {

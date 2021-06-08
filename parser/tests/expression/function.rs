@@ -12,6 +12,7 @@ fn empty_anonymous_function() {
                 generator: false,
                 identifier: None,
                 parameters: None,
+                body: vec![],
             }.into()
         ]
     );
@@ -20,10 +21,10 @@ fn empty_anonymous_function() {
 #[test]
 fn anonymous_function() {
     parser_test!(
-        input: "function (param) { }",
+        input: "function (param) { ; }",
         expr_output: [
             FunctionExpression {
-                span: Span::new(0, 20),
+                span: Span::new(0, 22),
                 asynchronous: false,
                 generator: false,
                 identifier: None,
@@ -38,6 +39,9 @@ fn anonymous_function() {
                     ],
                     rest: None,
                 }),
+                body: vec![
+                    EmptyStatement { span: Span::new(19, 20) }.into()
+                ],
             }.into()
         ]
     );
@@ -54,6 +58,7 @@ fn empty_function() {
                 generator: false,
                 identifier: Some(Ident::new("fn", (9, 11))),
                 parameters: None,
+                body: vec![],
             }.into()
         ]
     );
@@ -62,10 +67,10 @@ fn empty_function() {
 #[test]
 fn function() {
     parser_test!(
-        input: "function fn(param) { }",
+        input: "function fn(param) { ; }",
         expr_output: [
             FunctionExpression {
-                span: Span::new(0, 22),
+                span: Span::new(0, 24),
                 asynchronous: false,
                 generator: false,
                 identifier: Some(Ident::new("fn", (9, 11))),
@@ -80,6 +85,9 @@ fn function() {
                     ],
                     rest: None,
                 }),
+                body: vec![
+                    EmptyStatement { span: Span::new(21, 22) }.into()
+                ],
             }.into()
         ]
     );
@@ -96,6 +104,7 @@ fn empty_anonymous_generator() {
                 generator: true,
                 identifier: None,
                 parameters: None,
+                body: vec![],
             }.into()
         ]
     );
@@ -112,6 +121,7 @@ fn empty_generator() {
                 generator: true,
                 identifier: Some(Ident::new("fn", (10, 12))),
                 parameters: None,
+                body: vec![],
             }.into()
         ]
     );
@@ -120,10 +130,10 @@ fn empty_generator() {
 #[test]
 fn generator() {
     parser_test!(
-        input: "function *(param) { }",
+        input: "function *(param) { ; }",
         expr_output: [
             FunctionExpression {
-                span: Span::new(0, 21),
+                span: Span::new(0, 23),
                 asynchronous: false,
                 generator: true,
                 identifier: None,
@@ -138,6 +148,9 @@ fn generator() {
                     ],
                     rest: None,
                 }),
+                body: vec![
+                    EmptyStatement { span: Span::new(20, 21) }.into()
+                ],
             }.into()
         ]
     );
@@ -154,6 +167,7 @@ fn empty_anonymous_async_function() {
                 generator: false,
                 identifier: None,
                 parameters: None,
+                body: vec![],
             }.into()
         ]
     );
@@ -162,10 +176,10 @@ fn empty_anonymous_async_function() {
 #[test]
 fn anonymous_async_function() {
     parser_test!(
-        input: "async function (param) { }",
+        input: "async function (param) { ; }",
         expr_output: [
             FunctionExpression {
-                span: Span::new(0, 26),
+                span: Span::new(0, 28),
                 asynchronous: true,
                 generator: false,
                 identifier: None,
@@ -180,6 +194,9 @@ fn anonymous_async_function() {
                     ],
                     rest: None,
                 }),
+                body: vec![
+                    EmptyStatement { span: Span::new(25, 26) }.into()
+                ],
             }.into()
         ]
     );
@@ -196,6 +213,7 @@ fn empty_async_function() {
                 generator: false,
                 identifier: Some(Ident::new("fn", (15, 17))),
                 parameters: None,
+                body: vec![],
             }.into()
         ]
     );
@@ -204,10 +222,10 @@ fn empty_async_function() {
 #[test]
 fn async_function() {
     parser_test!(
-        input: "async function fn(param) { }",
+        input: "async function fn(param) { ; }",
         expr_output: [
             FunctionExpression {
-                span: Span::new(0, 28),
+                span: Span::new(0, 30),
                 asynchronous: true,
                 generator: false,
                 identifier: Some(Ident::new("fn", (15, 17))),
@@ -222,6 +240,9 @@ fn async_function() {
                     ],
                     rest: None,
                 }),
+                body: vec![
+                    EmptyStatement { span: Span::new(27, 28) }.into()
+                ],
             }.into()
         ]
     );
@@ -238,6 +259,7 @@ fn empty_anonymous_async_generator() {
                 generator: true,
                 identifier: None,
                 parameters: None,
+                body: vec![],
             }.into()
         ]
     );
@@ -246,10 +268,10 @@ fn empty_anonymous_async_generator() {
 #[test]
 fn anonymous_async_generator() {
     parser_test!(
-        input: "async function *(param) { }",
+        input: "async function *(param) { ; }",
         expr_output: [
             FunctionExpression {
-                span: Span::new(0, 27),
+                span: Span::new(0, 29),
                 asynchronous: true,
                 generator: true,
                 identifier: None,
@@ -264,6 +286,9 @@ fn anonymous_async_generator() {
                     ],
                     rest: None,
                 }),
+                body: vec![
+                    EmptyStatement { span: Span::new(26, 27) }.into()
+                ],
             }.into()
         ]
     );
@@ -280,6 +305,7 @@ fn empty_async_generator() {
                 generator: true,
                 identifier: Some(Ident::new("fn", (16, 18))),
                 parameters: None,
+                body: vec![],
             }.into()
         ]
     );
@@ -288,10 +314,10 @@ fn empty_async_generator() {
 #[test]
 fn async_generator() {
     parser_test!(
-        input: "async function* fn(param) { }",
+        input: "async function* fn(param) { ; }",
         expr_output: [
             FunctionExpression {
-                span: Span::new(0, 29),
+                span: Span::new(0, 31),
                 asynchronous: true,
                 generator: true,
                 identifier: Some(Ident::new("fn", (16, 18))),
@@ -306,6 +332,9 @@ fn async_generator() {
                     ],
                     rest: None,
                 }),
+                body: vec![
+                    EmptyStatement { span: Span::new(28, 29) }.into()
+                ],
             }.into()
         ]
     );
