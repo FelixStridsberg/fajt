@@ -1,6 +1,6 @@
 use crate::ast::{
-    ArrowFunctionExpression, BindingElement, Expression, FormalParameters, FunctionDeclaration,
-    FunctionExpression, Ident, Statement,
+    ArrowFunctionBody, ArrowFunctionExpression, BindingElement, Expression, FormalParameters,
+    FunctionDeclaration, FunctionExpression, Ident, Statement,
 };
 use crate::error::{ErrorKind, Result};
 use crate::parser::ContextModify;
@@ -20,14 +20,18 @@ impl Parser<'_, '_> {
             return err!(ErrorKind::UnexpectedToken(arrow));
         }
 
-        // TODO this can also be a plain expression
-        let _body = self.parse_function_body()?;
+        let body = if token_matches!(self.reader.current()?, punct!("{")) {
+            ArrowFunctionBody::Block(self.parse_function_body()?)
+        } else {
+            ArrowFunctionBody::Expression(self.parse_assignment_expression()?)
+        };
 
         let span = self.span_from(span_start);
         Ok(ArrowFunctionExpression {
             span,
             binding_parameter,
             parameters,
+            body,
         }
         .into())
     }

@@ -341,4 +341,11 @@ pub struct ArrowFunctionExpression {
     pub span: Span,
     pub binding_parameter: bool,
     pub parameters: Option<FormalParameters>,
+    pub body: ArrowFunctionBody,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub enum ArrowFunctionBody {
+    Expression(Expression),
+    Block(Vec<Statement>),
 }
