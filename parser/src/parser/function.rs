@@ -1,5 +1,6 @@
 use crate::ast::{
-    Expression, FormalParameters, FunctionDeclaration, FunctionExpression, Ident, Statement,
+    ArrowFunctionExpression, BindingElement, Expression, FormalParameters, FunctionDeclaration,
+    FunctionExpression, Ident, Statement,
 };
 use crate::error::{ErrorKind, Result};
 use crate::parser::ContextModify;
@@ -9,6 +10,53 @@ use fajt_lexer::punct;
 use fajt_lexer::token_matches;
 
 impl Parser<'_, '_> {
+    /// Parses the `ArrowFunction` goal symbol.
+    pub(super) fn parse_arrow_function_expression(&mut self) -> Result<Expression> {
+        let span_start = self.position();
+        let (parameters, binding_parameter) = self.parse_arrow_function_parameters()?;
+
+        let arrow = self.reader.consume()?;
+        if !token_matches!(arrow, punct!("=>")) {
+            return err!(ErrorKind::UnexpectedToken(arrow));
+        }
+
+        // TODO this can also be a plain expression
+        let _body = self.parse_function_body()?;
+
+        let span = self.span_from(span_start);
+        Ok(ArrowFunctionExpression {
+            span,
+            binding_parameter,
+            parameters,
+        }
+        .into())
+    }
+
+    /// Parses the `ArrowParameters` goal symbol.
+    /// Returns true in second tuple element if the parameters are a binding identifier without
+    /// parentheses.
+    fn parse_arrow_function_parameters(&mut self) -> Result<(Option<FormalParameters>, bool)> {
+        let span_start = self.position();
+        if self.is_identifier() {
+            let identifier = self.parse_identifier()?;
+            let span = self.span_from(span_start);
+            return Ok((
+                Some(FormalParameters {
+                    span: span.clone(),
+                    parameters: vec![BindingElement {
+                        span,
+                        pattern: identifier.into(),
+                        initializer: None,
+                    }],
+                    rest: None,
+                }),
+                true,
+            ));
+        }
+
+        todo!()
+    }
+
     /// Parses the `FunctionExpression` goal symbol.
     pub(super) fn parse_function_expression(&mut self) -> Result<Expression> {
         let span_start = self.position();

@@ -49,10 +49,15 @@ impl Parser<'_, '_> {
     pub(super) fn parse_assignment_expression(&mut self) -> Result<Expression> {
         match self.reader.current() {
             token_matches!(ok: keyword!("yield")) => self.parse_yield_expression(),
+            _ if self.is_identifier()
+                && token_matches!(self.reader.peek(), opt: punct!("=>"))
+                && !self.reader.peek().unwrap().first_on_line =>
+            {
+                self.parse_arrow_function_expression()
+            }
             _ => self.parse_conditional_expression(),
         }
 
-        // TODO ArrowFunction
         // TODO AsyncArrowFunction
         // TODO LeftHandSideExpression
     }

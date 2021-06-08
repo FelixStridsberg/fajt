@@ -2,6 +2,7 @@
 mod r#macro;
 
 mod expression {
+    mod arrow_function;
     mod async_expr;
     mod binary;
     mod class;

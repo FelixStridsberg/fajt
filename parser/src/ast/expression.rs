@@ -20,6 +20,7 @@ pub enum Expression {
     SequenceExpression(Box<SequenceExpression>),
     ClassExpression(Box<ClassExpression>),
     FunctionExpression(Box<FunctionExpression>),
+    ArrowFunctionExpression(Box<ArrowFunctionExpression>),
 }
 
 impl Expression {
@@ -117,6 +118,12 @@ impl From<ClassExpression> for Expression {
 impl From<FunctionExpression> for Expression {
     fn from(expr: FunctionExpression) -> Self {
         Self::FunctionExpression(Box::new(expr))
+    }
+}
+
+impl From<ArrowFunctionExpression> for Expression {
+    fn from(expr: ArrowFunctionExpression) -> Self {
+        Self::ArrowFunctionExpression(Box::new(expr))
     }
 }
 
@@ -327,4 +334,11 @@ pub struct FunctionExpression {
     pub identifier: Option<Ident>,
     pub parameters: Option<FormalParameters>,
     pub body: Vec<Statement>,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct ArrowFunctionExpression {
+    pub span: Span,
+    pub binding_parameter: bool,
+    pub parameters: Option<FormalParameters>,
 }
