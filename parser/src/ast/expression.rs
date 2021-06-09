@@ -3,7 +3,8 @@ use fajt_macros::FromString;
 
 use crate::ast::class::ClassExpression;
 use crate::ast::literal::*;
-use crate::ast::{FormalParameters, Ident, Statement};
+use crate::ast::{BindingPattern, FormalParameters, Ident, Statement};
+use std::mem::take;
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Expression {
@@ -21,6 +22,7 @@ pub enum Expression {
     ClassExpression(Box<ClassExpression>),
     FunctionExpression(Box<FunctionExpression>),
     ArrowFunctionExpression(Box<ArrowFunctionExpression>),
+    ParenthesizedExpression(Box<ParenthesizedExpression>),
 }
 
 impl Expression {
@@ -124,6 +126,12 @@ impl From<FunctionExpression> for Expression {
 impl From<ArrowFunctionExpression> for Expression {
     fn from(expr: ArrowFunctionExpression) -> Self {
         Self::ArrowFunctionExpression(Box::new(expr))
+    }
+}
+
+impl From<ParenthesizedExpression> for Expression {
+    fn from(expr: ParenthesizedExpression) -> Self {
+        Self::ParenthesizedExpression(Box::new(expr))
     }
 }
 
@@ -348,4 +356,36 @@ pub struct ArrowFunctionExpression {
 pub enum ArrowFunctionBody {
     Expression(Expression),
     Block(Vec<Statement>),
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct ParenthesizedExpression {
+    pub span: Span,
+    pub expression: Expression,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub(crate) struct CoverParenthesizedOrArrowParameters {
+    pub span: Span,
+    pub expression: Option<Expression>,
+    pub rest: Option<BindingPattern>,
+}
+
+impl CoverParenthesizedOrArrowParameters {
+    /// Returns `Expression` if this is a valid `Parenthesized` expression.
+    pub fn try_into_parenthesized(&mut self) -> Option<Expression> {
+        if self.expression.is_some() {
+            Some(
+                ParenthesizedExpression {
+                    span: self.span.clone(),
+                    expression: take(&mut self.expression).unwrap(),
+                }
+                .into(),
+            )
+        } else {
+            None
+        }
+    }
+
+    // TODO fn into_arrow_parameters() -> Option<FormalParameters>
 }

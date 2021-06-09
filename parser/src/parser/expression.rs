@@ -1,8 +1,9 @@
 use crate::ast::{
-    AwaitExpression, ConditionalExpression, Expression, Literal, SequenceExpression,
-    ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
+    AwaitExpression, BindingPattern, ConditionalExpression, CoverParenthesizedOrArrowParameters,
+    Expression, Literal, SequenceExpression, ThisExpression, UnaryExpression, UpdateExpression,
+    YieldExpression,
 };
-use crate::error::ErrorKind::UnexpectedToken;
+use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::Result;
 use crate::Parser;
 
@@ -257,10 +258,47 @@ impl Parser<'_, '_> {
             token_matches!(punct!("/")) => todo!("RegularExpressionLiteral"),
             // token_matches!(punct!("`")) => todo!("TemplateLiteral"), TODO missing from lexer
             token_matches!(punct!("(")) => {
-                todo!("CoverParenthesizedExpressionAndArrowParameterList")
+                let mut parenthesized_or_arrow_parameters =
+                    self.parse_cover_parenthesized_and_arrow_parameters()?;
+
+                if let Some(expression) = parenthesized_or_arrow_parameters.try_into_parenthesized()
+                {
+                    expression
+                } else {
+                    todo!("CoverParenthesizedExpressionAndArrowParameterList")
+                }
             }
             _ if self.is_identifier() => self.parse_identifier_reference()?,
             r => unimplemented!("TOKEN: {:?}", r),
+        })
+    }
+
+    /// Parses the `CoverParenthesizedExpressionAndArrowParameterList` goal symbol.
+    fn parse_cover_parenthesized_and_arrow_parameters(
+        &mut self,
+    ) -> Result<CoverParenthesizedOrArrowParameters> {
+        let span_start = self.position();
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, punct!("(")));
+
+        let mut expression: Option<Expression> = None;
+        let rest: Option<BindingPattern> = None;
+
+        expression = Some(self.parse_expression()?);
+
+        let end_token = self.reader.consume()?;
+        if !token_matches!(end_token, punct!(")")) {
+            return err!(SyntaxError(
+                "Expected end of parenthesized expression: ')'".to_owned(),
+                end_token.span
+            ));
+        }
+
+        let span = self.span_from(span_start);
+        Ok(CoverParenthesizedOrArrowParameters {
+            span,
+            expression,
+            rest,
         })
     }
 
