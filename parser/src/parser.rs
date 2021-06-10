@@ -2,7 +2,6 @@ use fajt_common::io::{PeekRead, PeekReader};
 use fajt_lexer::punct;
 use fajt_lexer::token::{KeywordContext, Span, Token, TokenValue};
 use fajt_lexer::token_matches;
-use fajt_lexer::Lexer;
 
 use crate::ast::{Expression, Ident, Program, PropertyName};
 use crate::error::ErrorKind::UnexpectedToken;

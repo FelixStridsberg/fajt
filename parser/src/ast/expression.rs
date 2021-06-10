@@ -3,10 +3,9 @@ use fajt_macros::FromString;
 
 use crate::ast::class::ClassExpression;
 use crate::ast::literal::*;
-use crate::ast::{BindingPattern, FormalParameters, Ident, Statement};
+use crate::ast::{FormalParameters, Ident, Statement};
 use crate::Parser;
-use fajt_common::io::{PeekRead, PeekReader};
-use std::io::Cursor;
+use fajt_common::io::PeekReader;
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Expression {

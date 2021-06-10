@@ -60,7 +60,7 @@ fn no_arguments() {
         expr_output: [
             ArrowFunctionExpression {
                 span: Span::new(0, 8),
-                binding_parameter: true,
+                binding_parameter: false,
                 parameters: None,
                 body: ArrowFunctionBody::Block(vec![])
             }.into()

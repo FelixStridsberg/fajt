@@ -1,7 +1,6 @@
 use crate::error::{Error, ErrorKind};
 use fajt_common::io::PeekRead;
 use fajt_macros::FromString;
-use std::io::Cursor;
 use std::vec::IntoIter;
 
 #[macro_export]
