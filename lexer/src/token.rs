@@ -1,5 +1,8 @@
 use crate::error::{Error, ErrorKind};
 use fajt_macros::FromString;
+use fajt_common::io::PeekRead;
+use std::io::Cursor;
+use std::vec::IntoIter;
 
 #[macro_export]
 macro_rules! token_matches {
@@ -384,6 +387,15 @@ impl Token {
         }
     }
 }
+
+impl PeekRead<Token> for IntoIter<Token> {
+    type Error = ();
+
+    fn next(&mut self) -> std::result::Result<Option<(usize, Token)>, Self::Error> {
+        todo!("HEJ")
+    }
+}
+
 
 #[cfg(test)]
 mod tests {

@@ -52,3 +52,18 @@ fn identifier_argument_expression_body() {
         ]
     );
 }
+
+#[test]
+fn no_arguments() {
+    parser_test!(
+        input: "() => {}",
+        expr_output: [
+            ArrowFunctionExpression {
+                span: Span::new(0, 8),
+                binding_parameter: true,
+                parameters: None,
+                body: ArrowFunctionBody::Block(vec![])
+            }.into()
+        ]
+    );
+}

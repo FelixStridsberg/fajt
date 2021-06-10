@@ -261,11 +261,11 @@ impl Parser<'_, '_> {
                 let mut parenthesized_or_arrow_parameters =
                     self.parse_cover_parenthesized_and_arrow_parameters()?;
 
-                if let Some(expression) = parenthesized_or_arrow_parameters.try_into_parenthesized()
-                {
-                    expression
+                if token_matches!(self.reader.current(), ok: punct!("=>")) && !self.reader.current().unwrap().first_on_line {
+                    let parameters = parenthesized_or_arrow_parameters.into_arrow_parameters()?;
+                    todo!("ARROW! {:?}", parameters)
                 } else {
-                    todo!("CoverParenthesizedExpressionAndArrowParameterList")
+                    parenthesized_or_arrow_parameters.into_expression()?
                 }
             }
             _ if self.is_identifier() => self.parse_identifier_reference()?,
@@ -281,24 +281,27 @@ impl Parser<'_, '_> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("(")));
 
-        let mut expression: Option<Expression> = None;
-        let rest: Option<BindingPattern> = None;
+        let mut tokens = Vec::new();
+        let mut depth = 1;
+        loop {
+            let token = self.reader.consume()?;
+            match &token {
+                token_matches!(punct!("(")) => depth += 1,
+                token_matches!(punct!(")")) => depth -= 1,
+                _ => {},
+            }
 
-        expression = Some(self.parse_expression()?);
+            if depth == 0 {
+                break;
+            }
 
-        let end_token = self.reader.consume()?;
-        if !token_matches!(end_token, punct!(")")) {
-            return err!(SyntaxError(
-                "Expected end of parenthesized expression: ')'".to_owned(),
-                end_token.span
-            ));
+            tokens.push(token);
         }
 
         let span = self.span_from(span_start);
         Ok(CoverParenthesizedOrArrowParameters {
             span,
-            expression,
-            rest,
+            tokens,
         })
     }
 

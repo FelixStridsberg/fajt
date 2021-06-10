@@ -1,10 +1,12 @@
-use fajt_lexer::token::Span;
+use fajt_lexer::token::{Span, Token};
 use fajt_macros::FromString;
 
 use crate::ast::class::ClassExpression;
 use crate::ast::literal::*;
 use crate::ast::{BindingPattern, FormalParameters, Ident, Statement};
-use std::mem::take;
+use crate::Parser;
+use fajt_common::io::{PeekReader, PeekRead};
+use std::io::Cursor;
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Expression {
@@ -367,25 +369,23 @@ pub struct ParenthesizedExpression {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub(crate) struct CoverParenthesizedOrArrowParameters {
     pub span: Span,
-    pub expression: Option<Expression>,
-    pub rest: Option<BindingPattern>,
+    pub tokens: Vec<Token>,
 }
 
 impl CoverParenthesizedOrArrowParameters {
-    /// Returns `Expression` if this is a valid `Parenthesized` expression.
-    pub fn try_into_parenthesized(&mut self) -> Option<Expression> {
-        if self.expression.is_some() {
-            Some(
-                ParenthesizedExpression {
-                    span: self.span.clone(),
-                    expression: take(&mut self.expression).unwrap(),
-                }
-                .into(),
-            )
+    pub fn into_arrow_parameters(self) -> crate::error::Result<Option<FormalParameters>> {
+        if self.tokens.is_empty() {
+            Ok(None)
         } else {
-            None
+            todo!()
         }
     }
 
-    // TODO fn into_arrow_parameters() -> Option<FormalParameters>
+    pub fn into_expression(self) -> crate::error::Result<Expression> {
+//        let a = self.tokens.into_iter();
+//        let reader = PeekReader::new(a).unwrap();
+//        let parser = Parser::new(&mut reader);
+
+        todo!("A")
+    }
 }
