@@ -1,6 +1,6 @@
 use crate::error::{Error, ErrorKind};
-use fajt_macros::FromString;
 use fajt_common::io::PeekRead;
+use fajt_macros::FromString;
 use std::io::Cursor;
 use std::vec::IntoIter;
 
@@ -395,7 +395,6 @@ impl PeekRead<Token> for IntoIter<Token> {
         todo!("HEJ")
     }
 }
-
 
 #[cfg(test)]
 mod tests {

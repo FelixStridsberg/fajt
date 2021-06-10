@@ -4,11 +4,15 @@ use crate::ast::{
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 use crate::Parser;
+use fajt_common::io::PeekRead;
 use fajt_lexer::punct;
-use fajt_lexer::token::TokenValue;
+use fajt_lexer::token::{Token, TokenValue};
 use fajt_lexer::token_matches;
 
-impl Parser<'_, '_> {
+impl<I> Parser<'_, I>
+where
+    I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+{
     /// Consumes a know literal token from the reader and returns an expression of it.
     pub(super) fn consume_literal(&mut self, literal: Literal) -> Result<Expression> {
         let token = self.reader.consume()?;

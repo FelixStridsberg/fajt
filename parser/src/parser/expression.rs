@@ -7,11 +7,16 @@ use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::Result;
 use crate::Parser;
 
+use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
+use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
 
-impl Parser<'_, '_> {
+impl<I> Parser<'_, I>
+where
+    I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+{
     /// Parses the `Expression` goal symbol.
     pub(super) fn parse_expression(&mut self) -> Result<Expression> {
         let span_start = self.position();
@@ -261,7 +266,9 @@ impl Parser<'_, '_> {
                 let mut parenthesized_or_arrow_parameters =
                     self.parse_cover_parenthesized_and_arrow_parameters()?;
 
-                if token_matches!(self.reader.current(), ok: punct!("=>")) && !self.reader.current().unwrap().first_on_line {
+                if token_matches!(self.reader.current(), ok: punct!("=>"))
+                    && !self.reader.current().unwrap().first_on_line
+                {
                     let parameters = parenthesized_or_arrow_parameters.into_arrow_parameters()?;
                     todo!("ARROW! {:?}", parameters)
                 } else {
@@ -288,7 +295,7 @@ impl Parser<'_, '_> {
             match &token {
                 token_matches!(punct!("(")) => depth += 1,
                 token_matches!(punct!(")")) => depth -= 1,
-                _ => {},
+                _ => {}
             }
 
             if depth == 0 {
@@ -299,10 +306,7 @@ impl Parser<'_, '_> {
         }
 
         let span = self.span_from(span_start);
-        Ok(CoverParenthesizedOrArrowParameters {
-            span,
-            tokens,
-        })
+        Ok(CoverParenthesizedOrArrowParameters { span, tokens })
     }
 
     /// Parses the `this` expression which is part of the `PrimaryExpression` goal symbol.

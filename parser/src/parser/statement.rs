@@ -2,11 +2,16 @@ use crate::ast::Statement::Expression;
 use crate::ast::{BlockStatement, EmptyStatement, Statement, VariableKind};
 use crate::error::Result;
 use crate::Parser;
+use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
+use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
 
-impl Parser<'_, '_> {
+impl<I> Parser<'_, I>
+where
+    I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+{
     pub(super) fn parse_statement(&mut self) -> Result<Statement> {
         Ok(match self.reader.current()? {
             token_matches!(punct!(";")) => self.parse_empty_statement()?,

@@ -4,12 +4,16 @@ use crate::ast::{
 use crate::error::Result;
 use crate::Parser;
 
+use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token::{Span, Token};
 use fajt_lexer::token_matches;
 
-impl Parser<'_, '_> {
+impl<'a, I> Parser<'a, I>
+where
+    I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+{
     /// Parses the `ShortCircuitExpression` goal symbol.
     pub(super) fn parse_short_circuit_expression(&mut self) -> Result<Expression> {
         self.parse_logical_expression(Self::parse_logical_or_expression, |token| {

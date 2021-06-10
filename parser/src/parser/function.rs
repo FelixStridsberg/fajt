@@ -5,11 +5,16 @@ use crate::ast::{
 use crate::error::{ErrorKind, Result};
 use crate::parser::ContextModify;
 use crate::Parser;
+use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
+use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
 
-impl Parser<'_, '_> {
+impl<I> Parser<'_, I>
+where
+    I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+{
     /// Parses the `ArrowFunction` goal symbol.
     pub(super) fn parse_arrow_function_expression(&mut self) -> Result<Expression> {
         let span_start = self.position();

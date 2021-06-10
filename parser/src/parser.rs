@@ -1,4 +1,4 @@
-use fajt_common::io::PeekReader;
+use fajt_common::io::{PeekRead, PeekReader};
 use fajt_lexer::punct;
 use fajt_lexer::token::{KeywordContext, Span, Token, TokenValue};
 use fajt_lexer::token_matches;
@@ -85,13 +85,19 @@ impl Default for Context {
     }
 }
 
-pub struct Parser<'a, 'b> {
+pub struct Parser<'a, I>
+where
+    I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+{
     context: Context,
-    reader: &'a mut PeekReader<Token, Lexer<'b>>,
+    reader: &'a mut PeekReader<Token, I>,
 }
 
-impl<'a, 'b> Parser<'a, 'b> {
-    pub fn new(reader: &'a mut PeekReader<Token, Lexer<'b>>) -> Result<Self> {
+impl<'a, I> Parser<'a, I>
+where
+    I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+{
+    pub fn new(reader: &'a mut PeekReader<Token, I>) -> Result<Self> {
         Ok(Parser {
             context: Context::default(),
             reader,
@@ -119,7 +125,7 @@ impl<'a, 'b> Parser<'a, 'b> {
         Span::new(start, self.reader.position())
     }
 
-    pub fn with_context(&mut self, modify: &ContextModify) -> Parser<'_, 'b> {
+    pub fn with_context(&mut self, modify: &ContextModify) -> Parser<'_, I> {
         Parser {
             context: self.context.modify(modify),
             reader: &mut self.reader,

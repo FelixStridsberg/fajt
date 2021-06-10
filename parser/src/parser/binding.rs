@@ -4,12 +4,16 @@ use crate::ast::{
 use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::Result;
 use crate::Parser;
+use fajt_common::io::PeekRead;
 use fajt_lexer::punct;
 use fajt_lexer::token::Punct::{BraceClose, BracketClose};
-use fajt_lexer::token::{Punct, TokenValue};
+use fajt_lexer::token::{Punct, Token, TokenValue};
 use fajt_lexer::token_matches;
 
-impl Parser<'_, '_> {
+impl<I> Parser<'_, I>
+where
+    I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+{
     /// Parses the `BindingPattern` goal symbol.
     pub(super) fn parse_binding_pattern(&mut self) -> Result<BindingPattern> {
         Ok(match self.reader.current()? {
