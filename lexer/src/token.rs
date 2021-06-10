@@ -389,10 +389,14 @@ impl Token {
 }
 
 impl PeekRead<Token> for IntoIter<Token> {
-    type Error = ();
+    type Error = Error;
 
     fn next(&mut self) -> std::result::Result<Option<(usize, Token)>, Self::Error> {
-        todo!("HEJ")
+        if let Some(token) = Iterator::next(self) {
+            Ok(Some((token.span.end, token)))
+        } else {
+            Ok(None)
+        }
     }
 }
 

@@ -382,10 +382,16 @@ impl CoverParenthesizedOrArrowParameters {
     }
 
     pub fn into_expression(self) -> crate::error::Result<Expression> {
-        //        let a = self.tokens.into_iter();
-        //        let reader = PeekReader::new(a).unwrap();
-        //        let parser = Parser::new(&mut reader);
+        let tokens = self.tokens.into_iter();
+        let mut reader = PeekReader::new(tokens).unwrap();
+        let mut parser = Parser::new(&mut reader).unwrap();
 
-        todo!("A")
+        let expression = parser.parse_expression().unwrap();
+
+        Ok(ParenthesizedExpression {
+            span: self.span,
+            expression,
+        }
+        .into())
     }
 }
