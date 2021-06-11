@@ -1,7 +1,7 @@
 use crate::ast::{
-    ArrowFunctionBody, ArrowFunctionExpression, AwaitExpression, ConditionalExpression,
-    CoverParenthesizedOrArrowParameters, Expression, Literal, SequenceExpression, ThisExpression,
-    UnaryExpression, UpdateExpression, YieldExpression,
+    AwaitExpression, ConditionalExpression, CoverParenthesizedOrArrowParameters, Expression,
+    Literal, SequenceExpression, ThisExpression, UnaryExpression, UpdateExpression,
+    YieldExpression,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
@@ -71,18 +71,8 @@ where
                 if token_matches!(self.reader.current(), ok: punct!("=>"))
                     && !self.reader.current().unwrap().first_on_line
                 {
-                    self.reader.consume()?;
                     let parameters = parenthesized_or_arrow_parameters.into_arrow_parameters()?;
-                    let body = self.parse_function_body()?;
-
-                    let span = self.span_from(span_start);
-                    Ok(ArrowFunctionExpression {
-                        span,
-                        binding_parameter: false,
-                        parameters,
-                        body: ArrowFunctionBody::Block(body),
-                    }
-                    .into())
+                    self.parse_arrow_function_expression(span_start, false, parameters)
                 } else {
                     parenthesized_or_arrow_parameters.into_expression()
                 }
