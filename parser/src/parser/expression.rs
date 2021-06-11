@@ -60,8 +60,17 @@ where
                     self.reader.consume()?;
                     let parameters = Some(self.parse_arrow_identifier_argument()?);
                     self.parse_arrow_function_expression(span_start, true, parameters)
+                } else if token_matches!(self.reader.peek(), opt: punct!("(")) {
+                    let span_start = self.position();
+                    let cover_call_and_async_arrow_head =
+                        self.parse_cover_call_and_async_arrow_head()?;
+                    if token_matches!(self.reader.current(), ok: punct!("=>")) {
+                        let parameters = cover_call_and_async_arrow_head.into_arrow_parameters()?;
+                        self.parse_arrow_function_expression(span_start, false, parameters)
+                    } else {
+                        cover_call_and_async_arrow_head.into_call_expression()
+                    }
                 } else {
-                    // TODO this is not always true:
                     self.parse_conditional_expression()
                 }
             }

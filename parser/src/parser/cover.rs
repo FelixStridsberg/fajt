@@ -1,7 +1,8 @@
-use crate::ast::CoverParenthesizedAndArrowParameters;
+use crate::ast::{CoverCallExpressionAndAsyncArrowHead, CoverParenthesizedAndArrowParameters};
 use crate::error::Result;
 use crate::Parser;
 use fajt_common::io::PeekRead;
+use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
@@ -15,16 +16,35 @@ where
         &mut self,
     ) -> Result<CoverParenthesizedAndArrowParameters> {
         let span_start = self.position();
-        let tokens = self.collect_parenthesized_tokens()?;
+        let mut tokens = Vec::new();
+
+        self.collect_parenthesized_tokens(&mut tokens)?;
+
         let span = self.span_from(span_start);
         Ok(CoverParenthesizedAndArrowParameters { span, tokens })
     }
 
-    fn collect_parenthesized_tokens(&mut self) -> Result<Vec<Token>> {
+    /// Parses the `CoverCallExpressionAndAsyncArrowHead` goal symbol.
+    pub(super) fn parse_cover_call_and_async_arrow_head(
+        &mut self,
+    ) -> Result<CoverCallExpressionAndAsyncArrowHead> {
+        let async_token = self.reader.consume()?;
+        debug_assert!(token_matches!(async_token, keyword!("async")));
+
+        let span_start = self.position();
+        let mut tokens = Vec::new();
+        tokens.push(async_token);
+
+        self.collect_parenthesized_tokens(&mut tokens)?;
+
+        let span = self.span_from(span_start);
+        Ok(CoverCallExpressionAndAsyncArrowHead { span, tokens })
+    }
+
+    fn collect_parenthesized_tokens(&mut self, tokens: &mut Vec<Token>) -> Result<()> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("(")));
 
-        let mut tokens = Vec::new();
         tokens.push(token);
 
         let mut depth = 1;
@@ -43,6 +63,6 @@ where
             }
         }
 
-        Ok(tokens)
+        Ok(())
     }
 }

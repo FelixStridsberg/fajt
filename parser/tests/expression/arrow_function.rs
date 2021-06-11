@@ -121,6 +121,21 @@ fn no_parameters() {
 }
 
 #[test]
+fn async_no_parameters() {
+    parser_test!(
+        input: "async () => {}",
+        expr_output: [
+            ArrowFunctionExpression {
+                span: Span::new(0, 14),
+                binding_parameter: false,
+                parameters: None,
+                body: ArrowFunctionBody::Block(vec![])
+            }.into()
+        ]
+    );
+}
+
+#[test]
 fn parameters_and_body() {
     parser_test!(
         input: "(a) => { ; }",
