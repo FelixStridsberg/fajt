@@ -100,13 +100,13 @@ fn parameters_and_body() {
 #[test]
 fn multiple_parameters() {
     parser_test!(
-        input: "(a, b) => { ; }",
+        input: "(a, b, ...rest) => { ; }",
         expr_output: [
             ArrowFunctionExpression {
-                span: Span::new(0, 15),
+                span: Span::new(0, 24),
                 binding_parameter: false,
                 parameters: Some(FormalParameters {
-                    span: Span::new(0, 6),
+                    span: Span::new(0, 15),
                     parameters: vec![
                         BindingElement {
                             span: Span::new(1, 2),
@@ -119,11 +119,11 @@ fn multiple_parameters() {
                             initializer: None,
                         }
                     ],
-                    rest: None,
+                    rest: Some(BindingPattern::Ident(Ident::new("rest", (10, 14)))),
                 }),
                 body: ArrowFunctionBody::Block(vec![
                     EmptyStatement {
-                        span: Span::new(12, 13),
+                        span: Span::new(21, 22),
                     }.into()
                 ])
             }.into()
