@@ -55,6 +55,9 @@ where
     pub(super) fn parse_assignment_expression(&mut self) -> Result<Expression> {
         match self.reader.current() {
             token_matches!(ok: keyword!("yield")) => self.parse_yield_expression(),
+            token_matches!(ok: keyword!("async")) if self.followed_by_new_lined() => {
+                todo!()
+            }
             token_matches!(ok: punct!("(")) => {
                 let span_start = self.position();
                 let parenthesized_or_arrow_parameters =
@@ -72,11 +75,11 @@ where
             _ if self.is_identifier()
                 && token_matches!(self.reader.peek(), opt: punct!("=>"))
                 && !self.reader.peek().unwrap().first_on_line =>
-                {
-                    let span_start = self.position();
-                    let parameters = Some(self.parse_arrow_identifier_argument()?);
-                    self.parse_arrow_function_expression(span_start, true, parameters)
-                }
+            {
+                let span_start = self.position();
+                let parameters = Some(self.parse_arrow_identifier_argument()?);
+                self.parse_arrow_function_expression(span_start, true, parameters)
+            }
             _ => self.parse_conditional_expression(),
         }
 

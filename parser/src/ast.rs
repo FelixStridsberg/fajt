@@ -1,5 +1,6 @@
 pub use binding::*;
 pub use class::*;
+pub(crate) use cover::*;
 pub use expression::*;
 pub use literal::*;
 pub use statement::*;
@@ -10,6 +11,7 @@ mod binding;
 #[macro_use]
 mod expression;
 mod class;
+mod cover;
 mod literal;
 mod statement;
 
