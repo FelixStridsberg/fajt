@@ -15,6 +15,12 @@ where
         &mut self,
     ) -> Result<CoverParenthesizedAndArrowParameters> {
         let span_start = self.position();
+        let tokens = self.collect_parenthesized_tokens()?;
+        let span = self.span_from(span_start);
+        Ok(CoverParenthesizedAndArrowParameters { span, tokens })
+    }
+
+    fn collect_parenthesized_tokens(&mut self) -> Result<Vec<Token>> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("(")));
 
@@ -37,7 +43,6 @@ where
             }
         }
 
-        let span = self.span_from(span_start);
-        Ok(CoverParenthesizedAndArrowParameters { span, tokens })
+        Ok(tokens)
     }
 }
