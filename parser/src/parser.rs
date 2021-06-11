@@ -136,18 +136,12 @@ where
         self.reader.peek().map_or(false, |t| t.first_on_line)
     }
 
+    fn peek_is_identifier(&self) -> bool {
+        is_identifier(self.reader.peek(), self.context.keyword_context())
+    }
+
     fn is_identifier(&self) -> bool {
-        match self.reader.current() {
-            Ok(Token {
-                value: TokenValue::Identifier(_),
-                ..
-            }) => true,
-            Ok(Token {
-                value: TokenValue::Keyword(k),
-                ..
-            }) => k.is_allows_as_identifier(self.context.keyword_context()),
-            _ => false,
-        }
+        is_identifier(self.reader.current().ok(), self.context.keyword_context())
     }
 
     fn parse_identifier(&mut self) -> Result<Ident> {
@@ -215,5 +209,19 @@ where
             token_matches!(punct!(")")) => Ok(()),
             _ => err!(UnexpectedToken(self.reader.consume()?)),
         }
+    }
+}
+
+fn is_identifier(token: Option<&Token>, keyword_context: KeywordContext) -> bool {
+    match token {
+        Some(Token {
+            value: TokenValue::Identifier(_),
+            ..
+        }) => true,
+        Some(Token {
+            value: TokenValue::Keyword(k),
+            ..
+        }) => k.is_allows_as_identifier(keyword_context),
+        _ => false,
     }
 }
