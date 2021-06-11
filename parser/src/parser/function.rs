@@ -21,6 +21,7 @@ where
         &mut self,
         span_start: usize,
         binding_parameter: bool,
+        asynchronous: bool,
         parameters: Option<FormalParameters>,
     ) -> Result<Expression> {
         let arrow = self.reader.consume()?;
@@ -37,6 +38,7 @@ where
         let span = self.span_from(span_start);
         Ok(ArrowFunctionExpression {
             span,
+            asynchronous,
             binding_parameter,
             parameters,
             body,

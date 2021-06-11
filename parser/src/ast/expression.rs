@@ -346,6 +346,7 @@ pub struct FunctionExpression {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ArrowFunctionExpression {
     pub span: Span,
+    pub asynchronous: bool,
     pub binding_parameter: bool,
     pub parameters: Option<FormalParameters>,
     pub body: ArrowFunctionBody,

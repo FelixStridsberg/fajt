@@ -8,6 +8,7 @@ fn identifier_argument() {
         expr_output: [
             ArrowFunctionExpression {
                 span: Span::new(0, 7),
+                asynchronous: false,
                 binding_parameter: true,
                 parameters: Some(FormalParameters {
                     span: Span::new(0, 1),
@@ -33,6 +34,7 @@ fn async_identifier_argument() {
         expr_output: [
             ArrowFunctionExpression {
                 span: Span::new(0, 13),
+                asynchronous: true,
                 binding_parameter: true,
                 parameters: Some(FormalParameters {
                     span: Span::new(6, 7),
@@ -58,6 +60,7 @@ fn identifier_argument_expression_body() {
         expr_output: [
             ArrowFunctionExpression {
                 span: Span::new(0, 6),
+                asynchronous: false,
                 binding_parameter: true,
                 parameters: Some(FormalParameters {
                     span: Span::new(0, 1),
@@ -85,6 +88,7 @@ fn async_identifier_argument_expression_body() {
         expr_output: [
             ArrowFunctionExpression {
                 span: Span::new(0, 12),
+                asynchronous: true,
                 binding_parameter: true,
                 parameters: Some(FormalParameters {
                     span: Span::new(6, 7),
@@ -112,6 +116,7 @@ fn no_parameters() {
         expr_output: [
             ArrowFunctionExpression {
                 span: Span::new(0, 8),
+                asynchronous: false,
                 binding_parameter: false,
                 parameters: None,
                 body: ArrowFunctionBody::Block(vec![])
@@ -127,6 +132,7 @@ fn async_no_parameters() {
         expr_output: [
             ArrowFunctionExpression {
                 span: Span::new(0, 14),
+                asynchronous: true,
                 binding_parameter: false,
                 parameters: None,
                 body: ArrowFunctionBody::Block(vec![])
@@ -142,6 +148,7 @@ fn parameters_and_body() {
         expr_output: [
             ArrowFunctionExpression {
                 span: Span::new(0, 12),
+                asynchronous: false,
                 binding_parameter: false,
                 parameters: Some(FormalParameters {
                     span: Span::new(0, 3),
@@ -171,6 +178,7 @@ fn multiple_parameters() {
         expr_output: [
             ArrowFunctionExpression {
                 span: Span::new(0, 24),
+                asynchronous: false,
                 binding_parameter: false,
                 parameters: Some(FormalParameters {
                     span: Span::new(0, 15),
@@ -205,6 +213,7 @@ fn async_multiple_parameters() {
         expr_output: [
             ArrowFunctionExpression {
                 span: Span::new(0, 30),
+                asynchronous: true,
                 binding_parameter: false,
                 parameters: Some(FormalParameters {
                     span: Span::new(6, 21),
