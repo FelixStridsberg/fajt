@@ -1,5 +1,5 @@
 use crate::ast::{
-    AwaitExpression, ConditionalExpression, CoverParenthesizedAndArrowParameters, Expression,
+    AwaitExpression, ConditionalExpression, Expression,
     Literal, SequenceExpression, ThisExpression, UnaryExpression, UpdateExpression,
     YieldExpression,
 };
@@ -287,37 +287,6 @@ where
             _ if self.is_identifier() => self.parse_identifier_reference()?,
             r => unimplemented!("TOKEN: {:?}", r),
         })
-    }
-
-    /// Parses the `CoverParenthesizedExpressionAndArrowParameterList` goal symbol.
-    fn parse_cover_parenthesized_and_arrow_parameters(
-        &mut self,
-    ) -> Result<CoverParenthesizedAndArrowParameters> {
-        let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, punct!("(")));
-
-        let mut tokens = Vec::new();
-        tokens.push(token);
-
-        let mut depth = 1;
-        loop {
-            let token = self.reader.consume()?;
-            match &token {
-                token_matches!(punct!("(")) => depth += 1,
-                token_matches!(punct!(")")) => depth -= 1,
-                _ => {}
-            }
-
-            tokens.push(token);
-
-            if depth == 0 {
-                break;
-            }
-        }
-
-        let span = self.span_from(span_start);
-        Ok(CoverParenthesizedAndArrowParameters { span, tokens })
     }
 
     /// Parses the `this` expression which is part of the `PrimaryExpression` goal symbol.

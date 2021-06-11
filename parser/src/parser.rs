@@ -10,6 +10,7 @@ use crate::error::Result;
 mod binary_expression;
 mod binding;
 mod class;
+mod cover;
 mod expression;
 mod function;
 mod literal;
