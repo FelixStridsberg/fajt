@@ -366,12 +366,12 @@ pub struct ParenthesizedExpression {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub(crate) struct CoverParenthesizedOrArrowParameters {
+pub(crate) struct CoverParenthesizedAndArrowParameters {
     pub span: Span,
     pub tokens: Vec<Token>,
 }
 
-impl CoverParenthesizedOrArrowParameters {
+impl CoverParenthesizedAndArrowParameters {
     pub fn into_arrow_parameters(self) -> crate::error::Result<Option<FormalParameters>> {
         let tokens = self.tokens.into_iter();
         let mut reader = PeekReader::new(tokens).unwrap();

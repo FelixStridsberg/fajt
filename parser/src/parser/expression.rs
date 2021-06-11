@@ -1,5 +1,5 @@
 use crate::ast::{
-    AwaitExpression, ConditionalExpression, CoverParenthesizedOrArrowParameters, Expression,
+    AwaitExpression, ConditionalExpression, CoverParenthesizedAndArrowParameters, Expression,
     Literal, SequenceExpression, ThisExpression, UnaryExpression, UpdateExpression,
     YieldExpression,
 };
@@ -289,7 +289,7 @@ where
     /// Parses the `CoverParenthesizedExpressionAndArrowParameterList` goal symbol.
     fn parse_cover_parenthesized_and_arrow_parameters(
         &mut self,
-    ) -> Result<CoverParenthesizedOrArrowParameters> {
+    ) -> Result<CoverParenthesizedAndArrowParameters> {
         let span_start = self.position();
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("(")));
@@ -314,7 +314,7 @@ where
         }
 
         let span = self.span_from(span_start);
-        Ok(CoverParenthesizedOrArrowParameters { span, tokens })
+        Ok(CoverParenthesizedAndArrowParameters { span, tokens })
     }
 
     /// Parses the `this` expression which is part of the `PrimaryExpression` goal symbol.
