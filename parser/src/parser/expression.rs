@@ -1,7 +1,6 @@
 use crate::ast::{
-    AwaitExpression, ConditionalExpression, Expression,
-    Literal, SequenceExpression, ThisExpression, UnaryExpression, UpdateExpression,
-    YieldExpression,
+    AwaitExpression, ConditionalExpression, Expression, Literal, SequenceExpression,
+    ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
@@ -55,8 +54,16 @@ where
     pub(super) fn parse_assignment_expression(&mut self) -> Result<Expression> {
         match self.reader.current() {
             token_matches!(ok: keyword!("yield")) => self.parse_yield_expression(),
-            token_matches!(ok: keyword!("async")) if self.followed_by_new_lined() => {
-                todo!()
+            token_matches!(ok: keyword!("async")) => {
+                if self.peek_is_identifier() {
+                    let span_start = self.position();
+                    self.reader.consume()?;
+                    let parameters = Some(self.parse_arrow_identifier_argument()?);
+                    self.parse_arrow_function_expression(span_start, true, parameters)
+                } else {
+                    // TODO this is not always true:
+                    self.parse_conditional_expression()
+                }
             }
             token_matches!(ok: punct!("(")) => {
                 let span_start = self.position();
