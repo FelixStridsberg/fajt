@@ -61,6 +61,30 @@ where
             {
                 self.parse_arrow_function_expression()
             }
+            token_matches!(ok: punct!("(")) => {
+                let span_start = self.position();
+                let parenthesized_or_arrow_parameters =
+                    self.parse_cover_parenthesized_and_arrow_parameters()?;
+
+                if token_matches!(self.reader.current(), ok: punct!("=>"))
+                    && !self.reader.current().unwrap().first_on_line
+                {
+                    self.reader.consume()?;
+                    let parameters = parenthesized_or_arrow_parameters.into_arrow_parameters()?;
+                    let body = self.parse_function_body()?;
+
+                    let span = self.span_from(span_start);
+                    Ok(ArrowFunctionExpression {
+                        span,
+                        binding_parameter: false,
+                        parameters,
+                        body: ArrowFunctionBody::Block(body),
+                    }
+                    .into())
+                } else {
+                    parenthesized_or_arrow_parameters.into_expression()
+                }
+            }
             _ => self.parse_conditional_expression(),
         }
 
@@ -263,29 +287,9 @@ where
             token_matches!(punct!("/")) => todo!("RegularExpressionLiteral"),
             // token_matches!(punct!("`")) => todo!("TemplateLiteral"), TODO missing from lexer
             token_matches!(punct!("(")) => {
-                let span_start = self.position();
                 let parenthesized_or_arrow_parameters =
                     self.parse_cover_parenthesized_and_arrow_parameters()?;
-
-                if token_matches!(self.reader.current(), ok: punct!("=>"))
-                    && !self.reader.current().unwrap().first_on_line
-                {
-                    self.reader.consume()?;
-                    let parameters =
-                        parenthesized_or_arrow_parameters.into_arrow_parameters()?;
-                    let body = self.parse_function_body()?;
-
-                    let span = self.span_from(span_start);
-                    ArrowFunctionExpression {
-                        span,
-                        binding_parameter: false,
-                        parameters,
-                        body: ArrowFunctionBody::Block(body),
-                    }
-                    .into()
-                } else {
-                    parenthesized_or_arrow_parameters.into_expression()?
-                }
+                parenthesized_or_arrow_parameters.into_expression()?
             }
             _ if self.is_identifier() => self.parse_identifier_reference()?,
             r => unimplemented!("TOKEN: {:?}", r),

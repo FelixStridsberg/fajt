@@ -44,9 +44,7 @@ where
     /// Parses the `ArrowParameters` goal symbol.
     /// Returns true in second tuple element if the parameters are a binding identifier without
     /// parentheses.
-    pub(crate) fn parse_arrow_identifier_argument(
-        &mut self,
-    ) -> Result<FormalParameters> {
+    pub(crate) fn parse_arrow_identifier_argument(&mut self) -> Result<FormalParameters> {
         let span_start = self.position();
         let identifier = self.parse_identifier()?;
         let span = self.span_from(span_start);
