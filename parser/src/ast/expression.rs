@@ -372,18 +372,17 @@ pub(crate) struct CoverParenthesizedOrArrowParameters {
 }
 
 impl CoverParenthesizedOrArrowParameters {
-    pub fn into_arrow_parameters(self) -> crate::error::Result<(Option<FormalParameters>, bool)> {
-        if self.tokens.is_empty() {
-            Ok((None, false))
-        } else {
-            let tokens = self.tokens.into_iter();
-            let mut reader = PeekReader::new(tokens).unwrap();
-            let mut parser = Parser::new(&mut reader).unwrap();
-            Ok((parser.parse_arrow_function_parameters()?.0, false))
-        }
+    pub fn into_arrow_parameters(self) -> crate::error::Result<Option<FormalParameters>> {
+        let tokens = self.tokens.into_iter();
+        let mut reader = PeekReader::new(tokens).unwrap();
+        let mut parser = Parser::new(&mut reader).unwrap();
+        Ok(parser.parse_formal_parameters()?)
     }
 
-    pub fn into_expression(self) -> crate::error::Result<Expression> {
+    pub fn into_expression(mut self) -> crate::error::Result<Expression> {
+        self.tokens.drain(0..1);
+        self.tokens.pop();
+
         let tokens = self.tokens.into_iter();
         let mut reader = PeekReader::new(tokens).unwrap();
         let mut parser = Parser::new(&mut reader).unwrap();

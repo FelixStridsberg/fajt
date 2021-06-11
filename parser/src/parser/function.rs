@@ -18,7 +18,7 @@ where
     /// Parses the `ArrowFunction` goal symbol.
     pub(super) fn parse_arrow_function_expression(&mut self) -> Result<Expression> {
         let span_start = self.position();
-        let (parameters, binding_parameter) = self.parse_arrow_function_parameters()?;
+        let parameters = Some(self.parse_arrow_identifier_argument()?);
 
         let arrow = self.reader.consume()?;
         if !token_matches!(arrow, punct!("=>")) {
@@ -34,7 +34,7 @@ where
         let span = self.span_from(span_start);
         Ok(ArrowFunctionExpression {
             span,
-            binding_parameter,
+            binding_parameter: true,
             parameters,
             body,
         }
@@ -44,28 +44,21 @@ where
     /// Parses the `ArrowParameters` goal symbol.
     /// Returns true in second tuple element if the parameters are a binding identifier without
     /// parentheses.
-    pub(crate) fn parse_arrow_function_parameters(
+    pub(crate) fn parse_arrow_identifier_argument(
         &mut self,
-    ) -> Result<(Option<FormalParameters>, bool)> {
+    ) -> Result<FormalParameters> {
         let span_start = self.position();
-        if self.is_identifier() {
-            let identifier = self.parse_identifier()?;
-            let span = self.span_from(span_start);
-            return Ok((
-                Some(FormalParameters {
-                    span: span.clone(),
-                    parameters: vec![BindingElement {
-                        span,
-                        pattern: identifier.into(),
-                        initializer: None,
-                    }],
-                    rest: None,
-                }),
-                true,
-            ));
-        }
-
-        todo!()
+        let identifier = self.parse_identifier()?;
+        let span = self.span_from(span_start);
+        Ok(FormalParameters {
+            span: span.clone(),
+            parameters: vec![BindingElement {
+                span,
+                pattern: identifier.into(),
+                initializer: None,
+            }],
+            rest: None,
+        })
     }
 
     /// Parses the `FunctionExpression` goal symbol.
@@ -181,7 +174,7 @@ where
     }
 
     /// Parses the `FormalParameters` goal symbol.
-    pub(super) fn parse_formal_parameters(&mut self) -> Result<Option<FormalParameters>> {
+    pub(crate) fn parse_formal_parameters(&mut self) -> Result<Option<FormalParameters>> {
         let span_start = self.position();
         let token = self.reader.consume()?;
         if !token_matches!(token, punct!("(")) {

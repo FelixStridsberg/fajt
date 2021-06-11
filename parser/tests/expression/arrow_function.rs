@@ -77,7 +77,7 @@ fn parameters_and_body() {
                 span: Span::new(0, 12),
                 binding_parameter: false,
                 parameters: Some(FormalParameters {
-                    span: Span::new(1, 2),
+                    span: Span::new(0, 3),
                     parameters: vec![
                         BindingElement {
                             span: Span::new(1, 2),
@@ -90,6 +90,40 @@ fn parameters_and_body() {
                 body: ArrowFunctionBody::Block(vec![
                     EmptyStatement {
                         span: Span::new(9, 10),
+                    }.into()
+                ])
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn multiple_parameters() {
+    parser_test!(
+        input: "(a, b) => { ; }",
+        expr_output: [
+            ArrowFunctionExpression {
+                span: Span::new(0, 15),
+                binding_parameter: false,
+                parameters: Some(FormalParameters {
+                    span: Span::new(0, 6),
+                    parameters: vec![
+                        BindingElement {
+                            span: Span::new(1, 2),
+                            pattern: Ident::new("a", (1, 2)).into(),
+                            initializer: None,
+                        },
+                        BindingElement {
+                            span: Span::new(4, 5),
+                            pattern: Ident::new("b", (4, 5)).into(),
+                            initializer: None,
+                        }
+                    ],
+                    rest: None,
+                }),
+                body: ArrowFunctionBody::Block(vec![
+                    EmptyStatement {
+                        span: Span::new(12, 13),
                     }.into()
                 ])
             }.into()

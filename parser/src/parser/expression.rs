@@ -271,14 +271,14 @@ where
                     && !self.reader.current().unwrap().first_on_line
                 {
                     self.reader.consume()?;
-                    let (parameters, binding_parameter) =
+                    let parameters =
                         parenthesized_or_arrow_parameters.into_arrow_parameters()?;
                     let body = self.parse_function_body()?;
 
                     let span = self.span_from(span_start);
                     ArrowFunctionExpression {
                         span,
-                        binding_parameter,
+                        binding_parameter: false,
                         parameters,
                         body: ArrowFunctionBody::Block(body),
                     }
@@ -301,6 +301,8 @@ where
         debug_assert!(token_matches!(token, punct!("(")));
 
         let mut tokens = Vec::new();
+        tokens.push(token);
+
         let mut depth = 1;
         loop {
             let token = self.reader.consume()?;
@@ -310,11 +312,11 @@ where
                 _ => {}
             }
 
+            tokens.push(token);
+
             if depth == 0 {
                 break;
             }
-
-            tokens.push(token);
         }
 
         let span = self.span_from(span_start);
