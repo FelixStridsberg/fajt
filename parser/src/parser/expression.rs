@@ -50,6 +50,7 @@ where
         Ok(SequenceExpression { span, expressions }.into())
     }
 
+    // TODO clean up this function, too complex.
     /// Parses the `AssignmentExpression` goal symbol.
     pub(super) fn parse_assignment_expression(&mut self) -> Result<Expression> {
         match self.reader.current() {
@@ -99,7 +100,6 @@ where
             _ => self.parse_conditional_expression(),
         }
 
-        // TODO AsyncArrowFunction
         // TODO LeftHandSideExpression
     }
 

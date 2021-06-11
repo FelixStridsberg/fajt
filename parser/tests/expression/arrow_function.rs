@@ -197,3 +197,37 @@ fn multiple_parameters() {
         ]
     );
 }
+
+#[test]
+fn async_multiple_parameters() {
+    parser_test!(
+        input: "async (a, b, ...rest) => { ; }",
+        expr_output: [
+            ArrowFunctionExpression {
+                span: Span::new(0, 30),
+                binding_parameter: false,
+                parameters: Some(FormalParameters {
+                    span: Span::new(6, 21),
+                    parameters: vec![
+                        BindingElement {
+                            span: Span::new(7, 8),
+                            pattern: Ident::new("a", (7, 8)).into(),
+                            initializer: None,
+                        },
+                        BindingElement {
+                            span: Span::new(10, 11),
+                            pattern: Ident::new("b", (10, 11)).into(),
+                            initializer: None,
+                        }
+                    ],
+                    rest: Some(BindingPattern::Ident(Ident::new("rest", (16, 20)))),
+                }),
+                body: ArrowFunctionBody::Block(vec![
+                    EmptyStatement {
+                        span: Span::new(27, 28),
+                    }.into()
+                ])
+            }.into()
+        ]
+    );
+}
