@@ -79,6 +79,33 @@ fn identifier_argument_expression_body() {
 }
 
 #[test]
+fn async_identifier_argument_expression_body() {
+    parser_test!(
+        input: "async a => b",
+        expr_output: [
+            ArrowFunctionExpression {
+                span: Span::new(0, 12),
+                binding_parameter: true,
+                parameters: Some(FormalParameters {
+                    span: Span::new(6, 7),
+                    parameters: vec![
+                        BindingElement {
+                            span: Span::new(6, 7),
+                            pattern: Ident::new("a", (6, 7)).into(),
+                            initializer: None,
+                        }
+                    ],
+                    rest: None,
+                }),
+                body: ArrowFunctionBody::Expression(
+                    IdentifierReference::Ident(Ident::new("b", (11, 12))).into()
+                )
+            }.into()
+        ]
+    );
+}
+
+#[test]
 fn no_parameters() {
     parser_test!(
         input: "() => {}",
