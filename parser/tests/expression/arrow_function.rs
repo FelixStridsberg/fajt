@@ -54,7 +54,7 @@ fn identifier_argument_expression_body() {
 }
 
 #[test]
-fn no_arguments() {
+fn no_parameters() {
     parser_test!(
         input: "() => {}",
         expr_output: [
@@ -63,6 +63,35 @@ fn no_arguments() {
                 binding_parameter: false,
                 parameters: None,
                 body: ArrowFunctionBody::Block(vec![])
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn parameters_and_body() {
+    parser_test!(
+        input: "(a) => { ; }",
+        expr_output: [
+            ArrowFunctionExpression {
+                span: Span::new(0, 12),
+                binding_parameter: false,
+                parameters: Some(FormalParameters {
+                    span: Span::new(1, 2),
+                    parameters: vec![
+                        BindingElement {
+                            span: Span::new(1, 2),
+                            pattern: Ident::new("a", (1, 2)).into(),
+                            initializer: None,
+                        }
+                    ],
+                    rest: None,
+                }),
+                body: ArrowFunctionBody::Block(vec![
+                    EmptyStatement {
+                        span: Span::new(9, 10),
+                    }.into()
+                ])
             }.into()
         ]
     );

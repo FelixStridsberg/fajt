@@ -271,13 +271,14 @@ where
                     && !self.reader.current().unwrap().first_on_line
                 {
                     self.reader.consume()?;
-                    let parameters = parenthesized_or_arrow_parameters.into_arrow_parameters()?;
+                    let (parameters, binding_parameter) =
+                        parenthesized_or_arrow_parameters.into_arrow_parameters()?;
                     let body = self.parse_function_body()?;
 
                     let span = self.span_from(span_start);
                     ArrowFunctionExpression {
                         span,
-                        binding_parameter: false,
+                        binding_parameter,
                         parameters,
                         body: ArrowFunctionBody::Block(body),
                     }
