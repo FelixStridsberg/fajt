@@ -55,26 +55,7 @@ where
     pub(super) fn parse_assignment_expression(&mut self) -> Result<Expression> {
         match self.reader.current() {
             token_matches!(ok: keyword!("yield")) => self.parse_yield_expression(),
-            token_matches!(ok: keyword!("async")) => {
-                if self.peek_is_identifier() {
-                    let span_start = self.position();
-                    self.reader.consume()?;
-                    let parameters = Some(self.parse_arrow_identifier_argument()?);
-                    self.parse_arrow_function_expression(span_start, true, true, parameters)
-                } else if token_matches!(self.reader.peek(), opt: punct!("(")) {
-                    let span_start = self.position();
-                    let cover_call_and_async_arrow_head =
-                        self.parse_cover_call_and_async_arrow_head()?;
-                    if token_matches!(self.reader.current(), ok: punct!("=>")) {
-                        let parameters = cover_call_and_async_arrow_head.into_arrow_parameters()?;
-                        self.parse_arrow_function_expression(span_start, false, true, parameters)
-                    } else {
-                        cover_call_and_async_arrow_head.into_call_expression()
-                    }
-                } else {
-                    self.parse_conditional_expression()
-                }
-            }
+            token_matches!(ok: keyword!("async")) => self.parse_assignment_expression_async(),
             token_matches!(ok: punct!("(")) => {
                 let span_start = self.position();
                 let parenthesized_or_arrow_parameters =
@@ -101,6 +82,33 @@ where
         }
 
         // TODO LeftHandSideExpression
+    }
+
+    /// Parses the part of `AssignmentExpression` that starts with the `async` keyword.
+    /// Note that most of the complexity comes because of the ambiguity between:
+    /// 1. `async a => {}` // Async arrow function without parameter parentheses.
+    /// 2. `async(a) => {}` // Async arrow function with parentheses.
+    /// 3. `async(a)` // Function call where `async` is an identifier and not a keyword.
+    fn parse_assignment_expression_async(&mut self) -> Result<Expression> {
+        if self.peek_is_identifier() {
+            let span_start = self.position();
+            self.reader.consume()?;
+            let parameters = Some(self.parse_arrow_identifier_argument()?);
+            return self.parse_arrow_function_expression(span_start, true, true, parameters);
+        }
+
+        if token_matches!(self.reader.peek(), opt: punct!("(")) {
+            let span_start = self.position();
+            let call_or_arrow_parameters = self.parse_cover_call_and_async_arrow_head()?;
+            if token_matches!(self.reader.current(), ok: punct!("=>")) {
+                let parameters = call_or_arrow_parameters.into_arrow_parameters()?;
+                self.parse_arrow_function_expression(span_start, false, true, parameters)
+            } else {
+                call_or_arrow_parameters.into_call()
+            }
+        } else {
+            self.parse_conditional_expression()
+        }
     }
 
     /// Parses the `YieldExpression` goal symbol.

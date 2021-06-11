@@ -1,4 +1,4 @@
-//! The `Cover*` goal symbols as unambiguous between more than one goal symbol. They are stored as
+//! The `Cover*` goal symbols are ambiguous between more than one goal symbol. They are stored as
 //! raw tokens that later can be parsed when the actual goal symbol is determined.
 //!
 //! These will never appear in the final AST.
@@ -55,7 +55,7 @@ impl CoverCallExpressionAndAsyncArrowHead {
         Ok(parser.parse_formal_parameters()?)
     }
 
-    pub fn into_call_expression(self) -> crate::error::Result<Expression> {
+    pub fn into_call(self) -> crate::error::Result<Expression> {
         // This is call expressions like: async(), async(parameters) since async is not reserved.
         todo!("CoverCallExpressionAndAsyncArrowHead to call expression")
     }
