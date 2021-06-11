@@ -59,7 +59,9 @@ where
                 && token_matches!(self.reader.peek(), opt: punct!("=>"))
                 && !self.reader.peek().unwrap().first_on_line =>
             {
-                self.parse_arrow_function_expression()
+                let span_start = self.position();
+                let parameters = Some(self.parse_arrow_identifier_argument()?);
+                self.parse_arrow_function_expression(span_start, true, parameters)
             }
             token_matches!(ok: punct!("(")) => {
                 let span_start = self.position();
@@ -286,11 +288,9 @@ where
             }
             token_matches!(punct!("/")) => todo!("RegularExpressionLiteral"),
             // token_matches!(punct!("`")) => todo!("TemplateLiteral"), TODO missing from lexer
-            token_matches!(punct!("(")) => {
-                let parenthesized_or_arrow_parameters =
-                    self.parse_cover_parenthesized_and_arrow_parameters()?;
-                parenthesized_or_arrow_parameters.into_expression()?
-            }
+            token_matches!(punct!("(")) => self
+                .parse_cover_parenthesized_and_arrow_parameters()?
+                .into_expression()?,
             _ if self.is_identifier() => self.parse_identifier_reference()?,
             r => unimplemented!("TOKEN: {:?}", r),
         })

@@ -15,11 +15,14 @@ impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
-    /// Parses the `ArrowFunction` goal symbol.
-    pub(super) fn parse_arrow_function_expression(&mut self) -> Result<Expression> {
-        let span_start = self.position();
-        let parameters = Some(self.parse_arrow_identifier_argument()?);
-
+    /// Parses the `ArrowFunction` goal symbol, but expects the parameters as input since that may
+    /// be a non terminal before we know if it is an arrow function or parenthesized expression.
+    pub(super) fn parse_arrow_function_expression(
+        &mut self,
+        span_start: usize,
+        binding_parameter: bool,
+        parameters: Option<FormalParameters>,
+    ) -> Result<Expression> {
         let arrow = self.reader.consume()?;
         if !token_matches!(arrow, punct!("=>")) {
             return err!(ErrorKind::UnexpectedToken(arrow));
@@ -34,7 +37,7 @@ where
         let span = self.span_from(span_start);
         Ok(ArrowFunctionExpression {
             span,
-            binding_parameter: true,
+            binding_parameter,
             parameters,
             body,
         }
