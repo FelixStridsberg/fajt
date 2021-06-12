@@ -50,26 +50,12 @@ where
         Ok(SequenceExpression { span, expressions }.into())
     }
 
-    // TODO clean up this function, too complex.
     /// Parses the `AssignmentExpression` goal symbol.
     pub(super) fn parse_assignment_expression(&mut self) -> Result<Expression> {
         match self.reader.current() {
             token_matches!(ok: keyword!("yield")) => self.parse_yield_expression(),
             token_matches!(ok: keyword!("async")) => self.parse_assignment_expression_async(),
-            token_matches!(ok: punct!("(")) => {
-                let span_start = self.position();
-                let parenthesized_or_arrow_parameters =
-                    self.parse_cover_parenthesized_and_arrow_parameters()?;
-
-                if token_matches!(self.reader.current(), ok: punct!("=>"))
-                    && !self.reader.current().unwrap().first_on_line
-                {
-                    let parameters = parenthesized_or_arrow_parameters.into_arrow_parameters()?;
-                    self.parse_arrow_function_expression(span_start, false, false, parameters)
-                } else {
-                    parenthesized_or_arrow_parameters.into_expression()
-                }
-            }
+            token_matches!(ok: punct!("(")) => self.parse_assignment_expression_open_parentheses(),
             _ if self.is_identifier()
                 && token_matches!(self.reader.peek(), opt: punct!("=>"))
                 && !self.reader.peek().unwrap().first_on_line =>
@@ -82,6 +68,22 @@ where
         }
 
         // TODO LeftHandSideExpression
+    }
+
+    /// Parses the part of `AssignmentExpression` that start with the `(` punctuator.
+    fn parse_assignment_expression_open_parentheses(&mut self) -> Result<Expression> {
+        let span_start = self.position();
+        let parenthesized_or_arrow_parameters =
+            self.parse_cover_parenthesized_and_arrow_parameters()?;
+
+        if token_matches!(self.reader.current(), ok: punct!("=>"))
+            && !self.reader.current().unwrap().first_on_line
+        {
+            let parameters = parenthesized_or_arrow_parameters.into_arrow_parameters()?;
+            self.parse_arrow_function_expression(span_start, false, false, parameters)
+        } else {
+            parenthesized_or_arrow_parameters.into_expression()
+        }
     }
 
     /// Parses the part of `AssignmentExpression` that starts with the `async` keyword.
