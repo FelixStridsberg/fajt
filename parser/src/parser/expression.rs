@@ -300,11 +300,25 @@ where
                     }
                     .into()
                 }
+                token_matches!(ok: punct!("[")) => {
+                    self.reader.consume()?;
+                    let member = self.parse_expression()?;
+                    let closing_bracket = self.reader.consume()?;
+                    if !token_matches!(closing_bracket, punct!("]")) {
+                        return err!(UnexpectedToken(closing_bracket));
+                    }
+                    let span = self.span_from(span_start);
+                    expression = MemberExpression {
+                        span,
+                        object: expression,
+                        member: Member::Expression(member),
+                    }
+                        .into()
+                }
                 _ => return Ok(expression),
             }
         }
 
-        // TODO MemberExpression [ Expression ]
         // TODO MemberExpression TemplateLiteral
         // TODO SuperProperty
         // TODO MetaProperty

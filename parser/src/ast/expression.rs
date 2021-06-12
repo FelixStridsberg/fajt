@@ -381,4 +381,5 @@ pub struct MemberExpression {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Member {
     Ident(Ident),
+    Expression(Expression),
 }

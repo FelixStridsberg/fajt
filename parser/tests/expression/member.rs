@@ -32,3 +32,41 @@ fn identifier_nested() {
         ]
     );
 }
+
+#[test]
+fn computed() {
+    parser_test!(
+        input: "a[b]",
+        expr_output: [
+            MemberExpression {
+                span: Span::new(0, 4),
+                object: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                member: Member::Expression(
+                    IdentifierReference::Ident(Ident::new("b", (2, 3))).into()
+                ),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn computed_nested() {
+    parser_test!(
+        input: "a[b][c]",
+        expr_output: [
+            MemberExpression {
+                span: Span::new(0, 7),
+                object: MemberExpression {
+                    span: Span::new(0, 4),
+                    object: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                    member: Member::Expression(
+                        IdentifierReference::Ident(Ident::new("b", (2, 3))).into()
+                    ),
+                }.into(),
+                member: Member::Expression(
+                    IdentifierReference::Ident(Ident::new("c", (5, 6))).into()
+                ),
+            }.into()
+        ]
+    );
+}
