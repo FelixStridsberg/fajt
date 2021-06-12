@@ -22,6 +22,7 @@ pub enum Expression {
     FunctionExpression(Box<FunctionExpression>),
     ArrowFunctionExpression(Box<ArrowFunctionExpression>),
     ParenthesizedExpression(Box<ParenthesizedExpression>),
+    MemberExpression(Box<MemberExpression>),
 }
 
 impl Expression {
@@ -131,6 +132,12 @@ impl From<ArrowFunctionExpression> for Expression {
 impl From<ParenthesizedExpression> for Expression {
     fn from(expr: ParenthesizedExpression) -> Self {
         Self::ParenthesizedExpression(Box::new(expr))
+    }
+}
+
+impl From<MemberExpression> for Expression {
+    fn from(expr: MemberExpression) -> Self {
+        Self::MemberExpression(Box::new(expr))
     }
 }
 
@@ -362,4 +369,16 @@ pub enum ArrowFunctionBody {
 pub struct ParenthesizedExpression {
     pub span: Span,
     pub expression: Expression,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct MemberExpression {
+    pub span: Span,
+    pub object: Expression,
+    pub member: Member,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub enum Member {
+    Ident(Ident),
 }

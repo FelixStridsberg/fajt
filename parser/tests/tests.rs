@@ -10,6 +10,7 @@ mod expression {
     mod flow_control;
     mod function;
     mod literal;
+    mod member;
     mod unary;
     mod update;
     mod yield_expr;

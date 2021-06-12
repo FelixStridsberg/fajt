@@ -1,6 +1,6 @@
 use crate::ast::{
-    AwaitExpression, ConditionalExpression, Expression, Literal, SequenceExpression,
-    ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
+    AwaitExpression, ConditionalExpression, Expression, Literal, Member, MemberExpression,
+    SequenceExpression, ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
@@ -284,9 +284,25 @@ where
 
     /// Parses the `MemberExpression` goal symbol.
     fn parse_member_expression(&mut self) -> Result<Expression> {
-        self.parse_primary_expression()
+        let span_start = self.position();
+        let expression = self.parse_primary_expression()?;
+
+        match self.reader.current() {
+            token_matches!(ok: punct!(".")) => {
+                self.reader.consume()?;
+                let identifier = self.parse_identifier()?;
+                let span = self.span_from(span_start);
+                Ok(MemberExpression {
+                    span,
+                    object: expression,
+                    member: Member::Ident(identifier),
+                }
+                .into())
+            }
+            _ => Ok(expression),
+        }
+
         // TODO MemberExpression [ Expression ]
-        // TODO MemberExpression . IdentifierName
         // TODO MemberExpression TemplateLiteral
         // TODO SuperProperty
         // TODO MetaProperty
