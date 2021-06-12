@@ -285,21 +285,23 @@ where
     /// Parses the `MemberExpression` goal symbol.
     fn parse_member_expression(&mut self) -> Result<Expression> {
         let span_start = self.position();
-        let expression = self.parse_primary_expression()?;
+        let mut expression = self.parse_primary_expression()?;
 
-        match self.reader.current() {
-            token_matches!(ok: punct!(".")) => {
-                self.reader.consume()?;
-                let identifier = self.parse_identifier()?;
-                let span = self.span_from(span_start);
-                Ok(MemberExpression {
-                    span,
-                    object: expression,
-                    member: Member::Ident(identifier),
+        loop {
+            match self.reader.current() {
+                token_matches!(ok: punct!(".")) => {
+                    self.reader.consume()?;
+                    let identifier = self.parse_identifier()?;
+                    let span = self.span_from(span_start);
+                    expression = MemberExpression {
+                        span,
+                        object: expression,
+                        member: Member::Ident(identifier),
+                    }
+                    .into()
                 }
-                .into())
+                _ => return Ok(expression),
             }
-            _ => Ok(expression),
         }
 
         // TODO MemberExpression [ Expression ]
