@@ -64,10 +64,13 @@ where
                 let parameters = Some(self.parse_arrow_identifier_argument()?);
                 self.parse_arrow_function_expression(span_start, true, false, parameters)
             }
-            _ => self.parse_conditional_expression(),
+            _ => {
+                self.parse_conditional_expression()
+                // If the expression parser is a LeftHandSideExpression:
+                // TODO LeftHandSideExpression = AssignmentExpression
+                // TODO LeftHandSideExpression AssignmentOperator AssignmentExpression
+            }
         }
-
-        // TODO LeftHandSideExpression
     }
 
     /// Parses the part of `AssignmentExpression` that start with the `(` punctuator.
