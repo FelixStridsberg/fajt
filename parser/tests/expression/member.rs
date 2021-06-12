@@ -70,3 +70,29 @@ fn computed_nested() {
         ]
     );
 }
+
+#[test]
+fn nested_mixed() {
+    parser_test!(
+        input: "a[b].c[d]",
+        expr_output: [
+            MemberExpression {
+                span: Span::new(0, 9),
+                object: MemberExpression {
+                    span: Span::new(0, 6),
+                    object: MemberExpression {
+                        span: Span::new(0, 4),
+                        object: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                        member: Member::Expression(
+                            IdentifierReference::Ident(Ident::new("b", (2, 3))).into()
+                        )
+                    }.into(),
+                    member: Member::Ident(Ident::new("c", (5, 6))),
+                }.into(),
+                member: Member::Expression(
+                    IdentifierReference::Ident(Ident::new("d", (7, 8))).into()
+                ),
+            }.into()
+        ]
+    );
+}
