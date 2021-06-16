@@ -1,7 +1,7 @@
 use crate::ast::{
-    AwaitExpression, ConditionalExpression, Expression, Literal, Member, MemberExpression,
-    NewExpression, SequenceExpression, ThisExpression, UnaryExpression, UpdateExpression,
-    YieldExpression,
+    Arguments, AwaitExpression, ConditionalExpression, Expression, Literal, Member,
+    MemberExpression, NewExpression, SequenceExpression, ThisExpression, UnaryExpression,
+    UpdateExpression, YieldExpression,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
@@ -281,14 +281,42 @@ where
             self.reader.consume()?;
 
             let callee = self.parse_new_expression()?;
+
+            let (arguments, parentheses_omitted) =
+                if token_matches!(self.reader.current(), ok: punct!("(")) {
+                    (self.parse_arguments()?, false)
+                } else {
+                    (None, true)
+                };
+
             let span = self.span_from(span_start);
-            Ok(NewExpression { span, callee }.into())
+            Ok(NewExpression {
+                span,
+                callee,
+                parentheses_omitted,
+                arguments,
+            }
+            .into())
         } else {
             self.parse_member_expression()
         }
     }
 
+    fn parse_arguments(&mut self) -> Result<Option<Arguments>> {
+        let span_start = self.position();
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, punct!("(")));
+
+        if !token_matches!(self.reader.consume()?, punct!(")")) {
+            todo!("ARGUMENTS");
+        }
+
+        let _span = self.span_from(span_start);
+        Ok(None)
+    }
+
     /// Parses the `MemberExpression` goal symbol.
+    /// NOTE: The `new MemberExpression Arguments` is parsed in `NewExpression`
     fn parse_member_expression(&mut self) -> Result<Expression> {
         let span_start = self.position();
         let mut expression = self.parse_primary_expression()?;
