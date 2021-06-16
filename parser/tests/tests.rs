@@ -11,6 +11,7 @@ mod expression {
     mod function;
     mod literal;
     mod member;
+    mod new;
     mod unary;
     mod update;
     mod yield_expr;

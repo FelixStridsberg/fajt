@@ -1,6 +1,7 @@
 use crate::ast::{
     AwaitExpression, ConditionalExpression, Expression, Literal, Member, MemberExpression,
-    SequenceExpression, ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
+    NewExpression, SequenceExpression, ThisExpression, UnaryExpression, UpdateExpression,
+    YieldExpression,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
@@ -276,7 +277,12 @@ where
     /// Parses the `NewExpression` goal symbol.
     fn parse_new_expression(&mut self) -> Result<Expression> {
         if token_matches!(self.reader.current(), ok: keyword!("new")) {
-            todo!("NewExpression")
+            let span_start = self.position();
+            self.reader.consume()?;
+
+            let callee = self.parse_new_expression()?;
+            let span = self.span_from(span_start);
+            Ok(NewExpression { span, callee }.into())
         } else {
             self.parse_member_expression()
         }
@@ -313,7 +319,7 @@ where
                         object: expression,
                         member: Member::Expression(member),
                     }
-                        .into()
+                    .into()
                 }
                 _ => return Ok(expression),
             }
