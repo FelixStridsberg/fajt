@@ -3,6 +3,7 @@ mod r#macro;
 
 mod expression {
     mod arrow_function;
+    mod assignment;
     mod async_expr;
     mod binary;
     mod class;

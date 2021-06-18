@@ -1,6 +1,6 @@
 use crate::ast::{
-    Argument, AwaitExpression, ConditionalExpression, Expression, Literal, Member,
-    MemberExpression, NewExpression, SequenceExpression, ThisExpression, UnaryExpression,
+    Argument, AssignmentExpression, AwaitExpression, ConditionalExpression, Expression, Literal,
+    Member, MemberExpression, NewExpression, SequenceExpression, ThisExpression, UnaryExpression,
     UpdateExpression, YieldExpression,
 };
 use crate::error::ErrorKind::UnexpectedToken;
@@ -53,6 +53,7 @@ where
 
     /// Parses the `AssignmentExpression` goal symbol.
     pub(super) fn parse_assignment_expression(&mut self) -> Result<Expression> {
+        let span_start = self.position();
         match self.reader.current() {
             token_matches!(ok: keyword!("yield")) => self.parse_yield_expression(),
             token_matches!(ok: keyword!("async")) => self.parse_assignment_expression_async(),
@@ -66,10 +67,40 @@ where
                 self.parse_arrow_function_expression(span_start, true, false, parameters)
             }
             _ => {
-                self.parse_conditional_expression()
-                // If the expression parser is a LeftHandSideExpression:
-                // TODO LeftHandSideExpression = AssignmentExpression
-                // TODO LeftHandSideExpression AssignmentOperator AssignmentExpression
+                let expression = self.parse_conditional_expression()?;
+
+                // TODO assignment left side must be LeftHandSideExpression
+                let assignment_operator = match self.reader.current() {
+                    token_matches!(ok: punct!("=")) => Some(assignment_op!("=")),
+                    token_matches!(ok: punct!("*=")) => todo!("Assign *="),
+                    token_matches!(ok: punct!("/=")) => todo!("Assign /="),
+                    token_matches!(ok: punct!("%=")) => todo!("Assign %="),
+                    token_matches!(ok: punct!("+=")) => todo!("Assign +="),
+                    token_matches!(ok: punct!("-=")) => todo!("Assign -="),
+                    token_matches!(ok: punct!("<<=")) => todo!("Assign <<="),
+                    token_matches!(ok: punct!(">>=")) => todo!("Assign >>="),
+                    token_matches!(ok: punct!(">>>=")) => todo!("Assign >>>="),
+                    token_matches!(ok: punct!("&=")) => todo!("Assign &="),
+                    token_matches!(ok: punct!("^=")) => todo!("Assign ^="),
+                    token_matches!(ok: punct!("|=")) => todo!("Assign |="),
+                    token_matches!(ok: punct!("**=")) => todo!("Assign **="),
+                    _ => None,
+                };
+
+                if let Some(operator) = assignment_operator {
+                    self.reader.consume()?; // consume the operator
+                    let right = self.parse_assignment_expression()?;
+                    let span = self.span_from(span_start);
+                    Ok(AssignmentExpression {
+                        span,
+                        operator,
+                        left: expression,
+                        right,
+                    }
+                    .into())
+                } else {
+                    Ok(expression)
+                }
             }
         }
     }

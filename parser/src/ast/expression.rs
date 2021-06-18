@@ -24,6 +24,7 @@ pub enum Expression {
     ParenthesizedExpression(Box<ParenthesizedExpression>),
     MemberExpression(Box<MemberExpression>),
     NewExpression(Box<NewExpression>),
+    AssignmentExpression(Box<AssignmentExpression>),
 }
 
 impl From<ThisExpression> for Expression {
@@ -131,6 +132,12 @@ impl From<MemberExpression> for Expression {
 impl From<NewExpression> for Expression {
     fn from(expr: NewExpression) -> Self {
         Self::NewExpression(Box::new(expr))
+    }
+}
+
+impl From<AssignmentExpression> for Expression {
+    fn from(expr: AssignmentExpression) -> Self {
+        Self::AssignmentExpression(Box::new(expr))
     }
 }
 
@@ -389,4 +396,24 @@ pub struct NewExpression {
 pub enum Argument {
     Expression(Expression),
     Spread(Expression),
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct AssignmentExpression {
+    pub span: Span,
+    pub operator: AssignmentOperator,
+    pub left: Expression,
+    pub right: Expression,
+}
+
+#[derive(Debug, PartialOrd, PartialEq, FromString)]
+#[from_string_macro("assignment_op")]
+#[from_string_macro_rules(
+    ($variant:ident) => {
+        $crate::ast::AssignmentOperator::$variant
+    };
+)]
+pub enum AssignmentOperator {
+    #[from_string("=")]
+    Assign,
 }
