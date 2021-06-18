@@ -20,7 +20,7 @@ fn empty() {
                             props: vec![],
                             rest: None,
                         }.into(),
-                        initializer: Some(Expression::reference(Ident::new("a", (9, 10)).into())),
+                        initializer: Some(Ident::new("a", (9, 10)).into()),
                     }
                 ]
             }.into()
@@ -44,7 +44,7 @@ fn identifier_binding() {
                             props: vec![Ident::new("a", (6, 7)).into()],
                             rest: None,
                         }.into(),
-                        initializer: Some(Expression::reference(Ident::new("b", (12, 13)).into())),
+                        initializer: Some(Ident::new("b", (12, 13)).into()),
                     }
                 ]
             }.into()
@@ -68,12 +68,12 @@ fn identifier_binding_with_initializer() {
                             props: vec![
                                 ObjectBindingProp::Single(
                                     Ident::new("a", (6, 7)),
-                                    Some(Expression::reference(Ident::new("b", (10, 11)).into()))
+                                    Some(Ident::new("b", (10, 11)).into()),
                                 )
                             ],
                             rest: None,
                         }.into(),
-                        initializer: Some(Expression::reference(Ident::new("c", (16, 17)).into())),
+                        initializer: Some(Ident::new("c", (16, 17)).into()),
                     }
                 ]
             }.into()
@@ -106,7 +106,7 @@ fn key_value_binding() {
                             ],
                             rest: None,
                         }.into(),
-                        initializer: Some(Expression::reference(Ident::new("c", (15, 16)).into())),
+                        initializer: Some(Ident::new("c", (15, 16)).into()),
                     }
                 ]
             }.into()
@@ -145,7 +145,7 @@ fn key_value_binding_with_object_binding() {
                             ],
                             rest: None,
                         }.into(),
-                        initializer: Some(Expression::reference(Ident::new("c", (19, 20)).into())),
+                        initializer: Some(Ident::new("c", (19, 20)).into()),
                     }
                 ]
             }.into()
@@ -169,7 +169,7 @@ fn trailing_comma() {
                             props: vec![Ident::new("a", (6, 7)).into()],
                             rest: None,
                         }.into(),
-                        initializer: Some(Expression::reference(Ident::new("b", (13, 14)).into())),
+                        initializer: Some(Ident::new("b", (13, 14)).into()),
                     }
                 ]
             }.into()
@@ -196,7 +196,7 @@ fn multiple_identifier_bindings() {
                             ],
                             rest: None,
                         }.into(),
-                        initializer: Some(Expression::reference(Ident::new("c", (15, 16)).into())),
+                        initializer: Some(Ident::new("c", (15, 16)).into()),
                     }
                 ],
             }.into()
@@ -220,7 +220,7 @@ fn rest_binding() {
                             props: vec![],
                             rest: Some(Ident::new("rest", (9, 13))),
                         }.into(),
-                        initializer: Some(Expression::reference(Ident::new("c", (18, 19)).into())),
+                        initializer: Some(Ident::new("c", (18, 19)).into()),
                     }
                 ],
             }.into()
@@ -246,7 +246,7 @@ fn await_as_identifier() {
                             ],
                             rest: Some(Ident::new("await", (16, 21))),
                         }.into(),
-                        initializer: Some(Expression::reference(Ident::new("c", (26, 27)).into())),
+                        initializer: Some(Ident::new("c", (26, 27)).into()),
                     }
                 ],
             }.into()
@@ -274,7 +274,7 @@ fn yield_as_identifier() {
                             ],
                             rest: Some(Ident::new("yield", (16, 21))),
                         }.into(),
-                        initializer: Some(Expression::reference(Ident::new("c", (26, 27)).into())),
+                        initializer: Some(Ident::new("c", (26, 27)).into()),
                     }
                 ],
             }.into()

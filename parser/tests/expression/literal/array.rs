@@ -10,9 +10,9 @@ fn empty_array_literal() {
             Expression::literal(
                 LiteralExpression {
                     span: Span::new(0, 2),
-                    literal: Literal::Array(
-                        Array { elements: vec![] }
-                    ),
+                    literal: Literal::Array(Array {
+                        elements: vec![]
+                    }),
                 }
             ).into()
         ]
@@ -35,9 +35,9 @@ fn elision_array_literal() {
             Expression::literal(
                 LiteralExpression {
                     span: Span::new(0, 4),
-                    literal: Literal::Array(
-                        Array { elements: vec![ArrayElement::None] }
-                    ),
+                    literal: Literal::Array(Array {
+                        elements: vec![ArrayElement::None]
+                    }),
                 }
             ).into()
         ]
@@ -55,9 +55,7 @@ fn single_element_array_literal() {
                     literal: Literal::Array(
                         Array {
                             elements: vec![
-                                ArrayElement::Expr(
-                                    Expression::reference(Ident::new("a", (2, 3)).into())
-                                )
+                                ArrayElement::Expr(Ident::new("a", (2, 3)).into())
                             ]
                         }
                     ),
@@ -78,13 +76,9 @@ fn mixed_element_array_literal() {
                     literal: Literal::Array(
                         Array {
                             elements: vec![
-                                ArrayElement::Expr(
-                                    Expression::reference(Ident::new("a", (2, 3)).into())
-                                ),
+                                ArrayElement::Expr(Ident::new("a", (2, 3)).into()),
                                 ArrayElement::None,
-                                ArrayElement::Expr(
-                                    Expression::reference(Ident::new("b", (6, 7)).into())
-                                ),
+                                ArrayElement::Expr(Ident::new("b", (6, 7)).into()),
                             ]
                         },
                     ),
@@ -105,9 +99,7 @@ fn array_literal_spread_element() {
                     literal: Literal::Array(
                         Array {
                             elements: vec![
-                                ArrayElement::Spread(
-                                    Expression::reference(Ident::new("a", (5, 6)).into())
-                                )
+                                ArrayElement::Spread(Ident::new("a", (5, 6)).into()),
                             ]
                         },
                     ),

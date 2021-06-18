@@ -8,14 +8,12 @@ fn empty_object_literal() {
     parser_test!(
         input: "{}",
         expr_output: [
-            Expression::literal(
-                LiteralExpression {
-                    span: Span::new(0, 2),
-                    literal: Literal::Object(Object {
-                        props: vec![]
-                    })
-                }
-            )
+            LiteralExpression {
+                span: Span::new(0, 2),
+                literal: Literal::Object(Object {
+                    props: vec![]
+                })
+            }.into()
         ]
     );
 }
@@ -25,16 +23,14 @@ fn single_prop_object_literal() {
     parser_test!(
         input: "{ a }",
         expr_output: [
-            Expression::literal(
-                LiteralExpression {
-                    span: Span::new(0, 5),
-                    literal: Literal::Object(Object {
-                        props: vec![
-                            PropertyDefinition::IdentifierReference(Ident::new("a", (2, 3)).into())
-                        ]
-                    })
-                }
-            )
+            LiteralExpression {
+                span: Span::new(0, 5),
+                literal: Literal::Object(Object {
+                    props: vec![
+                        PropertyDefinition::IdentifierReference(Ident::new("a", (2, 3)).into())
+                    ]
+                })
+            }.into()
         ]
     );
 }
@@ -44,16 +40,14 @@ fn single_prop_object_literal_trailing_comma() {
     parser_test!(
         input: "{ a, }",
         expr_output: [
-            Expression::literal(
-                LiteralExpression {
-                    span: Span::new(0, 6),
-                    literal: Literal::Object(Object {
-                        props: vec![
-                            PropertyDefinition::IdentifierReference(Ident::new("a", (2, 3)).into())
-                        ]
-                    })
-                }
-            )
+            LiteralExpression {
+                span: Span::new(0, 6),
+                literal: Literal::Object(Object {
+                    props: vec![
+                        PropertyDefinition::IdentifierReference(Ident::new("a", (2, 3)).into())
+                    ]
+                })
+            }.into()
         ]
     );
 }
@@ -63,18 +57,16 @@ fn multiple_props_object_literal() {
     parser_test!(
         input: "{ a,b, c }",
         expr_output: [
-            Expression::literal(
-                LiteralExpression {
-                    span: Span::new(0, 10),
-                    literal: Literal::Object(Object {
-                        props: vec![
-                            PropertyDefinition::IdentifierReference(Ident::new("a", (2, 3)).into()),
-                            PropertyDefinition::IdentifierReference(Ident::new("b", (4, 5)).into()),
-                            PropertyDefinition::IdentifierReference(Ident::new("c", (7, 8)).into()),
-                        ]
-                    })
-                }
-            )
+            LiteralExpression {
+                span: Span::new(0, 10),
+                literal: Literal::Object(Object {
+                    props: vec![
+                        PropertyDefinition::IdentifierReference(Ident::new("a", (2, 3)).into()),
+                        PropertyDefinition::IdentifierReference(Ident::new("b", (4, 5)).into()),
+                        PropertyDefinition::IdentifierReference(Ident::new("c", (7, 8)).into()),
+                    ]
+                })
+            }.into()
         ]
     );
 }
@@ -108,21 +100,15 @@ fn object_literal_spread() {
     parser_test!(
         input: "{ ...a, ...b }",
         expr_output: [
-            Expression::literal(
-                LiteralExpression {
-                    span: Span::new(0, 14),
-                    literal: Literal::Object(Object {
-                        props: vec![
-                            PropertyDefinition::Spread(
-                                Expression::reference(Ident::new("a", (5, 6)).into())
-                            ),
-                            PropertyDefinition::Spread(
-                                Expression::reference(Ident::new("b", (11, 12)).into())
-                            )
-                        ]
-                    })
-                }
-            )
+            LiteralExpression {
+                span: Span::new(0, 14),
+                literal: Literal::Object(Object {
+                    props: vec![
+                        PropertyDefinition::Spread(Ident::new("a", (5, 6)).into()),
+                        PropertyDefinition::Spread(Ident::new("b", (11, 12)).into()),
+                    ]
+                })
+            }.into()
         ]
     );
 }

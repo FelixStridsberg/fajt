@@ -31,10 +31,6 @@ impl Expression {
         Self::ThisExpression(Box::new(expr))
     }
 
-    pub fn reference(expr: IdentifierReference) -> Self {
-        Self::IdentifierReference(Box::new(expr))
-    }
-
     pub fn literal(expr: LiteralExpression) -> Self {
         Self::Literal(Box::new(expr))
     }

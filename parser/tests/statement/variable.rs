@@ -79,7 +79,7 @@ fn with_initializer() {
                     VariableDeclaration {
                         span: Span::new(4, 12),
                         pattern: Ident::new("foo", (4, 7)).into(),
-                        initializer: Some(Expression::reference(Ident::new("a", (10, 11)).into()))
+                        initializer: Some(Ident::new("a", (10, 11)).into())
                     }
                 ]
             }.into()

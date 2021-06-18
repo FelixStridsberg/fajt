@@ -21,7 +21,7 @@ fn empty() {
                                 rest: None,
                             }
                         ),
-                        initializer: Some(Expression::reference(Ident::new("a", (9, 10)).into())),
+                        initializer: Some(Ident::new("a", (9, 10)).into()),
                     },
                 ],
             }.into()
@@ -53,7 +53,7 @@ fn identifier_binding() {
                                 rest: None,
                             }
                         ),
-                        initializer: Some(Expression::reference(Ident::new("b", (12, 13)).into())),
+                        initializer: Some(Ident::new("b", (12, 13)).into()),
                     },
                 ],
             }.into()
@@ -79,15 +79,13 @@ fn identifier_binding_with_initializer() {
                                     Some(BindingElement {
                                         span: Span::new(6, 11),
                                         pattern: BindingPattern::Ident(Ident::new("a", (6, 7))),
-                                        initializer: Some(
-                                            Expression::reference(Ident::new("b", (10, 11)).into())
-                                        ),
+                                        initializer: Some(Ident::new("b", (10, 11)).into()),
                                     })
                                 ],
                                 rest: None,
                             }
                         ),
-                        initializer: Some(Expression::reference(Ident::new("c", (16, 17)).into())),
+                        initializer: Some(Ident::new("c", (16, 17)).into()),
                     },
                 ],
             }.into()
@@ -119,7 +117,7 @@ fn trailing_comma() {
                                 rest: None,
                             }
                         ),
-                        initializer: Some(Expression::reference(Ident::new("b", (13, 14)).into())),
+                        initializer: Some(Ident::new("b", (13, 14)).into()),
                     },
                 ],
             }.into()
@@ -145,7 +143,7 @@ fn single_elision() {
                                 rest: None,
                             }
                         ),
-                        initializer: Some(Expression::reference(Ident::new("b", (12, 13)).into())),
+                        initializer: Some(Ident::new("b", (12, 13)).into()),
                     },
                 ],
             }.into()
@@ -171,7 +169,7 @@ fn rest_element() {
                                 rest: Some(Ident::new("a", (9, 10))),
                             }
                         ),
-                        initializer: Some(Expression::reference(Ident::new("b", (15, 16)).into())),
+                        initializer: Some(Ident::new("b", (15, 16)).into()),
                     },
                 ],
             }.into()
@@ -212,7 +210,7 @@ fn mixed_elision_and_identifiers() {
                                 rest: None,
                             }
                         ),
-                        initializer: Some(Expression::reference(Ident::new("c", (17, 18)).into())),
+                        initializer: Some(Ident::new("c", (17, 18)).into()),
                     },
                 ],
             }.into()
@@ -246,7 +244,7 @@ fn await_as_identifier() {
                                 rest: Some(Ident::new("await", (16, 21))),
                             }
                         ),
-                        initializer: Some(Expression::reference(Ident::new("c", (26, 27)).into())),
+                        initializer: Some(Ident::new("c", (26, 27)).into()),
                     },
                 ],
             }.into()
@@ -282,7 +280,7 @@ fn yield_as_identifier() {
                                 rest: Some(Ident::new("yield", (16, 21))),
                             }
                         ),
-                        initializer: Some(Expression::reference(Ident::new("c", (26, 27)).into())),
+                        initializer: Some(Ident::new("c", (26, 27)).into()),
                     },
                 ],
             }.into()
@@ -338,7 +336,7 @@ fn nested_object_binding() {
                                 rest: None,
                             }
                         ),
-                        initializer: Some(Expression::reference(Ident::new("b", (16, 17)).into())),
+                        initializer: Some(Ident::new("b", (16, 17)).into()),
                     },
                 ],
             }.into()
