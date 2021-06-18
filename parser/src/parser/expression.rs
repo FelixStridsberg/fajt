@@ -307,9 +307,22 @@ where
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("(")));
 
-        let arguments = Vec::new();
-        if !token_matches!(self.reader.consume()?, punct!(")")) {
-            todo!("ARGUMENTS");
+        let mut arguments = Vec::new();
+
+        loop {
+            match self.reader.current() {
+                token_matches!(ok: punct!(")")) => {
+                    self.reader.consume()?;
+                    break;
+                }
+                token_matches!(ok: punct!("...")) => {
+                    todo!("Argument spread")
+                }
+                _ => {
+                    arguments.push(Argument::Expression(self.parse_assignment_expression()?));
+                    self.consume_parameter_delimiter()?;
+                }
+            }
         }
 
         let span = self.span_from(span_start);

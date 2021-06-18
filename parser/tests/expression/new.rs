@@ -50,3 +50,32 @@ fn new_empty_arguments() {
         ]
     );
 }
+
+#[test]
+fn new_with_arguments() {
+    parser_test!(
+        input: "new a(b, !null)",
+        expr_output: [
+            NewExpression {
+                span: Span::new(0, 15),
+                callee: IdentifierReference::Ident(Ident::new("a", (4, 5))).into(),
+                arguments_span: Some(Span::new(5, 15)),
+                arguments: vec![
+                    Argument::Expression(
+                        IdentifierReference::Ident(Ident::new("b", (6, 7))).into()
+                    ),
+                    Argument::Expression(
+                        UnaryExpression {
+                            span: Span::new(9, 14),
+                            operator: UnaryOperator::Not,
+                            argument: LiteralExpression {
+                                span: Span::new(10, 14),
+                                literal: Literal::Null,
+                            }.into(),
+                        }.into()
+                    ),
+                ],
+            }.into()
+        ]
+    );
+}
