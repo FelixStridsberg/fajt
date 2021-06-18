@@ -61,7 +61,7 @@ fn class_with_empty_method() {
                         span: Span::new(8, 20),
                         name: PropertyName::Ident(Ident::new("method1", (8, 15))),
                         kind: ClassMethodKind::Method,
-                        parameters: None,
+                        parameters: FormalParameters::empty((15, 17)),
                         body: vec![],
                         generator: false,
                         asynchronous: false,
@@ -86,7 +86,7 @@ fn class_with_empty_generator_method() {
                         span: Span::new(8, 21),
                         name: PropertyName::Ident(Ident::new("method1", (9, 16))),
                         kind: ClassMethodKind::Method,
-                        parameters: None,
+                        parameters: FormalParameters::empty((16, 18)),
                         body: vec![],
                         generator: true,
                         asynchronous: false,
@@ -111,7 +111,7 @@ fn class_with_empty_async_method() {
                         span: Span::new(8, 26),
                         name: PropertyName::Ident(Ident::new("method1", (14, 21))),
                         kind: ClassMethodKind::Method,
-                        parameters: None,
+                        parameters: FormalParameters::empty((21, 23)),
                         body: vec![],
                         generator: false,
                         asynchronous: true,
@@ -136,7 +136,7 @@ fn class_with_empty_async_generator_method() {
                         span: Span::new(8, 27),
                         name: PropertyName::Ident(Ident::new("method1", (15, 22))),
                         kind: ClassMethodKind::Method,
-                        parameters: None,
+                        parameters: FormalParameters::empty((22, 24)),
                         body: vec![],
                         generator: true,
                         asynchronous: true,
@@ -161,7 +161,7 @@ fn class_empty_getter_method() {
                         span: Span::new(8, 23),
                         name: PropertyName::Ident(Ident::new("getter", (12, 18))),
                         kind: ClassMethodKind::Get,
-                        parameters: None,
+                        parameters: FormalParameters::empty((18, 20)),
                         body: vec![],
                         generator: false,
                         asynchronous: false,
@@ -186,7 +186,7 @@ fn class_empty_setter_method() {
                         span: Span::new(8, 24),
                         name: PropertyName::Ident(Ident::new("setter", (12, 18))),
                         kind: ClassMethodKind::Set,
-                        parameters: Some(FormalParameters {
+                        parameters: FormalParameters {
                             span: Span::new(18, 21),
                             bindings: vec![
                                 BindingElement {
@@ -196,7 +196,7 @@ fn class_empty_setter_method() {
                                 }
                             ],
                             rest: None,
-                        }),
+                        },
                         body: vec![],
                         generator: false,
                         asynchronous: false,

@@ -62,7 +62,7 @@ where
                 && !self.reader.peek().unwrap().first_on_line =>
             {
                 let span_start = self.position();
-                let parameters = Some(self.parse_arrow_identifier_argument()?);
+                let parameters = self.parse_arrow_identifier_argument()?;
                 self.parse_arrow_function_expression(span_start, true, false, parameters)
             }
             _ => {
@@ -99,7 +99,7 @@ where
         if self.peek_is_identifier() {
             let span_start = self.position();
             self.reader.consume()?;
-            let parameters = Some(self.parse_arrow_identifier_argument()?);
+            let parameters = self.parse_arrow_identifier_argument()?;
             return self.parse_arrow_function_expression(span_start, true, true, parameters);
         }
 

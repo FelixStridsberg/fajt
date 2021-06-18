@@ -18,7 +18,7 @@ fn function_declaration() {
                 asynchronous: false,
                 generator: false,
                 identifier: Ident::new("fn", (9, 11)),
-                parameters: None,
+                parameters: FormalParameters::empty((11, 13)),
                 body: vec![],
             }.into()
         ]
@@ -35,7 +35,7 @@ fn generator_declaration() {
                 asynchronous: false,
                 generator: true,
                 identifier: Ident::new("fn", (10, 12)),
-                parameters: None,
+                parameters: FormalParameters::empty((12, 14)),
                 body: vec![],
             }.into()
         ]
@@ -52,7 +52,7 @@ fn function_declaration_with_body() {
                 asynchronous: false,
                 generator: false,
                 identifier: Ident::new("fn", (9, 11)),
-                parameters: None,
+                parameters: FormalParameters::empty((11, 13)),
                 body: vec![
                     VariableStatement {
                         span: Span::new(16, 25),
@@ -86,7 +86,7 @@ fn async_function_declaration() {
                 asynchronous: true,
                 generator: false,
                 identifier: Ident::new("fn", (15, 17)),
-                parameters: None,
+                parameters: FormalParameters::empty((17, 19)),
                 body: vec![],
             }.into()
         ]
@@ -103,7 +103,7 @@ fn async_generator_declaration() {
                 asynchronous: true,
                 generator: true,
                 identifier: Ident::new("fn", (16, 18)),
-                parameters: None,
+                parameters: FormalParameters::empty((18, 20)),
                 body: vec![],
             }.into()
         ]
@@ -120,7 +120,7 @@ fn async_function_declaration_with_body() {
                 asynchronous: true,
                 generator: false,
                 identifier: Ident::new("fn", (15, 17)),
-                parameters: None,
+                parameters: FormalParameters::empty((17, 19)),
                 body: vec![
                     VariableStatement {
                         span: Span::new(22, 31),
@@ -170,7 +170,7 @@ fn function_declaration_with_parameters() {
                 asynchronous: false,
                 generator: false,
                 identifier: Ident::new("fn", (9, 11)),
-                parameters: Some(FormalParameters {
+                parameters: FormalParameters {
                     span: Span::new(11, 21),
                     bindings: vec![
                         BindingElement {
@@ -187,7 +187,7 @@ fn function_declaration_with_parameters() {
                         }
                     ],
                     rest: None
-                }),
+                },
                 body: vec![],
             }.into()
         ]
@@ -204,11 +204,11 @@ fn function_declaration_with_rest_parameter() {
                 asynchronous: false,
                 generator: false,
                 identifier: Ident::new("fn", (9, 11)),
-                parameters: Some(FormalParameters {
+                parameters: FormalParameters {
                     span: Span::new(11, 17),
                     bindings: vec![],
                     rest: Some(BindingPattern::Ident(Ident::new("a", (15, 16))))
-                }),
+                },
                 body: vec![],
             }.into()
         ]

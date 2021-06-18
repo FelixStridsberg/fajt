@@ -11,7 +11,7 @@ fn empty_anonymous_function() {
                 asynchronous: false,
                 generator: false,
                 identifier: None,
-                parameters: None,
+                parameters: FormalParameters::empty((9, 11)),
                 body: vec![],
             }.into()
         ]
@@ -28,7 +28,7 @@ fn anonymous_function() {
                 asynchronous: false,
                 generator: false,
                 identifier: None,
-                parameters: Some(FormalParameters {
+                parameters: FormalParameters {
                     span: Span::new(9, 16),
                     bindings: vec![
                         BindingElement {
@@ -38,7 +38,7 @@ fn anonymous_function() {
                         }
                     ],
                     rest: None,
-                }),
+                },
                 body: vec![
                     EmptyStatement { span: Span::new(19, 20) }.into()
                 ],
@@ -57,7 +57,7 @@ fn empty_function() {
                 asynchronous: false,
                 generator: false,
                 identifier: Some(Ident::new("fn", (9, 11))),
-                parameters: None,
+                parameters: FormalParameters::empty((11, 13)),
                 body: vec![],
             }.into()
         ]
@@ -74,7 +74,7 @@ fn function() {
                 asynchronous: false,
                 generator: false,
                 identifier: Some(Ident::new("fn", (9, 11))),
-                parameters: Some(FormalParameters {
+                parameters: FormalParameters {
                     span: Span::new(11, 18),
                     bindings: vec![
                         BindingElement {
@@ -84,7 +84,7 @@ fn function() {
                         }
                     ],
                     rest: None,
-                }),
+                },
                 body: vec![
                     EmptyStatement { span: Span::new(21, 22) }.into()
                 ],
@@ -103,7 +103,7 @@ fn empty_anonymous_generator() {
                 asynchronous: false,
                 generator: true,
                 identifier: None,
-                parameters: None,
+                parameters: FormalParameters::empty((10, 12)),
                 body: vec![],
             }.into()
         ]
@@ -120,7 +120,7 @@ fn empty_generator() {
                 asynchronous: false,
                 generator: true,
                 identifier: Some(Ident::new("fn", (10, 12))),
-                parameters: None,
+                parameters: FormalParameters::empty((12, 14)),
                 body: vec![],
             }.into()
         ]
@@ -137,7 +137,7 @@ fn generator() {
                 asynchronous: false,
                 generator: true,
                 identifier: None,
-                parameters: Some(FormalParameters {
+                parameters: FormalParameters {
                     span: Span::new(10, 17),
                     bindings: vec![
                         BindingElement {
@@ -147,7 +147,7 @@ fn generator() {
                         }
                     ],
                     rest: None,
-                }),
+                },
                 body: vec![
                     EmptyStatement { span: Span::new(20, 21) }.into()
                 ],
@@ -166,7 +166,7 @@ fn empty_anonymous_async_function() {
                 asynchronous: true,
                 generator: false,
                 identifier: None,
-                parameters: None,
+                parameters: FormalParameters::empty((15, 17)),
                 body: vec![],
             }.into()
         ]
@@ -183,7 +183,7 @@ fn anonymous_async_function() {
                 asynchronous: true,
                 generator: false,
                 identifier: None,
-                parameters: Some(FormalParameters {
+                parameters: FormalParameters {
                     span: Span::new(15, 22),
                     bindings: vec![
                         BindingElement {
@@ -193,7 +193,7 @@ fn anonymous_async_function() {
                         }
                     ],
                     rest: None,
-                }),
+                },
                 body: vec![
                     EmptyStatement { span: Span::new(25, 26) }.into()
                 ],
@@ -212,7 +212,7 @@ fn empty_async_function() {
                 asynchronous: true,
                 generator: false,
                 identifier: Some(Ident::new("fn", (15, 17))),
-                parameters: None,
+                parameters: FormalParameters::empty((17, 19)),
                 body: vec![],
             }.into()
         ]
@@ -229,7 +229,7 @@ fn async_function() {
                 asynchronous: true,
                 generator: false,
                 identifier: Some(Ident::new("fn", (15, 17))),
-                parameters: Some(FormalParameters {
+                parameters: FormalParameters {
                     span: Span::new(17, 24),
                     bindings: vec![
                         BindingElement {
@@ -239,7 +239,7 @@ fn async_function() {
                         }
                     ],
                     rest: None,
-                }),
+                },
                 body: vec![
                     EmptyStatement { span: Span::new(27, 28) }.into()
                 ],
@@ -258,7 +258,7 @@ fn empty_anonymous_async_generator() {
                 asynchronous: true,
                 generator: true,
                 identifier: None,
-                parameters: None,
+                parameters: FormalParameters::empty((16, 18)),
                 body: vec![],
             }.into()
         ]
@@ -275,7 +275,7 @@ fn anonymous_async_generator() {
                 asynchronous: true,
                 generator: true,
                 identifier: None,
-                parameters: Some(FormalParameters {
+                parameters: FormalParameters {
                     span: Span::new(16, 23),
                     bindings: vec![
                         BindingElement {
@@ -285,7 +285,7 @@ fn anonymous_async_generator() {
                         }
                     ],
                     rest: None,
-                }),
+                },
                 body: vec![
                     EmptyStatement { span: Span::new(26, 27) }.into()
                 ],
@@ -304,7 +304,7 @@ fn empty_async_generator() {
                 asynchronous: true,
                 generator: true,
                 identifier: Some(Ident::new("fn", (16, 18))),
-                parameters: None,
+                parameters: FormalParameters::empty((18, 20)),
                 body: vec![],
             }.into()
         ]
@@ -321,7 +321,7 @@ fn async_generator() {
                 asynchronous: true,
                 generator: true,
                 identifier: Some(Ident::new("fn", (16, 18))),
-                parameters: Some(FormalParameters {
+                parameters: FormalParameters {
                     span: Span::new(18, 25),
                     bindings: vec![
                         BindingElement {
@@ -331,7 +331,7 @@ fn async_generator() {
                         }
                     ],
                     rest: None,
-                }),
+                },
                 body: vec![
                     EmptyStatement { span: Span::new(28, 29) }.into()
                 ],

@@ -353,7 +353,7 @@ pub struct FunctionExpression {
     pub asynchronous: bool,
     pub generator: bool,
     pub identifier: Option<Ident>,
-    pub parameters: Option<FormalParameters>,
+    pub parameters: FormalParameters,
     pub body: Vec<Statement>,
 }
 
@@ -362,7 +362,7 @@ pub struct ArrowFunctionExpression {
     pub span: Span,
     pub asynchronous: bool,
     pub binding_parameter: bool,
-    pub parameters: Option<FormalParameters>,
+    pub parameters: FormalParameters,
     pub body: ArrowFunctionBody,
 }
 

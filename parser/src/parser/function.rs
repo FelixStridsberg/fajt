@@ -22,7 +22,7 @@ where
         span_start: usize,
         binding_parameter: bool,
         asynchronous: bool,
-        parameters: Option<FormalParameters>,
+        parameters: FormalParameters,
     ) -> Result<Expression> {
         let arrow = self.reader.consume()?;
         if !token_matches!(arrow, punct!("=>")) {
@@ -177,16 +177,11 @@ where
     }
 
     /// Parses the `FormalParameters` goal symbol.
-    pub(crate) fn parse_formal_parameters(&mut self) -> Result<Option<FormalParameters>> {
+    pub(crate) fn parse_formal_parameters(&mut self) -> Result<FormalParameters> {
         let span_start = self.position();
         let token = self.reader.consume()?;
         if !token_matches!(token, punct!("(")) {
             return err!(ErrorKind::UnexpectedToken(token));
-        }
-
-        if token_matches!(self.reader.current()?, punct!(")")) {
-            self.reader.consume()?;
-            return Ok(None);
         }
 
         let mut parameters = Vec::new();
@@ -209,11 +204,11 @@ where
         }
 
         let span = self.span_from(span_start);
-        Ok(Some(FormalParameters {
+        Ok(FormalParameters {
             span,
             bindings: parameters,
             rest,
-        }))
+        })
     }
 
     /// Parses the `FunctionBody` or `AsyncFunctionBody` goal symbol.

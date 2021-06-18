@@ -10,7 +10,7 @@ fn identifier_argument() {
                 span: Span::new(0, 7),
                 asynchronous: false,
                 binding_parameter: true,
-                parameters: Some(FormalParameters {
+                parameters: FormalParameters {
                     span: Span::new(0, 1),
                     bindings: vec![
                         BindingElement {
@@ -20,7 +20,7 @@ fn identifier_argument() {
                         }
                     ],
                     rest: None,
-                }),
+                },
                 body: ArrowFunctionBody::Block(vec![])
             }.into()
         ]
@@ -36,7 +36,7 @@ fn async_identifier_argument() {
                 span: Span::new(0, 13),
                 asynchronous: true,
                 binding_parameter: true,
-                parameters: Some(FormalParameters {
+                parameters: FormalParameters {
                     span: Span::new(6, 7),
                     bindings: vec![
                         BindingElement {
@@ -46,7 +46,7 @@ fn async_identifier_argument() {
                         }
                     ],
                     rest: None,
-                }),
+                },
                 body: ArrowFunctionBody::Block(vec![])
             }.into()
         ]
@@ -62,7 +62,7 @@ fn identifier_argument_expression_body() {
                 span: Span::new(0, 6),
                 asynchronous: false,
                 binding_parameter: true,
-                parameters: Some(FormalParameters {
+                parameters: FormalParameters {
                     span: Span::new(0, 1),
                     bindings: vec![
                         BindingElement {
@@ -72,7 +72,7 @@ fn identifier_argument_expression_body() {
                         }
                     ],
                     rest: None,
-                }),
+                },
                 body: ArrowFunctionBody::Expression(
                     IdentifierReference::Ident(Ident::new("b", (5, 6))).into()
                 )
@@ -90,7 +90,7 @@ fn async_identifier_argument_expression_body() {
                 span: Span::new(0, 12),
                 asynchronous: true,
                 binding_parameter: true,
-                parameters: Some(FormalParameters {
+                parameters: FormalParameters {
                     span: Span::new(6, 7),
                     bindings: vec![
                         BindingElement {
@@ -100,7 +100,7 @@ fn async_identifier_argument_expression_body() {
                         }
                     ],
                     rest: None,
-                }),
+                },
                 body: ArrowFunctionBody::Expression(
                     IdentifierReference::Ident(Ident::new("b", (11, 12))).into()
                 )
@@ -118,7 +118,7 @@ fn no_parameters() {
                 span: Span::new(0, 8),
                 asynchronous: false,
                 binding_parameter: false,
-                parameters: None,
+                parameters: FormalParameters::empty((0, 2)),
                 body: ArrowFunctionBody::Block(vec![])
             }.into()
         ]
@@ -134,7 +134,7 @@ fn async_no_parameters() {
                 span: Span::new(0, 14),
                 asynchronous: true,
                 binding_parameter: false,
-                parameters: None,
+                parameters: FormalParameters::empty((6, 8)),
                 body: ArrowFunctionBody::Block(vec![])
             }.into()
         ]
@@ -150,7 +150,7 @@ fn parameters_and_body() {
                 span: Span::new(0, 12),
                 asynchronous: false,
                 binding_parameter: false,
-                parameters: Some(FormalParameters {
+                parameters: FormalParameters {
                     span: Span::new(0, 3),
                     bindings: vec![
                         BindingElement {
@@ -160,7 +160,7 @@ fn parameters_and_body() {
                         }
                     ],
                     rest: None,
-                }),
+                },
                 body: ArrowFunctionBody::Block(vec![
                     EmptyStatement {
                         span: Span::new(9, 10),
@@ -180,7 +180,7 @@ fn multiple_parameters() {
                 span: Span::new(0, 24),
                 asynchronous: false,
                 binding_parameter: false,
-                parameters: Some(FormalParameters {
+                parameters: FormalParameters {
                     span: Span::new(0, 15),
                     bindings: vec![
                         BindingElement {
@@ -195,7 +195,7 @@ fn multiple_parameters() {
                         }
                     ],
                     rest: Some(BindingPattern::Ident(Ident::new("rest", (10, 14)))),
-                }),
+                },
                 body: ArrowFunctionBody::Block(vec![
                     EmptyStatement {
                         span: Span::new(21, 22),
@@ -215,7 +215,7 @@ fn async_multiple_parameters() {
                 span: Span::new(0, 30),
                 asynchronous: true,
                 binding_parameter: false,
-                parameters: Some(FormalParameters {
+                parameters: FormalParameters {
                     span: Span::new(6, 21),
                     bindings: vec![
                         BindingElement {
@@ -230,7 +230,7 @@ fn async_multiple_parameters() {
                         }
                     ],
                     rest: Some(BindingPattern::Ident(Ident::new("rest", (16, 20)))),
-                }),
+                },
                 body: ArrowFunctionBody::Block(vec![
                     EmptyStatement {
                         span: Span::new(27, 28),

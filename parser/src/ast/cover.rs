@@ -14,7 +14,7 @@ pub(crate) struct CoverParenthesizedAndArrowParameters {
 }
 
 impl CoverParenthesizedAndArrowParameters {
-    pub fn into_arrow_parameters(self) -> crate::error::Result<Option<FormalParameters>> {
+    pub fn into_arrow_parameters(self) -> crate::error::Result<FormalParameters> {
         let tokens = self.tokens.into_iter();
         let mut reader = PeekReader::new(tokens).unwrap();
         let mut parser = Parser::new(&mut reader).unwrap();
@@ -46,7 +46,7 @@ pub(crate) struct CoverCallExpressionAndAsyncArrowHead {
 }
 
 impl CoverCallExpressionAndAsyncArrowHead {
-    pub fn into_arrow_parameters(mut self) -> crate::error::Result<Option<FormalParameters>> {
+    pub fn into_arrow_parameters(mut self) -> crate::error::Result<FormalParameters> {
         self.tokens.drain(0..1); // Skip 'async' of 'async (...)'
 
         let tokens = self.tokens.into_iter();

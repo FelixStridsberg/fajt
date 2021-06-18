@@ -48,7 +48,7 @@ pub struct FunctionDeclaration {
     pub asynchronous: bool,
     pub generator: bool,
     pub identifier: Ident,
-    pub parameters: Option<FormalParameters>,
+    pub parameters: FormalParameters,
     pub body: Vec<Statement>,
 }
 
@@ -57,6 +57,16 @@ pub struct FormalParameters {
     pub span: Span,
     pub bindings: Vec<BindingElement>,
     pub rest: Option<BindingPattern>,
+}
+
+impl FormalParameters {
+    pub fn empty<S>(span: S) -> Self where S: Into<Span> {
+        FormalParameters {
+            span: span.into(),
+            bindings: vec![],
+            rest: None
+        }
+    }
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
