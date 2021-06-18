@@ -26,16 +26,6 @@ pub enum Expression {
     NewExpression(Box<NewExpression>),
 }
 
-impl Expression {
-    pub fn this(expr: ThisExpression) -> Self {
-        Self::ThisExpression(Box::new(expr))
-    }
-
-    pub fn literal(expr: LiteralExpression) -> Self {
-        Self::Literal(Box::new(expr))
-    }
-}
-
 impl From<ThisExpression> for Expression {
     fn from(expr: ThisExpression) -> Self {
         Self::ThisExpression(Box::new(expr))
