@@ -79,3 +79,29 @@ fn new_with_arguments() {
         ]
     );
 }
+
+#[test]
+fn new_with_spread_arguments() {
+    parser_test!(
+        input: "new a(...b, c, ...[])",
+        expr_output: [
+            NewExpression {
+                span: Span::new(0, 21),
+                callee: IdentifierReference::Ident(Ident::new("a", (4, 5))).into(),
+                arguments_span: Some(Span::new(5, 21)),
+                arguments: vec![
+                    Argument::Spread(IdentifierReference::Ident(Ident::new("b", (9, 10))).into()),
+                    Argument::Expression(IdentifierReference::Ident(Ident::new("c", (12, 13))).into()),
+                    Argument::Spread(
+                        LiteralExpression {
+                            span: Span::new(18, 20),
+                            literal: Literal::Array(Array {
+                                elements: vec![]
+                            })
+                        }.into()
+                    ),
+                ],
+            }.into()
+        ]
+    );
+}

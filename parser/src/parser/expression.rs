@@ -316,7 +316,9 @@ where
                     break;
                 }
                 token_matches!(ok: punct!("...")) => {
-                    todo!("Argument spread")
+                    self.reader.consume()?;
+                    arguments.push(Argument::Spread(self.parse_assignment_expression()?));
+                    self.consume_parameter_delimiter()?;
                 }
                 _ => {
                     arguments.push(Argument::Expression(self.parse_assignment_expression()?));
