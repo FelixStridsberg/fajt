@@ -416,4 +416,28 @@ pub struct AssignmentExpression {
 pub enum AssignmentOperator {
     #[from_string("=")]
     Assign,
+    #[from_string("*=")]
+    Multiply,
+    #[from_string("**=")]
+    Power,
+    #[from_string("/=")]
+    Divide,
+    #[from_string("%=")]
+    Modulus,
+    #[from_string("+=")]
+    Add,
+    #[from_string("-=")]
+    Sub,
+    #[from_string("<<=")]
+    LeftShift,
+    #[from_string(">>=")]
+    RightShift,
+    #[from_string(">>>=")]
+    UnsignedRightShift,
+    #[from_string("&=")]
+    BitwiseAnd,
+    #[from_string("^=")]
+    BitwiseXOr,
+    #[from_string("|=")]
+    BitwiseOr,
 }
