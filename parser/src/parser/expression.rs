@@ -1,5 +1,5 @@
 use crate::ast::{
-    Arguments, AwaitExpression, ConditionalExpression, Expression, Literal, Member,
+    Argument, AwaitExpression, ConditionalExpression, Expression, Literal, Member,
     MemberExpression, NewExpression, SequenceExpression, ThisExpression, UnaryExpression,
     UpdateExpression, YieldExpression,
 };
@@ -10,7 +10,7 @@ use crate::Parser;
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
-use fajt_lexer::token::Token;
+use fajt_lexer::token::{Span, Token};
 use fajt_lexer::token_matches;
 
 impl<I> Parser<'_, I>
@@ -282,18 +282,18 @@ where
 
             let callee = self.parse_new_expression()?;
 
-            let (arguments, parentheses_omitted) =
+            let (arguments_span, arguments) =
                 if token_matches!(self.reader.current(), ok: punct!("(")) {
-                    (self.parse_arguments()?, false)
+                    self.parse_arguments()?
                 } else {
-                    (None, true)
+                    (None, Vec::new())
                 };
 
             let span = self.span_from(span_start);
             Ok(NewExpression {
                 span,
                 callee,
-                parentheses_omitted,
+                arguments_span,
                 arguments,
             }
             .into())
@@ -302,17 +302,18 @@ where
         }
     }
 
-    fn parse_arguments(&mut self) -> Result<Option<Arguments>> {
+    fn parse_arguments(&mut self) -> Result<(Option<Span>, Vec<Argument>)> {
         let span_start = self.position();
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("(")));
 
+        let arguments = Vec::new();
         if !token_matches!(self.reader.consume()?, punct!(")")) {
             todo!("ARGUMENTS");
         }
 
-        let _span = self.span_from(span_start);
-        Ok(None)
+        let span = self.span_from(span_start);
+        Ok((Some(span), arguments))
     }
 
     /// Parses the `MemberExpression` goal symbol.

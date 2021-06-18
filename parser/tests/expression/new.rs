@@ -8,9 +8,9 @@ fn new() {
         expr_output: [
             NewExpression {
                 span: Span::new(0, 5),
-                parentheses_omitted: true,
                 callee: IdentifierReference::Ident(Ident::new("a", (4, 5))).into(),
-                arguments: None,
+                arguments_span: None,
+                arguments: vec![],
             }.into()
         ]
     );
@@ -26,11 +26,11 @@ fn new_nested() {
                 callee: NewExpression {
                     span: Span::new(4, 9),
                     callee: IdentifierReference::Ident(Ident::new("a", (8, 9))).into(),
-                    parentheses_omitted: true,
-                    arguments: None,
+                    arguments_span: None,
+                    arguments: vec![],
                 }.into(),
-                parentheses_omitted: true,
-                arguments: None,
+                arguments_span: None,
+                arguments: vec![],
             }.into()
         ]
     );
@@ -43,9 +43,9 @@ fn new_empty_arguments() {
         expr_output: [
             NewExpression {
                 span: Span::new(0, 7),
-                parentheses_omitted: false,
                 callee: IdentifierReference::Ident(Ident::new("a", (4, 5))).into(),
-                arguments: None,
+                arguments_span: Some(Span::new(5, 7)),
+                arguments: vec![],
             }.into()
         ]
     );

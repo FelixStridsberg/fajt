@@ -60,11 +60,14 @@ pub struct FormalParameters {
 }
 
 impl FormalParameters {
-    pub fn empty<S>(span: S) -> Self where S: Into<Span> {
+    pub fn empty<S>(span: S) -> Self
+    where
+        S: Into<Span>,
+    {
         FormalParameters {
             span: span.into(),
             bindings: vec![],
-            rest: None
+            rest: None,
         }
     }
 }

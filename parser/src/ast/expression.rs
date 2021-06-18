@@ -395,12 +395,12 @@ pub enum Member {
 pub struct NewExpression {
     pub span: Span,
     pub callee: Expression,
-    pub parentheses_omitted: bool,
-    pub arguments: Option<Arguments>,
+    pub arguments_span: Option<Span>,
+    pub arguments: Vec<Argument>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct Arguments {
-    pub span: Span,
-    pub parameters: Vec<Expression>,
+pub enum Argument {
+    Expression(Expression),
+    Spread(Expression),
 }
