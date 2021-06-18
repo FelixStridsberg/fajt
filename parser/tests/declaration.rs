@@ -172,7 +172,7 @@ fn function_declaration_with_parameters() {
                 identifier: Ident::new("fn", (9, 11)),
                 parameters: Some(FormalParameters {
                     span: Span::new(11, 21),
-                    parameters: vec![
+                    bindings: vec![
                         BindingElement {
                             span: Span::new(12, 13),
                             pattern: BindingPattern::Ident(Ident::new("a", (12, 13))),
@@ -206,7 +206,7 @@ fn function_declaration_with_rest_parameter() {
                 identifier: Ident::new("fn", (9, 11)),
                 parameters: Some(FormalParameters {
                     span: Span::new(11, 17),
-                    parameters: vec![],
+                    bindings: vec![],
                     rest: Some(BindingPattern::Ident(Ident::new("a", (15, 16))))
                 }),
                 body: vec![],

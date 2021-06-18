@@ -30,7 +30,7 @@ fn anonymous_function() {
                 identifier: None,
                 parameters: Some(FormalParameters {
                     span: Span::new(9, 16),
-                    parameters: vec![
+                    bindings: vec![
                         BindingElement {
                             span: Span::new(10, 15),
                             pattern: BindingPattern::Ident(Ident::new("param", (10, 15))),
@@ -76,7 +76,7 @@ fn function() {
                 identifier: Some(Ident::new("fn", (9, 11))),
                 parameters: Some(FormalParameters {
                     span: Span::new(11, 18),
-                    parameters: vec![
+                    bindings: vec![
                         BindingElement {
                             span: Span::new(12, 17),
                             pattern: BindingPattern::Ident(Ident::new("param", (12, 17))),
@@ -139,7 +139,7 @@ fn generator() {
                 identifier: None,
                 parameters: Some(FormalParameters {
                     span: Span::new(10, 17),
-                    parameters: vec![
+                    bindings: vec![
                         BindingElement {
                             span: Span::new(11, 16),
                             pattern: BindingPattern::Ident(Ident::new("param", (11, 16))),
@@ -185,7 +185,7 @@ fn anonymous_async_function() {
                 identifier: None,
                 parameters: Some(FormalParameters {
                     span: Span::new(15, 22),
-                    parameters: vec![
+                    bindings: vec![
                         BindingElement {
                             span: Span::new(16, 21),
                             pattern: BindingPattern::Ident(Ident::new("param", (16, 21))),
@@ -231,7 +231,7 @@ fn async_function() {
                 identifier: Some(Ident::new("fn", (15, 17))),
                 parameters: Some(FormalParameters {
                     span: Span::new(17, 24),
-                    parameters: vec![
+                    bindings: vec![
                         BindingElement {
                             span: Span::new(18, 23),
                             pattern: BindingPattern::Ident(Ident::new("param", (18, 23))),
@@ -277,7 +277,7 @@ fn anonymous_async_generator() {
                 identifier: None,
                 parameters: Some(FormalParameters {
                     span: Span::new(16, 23),
-                    parameters: vec![
+                    bindings: vec![
                         BindingElement {
                             span: Span::new(17, 22),
                             pattern: BindingPattern::Ident(Ident::new("param", (17, 22))),
@@ -323,7 +323,7 @@ fn async_generator() {
                 identifier: Some(Ident::new("fn", (16, 18))),
                 parameters: Some(FormalParameters {
                     span: Span::new(18, 25),
-                    parameters: vec![
+                    bindings: vec![
                         BindingElement {
                             span: Span::new(19, 24),
                             pattern: BindingPattern::Ident(Ident::new("param", (19, 24))),

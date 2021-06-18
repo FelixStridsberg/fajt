@@ -12,7 +12,7 @@ fn identifier_argument() {
                 binding_parameter: true,
                 parameters: Some(FormalParameters {
                     span: Span::new(0, 1),
-                    parameters: vec![
+                    bindings: vec![
                         BindingElement {
                             span: Span::new(0, 1),
                             pattern: Ident::new("a", (0, 1)).into(),
@@ -38,7 +38,7 @@ fn async_identifier_argument() {
                 binding_parameter: true,
                 parameters: Some(FormalParameters {
                     span: Span::new(6, 7),
-                    parameters: vec![
+                    bindings: vec![
                         BindingElement {
                             span: Span::new(6, 7),
                             pattern: Ident::new("a", (6, 7)).into(),
@@ -64,7 +64,7 @@ fn identifier_argument_expression_body() {
                 binding_parameter: true,
                 parameters: Some(FormalParameters {
                     span: Span::new(0, 1),
-                    parameters: vec![
+                    bindings: vec![
                         BindingElement {
                             span: Span::new(0, 1),
                             pattern: Ident::new("a", (0, 1)).into(),
@@ -92,7 +92,7 @@ fn async_identifier_argument_expression_body() {
                 binding_parameter: true,
                 parameters: Some(FormalParameters {
                     span: Span::new(6, 7),
-                    parameters: vec![
+                    bindings: vec![
                         BindingElement {
                             span: Span::new(6, 7),
                             pattern: Ident::new("a", (6, 7)).into(),
@@ -152,7 +152,7 @@ fn parameters_and_body() {
                 binding_parameter: false,
                 parameters: Some(FormalParameters {
                     span: Span::new(0, 3),
-                    parameters: vec![
+                    bindings: vec![
                         BindingElement {
                             span: Span::new(1, 2),
                             pattern: Ident::new("a", (1, 2)).into(),
@@ -182,7 +182,7 @@ fn multiple_parameters() {
                 binding_parameter: false,
                 parameters: Some(FormalParameters {
                     span: Span::new(0, 15),
-                    parameters: vec![
+                    bindings: vec![
                         BindingElement {
                             span: Span::new(1, 2),
                             pattern: Ident::new("a", (1, 2)).into(),
@@ -217,7 +217,7 @@ fn async_multiple_parameters() {
                 binding_parameter: false,
                 parameters: Some(FormalParameters {
                     span: Span::new(6, 21),
-                    parameters: vec![
+                    bindings: vec![
                         BindingElement {
                             span: Span::new(7, 8),
                             pattern: Ident::new("a", (7, 8)).into(),

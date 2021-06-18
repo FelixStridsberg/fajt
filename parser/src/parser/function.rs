@@ -55,7 +55,7 @@ where
         let span = self.span_from(span_start);
         Ok(FormalParameters {
             span: span.clone(),
-            parameters: vec![BindingElement {
+            bindings: vec![BindingElement {
                 span,
                 pattern: identifier.into(),
                 initializer: None,
@@ -211,7 +211,7 @@ where
         let span = self.span_from(span_start);
         Ok(Some(FormalParameters {
             span,
-            parameters,
+            bindings: parameters,
             rest,
         }))
     }

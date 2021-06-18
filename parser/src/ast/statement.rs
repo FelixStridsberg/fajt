@@ -55,7 +55,7 @@ pub struct FunctionDeclaration {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct FormalParameters {
     pub span: Span,
-    pub parameters: Vec<BindingElement>,
+    pub bindings: Vec<BindingElement>,
     pub rest: Option<BindingPattern>,
 }
 

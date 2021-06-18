@@ -188,7 +188,7 @@ fn class_empty_setter_method() {
                         kind: ClassMethodKind::Set,
                         parameters: Some(FormalParameters {
                             span: Span::new(18, 21),
-                            parameters: vec![
+                            bindings: vec![
                                 BindingElement {
                                     span: Span::new(19, 20),
                                     pattern: BindingPattern::Ident(Ident::new("a", (19, 20))),
