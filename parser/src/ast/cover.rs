@@ -18,7 +18,7 @@ impl CoverParenthesizedAndArrowParameters {
         let tokens = self.tokens.into_iter();
         let mut reader = PeekReader::new(tokens).unwrap();
         let mut parser = Parser::new(&mut reader).unwrap();
-        Ok(parser.parse_formal_parameters()?)
+        parser.parse_formal_parameters()
     }
 
     pub fn into_expression(mut self) -> crate::error::Result<Expression> {
@@ -52,7 +52,7 @@ impl CoverCallExpressionAndAsyncArrowHead {
         let tokens = self.tokens.into_iter();
         let mut reader = PeekReader::new(tokens).unwrap();
         let mut parser = Parser::new(&mut reader).unwrap();
-        Ok(parser.parse_formal_parameters()?)
+        parser.parse_formal_parameters()
     }
 
     pub fn into_call(self) -> crate::error::Result<Expression> {

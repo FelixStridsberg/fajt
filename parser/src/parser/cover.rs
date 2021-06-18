@@ -32,8 +32,7 @@ where
         debug_assert!(token_matches!(async_token, keyword!("async")));
 
         let span_start = self.position();
-        let mut tokens = Vec::new();
-        tokens.push(async_token);
+        let mut tokens = vec![async_token];
 
         self.collect_parenthesized_tokens(&mut tokens)?;
 
