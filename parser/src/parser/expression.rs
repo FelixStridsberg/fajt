@@ -1,4 +1,9 @@
-use crate::ast::{Argument, AssignmentExpression, AwaitExpression, CallExpression, Callee, ConditionalExpression, Expression, Literal, MemberExpression, MemberObject, MemberProperty, NewExpression, SequenceExpression, Super, ThisExpression, UnaryExpression, UpdateExpression, YieldExpression, MetaPropertyExpression, Ident};
+use crate::ast::{
+    Argument, AssignmentExpression, AwaitExpression, CallExpression, Callee, ConditionalExpression,
+    Expression, Ident, Literal, MemberExpression, MemberObject, MemberProperty,
+    MetaPropertyExpression, NewExpression, SequenceExpression, Super, ThisExpression,
+    UnaryExpression, UpdateExpression, YieldExpression,
+};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 use crate::Parser;
@@ -312,7 +317,9 @@ where
                 }
                 .into())
             }
-            token_matches!(ok: keyword!("import")) => {
+            token_matches!(ok: keyword!("import"))
+                if token_matches!(self.reader.peek(), opt: punct!("(")) =>
+            {
                 let span_start = self.position();
                 self.reader.consume()?;
 
@@ -473,8 +480,8 @@ where
                 let new_token = self.reader.consume()?;
                 self.reader.consume()?; // .
 
-                let property = self.reader.consume()?;
-                if !token_matches!(property, keyword!("target")) {
+                let property = self.parse_identifier()?;
+                if property.name != "target" {
                     todo!("Error, expected `target` after `new.`");
                 }
 
@@ -482,11 +489,27 @@ where
                 Ok(MetaPropertyExpression {
                     span,
                     meta: Ident::new("new", new_token.span),
-                    property: Ident::new("target", property.span),
-                }.into())
+                    property,
+                }
+                .into())
             }
             token_matches!(keyword!("import")) if token_matches!(peek, opt: punct!(".")) => {
-                todo!("ImportMeta")
+                let span_start = self.position();
+                let import_token = self.reader.consume()?;
+                self.reader.consume()?; // .
+
+                let property = self.parse_identifier()?;
+                if property.name != "meta" {
+                    todo!("Error, expected `meta` after `import.`");
+                }
+
+                let span = self.span_from(span_start);
+                Ok(MetaPropertyExpression {
+                    span,
+                    meta: Ident::new("import", import_token.span),
+                    property,
+                }
+                .into())
             }
             token_matches!(keyword!("new")) => todo!("new MemberExpression Arguments"),
             _ => self.parse_primary_expression(),

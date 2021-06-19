@@ -164,3 +164,17 @@ fn new_target_meta_property() {
         ]
     );
 }
+
+#[test]
+fn import_meta_property() {
+    parser_test!(
+        input: "import.meta",
+        expr_output: [
+            MetaPropertyExpression {
+                span: Span::new(0, 11),
+                meta: Ident::new("import", (0, 6)),
+                property: Ident::new("meta", (7, 11)),
+            }.into()
+        ]
+    );
+}
