@@ -5,34 +5,29 @@ use std::vec::IntoIter;
 
 #[macro_export]
 macro_rules! token_matches {
+    ($token:expr, @literal) => {
+        token_matches!($token, $crate::token::TokenValue::Literal(_))
+    };
     ($token:expr, $($value:pat)|+) => {
         matches!($token, $( $crate::token::Token { value: $value, .. } )|+);
     };
-    ($token:expr, @ident) => {
-        token_matches!($token, $crate::token::TokenValue::Identifier(_))
+    ($token:expr, opt: $($value:pat)|+) => {
+        token_matches!($token, $( $value )|+, wrap: Some)
     };
-    ($token:expr, @literal) => {
-        token_matches!($token, $crate::token::TokenValue::Literal(_))
+    ($token:expr, ok: $($value:pat)|+) => {
+        token_matches!($token, $( $value )|+, wrap: Ok)
+    };
+    ($token:expr, $($value:pat)|+, wrap: $wrap:path) => {
+         matches!(
+            $token,
+            $( $wrap($crate::token::Token { value: $value, .. }) )|+
+        );
     };
     ($value:pat) => {
         $crate::token::Token { value: $value, .. }
     };
-    (@ident) => {
-        token_matches!($crate::token::TokenValue::Identifier(_))
-    };
     (@literal) => {
         token_matches!($crate::token::TokenValue::Literal(_))
-    };
-    ($token:expr, opt: $value:pat) => {
-        matches!($token, Some($crate::token::Token { value: $value, .. }));
-    };
-    ($token:expr, ok: $($value:pat)|+) => {
-        matches!(
-            $token,
-            $(
-                Ok($crate::token::Token { value: $value, .. })
-            )|+
-        );
     };
     (opt: $value:pat) => {
         Some($crate::token::Token { value: $value, .. })

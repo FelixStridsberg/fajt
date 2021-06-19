@@ -170,9 +170,9 @@ where
     /// Parses the `PropertyName` goal symbol.
     fn parse_property_name(&mut self) -> Result<PropertyName> {
         match self.reader.current()? {
-            token_matches!(@ident) => Ok(PropertyName::Ident(self.parse_identifier()?)),
             token_matches!(@literal) => todo!(),
             token_matches!(punct!("[")) => todo!(),
+            _ if self.is_identifier() => Ok(PropertyName::Ident(self.parse_identifier()?)),
             _ => return err!(UnexpectedToken(self.reader.consume()?)),
         }
     }
