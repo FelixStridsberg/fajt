@@ -6,6 +6,7 @@ mod expression {
     mod assignment;
     mod async_expr;
     mod binary;
+    mod call;
     mod class;
     mod expression;
     mod flow_control;

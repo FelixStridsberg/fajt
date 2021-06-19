@@ -1,7 +1,7 @@
 use crate::ast::{
-    Argument, AssignmentExpression, AwaitExpression, ConditionalExpression, Expression, Literal,
-    Member, MemberExpression, NewExpression, SequenceExpression, ThisExpression, UnaryExpression,
-    UpdateExpression, YieldExpression,
+    Argument, AssignmentExpression, AwaitExpression, CallExpression, Callee, ConditionalExpression,
+    Expression, Literal, Member, MemberExpression, NewExpression, SequenceExpression,
+    ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
@@ -300,7 +300,23 @@ where
 
     /// Parses the `LeftHandSideExpression` goal symbol.
     pub(super) fn parse_left_hand_side_expression(&mut self) -> Result<Expression> {
-        self.parse_new_expression()
+        match self.reader.current() {
+            token_matches!(ok: keyword!("super")) => {
+                let span_start = self.position();
+                self.reader.consume()?;
+                let (arguments_span, arguments) = self.parse_arguments()?;
+                let span = self.span_from(span_start);
+                Ok(CallExpression {
+                    span,
+                    callee: Callee::Super,
+                    arguments_span,
+                    arguments,
+                }
+                .into())
+            }
+            _ => self.parse_new_expression(),
+        }
+
         // TODO CallExpression
         // TODO OptionalExpression
     }
@@ -315,7 +331,8 @@ where
 
             let (arguments_span, arguments) =
                 if token_matches!(self.reader.current(), ok: punct!("(")) {
-                    self.parse_arguments()?
+                    self.parse_arguments()
+                        .map(|(span, args)| (Some(span), args))?
                 } else {
                     (None, Vec::new())
                 };
@@ -333,7 +350,7 @@ where
         }
     }
 
-    fn parse_arguments(&mut self) -> Result<(Option<Span>, Vec<Argument>)> {
+    fn parse_arguments(&mut self) -> Result<(Span, Vec<Argument>)> {
         let span_start = self.position();
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("(")));
@@ -359,7 +376,7 @@ where
         }
 
         let span = self.span_from(span_start);
-        Ok((Some(span), arguments))
+        Ok((span, arguments))
     }
 
     /// Parses the `MemberExpression` goal symbol.

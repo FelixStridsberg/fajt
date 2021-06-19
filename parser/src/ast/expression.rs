@@ -25,6 +25,7 @@ pub enum Expression {
     MemberExpression(Box<MemberExpression>),
     NewExpression(Box<NewExpression>),
     AssignmentExpression(Box<AssignmentExpression>),
+    CallExpression(Box<CallExpression>),
 }
 
 impl From<ThisExpression> for Expression {
@@ -138,6 +139,12 @@ impl From<NewExpression> for Expression {
 impl From<AssignmentExpression> for Expression {
     fn from(expr: AssignmentExpression) -> Self {
         Self::AssignmentExpression(Box::new(expr))
+    }
+}
+
+impl From<CallExpression> for Expression {
+    fn from(expr: CallExpression) -> Self {
+        Self::CallExpression(Box::new(expr))
     }
 }
 
@@ -440,4 +447,17 @@ pub enum AssignmentOperator {
     BitwiseXOr,
     #[from_string("|=")]
     BitwiseOr,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct CallExpression {
+    pub span: Span,
+    pub callee: Callee,
+    pub arguments_span: Span,
+    pub arguments: Vec<Argument>,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub enum Callee {
+    Super,
 }
