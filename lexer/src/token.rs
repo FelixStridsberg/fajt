@@ -190,9 +190,9 @@ pub enum Number {
 )]
 pub enum Punct {
     #[from_string("(")]
-    ParantOpen,
+    ParenOpen,
     #[from_string(")")]
-    ParantClose,
+    ParenClose,
     #[from_string("[")]
     BraceOpen,
     #[from_string("]")]
