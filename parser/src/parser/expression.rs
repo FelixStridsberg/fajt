@@ -1,8 +1,4 @@
-use crate::ast::{
-    Argument, AssignmentExpression, AwaitExpression, CallExpression, Callee, ConditionalExpression,
-    Expression, Literal, MemberExpression, MemberObject, MemberProperty, NewExpression,
-    SequenceExpression, Super, ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
-};
+use crate::ast::{Argument, AssignmentExpression, AwaitExpression, CallExpression, Callee, ConditionalExpression, Expression, Literal, MemberExpression, MemberObject, MemberProperty, NewExpression, SequenceExpression, Super, ThisExpression, UnaryExpression, UpdateExpression, YieldExpression, MetaPropertyExpression, Ident};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 use crate::Parser;
@@ -357,7 +353,9 @@ where
 
     /// Parses the `NewExpression` goal symbol.
     fn parse_new_expression(&mut self) -> Result<Expression> {
-        if token_matches!(self.reader.current(), ok: keyword!("new")) {
+        if token_matches!(self.reader.current(), ok: keyword!("new"))
+            && !token_matches!(self.reader.peek(), opt: punct!("."))
+        {
             let span_start = self.position();
             self.reader.consume()?;
 
@@ -471,7 +469,21 @@ where
                 )
             }
             token_matches!(keyword!("new")) if token_matches!(peek, opt: punct!(".")) => {
-                todo!("NewTarget")
+                let span_start = self.position();
+                let new_token = self.reader.consume()?;
+                self.reader.consume()?; // .
+
+                let property = self.reader.consume()?;
+                if !token_matches!(property, keyword!("target")) {
+                    todo!("Error, expected `target` after `new.`");
+                }
+
+                let span = self.span_from(span_start);
+                Ok(MetaPropertyExpression {
+                    span,
+                    meta: Ident::new("new", new_token.span),
+                    property: Ident::new("target", property.span),
+                }.into())
             }
             token_matches!(keyword!("import")) if token_matches!(peek, opt: punct!(".")) => {
                 todo!("ImportMeta")

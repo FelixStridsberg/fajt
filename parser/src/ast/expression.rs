@@ -26,6 +26,7 @@ pub enum Expression {
     NewExpression(Box<NewExpression>),
     AssignmentExpression(Box<AssignmentExpression>),
     CallExpression(Box<CallExpression>),
+    MetaPropertyExpression(Box<MetaPropertyExpression>),
 }
 
 impl From<ThisExpression> for Expression {
@@ -145,6 +146,12 @@ impl From<AssignmentExpression> for Expression {
 impl From<CallExpression> for Expression {
     fn from(expr: CallExpression) -> Self {
         Self::CallExpression(Box::new(expr))
+    }
+}
+
+impl From<MetaPropertyExpression> for Expression {
+    fn from(expr: MetaPropertyExpression) -> Self {
+        Self::MetaPropertyExpression(Box::new(expr))
     }
 }
 
@@ -400,6 +407,13 @@ pub struct Super {
 pub enum MemberProperty {
     Ident(Ident),
     Expression(Expression),
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct MetaPropertyExpression {
+    pub span: Span,
+    pub meta: Ident,
+    pub property: Ident,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]

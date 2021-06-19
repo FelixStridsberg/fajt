@@ -150,3 +150,17 @@ fn nested_mixed() {
         ]
     );
 }
+
+#[test]
+fn new_target_meta_property() {
+    parser_test!(
+        input: "new.target",
+        expr_output: [
+            MetaPropertyExpression {
+                span: Span::new(0, 10),
+                meta: Ident::new("new", (0, 3)),
+                property: Ident::new("target", (4, 10)),
+            }.into()
+        ]
+    );
+}
