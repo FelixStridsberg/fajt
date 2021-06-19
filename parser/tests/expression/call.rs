@@ -83,3 +83,52 @@ fn call_expression() {
         ]
     );
 }
+
+#[test]
+fn empty_call_member_identifier() {
+    parser_test!(
+        input: "fn().a",
+        expr_output: [
+            MemberExpression {
+                span: Span::new(0, 6),
+                object: MemberObject::Expression(
+                    CallExpression {
+                        span: Span::new(0, 4),
+                        callee: Callee::Expression(Ident::new("fn", (0, 2)).into()),
+                        arguments_span: Span::new(2, 4),
+                        arguments: vec![]
+                    }.into()
+                ),
+                property: MemberProperty::Ident(Ident::new("a", (5, 6))),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn nested_call_member() {
+    parser_test!(
+        input: "f1().f2()",
+        expr_output: [
+            CallExpression {
+                span: Span::new(0, 9),
+                callee: Callee::Expression(
+                    MemberExpression {
+                        span: Span::new(0, 7),
+                        object: MemberObject::Expression(
+                            CallExpression {
+                                span: Span::new(0, 4),
+                                callee: Callee::Expression(Ident::new("f1", (0, 2)).into()),
+                                arguments_span: Span::new(2, 4),
+                                arguments: vec![],
+                            }.into()
+                        ),
+                        property: MemberProperty::Ident(Ident::new("f2", (5, 7))),
+                    }.into()
+                ),
+                arguments_span: Span::new(7, 9),
+                arguments: vec![]
+            }.into()
+        ]
+    );
+}

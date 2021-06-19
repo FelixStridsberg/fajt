@@ -273,7 +273,7 @@ where
         }
 
         let span_start = self.position();
-        let argument = self.parse_left_hand_side_expression()?;
+        let argument = self.parse_left_hand_side_expression(false)?;
         let suffix_operator = match self.reader.current() {
             token_matches!(ok: punct!("++")) => Some(update_op!("++")),
             token_matches!(ok: punct!("--")) => Some(update_op!("--")),
@@ -300,54 +300,52 @@ where
     }
 
     /// Parses the `LeftHandSideExpression` goal symbol.
-    pub(super) fn parse_left_hand_side_expression(&mut self) -> Result<Expression> {
+    /// TODO `only_call` don't make sense, hide between function call
+    pub(super) fn parse_left_hand_side_expression(
+        &mut self,
+        only_call: bool,
+    ) -> Result<Expression> {
         match self.reader.current() {
             token_matches!(ok: keyword!("super"))
                 if token_matches!(self.reader.peek(), opt: punct!("(")) =>
             {
-                let span_start = self.position();
-                self.reader.consume()?;
-                let (arguments_span, arguments) = self.parse_arguments()?;
-                let span = self.span_from(span_start);
-                Ok(CallExpression {
-                    span,
-                    callee: Callee::Super,
-                    arguments_span,
-                    arguments,
-                }
-                .into())
+                self.parse_super_call_expression()
             }
             token_matches!(ok: keyword!("import"))
                 if token_matches!(self.reader.peek(), opt: punct!("(")) =>
             {
-                let span_start = self.position();
-                self.reader.consume()?;
-
-                let (arguments_span, arguments) = self.parse_import_argument()?;
-
-                let span = self.span_from(span_start);
-                Ok(CallExpression {
-                    span,
-                    callee: Callee::Import,
-                    arguments_span,
-                    arguments,
-                }
-                .into())
+                self.parse_import_call_expression()
+            }
+            token_matches!(ok: keyword!("new"))
+                if !token_matches!(self.reader.peek(), opt: punct!(".")) && !only_call =>
+            {
+                self.parse_new_expression()
             }
             _ => {
                 let span_start = self.position();
-                let expression = self.parse_new_expression()?;
+                let mut expression = self.parse_member_expression()?;
 
-                if token_matches!(self.reader.current(), ok: punct!("(")) {
-                    let (arguments_span, arguments) = self.parse_arguments()?;
-                    let span = self.span_from(span_start);
-                    return Ok(CallExpression {
-                        span,
-                        callee: Callee::Expression(expression),
-                        arguments_span,
-                        arguments,
+                loop {
+                    match self.reader.current() {
+                        token_matches!(ok: punct!("(")) => {
+                            let (arguments_span, arguments) = self.parse_arguments()?;
+                            let span = self.span_from(span_start);
+                            expression = CallExpression {
+                                span,
+                                callee: Callee::Expression(expression),
+                                arguments_span,
+                                arguments,
+                            }
+                            .into();
+                        }
+                        token_matches!(ok: punct!(".")) => {
+                            expression = self.parse_member_property(
+                                span_start,
+                                MemberObject::Expression(expression),
+                            )?;
+                        }
+                        _ => break,
                     }
-                    .into());
                 }
 
                 Ok(expression)
@@ -356,6 +354,38 @@ where
 
         // TODO CallExpression
         // TODO OptionalExpression
+    }
+
+    /// Parses the `SuperCall` goal symbol.
+    fn parse_super_call_expression(&mut self) -> Result<Expression> {
+        let span_start = self.position();
+        self.reader.consume()?;
+        let (arguments_span, arguments) = self.parse_arguments()?;
+        let span = self.span_from(span_start);
+        Ok(CallExpression {
+            span,
+            callee: Callee::Super,
+            arguments_span,
+            arguments,
+        }
+        .into())
+    }
+
+    /// Parses the `ImportCall` goal symbol.
+    fn parse_import_call_expression(&mut self) -> Result<Expression> {
+        let span_start = self.position();
+        self.reader.consume()?;
+
+        let (arguments_span, arguments) = self.parse_import_argument()?;
+
+        let span = self.span_from(span_start);
+        Ok(CallExpression {
+            span,
+            callee: Callee::Import,
+            arguments_span,
+            arguments,
+        }
+        .into())
     }
 
     /// Parses the `NewExpression` goal symbol.
@@ -438,7 +468,7 @@ where
 
     /// Parses the `MemberExpression` goal symbol.
     /// NOTE: The `new MemberExpression Arguments` is parsed in `NewExpression`
-    fn parse_member_expression(&mut self) -> Result<Expression> {
+    pub fn parse_member_expression(&mut self) -> Result<Expression> {
         let span_start = self.position();
         let mut expression = self.parse_terminal_member_expression_or_primary()?;
 
