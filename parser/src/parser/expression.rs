@@ -511,7 +511,6 @@ where
                 }
                 .into())
             }
-            token_matches!(keyword!("new")) => todo!("new MemberExpression Arguments"),
             _ => self.parse_primary_expression(),
         }
     }

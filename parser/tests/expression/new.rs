@@ -52,6 +52,27 @@ fn new_empty_arguments() {
 }
 
 #[test]
+fn new_empty_arguments_member() {
+    parser_test!(
+        input: "new a.b()",
+        expr_output: [
+            NewExpression {
+                span: Span::new(0, 9),
+                callee: MemberExpression {
+                    span: Span::new(4, 7),
+                    object: MemberObject::Expression(
+                        IdentifierReference::Ident(Ident::new("a", (4, 5))).into()
+                    ),
+                    property: MemberProperty::Ident(Ident::new("b", (6, 7))),
+                }.into(),
+                arguments_span: Some(Span::new(7, 9)),
+                arguments: vec![],
+            }.into()
+        ]
+    );
+}
+
+#[test]
 fn new_with_arguments() {
     parser_test!(
         input: "new a(b, !null)",
