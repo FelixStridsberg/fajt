@@ -1,6 +1,6 @@
 use crate::ast::{
     Argument, AssignmentExpression, AwaitExpression, CallExpression, Callee, ConditionalExpression,
-    Expression, Literal, Member, MemberExpression, NewExpression, SequenceExpression,
+    Expression, Literal, MemberExpression, MemberProperty, NewExpression, SequenceExpression,
     ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
 };
 use crate::error::ErrorKind::UnexpectedToken;
@@ -444,7 +444,7 @@ where
                     expression = MemberExpression {
                         span,
                         object: expression,
-                        member: Member::Ident(identifier),
+                        property: MemberProperty::Ident(identifier),
                     }
                     .into()
                 }
@@ -459,7 +459,7 @@ where
                     expression = MemberExpression {
                         span,
                         object: expression,
-                        member: Member::Expression(member),
+                        property: MemberProperty::Expression(member),
                     }
                     .into()
                 }

@@ -382,11 +382,11 @@ pub struct ParenthesizedExpression {
 pub struct MemberExpression {
     pub span: Span,
     pub object: Expression,
-    pub member: Member,
+    pub property: MemberProperty,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub enum Member {
+pub enum MemberProperty {
     Ident(Ident),
     Expression(Expression),
 }

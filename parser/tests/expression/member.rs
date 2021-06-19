@@ -9,7 +9,7 @@ fn identifier() {
             MemberExpression {
                 span: Span::new(0, 3),
                 object: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
-                member: Member::Ident(Ident::new("b", (2, 3))),
+                property: MemberProperty::Ident(Ident::new("b", (2, 3))),
             }.into()
         ]
     );
@@ -25,9 +25,9 @@ fn identifier_nested() {
                 object: MemberExpression {
                     span: Span::new(0, 3),
                     object: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
-                    member: Member::Ident(Ident::new("b", (2, 3))),
+                    property: MemberProperty::Ident(Ident::new("b", (2, 3))),
                 }.into(),
-                member: Member::Ident(Ident::new("c", (4, 5))),
+                property: MemberProperty::Ident(Ident::new("c", (4, 5))),
             }.into()
         ]
     );
@@ -41,7 +41,7 @@ fn computed() {
             MemberExpression {
                 span: Span::new(0, 4),
                 object: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
-                member: Member::Expression(
+                property: MemberProperty::Expression(
                     IdentifierReference::Ident(Ident::new("b", (2, 3))).into()
                 ),
             }.into()
@@ -59,11 +59,11 @@ fn computed_nested() {
                 object: MemberExpression {
                     span: Span::new(0, 4),
                     object: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
-                    member: Member::Expression(
+                    property: MemberProperty::Expression(
                         IdentifierReference::Ident(Ident::new("b", (2, 3))).into()
                     ),
                 }.into(),
-                member: Member::Expression(
+                property: MemberProperty::Expression(
                     IdentifierReference::Ident(Ident::new("c", (5, 6))).into()
                 ),
             }.into()
@@ -83,13 +83,13 @@ fn nested_mixed() {
                     object: MemberExpression {
                         span: Span::new(0, 4),
                         object: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
-                        member: Member::Expression(
+                        property: MemberProperty::Expression(
                             IdentifierReference::Ident(Ident::new("b", (2, 3))).into()
                         )
                     }.into(),
-                    member: Member::Ident(Ident::new("c", (5, 6))),
+                    property: MemberProperty::Ident(Ident::new("c", (5, 6))),
                 }.into(),
-                member: Member::Expression(
+                property: MemberProperty::Expression(
                     IdentifierReference::Ident(Ident::new("d", (7, 8))).into()
                 ),
             }.into()
