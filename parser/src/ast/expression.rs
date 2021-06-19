@@ -388,6 +388,12 @@ pub struct MemberExpression {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum MemberObject {
     Expression(Expression),
+    Super(Super),
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct Super {
+    pub span: Span,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]

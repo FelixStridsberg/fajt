@@ -301,7 +301,9 @@ where
     /// Parses the `LeftHandSideExpression` goal symbol.
     pub(super) fn parse_left_hand_side_expression(&mut self) -> Result<Expression> {
         match self.reader.current() {
-            token_matches!(ok: keyword!("super")) => {
+            token_matches!(ok: keyword!("super"))
+                if token_matches!(self.reader.peek(), opt: punct!("(")) =>
+            {
                 let span_start = self.position();
                 self.reader.consume()?;
                 let (arguments_span, arguments) = self.parse_arguments()?;
@@ -433,44 +435,72 @@ where
     /// NOTE: The `new MemberExpression Arguments` is parsed in `NewExpression`
     fn parse_member_expression(&mut self) -> Result<Expression> {
         let span_start = self.position();
-        let mut expression = self.parse_primary_expression()?;
+        let mut expression = self.parse_terminal_member_expression_or_primary()?;
 
         loop {
-            match self.reader.current() {
-                token_matches!(ok: punct!(".")) => {
-                    self.reader.consume()?;
-                    let identifier = self.parse_identifier()?;
-                    let span = self.span_from(span_start);
-                    expression = MemberExpression {
-                        span,
-                        object: MemberObject::Expression(expression),
-                        property: MemberProperty::Ident(identifier),
-                    }
-                    .into()
-                }
-                token_matches!(ok: punct!("[")) => {
-                    self.reader.consume()?;
-                    let member = self.parse_expression()?;
-                    let closing_bracket = self.reader.consume()?;
-                    if !token_matches!(closing_bracket, punct!("]")) {
-                        return err!(UnexpectedToken(closing_bracket));
-                    }
-                    let span = self.span_from(span_start);
-                    expression = MemberExpression {
-                        span,
-                        object: MemberObject::Expression(expression),
-                        property: MemberProperty::Expression(member),
-                    }
-                    .into()
-                }
-                _ => return Ok(expression),
+            if token_matches!(self.reader.current(), ok: punct!(".") | punct!("[")) {
+                expression =
+                    self.parse_member_property(span_start, MemberObject::Expression(expression))?;
+            } else {
+                break;
             }
         }
 
+        Ok(expression)
+
         // TODO MemberExpression TemplateLiteral
-        // TODO SuperProperty
-        // TODO MetaProperty
-        // TODO new MemberExpression Arguments
+    }
+
+    /// Parses the `MemberExpressions` that starts with a terminal, or `PrimaryExpression` goal symbols.
+    fn parse_terminal_member_expression_or_primary(&mut self) -> Result<Expression> {
+        let peek = self.reader.peek();
+        match self.reader.current()? {
+            token_matches!(keyword!("super")) => todo!("SuperProperty"),
+            token_matches!(keyword!("new")) if token_matches!(peek, opt: punct!(".")) => {
+                todo!("NewTarget")
+            }
+            token_matches!(keyword!("import")) if token_matches!(peek, opt: punct!(".")) => {
+                todo!("ImportMeta")
+            }
+            token_matches!(keyword!("new")) => todo!("new MemberExpression Arguments"),
+            _ => self.parse_primary_expression(),
+        }
+    }
+
+    fn parse_member_property(
+        &mut self,
+        span_start: usize,
+        object: MemberObject,
+    ) -> Result<Expression> {
+        match self.reader.current() {
+            token_matches!(ok: punct!(".")) => {
+                self.reader.consume()?;
+                let identifier = self.parse_identifier()?;
+                let span = self.span_from(span_start);
+                Ok(MemberExpression {
+                    span,
+                    object,
+                    property: MemberProperty::Ident(identifier),
+                }
+                .into())
+            }
+            token_matches!(ok: punct!("[")) => {
+                self.reader.consume()?;
+                let member = self.parse_expression()?;
+                let closing_bracket = self.reader.consume()?;
+                if !token_matches!(closing_bracket, punct!("]")) {
+                    return err!(UnexpectedToken(closing_bracket));
+                }
+                let span = self.span_from(span_start);
+                Ok(MemberExpression {
+                    span,
+                    object,
+                    property: MemberProperty::Expression(member),
+                }
+                .into())
+            }
+            _ => unreachable!(),
+        }
     }
 
     /// Parses the `PrimaryExpression` goal symbol.

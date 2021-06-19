@@ -18,6 +18,24 @@ fn identifier() {
 }
 
 #[test]
+fn super_identifier() {
+    parser_test!(
+        input: "super.b",
+        expr_output: [
+            MemberExpression {
+                span: Span::new(0, 7),
+                object: MemberObject::Super(
+                    Super {
+                        span: Span::new(0, 5)
+                    }
+                ),
+                property: MemberProperty::Ident(Ident::new("b", (6, 7))),
+            }.into()
+        ]
+    );
+}
+
+#[test]
 fn identifier_nested() {
     parser_test!(
         input: "a.b.c",
