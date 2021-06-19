@@ -33,3 +33,20 @@ fn super_call_with_args() {
         ]
     );
 }
+
+#[test]
+fn import_call() {
+    parser_test!(
+        input: "import(a)",
+        expr_output: [
+            CallExpression {
+                span: Span::new(0, 9),
+                callee: Callee::Super,
+                arguments_span: Span::new(6, 9),
+                arguments: vec![
+                    Argument::Expression(Ident::new("a", (7, 8)).into()),
+                ]
+            }.into()
+        ]
+    );
+}

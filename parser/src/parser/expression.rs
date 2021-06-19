@@ -314,6 +314,21 @@ where
                 }
                 .into())
             }
+            token_matches!(ok: keyword!("import")) => {
+                let span_start = self.position();
+                self.reader.consume()?;
+
+                let (arguments_span, arguments) = self.parse_import_argument()?;
+
+                let span = self.span_from(span_start);
+                Ok(CallExpression {
+                    span,
+                    callee: Callee::Super,
+                    arguments_span,
+                    arguments,
+                }
+                .into())
+            }
             _ => self.parse_new_expression(),
         }
 
@@ -377,6 +392,24 @@ where
 
         let span = self.span_from(span_start);
         Ok((span, arguments))
+    }
+
+    fn parse_import_argument(&mut self) -> Result<(Span, Vec<Argument>)> {
+        let span_start = self.position();
+        let open_parentheses = self.reader.consume()?;
+        if !token_matches!(open_parentheses, punct!("(")) {
+            return err!(UnexpectedToken(open_parentheses));
+        }
+
+        let expression = self.parse_assignment_expression()?;
+
+        let close_parentheses = self.reader.consume()?;
+        if !token_matches!(close_parentheses, punct!(")")) {
+            return err!(UnexpectedToken(open_parentheses));
+        }
+
+        let span = self.span_from(span_start);
+        Ok((span, vec![Argument::Expression(expression)]))
     }
 
     /// Parses the `MemberExpression` goal symbol.
