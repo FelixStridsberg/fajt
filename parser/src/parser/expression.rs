@@ -1,7 +1,7 @@
 use crate::ast::{
     Argument, AssignmentExpression, AwaitExpression, CallExpression, Callee, ConditionalExpression,
     Expression, Literal, MemberExpression, MemberObject, MemberProperty, NewExpression,
-    SequenceExpression, ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
+    SequenceExpression, Super, ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
@@ -455,7 +455,21 @@ where
     fn parse_terminal_member_expression_or_primary(&mut self) -> Result<Expression> {
         let peek = self.reader.peek();
         match self.reader.current()? {
-            token_matches!(keyword!("super")) => todo!("SuperProperty"),
+            token_matches!(keyword!("super")) => {
+                let span_start = self.position();
+                let super_token = self.reader.consume()?;
+
+                if !token_matches!(self.reader.current(), ok: punct!(".") | punct!("[")) {
+                    todo!("Error, unexpected super")
+                }
+
+                self.parse_member_property(
+                    span_start,
+                    MemberObject::Super(Super {
+                        span: super_token.span,
+                    }),
+                )
+            }
             token_matches!(keyword!("new")) if token_matches!(peek, opt: punct!(".")) => {
                 todo!("NewTarget")
             }

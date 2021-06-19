@@ -76,6 +76,24 @@ fn computed() {
 }
 
 #[test]
+fn super_computed() {
+    parser_test!(
+        input: "super[b]",
+        expr_output: [
+            MemberExpression {
+                span: Span::new(0, 8),
+                object: MemberObject::Super(Super {
+                    span: Span::new(0, 5)
+                }),
+                property: MemberProperty::Expression(
+                    IdentifierReference::Ident(Ident::new("b", (6, 7))).into()
+                ),
+            }.into()
+        ]
+    );
+}
+
+#[test]
 fn computed_nested() {
     parser_test!(
         input: "a[b][c]",
