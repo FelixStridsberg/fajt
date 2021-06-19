@@ -323,13 +323,30 @@ where
                 let span = self.span_from(span_start);
                 Ok(CallExpression {
                     span,
-                    callee: Callee::Super,
+                    callee: Callee::Import,
                     arguments_span,
                     arguments,
                 }
                 .into())
             }
-            _ => self.parse_new_expression(),
+            _ => {
+                let span_start = self.position();
+                let expression = self.parse_new_expression()?;
+
+                if token_matches!(self.reader.current(), ok: punct!("(")) {
+                    let (arguments_span, arguments) = self.parse_arguments()?;
+                    let span = self.span_from(span_start);
+                    return Ok(CallExpression {
+                        span,
+                        callee: Callee::Expression(expression),
+                        arguments_span,
+                        arguments,
+                    }
+                    .into());
+                }
+
+                Ok(expression)
+            }
         }
 
         // TODO CallExpression

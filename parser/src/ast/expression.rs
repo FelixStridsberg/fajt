@@ -460,4 +460,6 @@ pub struct CallExpression {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Callee {
     Super,
+    Import,
+    Expression(Expression),
 }

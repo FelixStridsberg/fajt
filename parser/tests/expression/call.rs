@@ -41,10 +41,43 @@ fn import_call() {
         expr_output: [
             CallExpression {
                 span: Span::new(0, 9),
-                callee: Callee::Super,
+                callee: Callee::Import,
                 arguments_span: Span::new(6, 9),
                 arguments: vec![
                     Argument::Expression(Ident::new("a", (7, 8)).into()),
+                ]
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn empty_call_expression() {
+    parser_test!(
+        input: "fn()",
+        expr_output: [
+            CallExpression {
+                span: Span::new(0, 4),
+                callee: Callee::Expression(Ident::new("fn", (0, 2)).into()),
+                arguments_span: Span::new(2, 4),
+                arguments: vec![]
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn call_expression() {
+    parser_test!(
+        input: "fn(a, ...b)",
+        expr_output: [
+            CallExpression {
+                span: Span::new(0, 11),
+                callee: Callee::Expression(Ident::new("fn", (0, 2)).into()),
+                arguments_span: Span::new(2, 11),
+                arguments: vec![
+                    Argument::Expression(Ident::new("a", (3, 4)).into()),
+                    Argument::Spread(Ident::new("b", (9, 10)).into()),
                 ]
             }.into()
         ]
