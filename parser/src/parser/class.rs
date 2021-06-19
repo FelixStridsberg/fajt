@@ -23,7 +23,7 @@ where
 
         let super_class = if token_matches!(self.reader.current(), ok: keyword!("extends")) {
             self.reader.consume()?;
-            Some(self.parse_left_hand_side_expression(false)?)
+            Some(self.parse_left_hand_side_expression()?)
         } else {
             None
         };

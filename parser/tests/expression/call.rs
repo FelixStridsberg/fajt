@@ -132,3 +132,34 @@ fn nested_call_member() {
         ]
     );
 }
+
+#[test]
+fn nested_call_member_computed() {
+    parser_test!(
+        input: r#"f1()["f2"]()"#,
+        expr_output: [
+            CallExpression {
+                span: Span::new(0, 12),
+                callee: Callee::Expression(
+                    MemberExpression {
+                        span: Span::new(0, 10),
+                        object: MemberObject::Expression(
+                            CallExpression {
+                                span: Span::new(0, 4),
+                                callee: Callee::Expression(Ident::new("f1", (0, 2)).into()),
+                                arguments_span: Span::new(2, 4),
+                                arguments: vec![],
+                            }.into()
+                        ),
+                        property: MemberProperty::Expression(LiteralExpression {
+                            span: Span::new(5, 9),
+                            literal: Literal::String("f2".to_owned(), '"')
+                        }.into()),
+                    }.into()
+                ),
+                arguments_span: Span::new(10, 12),
+                arguments: vec![]
+            }.into()
+        ]
+    );
+}

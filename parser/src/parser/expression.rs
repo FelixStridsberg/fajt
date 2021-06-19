@@ -273,7 +273,7 @@ where
         }
 
         let span_start = self.position();
-        let argument = self.parse_left_hand_side_expression(false)?;
+        let argument = self.parse_left_hand_side_expression()?;
         let suffix_operator = match self.reader.current() {
             token_matches!(ok: punct!("++")) => Some(update_op!("++")),
             token_matches!(ok: punct!("--")) => Some(update_op!("--")),
@@ -300,12 +300,21 @@ where
     }
 
     /// Parses the `LeftHandSideExpression` goal symbol.
-    /// TODO `only_call` don't make sense, hide between function call
-    pub(super) fn parse_left_hand_side_expression(
+    pub(super) fn parse_left_hand_side_expression(&mut self) -> Result<Expression> {
+        self.parse_left_hand_side_expression_members(false)
+    }
+
+    /// Parses the `NewExpression`, `CallExpression` and `OptionalExpression` goal symbols.
+    pub(super) fn parse_left_hand_side_expression_members(
         &mut self,
         only_call: bool,
     ) -> Result<Expression> {
         match self.reader.current() {
+            token_matches!(ok: keyword!("new"))
+                if !token_matches!(self.reader.peek(), opt: punct!(".")) && !only_call =>
+            {
+                self.parse_new_expression()
+            }
             token_matches!(ok: keyword!("super"))
                 if token_matches!(self.reader.peek(), opt: punct!("(")) =>
             {
@@ -315,11 +324,6 @@ where
                 if token_matches!(self.reader.peek(), opt: punct!("(")) =>
             {
                 self.parse_import_call_expression()
-            }
-            token_matches!(ok: keyword!("new"))
-                if !token_matches!(self.reader.peek(), opt: punct!(".")) && !only_call =>
-            {
-                self.parse_new_expression()
             }
             _ => {
                 let span_start = self.position();
@@ -338,12 +342,13 @@ where
                             }
                             .into();
                         }
-                        token_matches!(ok: punct!(".")) => {
+                        token_matches!(ok: punct!(".")) | token_matches!(ok: punct!("[")) => {
                             expression = self.parse_member_property(
                                 span_start,
                                 MemberObject::Expression(expression),
                             )?;
                         }
+                        // TODO CallExpression TemplateLiteral
                         _ => break,
                     }
                 }
@@ -352,7 +357,6 @@ where
             }
         }
 
-        // TODO CallExpression
         // TODO OptionalExpression
     }
 
