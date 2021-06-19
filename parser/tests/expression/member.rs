@@ -8,7 +8,9 @@ fn identifier() {
         expr_output: [
             MemberExpression {
                 span: Span::new(0, 3),
-                object: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                object: MemberObject::Expression(
+                    IdentifierReference::Ident(Ident::new("a", (0, 1))).into()
+                ),
                 property: MemberProperty::Ident(Ident::new("b", (2, 3))),
             }.into()
         ]
@@ -22,11 +24,15 @@ fn identifier_nested() {
         expr_output: [
             MemberExpression {
                 span: Span::new(0, 5),
-                object: MemberExpression {
-                    span: Span::new(0, 3),
-                    object: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
-                    property: MemberProperty::Ident(Ident::new("b", (2, 3))),
-                }.into(),
+                object: MemberObject::Expression(
+                    MemberExpression {
+                        span: Span::new(0, 3),
+                        object: MemberObject::Expression(
+                            IdentifierReference::Ident(Ident::new("a", (0, 1))).into()
+                        ),
+                        property: MemberProperty::Ident(Ident::new("b", (2, 3))),
+                    }.into(),
+                ),
                 property: MemberProperty::Ident(Ident::new("c", (4, 5))),
             }.into()
         ]
@@ -40,7 +46,9 @@ fn computed() {
         expr_output: [
             MemberExpression {
                 span: Span::new(0, 4),
-                object: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                object: MemberObject::Expression(
+                    IdentifierReference::Ident(Ident::new("a", (0, 1))).into()
+                ),
                 property: MemberProperty::Expression(
                     IdentifierReference::Ident(Ident::new("b", (2, 3))).into()
                 ),
@@ -56,13 +64,17 @@ fn computed_nested() {
         expr_output: [
             MemberExpression {
                 span: Span::new(0, 7),
-                object: MemberExpression {
-                    span: Span::new(0, 4),
-                    object: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
-                    property: MemberProperty::Expression(
-                        IdentifierReference::Ident(Ident::new("b", (2, 3))).into()
-                    ),
-                }.into(),
+                object: MemberObject::Expression(
+                    MemberExpression {
+                        span: Span::new(0, 4),
+                        object: MemberObject::Expression(
+                            IdentifierReference::Ident(Ident::new("a", (0, 1))).into()
+                        ),
+                        property: MemberProperty::Expression(
+                            IdentifierReference::Ident(Ident::new("b", (2, 3))).into()
+                        ),
+                    }.into(),
+                ),
                 property: MemberProperty::Expression(
                     IdentifierReference::Ident(Ident::new("c", (5, 6))).into()
                 ),
@@ -78,17 +90,23 @@ fn nested_mixed() {
         expr_output: [
             MemberExpression {
                 span: Span::new(0, 9),
-                object: MemberExpression {
-                    span: Span::new(0, 6),
-                    object: MemberExpression {
-                        span: Span::new(0, 4),
-                        object: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
-                        property: MemberProperty::Expression(
-                            IdentifierReference::Ident(Ident::new("b", (2, 3))).into()
-                        )
+                object: MemberObject::Expression(
+                    MemberExpression {
+                        span: Span::new(0, 6),
+                        object: MemberObject::Expression(
+                            MemberExpression {
+                                span: Span::new(0, 4),
+                                object: MemberObject::Expression(
+                                    IdentifierReference::Ident(Ident::new("a", (0, 1))).into()
+                                ),
+                                property: MemberProperty::Expression(
+                                    IdentifierReference::Ident(Ident::new("b", (2, 3))).into()
+                                )
+                            }.into(),
+                        ),
+                        property: MemberProperty::Ident(Ident::new("c", (5, 6))),
                     }.into(),
-                    property: MemberProperty::Ident(Ident::new("c", (5, 6))),
-                }.into(),
+                ),
                 property: MemberProperty::Expression(
                     IdentifierReference::Ident(Ident::new("d", (7, 8))).into()
                 ),

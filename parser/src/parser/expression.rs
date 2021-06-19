@@ -1,7 +1,7 @@
 use crate::ast::{
     Argument, AssignmentExpression, AwaitExpression, CallExpression, Callee, ConditionalExpression,
-    Expression, Literal, MemberExpression, MemberProperty, NewExpression, SequenceExpression,
-    ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
+    Expression, Literal, MemberExpression, MemberObject, MemberProperty, NewExpression,
+    SequenceExpression, ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
@@ -443,7 +443,7 @@ where
                     let span = self.span_from(span_start);
                     expression = MemberExpression {
                         span,
-                        object: expression,
+                        object: MemberObject::Expression(expression),
                         property: MemberProperty::Ident(identifier),
                     }
                     .into()
@@ -458,7 +458,7 @@ where
                     let span = self.span_from(span_start);
                     expression = MemberExpression {
                         span,
-                        object: expression,
+                        object: MemberObject::Expression(expression),
                         property: MemberProperty::Expression(member),
                     }
                     .into()

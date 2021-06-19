@@ -381,8 +381,13 @@ pub struct ParenthesizedExpression {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct MemberExpression {
     pub span: Span,
-    pub object: Expression,
+    pub object: MemberObject,
     pub property: MemberProperty,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub enum MemberObject {
+    Expression(Expression),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
