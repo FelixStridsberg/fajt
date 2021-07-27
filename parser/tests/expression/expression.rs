@@ -64,3 +64,28 @@ fn optional_member() {
         ]
     );
 }
+
+#[test]
+fn optional_member_nested() {
+    parser_test!(
+        input: "a?.b?.c?.d",
+        expr_output: [
+            OptionalMemberExpression {
+                span: Span::new(0, 10),
+                object: OptionalMemberExpression {
+                    span: Span::new(0, 7),
+                    object: OptionalMemberExpression {
+                        span: Span::new(0, 4),
+                        object: Ident::new("a", (0, 1)).into(),
+                        property: MemberProperty::Ident(Ident::new("b", (3, 4))),
+                        optional: true,
+                    }.into(),
+                    property: MemberProperty::Ident(Ident::new("c", (6, 7))),
+                    optional: true,
+                }.into(),
+                property: MemberProperty::Ident(Ident::new("d", (9, 10))),
+                optional: true,
+            }.into()
+        ]
+    );
+}

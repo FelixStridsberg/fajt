@@ -369,31 +369,38 @@ where
     fn parse_optional_member_expression(
         &mut self,
         span_start: usize,
-        mut object: Expression,
+        object: Expression,
     ) -> Result<Expression> {
         let mut expression = object;
 
         loop {
-            if token_matches!(self.reader.current(), ok: punct!("?.")) {
-                let property = self.parse_member_property()?;
-                let span = self.span_from(span_start);
-                expression = OptionalMemberExpression {
-                    span,
-                    object: expression,
-                    property,
-                    optional: true,
-                }
-                .into();
-
-                // TODO remove break;
-                break;
-            } else {
-                todo!();
+            if !token_matches!(self.reader.current(), ok: punct!("?.")) {
                 break;
             }
+
+            let property = self.parse_optional_member_property()?;
+            let span = self.span_from(span_start);
+            expression = OptionalMemberExpression {
+                span,
+                object: expression,
+                property,
+                optional: true,
+            }
+            .into();
         }
 
         Ok(expression)
+    }
+
+    fn parse_optional_member_property(&mut self) -> Result<MemberProperty> {
+        match self.reader.current() {
+            token_matches!(ok: punct!("?.")) => {
+                self.reader.consume()?;
+                let identifier = self.parse_identifier()?;
+                Ok(MemberProperty::Ident(identifier))
+            }
+            _ => unreachable!(),
+        }
     }
 
     /// Parses the `SuperCall` goal symbol.
@@ -604,7 +611,7 @@ where
 
     fn parse_member_property(&mut self) -> Result<MemberProperty> {
         match self.reader.current() {
-            token_matches!(ok: punct!(".")) | token_matches!(ok: punct!("?.")) => {
+            token_matches!(ok: punct!(".")) => {
                 self.reader.consume()?;
                 let identifier = self.parse_identifier()?;
                 Ok(MemberProperty::Ident(identifier))
