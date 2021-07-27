@@ -300,18 +300,10 @@ where
 
     /// Parses the `LeftHandSideExpression` goal symbol.
     pub(super) fn parse_left_hand_side_expression(&mut self) -> Result<Expression> {
-        self.parse_left_hand_side_expression_members(false)
-    }
-
-    /// Parses the `NewExpression`, `CallExpression` and `OptionalExpression` goal symbols.
-    pub(super) fn parse_left_hand_side_expression_members(
-        &mut self,
-        only_call: bool,
-    ) -> Result<Expression> {
         let span_start = self.position();
         let expression = match self.reader.current() {
             token_matches!(ok: keyword!("new"))
-                if !token_matches!(self.reader.peek(), opt: punct!(".")) && !only_call =>
+                if !token_matches!(self.reader.peek(), opt: punct!(".")) =>
             {
                 self.parse_new_expression()
             }
