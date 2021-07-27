@@ -293,6 +293,8 @@ pub enum Punct {
     QuestionMark,
     #[from_string("??")]
     DoubleQuestionMark,
+    #[from_string("?.")]
+    QuestionMarkDot,
     #[from_string(":")]
     Colon,
 }

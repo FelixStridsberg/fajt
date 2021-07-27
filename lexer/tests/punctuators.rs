@@ -1,5 +1,6 @@
 mod lib;
 
+use fajt_lexer::literal;
 use fajt_lexer::punct;
 
 #[test]
@@ -97,7 +98,7 @@ fn bitwise() {
 #[test]
 fn others() {
     assert_lexer!(
-        input: "&& || ?? ? : !",
+        input: "&& || ?? ? : ! ?.",
         output: [
             (punct!("&&"), (0, 2)),
             (punct!("||"), (3, 5)),
@@ -105,6 +106,19 @@ fn others() {
             (punct!("?"), (9, 10)),
             (punct!(":"), (11, 12)),
             (punct!("!"), (13, 14)),
+            (punct!("?."), (15, 17)),
+        ]
+    );
+}
+
+#[test]
+fn optional_chaining_exception() {
+    assert_lexer!(
+        input: "?.2",
+        output: [
+            (punct!("?"), (0, 1)),
+            (punct!("."), (1, 2)),
+            (literal!(integer, 2), (2, 3)),
         ]
     );
 }

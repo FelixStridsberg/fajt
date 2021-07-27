@@ -154,9 +154,22 @@ impl<'a> Lexer<'a> {
             '!' => produce!(self, 1, punct!("!")),
             '&' => produce!(self, peek: '&' ? punct!("&&") ; punct!("&")),
             '|' => produce!(self, peek: '|' ? punct!("||") ; punct!("|")),
-            '?' => produce!(self, peek: '?' ? punct!("??") ; punct!("?")),
             '+' => produce!(self, peek: '+' ? punct!("++") ; punct!("+")),
             '-' => produce!(self, peek: '-' ? punct!("--") ; punct!("-")),
+            '?' => {
+                self.reader.consume()?;
+                Ok(match self.reader.current() {
+                    Ok(&'.') if !matches!(self.reader.peek(), Some('0'..='9')) => {
+                        self.reader.consume()?;
+                        punct!("?.")
+                    }
+                    Ok(&'?') => {
+                        self.reader.consume()?;
+                        punct!("??")
+                    }
+                    _ => punct!("?"),
+                })
+            }
             '*' => {
                 if self.reader.peek() == Some(&'*') {
                     self.reader.consume()?;
