@@ -395,7 +395,7 @@ where
                     expression = self.parse_optional_member_expression(span_start, expression)?;
                 }
                 token_matches!(ok: punct!("(")) => {
-                    todo!("Optional required call expression")
+                    expression = self.parse_optional_call_expression(span_start, expression)?;
                 }
                 _ => break,
             }

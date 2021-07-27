@@ -190,3 +190,31 @@ fn optional_call_nested() {
         ]
     );
 }
+
+#[test]
+fn optional_call_mixed() {
+    parser_test!(
+        input: "a?.()?.()()",
+        expr_output: [
+            OptionalCallExpression {
+                span: Span::new(0, 11),
+                callee: OptionalCallExpression {
+                    span: Span::new(0, 9),
+                    callee: OptionalCallExpression {
+                        span: Span::new(0, 5),
+                        callee: Ident::new("a", (0, 1)).into(),
+                        arguments_span: Span::new(3, 5),
+                        arguments: vec![],
+                        optional: true,
+                    }.into(),
+                    arguments_span: Span::new(7, 9),
+                    arguments: vec![],
+                    optional: true,
+                }.into(),
+                arguments_span: Span::new(9, 11),
+                arguments: vec![],
+                optional: false,
+            }.into()
+        ]
+    );
+}
