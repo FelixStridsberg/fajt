@@ -1,8 +1,8 @@
 use crate::ast::{
     Argument, AssignmentExpression, AwaitExpression, CallExpression, Callee, ConditionalExpression,
     Expression, Ident, Literal, MemberExpression, MemberObject, MemberProperty,
-    MetaPropertyExpression, NewExpression, SequenceExpression, Super, ThisExpression,
-    UnaryExpression, UpdateExpression, YieldExpression,
+    MetaPropertyExpression, NewExpression, OptionalMemberExpression, SequenceExpression, Super,
+    ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
@@ -309,7 +309,8 @@ where
         &mut self,
         only_call: bool,
     ) -> Result<Expression> {
-        match self.reader.current() {
+        let span_start = self.position();
+        let expression = match self.reader.current() {
             token_matches!(ok: keyword!("new"))
                 if !token_matches!(self.reader.peek(), opt: punct!(".")) && !only_call =>
             {
@@ -343,7 +344,7 @@ where
                             .into();
                         }
                         token_matches!(ok: punct!(".")) | token_matches!(ok: punct!("[")) => {
-                            expression = self.parse_member_property(
+                            expression = self.parse_member_property_REFACTOR(
                                 span_start,
                                 MemberObject::Expression(expression),
                             )?;
@@ -355,9 +356,44 @@ where
 
                 Ok(expression)
             }
+        }?;
+
+        // TODO OptionalExpression do not apply to new expressions
+        if token_matches!(self.reader.current(), ok: punct!("?.")) {
+            self.parse_optional_member_expression(span_start, expression)
+        } else {
+            Ok(expression)
+        }
+    }
+
+    fn parse_optional_member_expression(
+        &mut self,
+        span_start: usize,
+        mut object: Expression,
+    ) -> Result<Expression> {
+        let mut expression = object;
+
+        loop {
+            if token_matches!(self.reader.current(), ok: punct!("?.")) {
+                let property = self.parse_member_property()?;
+                let span = self.span_from(span_start);
+                expression = OptionalMemberExpression {
+                    span,
+                    object: expression,
+                    property,
+                    optional: true,
+                }
+                .into();
+
+                // TODO remove break;
+                break;
+            } else {
+                todo!();
+                break;
+            }
         }
 
-        // TODO OptionalExpression
+        Ok(expression)
     }
 
     /// Parses the `SuperCall` goal symbol.
@@ -478,8 +514,10 @@ where
 
         loop {
             if token_matches!(self.reader.current(), ok: punct!(".") | punct!("[")) {
-                expression =
-                    self.parse_member_property(span_start, MemberObject::Expression(expression))?;
+                expression = self.parse_member_property_REFACTOR(
+                    span_start,
+                    MemberObject::Expression(expression),
+                )?;
             } else {
                 break;
             }
@@ -502,7 +540,7 @@ where
                     todo!("Error, unexpected super")
                 }
 
-                self.parse_member_property(
+                self.parse_member_property_REFACTOR(
                     span_start,
                     MemberObject::Super(Super {
                         span: super_token.span,
@@ -549,7 +587,8 @@ where
         }
     }
 
-    fn parse_member_property(
+    // TODO refactor this, it do not parse member property (only)
+    fn parse_member_property_REFACTOR(
         &mut self,
         span_start: usize,
         object: MemberObject,
@@ -580,6 +619,26 @@ where
                     property: MemberProperty::Expression(member),
                 }
                 .into())
+            }
+            _ => unreachable!(),
+        }
+    }
+
+    fn parse_member_property(&mut self) -> Result<MemberProperty> {
+        match self.reader.current() {
+            token_matches!(ok: punct!(".")) | token_matches!(ok: punct!("?.")) => {
+                self.reader.consume()?;
+                let identifier = self.parse_identifier()?;
+                Ok(MemberProperty::Ident(identifier))
+            }
+            token_matches!(ok: punct!("[")) => {
+                self.reader.consume()?;
+                let member = self.parse_expression()?;
+                let closing_bracket = self.reader.consume()?;
+                if !token_matches!(closing_bracket, punct!("]")) {
+                    return err!(UnexpectedToken(closing_bracket));
+                }
+                Ok(MemberProperty::Expression(member))
             }
             _ => unreachable!(),
         }

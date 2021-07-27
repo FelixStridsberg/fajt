@@ -23,6 +23,7 @@ pub enum Expression {
     ArrowFunctionExpression(Box<ArrowFunctionExpression>),
     ParenthesizedExpression(Box<ParenthesizedExpression>),
     MemberExpression(Box<MemberExpression>),
+    OptionalMemberExpression(Box<OptionalMemberExpression>),
     NewExpression(Box<NewExpression>),
     AssignmentExpression(Box<AssignmentExpression>),
     CallExpression(Box<CallExpression>),
@@ -128,6 +129,12 @@ impl From<ParenthesizedExpression> for Expression {
 impl From<MemberExpression> for Expression {
     fn from(expr: MemberExpression) -> Self {
         Self::MemberExpression(Box::new(expr))
+    }
+}
+
+impl From<OptionalMemberExpression> for Expression {
+    fn from(expr: OptionalMemberExpression) -> Self {
+        Self::OptionalMemberExpression(Box::new(expr))
     }
 }
 
@@ -390,6 +397,14 @@ pub struct MemberExpression {
     pub span: Span,
     pub object: MemberObject,
     pub property: MemberProperty,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct OptionalMemberExpression {
+    pub span: Span,
+    pub object: Expression,
+    pub property: MemberProperty,
+    pub optional: bool,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]

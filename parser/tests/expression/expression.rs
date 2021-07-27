@@ -49,3 +49,18 @@ fn parenthesized_expression_sequence() {
         ]
     );
 }
+
+#[test]
+fn optional_member() {
+    parser_test!(
+        input: "a?.b",
+        expr_output: [
+            OptionalMemberExpression {
+                span: Span::new(0, 4),
+                object: Ident::new("a", (0, 1)).into(),
+                property: MemberProperty::Ident(Ident::new("b", (3, 4))),
+                optional: true,
+            }.into()
+        ]
+    );
+}
