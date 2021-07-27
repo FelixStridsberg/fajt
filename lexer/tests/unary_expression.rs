@@ -2,7 +2,6 @@ mod lib;
 
 use fajt_lexer::literal;
 use fajt_lexer::punct;
-use fajt_lexer::token;
 
 #[test]
 fn lex_expression_add() {

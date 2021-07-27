@@ -1,7 +1,6 @@
 mod lib;
 
 use fajt_lexer::literal;
-use fajt_lexer::token;
 
 #[test]
 fn empty_string_single_quote() {

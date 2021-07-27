@@ -300,38 +300,38 @@ pub enum Punct {
 #[macro_export]
 macro_rules! literal(
     (integer, $value:expr) => {
-        literal!(number, crate::token::Base::Decimal, $value)
+        literal!(number, $crate::token::Base::Decimal, $value)
     };
     (hex, $value:expr) => {
-        literal!(number, crate::token::Base::Hex, $value)
+        literal!(number, $crate::token::Base::Hex, $value)
     };
     (octal, $value:expr) => {
-        literal!(number, crate::token::Base::Octal, $value)
+        literal!(number, $crate::token::Base::Octal, $value)
     };
     (binary, $value:expr) => {
-        literal!(number, crate::token::Base::Binary, $value)
+        literal!(number, $crate::token::Base::Binary, $value)
     };
     (decimal, $value:expr) => {
-         crate::token::TokenValue::Literal(
-            crate::token::Literal::Number(
-                crate::token::Number::Decimal(
+         $crate::token::TokenValue::Literal(
+            $crate::token::Literal::Number(
+                $crate::token::Number::Decimal(
                     $value
                 )
             )
         )
     };
     (number, $type:expr, $value:expr) => {
-        crate::token::TokenValue::Literal(
-            crate::token::Literal::Number(
-                crate::token::Number::Integer(
+        $crate::token::TokenValue::Literal(
+            $crate::token::Literal::Number(
+                $crate::token::Number::Integer(
                     $value, $type
                 )
             )
         )
     };
     (string, $type:expr, $value:expr) => {
-         crate::token::TokenValue::Literal(
-            crate::token::Literal::String(
+         $crate::token::TokenValue::Literal(
+            $crate::token::Literal::String(
                 $value.to_owned(), $type
             )
         )
