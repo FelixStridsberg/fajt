@@ -108,10 +108,10 @@ fn optional_member_nested() {
 #[test]
 fn optional_member_mixed() {
     parser_test!(
-        input: "a.b?.c.d",
+        input: "a.b?.c[d]",
         expr_output: [
             OptionalMemberExpression {
-                span: Span::new(0, 8),
+                span: Span::new(0, 9),
                 object: OptionalMemberExpression {
                     span: Span::new(0, 6),
                     object: MemberExpression {
@@ -122,7 +122,7 @@ fn optional_member_mixed() {
                     property: MemberProperty::Ident(Ident::new("c", (5, 6))),
                     optional: true,
                 }.into(),
-                property: MemberProperty::Ident(Ident::new("d", (7, 8))),
+                property: MemberProperty::Expression(Ident::new("d", (7, 8)).into()),
                 optional: false,
             }.into()
         ]

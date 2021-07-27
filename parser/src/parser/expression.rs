@@ -374,7 +374,7 @@ where
         let mut expression = object;
 
         loop {
-            if !token_matches!(self.reader.current(), ok: punct!("?.") | punct!(".")) {
+            if !token_matches!(self.reader.current(), ok: punct!("?.") | punct!(".") | punct!("[")) {
                 break;
             }
 
@@ -399,6 +399,10 @@ where
                 if token_matches!(self.reader.peek(), opt: punct!("[")) =>
             {
                 self.reader.consume()?;
+                let property = self.parse_computed_property()?;
+                Ok(MemberProperty::Expression(property))
+            }
+            token_matches!(ok: punct!("[")) => {
                 let property = self.parse_computed_property()?;
                 Ok(MemberProperty::Expression(property))
             }
