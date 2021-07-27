@@ -66,6 +66,21 @@ fn optional_member() {
 }
 
 #[test]
+fn optional_member_computed() {
+    parser_test!(
+        input: "a?.[b]",
+        expr_output: [
+            OptionalMemberExpression {
+                span: Span::new(0, 6),
+                object: Ident::new("a", (0, 1)).into(),
+                property: MemberProperty::Expression(Ident::new("b", (4, 5)).into()),
+                optional: true,
+            }.into()
+        ]
+    );
+}
+
+#[test]
 fn optional_member_nested() {
     parser_test!(
         input: "a?.b?.c?.d",

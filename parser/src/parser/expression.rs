@@ -395,6 +395,13 @@ where
 
     fn parse_optional_member_property(&mut self) -> Result<MemberProperty> {
         match self.reader.current() {
+            token_matches!(ok: punct!("?."))
+                if token_matches!(self.reader.peek(), opt: punct!("[")) =>
+            {
+                self.reader.consume()?;
+                let property = self.parse_computed_property()?;
+                Ok(MemberProperty::Expression(property))
+            }
             token_matches!(ok: punct!("?.")) | token_matches!(ok: punct!(".")) => {
                 self.reader.consume()?;
                 let identifier = self.parse_identifier()?;
@@ -618,16 +625,24 @@ where
                 Ok(MemberProperty::Ident(identifier))
             }
             token_matches!(ok: punct!("[")) => {
-                self.reader.consume()?;
-                let member = self.parse_expression()?;
-                let closing_bracket = self.reader.consume()?;
-                if !token_matches!(closing_bracket, punct!("]")) {
-                    return err!(UnexpectedToken(closing_bracket));
-                }
+                let member = self.parse_computed_property()?;
                 Ok(MemberProperty::Expression(member))
             }
             _ => unreachable!(),
         }
+    }
+
+    fn parse_computed_property(&mut self) -> Result<Expression> {
+        let open_bracket = self.reader.consume()?;
+        debug_assert!(token_matches!(open_bracket, punct!("[")));
+
+        let expression = self.parse_expression()?;
+        let closing_bracket = self.reader.consume()?;
+        if !token_matches!(closing_bracket, punct!("]")) {
+            return err!(UnexpectedToken(closing_bracket));
+        }
+
+        Ok(expression)
     }
 
     /// Parses the `PrimaryExpression` goal symbol.
