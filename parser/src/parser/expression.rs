@@ -374,17 +374,18 @@ where
         let mut expression = object;
 
         loop {
-            if !token_matches!(self.reader.current(), ok: punct!("?.")) {
+            if !token_matches!(self.reader.current(), ok: punct!("?.") | punct!(".")) {
                 break;
             }
 
+            let optional = token_matches!(self.reader.current(), ok: punct!("?."));
             let property = self.parse_optional_member_property()?;
             let span = self.span_from(span_start);
             expression = OptionalMemberExpression {
                 span,
                 object: expression,
                 property,
-                optional: true,
+                optional,
             }
             .into();
         }
@@ -394,7 +395,7 @@ where
 
     fn parse_optional_member_property(&mut self) -> Result<MemberProperty> {
         match self.reader.current() {
-            token_matches!(ok: punct!("?.")) => {
+            token_matches!(ok: punct!("?.")) | token_matches!(ok: punct!(".")) => {
                 self.reader.consume()?;
                 let identifier = self.parse_identifier()?;
                 Ok(MemberProperty::Ident(identifier))
