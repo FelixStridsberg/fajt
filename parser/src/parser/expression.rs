@@ -1,8 +1,8 @@
 use crate::ast::{
     Argument, AssignmentExpression, AwaitExpression, CallExpression, Callee, ConditionalExpression,
     Expression, Ident, Literal, MemberExpression, MemberObject, MemberProperty,
-    MetaPropertyExpression, NewExpression, OptionalMemberExpression, SequenceExpression, Super,
-    ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
+    MetaPropertyExpression, NewExpression, OptionalCallExpression, OptionalMemberExpression,
+    SequenceExpression, Super, ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
 };
 use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::Result;
@@ -368,13 +368,13 @@ where
                 ));
             }
 
-            self.parse_optional_member_expression(span_start, expression)
+            self.parse_optional_chain(span_start, expression)
         } else {
             Ok(expression)
         }
     }
 
-    fn parse_optional_member_expression(
+    fn parse_optional_chain(
         &mut self,
         span_start: usize,
         object: Expression,
@@ -382,26 +382,67 @@ where
         let mut expression = object;
 
         loop {
-            if !token_matches!(
-                self.reader.current(),
-                ok: punct!("?.") | punct!(".") | punct!("[")
-            ) {
-                break;
+            match self.reader.current() {
+                token_matches!(ok: punct!("?.")) => {
+                    if token_matches!(self.reader.peek(), opt: punct!("(")) {
+                        expression = self.parse_optional_call_expression(span_start, expression)?;
+                    } else {
+                        expression =
+                            self.parse_optional_member_expression(span_start, expression)?;
+                    }
+                }
+                token_matches!(ok: punct!(".")) | token_matches!(ok: punct!("[")) => {
+                    expression = self.parse_optional_member_expression(span_start, expression)?;
+                }
+                token_matches!(ok: punct!("(")) => {
+                    todo!("Optional required call expression")
+                }
+                _ => break,
             }
-
-            let optional = token_matches!(self.reader.current(), ok: punct!("?."));
-            let property = self.parse_optional_member_property()?;
-            let span = self.span_from(span_start);
-            expression = OptionalMemberExpression {
-                span,
-                object: expression,
-                property,
-                optional,
-            }
-            .into();
         }
 
         Ok(expression)
+    }
+
+    fn parse_optional_call_expression(
+        &mut self,
+        span_start: usize,
+        callee: Expression,
+    ) -> Result<Expression> {
+        let optional = token_matches!(self.reader.current(), ok: punct!("?."));
+        if optional {
+            self.reader.consume()?;
+        }
+
+        let (arguments_span, arguments) = self.parse_arguments()?;
+        let span = self.span_from(span_start);
+
+        Ok(OptionalCallExpression {
+            span,
+            callee,
+            arguments_span,
+            arguments,
+            optional,
+        }
+        .into())
+    }
+
+    fn parse_optional_member_expression(
+        &mut self,
+        span_start: usize,
+        object: Expression,
+    ) -> Result<Expression> {
+        let optional = token_matches!(self.reader.current(), ok: punct!("?."));
+        let property = self.parse_optional_member_property()?;
+        let span = self.span_from(span_start);
+
+        Ok(OptionalMemberExpression {
+            span,
+            object,
+            property,
+            optional,
+        }
+        .into())
     }
 
     fn parse_optional_member_property(&mut self) -> Result<MemberProperty> {

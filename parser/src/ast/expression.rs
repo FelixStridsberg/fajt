@@ -27,6 +27,7 @@ pub enum Expression {
     NewExpression(Box<NewExpression>),
     AssignmentExpression(Box<AssignmentExpression>),
     CallExpression(Box<CallExpression>),
+    OptionalCallExpression(Box<OptionalCallExpression>),
     MetaPropertyExpression(Box<MetaPropertyExpression>),
 }
 
@@ -163,6 +164,12 @@ impl From<AssignmentExpression> for Expression {
 impl From<CallExpression> for Expression {
     fn from(expr: CallExpression) -> Self {
         Self::CallExpression(Box::new(expr))
+    }
+}
+
+impl From<OptionalCallExpression> for Expression {
+    fn from(expr: OptionalCallExpression) -> Self {
+        Self::OptionalCallExpression(Box::new(expr))
     }
 }
 
@@ -505,6 +512,15 @@ pub struct CallExpression {
     pub callee: Callee,
     pub arguments_span: Span,
     pub arguments: Vec<Argument>,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct OptionalCallExpression {
+    pub span: Span,
+    pub callee: Expression,
+    pub arguments_span: Span,
+    pub arguments: Vec<Argument>,
+    pub optional: bool,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]

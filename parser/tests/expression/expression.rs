@@ -146,3 +146,47 @@ fn fail_invalid_optional_chain_from_new_expression() {
         )
     );
 }
+
+#[test]
+fn optional_call() {
+    parser_test!(
+        input: "a?.()",
+        expr_output: [
+            OptionalCallExpression {
+                span: Span::new(0, 5),
+                callee: Ident::new("a", (0, 1)).into(),
+                arguments_span: Span::new(3, 5),
+                arguments: vec![],
+                optional: true,
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn optional_call_nested() {
+    parser_test!(
+        input: "a?.()?.()?.()",
+        expr_output: [
+            OptionalCallExpression {
+                span: Span::new(0, 13),
+                callee: OptionalCallExpression {
+                    span: Span::new(0, 9),
+                    callee: OptionalCallExpression {
+                        span: Span::new(0, 5),
+                        callee: Ident::new("a", (0, 1)).into(),
+                        arguments_span: Span::new(3, 5),
+                        arguments: vec![],
+                        optional: true,
+                    }.into(),
+                    arguments_span: Span::new(7, 9),
+                    arguments: vec![],
+                    optional: true,
+                }.into(),
+                arguments_span: Span::new(11, 13),
+                arguments: vec![],
+                optional: true,
+            }.into()
+        ]
+    );
+}
