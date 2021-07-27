@@ -1,7 +1,6 @@
 use crate::ast::{
     Argument, AssignmentExpression, AwaitExpression, CallExpression, Callee, ConditionalExpression,
-    Expression, Ident, Literal, MemberExpression, MemberObject, MemberProperty,
-    MetaPropertyExpression, NewExpression, OptionalCallExpression, OptionalMemberExpression,
+    Expression, Ident, Literal, MemberObject, MetaPropertyExpression, NewExpression,
     SequenceExpression, Super, ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
 };
 use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
@@ -368,102 +367,9 @@ where
                 ));
             }
 
-            self.parse_optional_chain(span_start, expression)
+            self.parse_optional_expression(span_start, expression)
         } else {
             Ok(expression)
-        }
-    }
-
-    fn parse_optional_chain(
-        &mut self,
-        span_start: usize,
-        object: Expression,
-    ) -> Result<Expression> {
-        let mut expression = object;
-
-        loop {
-            match self.reader.current() {
-                token_matches!(ok: punct!("?.")) => {
-                    if token_matches!(self.reader.peek(), opt: punct!("(")) {
-                        expression = self.parse_optional_call_expression(span_start, expression)?;
-                    } else {
-                        expression =
-                            self.parse_optional_member_expression(span_start, expression)?;
-                    }
-                }
-                token_matches!(ok: punct!(".")) | token_matches!(ok: punct!("[")) => {
-                    expression = self.parse_optional_member_expression(span_start, expression)?;
-                }
-                token_matches!(ok: punct!("(")) => {
-                    expression = self.parse_optional_call_expression(span_start, expression)?;
-                }
-                _ => break,
-            }
-        }
-
-        Ok(expression)
-    }
-
-    fn parse_optional_call_expression(
-        &mut self,
-        span_start: usize,
-        callee: Expression,
-    ) -> Result<Expression> {
-        let optional = token_matches!(self.reader.current(), ok: punct!("?."));
-        if optional {
-            self.reader.consume()?;
-        }
-
-        let (arguments_span, arguments) = self.parse_arguments()?;
-        let span = self.span_from(span_start);
-
-        Ok(OptionalCallExpression {
-            span,
-            callee,
-            arguments_span,
-            arguments,
-            optional,
-        }
-        .into())
-    }
-
-    fn parse_optional_member_expression(
-        &mut self,
-        span_start: usize,
-        object: Expression,
-    ) -> Result<Expression> {
-        let optional = token_matches!(self.reader.current(), ok: punct!("?."));
-        let property = self.parse_optional_member_property()?;
-        let span = self.span_from(span_start);
-
-        Ok(OptionalMemberExpression {
-            span,
-            object,
-            property,
-            optional,
-        }
-        .into())
-    }
-
-    fn parse_optional_member_property(&mut self) -> Result<MemberProperty> {
-        match self.reader.current() {
-            token_matches!(ok: punct!("?."))
-                if token_matches!(self.reader.peek(), opt: punct!("[")) =>
-            {
-                self.reader.consume()?;
-                let property = self.parse_computed_property()?;
-                Ok(MemberProperty::Expression(property))
-            }
-            token_matches!(ok: punct!("[")) => {
-                let property = self.parse_computed_property()?;
-                Ok(MemberProperty::Expression(property))
-            }
-            token_matches!(ok: punct!("?.")) | token_matches!(ok: punct!(".")) => {
-                self.reader.consume()?;
-                let identifier = self.parse_identifier()?;
-                Ok(MemberProperty::Ident(identifier))
-            }
-            _ => unreachable!(),
         }
     }
 
@@ -499,6 +405,24 @@ where
         .into())
     }
 
+    fn parse_import_argument(&mut self) -> Result<(Span, Vec<Argument>)> {
+        let span_start = self.position();
+        let open_parentheses = self.reader.consume()?;
+        if !token_matches!(open_parentheses, punct!("(")) {
+            return err!(UnexpectedToken(open_parentheses));
+        }
+
+        let expression = self.parse_assignment_expression()?;
+
+        let close_parentheses = self.reader.consume()?;
+        if !token_matches!(close_parentheses, punct!(")")) {
+            return err!(UnexpectedToken(open_parentheses));
+        }
+
+        let span = self.span_from(span_start);
+        Ok((span, vec![Argument::Expression(expression)]))
+    }
+
     /// Parses the `NewExpression` goal symbol.
     fn parse_new_expression(&mut self) -> Result<Expression> {
         if token_matches!(self.reader.current(), ok: keyword!("new"))
@@ -530,7 +454,8 @@ where
         }
     }
 
-    fn parse_arguments(&mut self) -> Result<(Span, Vec<Argument>)> {
+    /// Parses the `Arguments` goal symbol.
+    pub(super) fn parse_arguments(&mut self) -> Result<(Span, Vec<Argument>)> {
         let span_start = self.position();
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("(")));
@@ -557,24 +482,6 @@ where
 
         let span = self.span_from(span_start);
         Ok((span, arguments))
-    }
-
-    fn parse_import_argument(&mut self) -> Result<(Span, Vec<Argument>)> {
-        let span_start = self.position();
-        let open_parentheses = self.reader.consume()?;
-        if !token_matches!(open_parentheses, punct!("(")) {
-            return err!(UnexpectedToken(open_parentheses));
-        }
-
-        let expression = self.parse_assignment_expression()?;
-
-        let close_parentheses = self.reader.consume()?;
-        if !token_matches!(close_parentheses, punct!(")")) {
-            return err!(UnexpectedToken(open_parentheses));
-        }
-
-        let span = self.span_from(span_start);
-        Ok((span, vec![Argument::Expression(expression)]))
     }
 
     /// Parses the `MemberExpression` goal symbol.
@@ -656,49 +563,6 @@ where
             }
             _ => self.parse_primary_expression(),
         }
-    }
-
-    fn parse_member_expression_right_side(
-        &mut self,
-        span_start: usize,
-        left: MemberObject,
-    ) -> Result<Expression> {
-        let property = self.parse_member_property()?;
-        let span = self.span_from(span_start);
-        Ok(MemberExpression {
-            span,
-            object: left,
-            property,
-        }
-        .into())
-    }
-
-    fn parse_member_property(&mut self) -> Result<MemberProperty> {
-        match self.reader.current() {
-            token_matches!(ok: punct!(".")) => {
-                self.reader.consume()?;
-                let identifier = self.parse_identifier()?;
-                Ok(MemberProperty::Ident(identifier))
-            }
-            token_matches!(ok: punct!("[")) => {
-                let member = self.parse_computed_property()?;
-                Ok(MemberProperty::Expression(member))
-            }
-            _ => unreachable!(),
-        }
-    }
-
-    fn parse_computed_property(&mut self) -> Result<Expression> {
-        let open_bracket = self.reader.consume()?;
-        debug_assert!(token_matches!(open_bracket, punct!("[")));
-
-        let expression = self.parse_expression()?;
-        let closing_bracket = self.reader.consume()?;
-        if !token_matches!(closing_bracket, punct!("]")) {
-            return err!(UnexpectedToken(closing_bracket));
-        }
-
-        Ok(expression)
     }
 
     /// Parses the `PrimaryExpression` goal symbol.

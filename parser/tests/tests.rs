@@ -12,7 +12,7 @@ mod expression {
     mod flow_control;
     mod function;
     mod literal;
-    mod member;
+    mod member_access;
     mod new;
     mod unary;
     mod update;

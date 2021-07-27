@@ -14,6 +14,7 @@ mod cover;
 mod expression;
 mod function;
 mod literal;
+mod member_access;
 mod statement;
 mod variable;
 
