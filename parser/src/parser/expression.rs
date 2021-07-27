@@ -480,7 +480,7 @@ where
     /// NOTE: The `new MemberExpression Arguments` is parsed in `NewExpression`
     pub fn parse_member_expression(&mut self) -> Result<Expression> {
         let span_start = self.position();
-        let mut expression = self.parse_terminal_member_expression_or_primary()?;
+        let mut expression = self.parse_member_expression_non_recursive()?;
 
         loop {
             if token_matches!(self.reader.current(), ok: punct!(".") | punct!("[")) {
@@ -498,8 +498,8 @@ where
         // TODO MemberExpression TemplateLiteral
     }
 
-    /// Parses the `MemberExpressions` that starts with a terminal, or `PrimaryExpression` goal symbols.
-    fn parse_terminal_member_expression_or_primary(&mut self) -> Result<Expression> {
+    /// Parses the non recursive parts of `MemberExpressions`.
+    fn parse_member_expression_non_recursive(&mut self) -> Result<Expression> {
         let peek = self.reader.peek();
         match self.reader.current()? {
             token_matches!(keyword!("super")) => {
