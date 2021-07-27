@@ -4,7 +4,7 @@ use crate::ast::{
     MetaPropertyExpression, NewExpression, OptionalMemberExpression, SequenceExpression, Super,
     ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
 };
-use crate::error::ErrorKind::UnexpectedToken;
+use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::Result;
 use crate::Parser;
 
@@ -358,8 +358,16 @@ where
             }
         }?;
 
-        // TODO OptionalExpression do not apply to new expressions
         if token_matches!(self.reader.current(), ok: punct!("?.")) {
+            // The NewExpression goal symbol handles nested news and is not included in the
+            // OptionalExpression goal symbol as a base for the chain.
+            if expression.is_nested_new() {
+                return err!(SyntaxError(
+                    "Invalid optional chain from new expression".to_owned(),
+                    self.reader.current().unwrap().span.clone()
+                ));
+            }
+
             self.parse_optional_member_expression(span_start, expression)
         } else {
             Ok(expression)
@@ -374,7 +382,10 @@ where
         let mut expression = object;
 
         loop {
-            if !token_matches!(self.reader.current(), ok: punct!("?.") | punct!(".") | punct!("[")) {
+            if !token_matches!(
+                self.reader.current(),
+                ok: punct!("?.") | punct!(".") | punct!("[")
+            ) {
                 break;
             }
 

@@ -30,6 +30,16 @@ pub enum Expression {
     MetaPropertyExpression(Box<MetaPropertyExpression>),
 }
 
+impl Expression {
+    pub fn is_nested_new(&self) -> bool {
+        if let Expression::NewExpression(expr) = &self {
+            matches!(expr.callee, Expression::NewExpression(_))
+        } else {
+            false
+        }
+    }
+}
+
 impl From<ThisExpression> for Expression {
     fn from(expr: ThisExpression) -> Self {
         Self::ThisExpression(Box::new(expr))
