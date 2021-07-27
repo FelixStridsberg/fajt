@@ -218,3 +218,39 @@ fn optional_call_mixed() {
         ]
     );
 }
+
+#[test]
+fn optional_chain_mixed_call_and_member() {
+    parser_test!(
+        input: "a.b?.c()?.d?.()",
+        expr_output: [
+            OptionalCallExpression {
+                span: Span::new(0, 15),
+                callee: OptionalMemberExpression {
+                    span: Span::new(0, 11),
+                    object: OptionalCallExpression {
+                        span: Span::new(0, 8),
+                        callee: OptionalMemberExpression {
+                            span: Span::new(0, 6),
+                            object: MemberExpression {
+                                span: Span::new(0, 3),
+                                object: MemberObject::Expression(Ident::new("a", (0, 1)).into()),
+                                property: MemberProperty::Ident(Ident::new("b", (2, 3))),
+                            }.into(),
+                            property: MemberProperty::Ident(Ident::new("c", (5, 6))),
+                            optional: true,
+                        }.into(),
+                        arguments_span: Span::new(6, 8),
+                        arguments: vec![],
+                        optional: false,
+                    }.into(),
+                    property: MemberProperty::Ident(Ident::new("d", (10, 11))),
+                    optional: true,
+                }.into(),
+                arguments_span: Span::new(13, 15),
+                arguments: vec![],
+                optional: true,
+            }.into()
+        ]
+    );
+}
