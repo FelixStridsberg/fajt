@@ -1,5 +1,5 @@
 use crate::ast::Statement::Expression;
-use crate::ast::{BlockStatement, EmptyStatement, ReturnStatement, Statement, VariableKind};
+use crate::ast::{BlockStatement, EmptyStatement, ReturnStatement, Statement, VariableKind, BreakStatement};
 use crate::error::Result;
 use crate::Parser;
 use fajt_common::io::PeekRead;
@@ -22,7 +22,7 @@ where
             }
             token_matches!(keyword!("let")) => self.parse_variable_statement(VariableKind::Let)?,
             token_matches!(keyword!("if")) => todo!("IfStatement"),
-            token_matches!(keyword!("break")) => todo!("BreakStatement"),
+            token_matches!(keyword!("break")) => self.parse_break_statement()?,
             token_matches!(keyword!("continue")) => todo!("ContinueStatement"),
             token_matches!(keyword!("break")) => todo!("BreakStatement"),
             token_matches!(keyword!("return")) => self.parse_return_statement()?,
@@ -106,6 +106,22 @@ where
         debug_assert!(token_matches!(token, punct!(";")));
 
         Ok(Statement::Empty(EmptyStatement { span: token.span }))
+    }
+
+    /// Parses the `BreakStatement` goal symbol.
+    fn parse_break_statement(&mut self) -> Result<Statement> {
+        let span_start = self.position();
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, keyword!("break")));
+
+        let label = match self.reader.current() {
+            token_matches!(ok: punct!(";")) | Err(_) => None,
+            Ok(token) if token.first_on_line => None,
+            _ => Some(self.parse_identifier()?),
+        };
+
+        let span = self.span_from(span_start);
+        Ok(BreakStatement { span, label }.into())
     }
 
     /// Parses the `ReturnStatement` goal symbol.

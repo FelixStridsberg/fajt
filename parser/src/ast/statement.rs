@@ -11,6 +11,7 @@ pub enum Statement {
     Expression(Expression),
     FunctionDeclaration(FunctionDeclaration),
     Return(ReturnStatement),
+    Break(BreakStatement),
 }
 
 impl From<BlockStatement> for Statement {
@@ -46,6 +47,12 @@ impl From<FunctionDeclaration> for Statement {
 impl From<ReturnStatement> for Statement {
     fn from(expr: ReturnStatement) -> Self {
         Self::Return(expr)
+    }
+}
+
+impl From<BreakStatement> for Statement {
+    fn from(expr: BreakStatement) -> Self {
+        Self::Break(expr)
     }
 }
 
@@ -115,4 +122,10 @@ pub enum VariableKind {
 pub struct ReturnStatement {
     pub span: Span,
     pub argument: Option<Expression>,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct BreakStatement {
+    pub span: Span,
+    pub label: Option<Ident>,
 }
