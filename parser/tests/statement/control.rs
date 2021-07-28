@@ -1,5 +1,7 @@
 use fajt_lexer::token::Span;
-use fajt_parser::ast::{BreakStatement, ContinueStatement, Ident, ReturnStatement};
+use fajt_parser::ast::{
+    BreakStatement, ContinueStatement, Ident, IfStatement, ReturnStatement, Statement,
+};
 
 #[test]
 fn return_void() {
@@ -74,6 +76,21 @@ fn continue_labelled() {
             ContinueStatement {
                 span: Span::new(0, 10),
                 label: Some(Ident::new("a", (9, 10)).into()),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn if_no_else() {
+    parser_test!(
+        input: "if ( a ) b",
+        output: [
+            IfStatement {
+                span: Span::new(0, 10),
+                condition: Ident::new("a", (5, 6)).into(),
+                consequent: Statement::Expression(Ident::new("b", (9, 10)).into()),
+                alternate: None,
             }.into()
         ]
     );

@@ -15,6 +15,7 @@ pub enum Statement {
     Continue(ContinueStatement),
     Throw(ThrowStatement),
     Debugger(DebuggerStatement),
+    If(Box<IfStatement>),
 }
 
 impl From<BlockStatement> for Statement {
@@ -74,6 +75,12 @@ impl From<ThrowStatement> for Statement {
 impl From<DebuggerStatement> for Statement {
     fn from(expr: DebuggerStatement) -> Self {
         Self::Debugger(expr)
+    }
+}
+
+impl From<IfStatement> for Statement {
+    fn from(expr: IfStatement) -> Self {
+        Self::If(Box::new(expr))
     }
 }
 
@@ -166,4 +173,12 @@ pub struct ThrowStatement {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct DebuggerStatement {
     pub span: Span,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct IfStatement {
+    pub span: Span,
+    pub condition: Expression,
+    pub consequent: Statement,
+    pub alternate: Option<Statement>,
 }

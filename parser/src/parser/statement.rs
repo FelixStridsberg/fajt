@@ -1,8 +1,9 @@
 use crate::ast::Statement::Expression;
 use crate::ast::{
     BlockStatement, BreakStatement, ContinueStatement, DebuggerStatement, EmptyStatement,
-    ReturnStatement, Statement, ThrowStatement, VariableKind,
+    IfStatement, ReturnStatement, Statement, ThrowStatement, VariableKind,
 };
+use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 use crate::Parser;
 use fajt_common::io::PeekRead;
@@ -24,7 +25,7 @@ where
                 self.parse_variable_statement(VariableKind::Const)?
             }
             token_matches!(keyword!("let")) => self.parse_variable_statement(VariableKind::Let)?,
-            token_matches!(keyword!("if")) => todo!("IfStatement"),
+            token_matches!(keyword!("if")) => self.parse_if_statement()?,
             token_matches!(keyword!("break")) => self.parse_break_statement()?,
             token_matches!(keyword!("continue")) => self.parse_continue_statement()?,
             token_matches!(keyword!("return")) => self.parse_return_statement()?,
@@ -180,5 +181,35 @@ where
         debug_assert!(token_matches!(token, keyword!("debugger")));
 
         Ok(DebuggerStatement { span: token.span }.into())
+    }
+
+    /// Parses the `IfStatement` goal symbol.
+    fn parse_if_statement(&mut self) -> Result<Statement> {
+        let span_start = self.position();
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, keyword!("if")));
+
+        let open_paren = self.reader.consume()?;
+        if !token_matches!(open_paren, punct!("(")) {
+            return err!(UnexpectedToken(open_paren));
+        }
+
+        let condition = self.parse_expression()?;
+
+        let close_paren = self.reader.consume()?;
+        if !token_matches!(close_paren, punct!(")")) {
+            return err!(UnexpectedToken(close_paren));
+        }
+
+        let consequent = self.parse_statement()?;
+
+        let span = self.span_from(span_start);
+        Ok(IfStatement {
+            span,
+            condition,
+            consequent,
+            alternate: None,
+        }
+        .into())
     }
 }
