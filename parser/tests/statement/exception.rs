@@ -76,3 +76,52 @@ fn try_catch_with_param() {
         ]
     );
 }
+
+#[test]
+fn try_finally() {
+    parser_test!(
+        input: "try {} finally {}",
+        output: [
+            TryStatement {
+                span: Span::new(0, 17),
+                block: BlockStatement {
+                    span: Span::new(4, 6),
+                    statements: vec![],
+                }.into(),
+                handler: None,
+                finalizer: Some(BlockStatement {
+                    span: Span::new(15, 17),
+                    statements: vec![],
+                }.into()),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn try_catch_finally() {
+    parser_test!(
+        input: "try {} catch(e) {} finally {}",
+        output: [
+            TryStatement {
+                span: Span::new(0, 29),
+                block: BlockStatement {
+                    span: Span::new(4, 6),
+                    statements: vec![],
+                }.into(),
+                handler: Some(CatchClause {
+                    span: Span::new(7, 18),
+                    parameter: Some(Ident::new("e", (13, 14)).into()),
+                    body: BlockStatement {
+                        span: Span::new(16, 18),
+                        statements: vec![],
+                    }.into(),
+                }),
+                finalizer: Some(BlockStatement {
+                    span: Span::new(27, 29),
+                    statements: vec![],
+                }.into()),
+            }.into()
+        ]
+    );
+}

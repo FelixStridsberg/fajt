@@ -279,12 +279,19 @@ where
             None
         };
 
+        let finalizer = if token_matches!(self.reader.current(), ok: keyword!("finally")) {
+            self.reader.consume()?;
+            Some(self.parse_block_statement()?.unwrap_block_statement())
+        } else {
+            None
+        };
+
         let span = self.span_from(span_start);
         Ok(TryStatement {
             span,
             block,
             handler,
-            finalizer: None,
+            finalizer,
         }
         .into())
     }
