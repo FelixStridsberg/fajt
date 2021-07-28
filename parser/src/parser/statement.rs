@@ -27,7 +27,6 @@ where
             token_matches!(keyword!("if")) => todo!("IfStatement"),
             token_matches!(keyword!("break")) => self.parse_break_statement()?,
             token_matches!(keyword!("continue")) => self.parse_continue_statement()?,
-            token_matches!(keyword!("break")) => todo!("BreakStatement"),
             token_matches!(keyword!("return")) => self.parse_return_statement()?,
             token_matches!(keyword!("with")) => todo!("WithStatement"),
             token_matches!(keyword!("throw")) => todo!("ThrowStatement"),
