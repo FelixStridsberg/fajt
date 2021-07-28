@@ -187,3 +187,58 @@ fn switch_case_empty() {
         ]
     );
 }
+
+#[test]
+fn switch_case() {
+    parser_test!(
+        input: "switch (a) { case b: c; d }",
+        output: [
+            SwitchStatement {
+                span: Span::new(0, 27),
+                discriminant: Ident::new("a", (8, 9)).into(),
+                cases: vec![
+                    SwitchCase {
+                        span: Span::new(13, 25),
+                        test: Some(Ident::new("b", (18, 19)).into()),
+                        consequent: vec![
+                            Statement::Expression(Ident::new("c", (21, 22)).into()),
+                            Statement::Expression(Ident::new("d", (24, 25)).into()),
+                        ],
+                    }
+                ],
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn switch_mixed() {
+    parser_test!(
+        input: "switch (a) { case b: case c: d; default: }",
+        output: [
+            SwitchStatement {
+                span: Span::new(0, 42),
+                discriminant: Ident::new("a", (8, 9)).into(),
+                cases: vec![
+                    SwitchCase {
+                        span: Span::new(13, 20),
+                        test: Some(Ident::new("b", (18, 19)).into()),
+                        consequent: vec![],
+                    },
+                    SwitchCase {
+                        span: Span::new(21, 31),
+                        test: Some(Ident::new("c", (26, 27)).into()),
+                        consequent: vec![
+                            Statement::Expression(Ident::new("d", (29, 30)).into()),
+                        ],
+                    },
+                    SwitchCase {
+                        span: Span::new(32, 40),
+                        test: None,
+                        consequent: vec![],
+                    },
+                ],
+            }.into()
+        ]
+    );
+}

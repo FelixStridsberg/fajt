@@ -90,6 +90,11 @@ where
 
     fn parse_expression_statement(&mut self) -> Result<Statement> {
         let expr = self.parse_expression()?;
+
+        if self.current_matches(punct!(";")) {
+            self.reader.consume()?;
+        }
+
         Ok(Expression(expr))
     }
 
