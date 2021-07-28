@@ -4,7 +4,6 @@ use crate::ast::{
     EmptyStatement, IfStatement, ReturnStatement, Statement, ThrowStatement, TryStatement,
     VariableKind, WithStatement,
 };
-use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenMaybe};
 use crate::Parser;
 use fajt_common::io::PeekRead;
@@ -184,17 +183,9 @@ where
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, keyword!("if")));
 
-        let open_paren = self.reader.consume()?;
-        if !token_matches!(open_paren, punct!("(")) {
-            return err!(UnexpectedToken(open_paren));
-        }
-
+        self.consume_known(punct!("("))?;
         let condition = self.parse_expression()?;
-
-        let close_paren = self.reader.consume()?;
-        if !token_matches!(close_paren, punct!(")")) {
-            return err!(UnexpectedToken(close_paren));
-        }
+        self.consume_known(punct!(")"))?;
 
         let consequent = self.parse_statement()?;
 
@@ -219,17 +210,9 @@ where
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, keyword!("with")));
 
-        let open_paren = self.reader.consume()?;
-        if !token_matches!(open_paren, punct!("(")) {
-            return err!(UnexpectedToken(open_paren));
-        }
-
+        self.consume_known(punct!("("))?;
         let object = self.parse_expression()?;
-
-        let close_paren = self.reader.consume()?;
-        if !token_matches!(close_paren, punct!(")")) {
-            return err!(UnexpectedToken(close_paren));
-        }
+        self.consume_known(punct!(")"))?;
 
         let body = self.parse_statement()?;
         let span = self.span_from(span_start);
@@ -263,14 +246,13 @@ where
 
     fn parse_catch_clause(&mut self) -> Result<CatchClause> {
         let span_start = self.position();
-        self.reader.consume()?;
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, keyword!("catch")));
+
         let parameter = self.current_matches(punct!("(")).then_maybe(|| {
             self.reader.consume()?;
             let pattern = self.parse_binding_pattern()?;
-            let close_paren = self.reader.consume()?;
-            if !token_matches!(close_paren, punct!(")")) {
-                return err!(UnexpectedToken(close_paren));
-            }
+            self.consume_known(punct!(")"))?;
             Ok(pattern)
         })?;
 

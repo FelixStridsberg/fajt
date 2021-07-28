@@ -1,6 +1,6 @@
 use fajt_common::io::{PeekRead, PeekReader};
 use fajt_lexer::punct;
-use fajt_lexer::token::{Keyword, KeywordContext, Span, Token, TokenValue};
+use fajt_lexer::token::{KeywordContext, Span, Token, TokenValue};
 use fajt_lexer::token_matches;
 
 use crate::ast::{Expression, Ident, Program, PropertyName};
@@ -147,6 +147,14 @@ where
         } else {
             false
         }
+    }
+
+    fn consume_known(&mut self, value: TokenValue) -> Result<()> {
+        let token = self.reader.consume()?;
+        if token.value != value {
+            return err!(UnexpectedToken(token));
+        }
+        Ok(())
     }
 
     fn followed_by_new_lined(&self) -> bool {
