@@ -289,8 +289,14 @@ pub struct WhileStatement {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ForStatement {
     pub span: Span,
-    pub init: Option<Expression>,
+    pub init: Option<ForInit>,
     pub test: Option<Expression>,
     pub update: Option<Expression>,
     pub body: Statement,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub enum ForInit {
+    Expression(Expression),
+    Declaration(VariableStatement),
 }

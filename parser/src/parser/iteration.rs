@@ -1,4 +1,7 @@
-use crate::ast::{DoWhileStatement, ForStatement, Statement, WhileStatement};
+use crate::ast::{
+    DoWhileStatement, ForInit, ForStatement, Statement, VariableKind, VariableStatement,
+    WhileStatement,
+};
 use crate::error::{Result, ThenTry};
 use crate::Parser;
 use fajt_common::io::PeekRead;
@@ -51,34 +54,51 @@ where
 
         self.consume_assert(punct!("("))?;
 
-        match self.reader.current()? {
-            token_matches!(keyword!("var")) => todo!("for ( var ..."),
+        let init = self.parse_for_first_argument()?;
+        self.consume_assert(punct!(";"))?; // TODO of, in
+
+        let test = (!self.current_matches(punct!(";"))).then_try(|| self.parse_expression())?;
+        self.consume_assert(punct!(";"))?;
+        let update = (!self.current_matches(punct!(")"))).then_try(|| self.parse_expression())?;
+        self.consume_assert(punct!(")"))?;
+
+        let body = self.parse_statement()?;
+
+        let span = self.span_from(span_start);
+        return Ok(ForStatement {
+            span,
+            init,
+            test,
+            update,
+            body,
+        }
+        .into());
+    }
+
+    pub(super) fn parse_for_first_argument(&mut self) -> Result<Option<ForInit>> {
+        let span_start = self.position();
+        let variable_kind = match self.reader.current()? {
+            token_matches!(keyword!("var")) => Some(VariableKind::Var),
             token_matches!(keyword!("let")) => todo!("for ( let ..."),
             token_matches!(keyword!("const")) => todo!("for ( const ..."),
-            _ => {
-                // TODO clean up
-                let init =
-                    (!self.current_matches(punct!(";"))).then_try(|| self.parse_expression())?;
-                self.consume_assert(punct!(";"))?;
-                let test =
-                    (!self.current_matches(punct!(";"))).then_try(|| self.parse_expression())?;
-                self.consume_assert(punct!(";"))?;
-                let update =
-                    (!self.current_matches(punct!(")"))).then_try(|| self.parse_expression())?;
-                self.consume_assert(punct!(")"))?;
+            _ => None,
+        };
 
-                let body = self.parse_statement()?;
+        if let Some(kind) = variable_kind {
+            self.reader.consume()?; // var, let, const
+            let declarations = self.parse_variable_declarations()?;
 
-                let span = self.span_from(span_start);
-                return Ok(ForStatement {
-                    span,
-                    init,
-                    test,
-                    update,
-                    body,
-                }
-                .into());
-            }
+            let span = self.span_from(span_start);
+            return Ok(Some(ForInit::Declaration(VariableStatement {
+                span,
+                kind,
+                declarations,
+            })));
         }
+
+        Ok(match self.reader.current()? {
+            _ if self.current_matches(punct!(";")) => None,
+            _ => Some(ForInit::Expression(self.parse_expression()?)),
+        })
     }
 }

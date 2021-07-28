@@ -12,12 +12,14 @@ where
     /// Parses the `VariableStatement` or `LexicalDeclaration` goal symbol.
     pub(super) fn parse_variable_statement(&mut self, kind: VariableKind) -> Result<Statement> {
         let token = self.reader.consume()?;
-        let start = token.span.start;
+        let span_start = token.span.start;
 
         let declarations = self.parse_variable_declarations()?;
-        let end = self.reader.position();
+        if self.current_matches(punct!(";")) {
+            self.reader.consume()?;
+        }
 
-        let span = Span::new(start, end);
+        let span = self.span_from(span_start);
         Ok(VariableStatement {
             span,
             kind,
@@ -26,7 +28,7 @@ where
         .into())
     }
 
-    fn parse_variable_declarations(&mut self) -> Result<Vec<VariableDeclaration>> {
+    pub(super) fn parse_variable_declarations(&mut self) -> Result<Vec<VariableDeclaration>> {
         let mut declarations = Vec::new();
         declarations.push(self.parse_variable_declaration()?);
 
@@ -37,10 +39,6 @@ where
             } else {
                 break;
             }
-        }
-
-        if self.current_matches(punct!(";")) {
-            self.reader.consume()?;
         }
 
         Ok(declarations)

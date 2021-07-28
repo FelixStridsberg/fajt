@@ -1,6 +1,7 @@
 use fajt_lexer::token::Span;
 use fajt_parser::ast::{
-    DoWhileStatement, EmptyStatement, ForStatement, Ident, Literal, LiteralExpression, Statement,
+    BindingPattern, DoWhileStatement, EmptyStatement, ForInit, ForStatement, Ident, Literal,
+    LiteralExpression, Statement, VariableDeclaration, VariableKind, VariableStatement,
     WhileStatement,
 };
 
@@ -63,7 +64,7 @@ fn for_with_init() {
         output: [
             ForStatement {
                 span: Span::new(0, 11),
-                init: Some(Ident::new("a", (5, 6)).into()),
+                init: Some(ForInit::Expression(Ident::new("a", (5, 6)).into())),
                 test: None,
                 update: None,
                 body: EmptyStatement {
@@ -104,6 +105,36 @@ fn for_with_update() {
                 update: Some(Ident::new("a", (7, 8)).into()),
                 body: EmptyStatement {
                    span: Span::new(10, 11),
+                }.into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn for_with_var_declaration() {
+    parser_test!(
+        input: "for (var a;;) ;",
+        output: [
+            ForStatement {
+                span: Span::new(0, 15),
+                init: Some(ForInit::Declaration(
+                    VariableStatement {
+                        span: Span::new(5, 10),
+                        kind: VariableKind::Var,
+                        declarations: vec![
+                            VariableDeclaration {
+                                span: Span::new(9, 10),
+                                pattern: BindingPattern::Ident(Ident::new("a", (9, 10))),
+                                initializer: None,
+                            }
+                        ]
+                    }
+                )),
+                test: None,
+                update: None,
+                body: EmptyStatement {
+                   span: Span::new(14, 15),
                 }.into(),
             }.into()
         ]
