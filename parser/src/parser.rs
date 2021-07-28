@@ -217,12 +217,11 @@ where
     fn consume_list_delimiter(&mut self, list_end: TokenValue) -> Result<()> {
         if self.current_matches(punct!(",")) {
             self.reader.consume()?;
-        }
-        else if !self.current_matches(list_end) {
-            return err!(UnexpectedToken(self.reader.consume()?))
+        } else if !self.current_matches(list_end) {
+            return err!(UnexpectedToken(self.reader.consume()?));
         }
 
-        return Ok(())
+        return Ok(());
     }
 }
 

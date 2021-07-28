@@ -2,7 +2,7 @@ use crate::ast::{
     ArrayBinding, BindingElement, BindingPattern, Ident, ObjectBinding, ObjectBindingProp,
 };
 use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
-use crate::error::Result;
+use crate::error::{Result, ThenTry};
 use crate::Parser;
 use fajt_common::io::PeekRead;
 use fajt_lexer::punct;
@@ -46,7 +46,7 @@ where
                 }
                 _ if token_matches!(self.reader.peek(), opt: punct!(":")) => {
                     let property_name = self.parse_property_name()?;
-                    debug_assert!(token_matches!(self.reader.consume()?, punct!(":")));
+                    self.consume_known(punct!(":"))?;
 
                     let binding_element = self.parse_binding_element()?;
                     props.push(ObjectBindingProp::KeyValue(property_name, binding_element));
@@ -55,12 +55,9 @@ where
                 }
                 _ if self.is_identifier() => {
                     let ident = self.parse_identifier()?;
-                    let initializer = if token_matches!(self.reader.current()?, punct!("=")) {
-                        Some(self.parse_initializer()?)
-                    } else {
-                        None
-                    };
-
+                    let initializer = self
+                        .current_matches(punct!("="))
+                        .then_try(|| self.parse_initializer())?;
                     props.push(ObjectBindingProp::Single(ident, initializer));
 
                     self.consume_object_delimiter()?;
@@ -69,6 +66,7 @@ where
             }
         }
 
+        // TODO this should be handled generally (and probably not be part of the span?)
         if self.reader.current()?.value == punct!(";") {
             self.reader.consume()?;
         }
@@ -130,12 +128,9 @@ where
     pub(super) fn parse_binding_element(&mut self) -> Result<BindingElement> {
         let span_start = self.position();
         let pattern = self.parse_binding_pattern()?;
-
-        let initializer = if token_matches!(self.reader.current()?, punct!("=")) {
-            Some(self.parse_initializer()?)
-        } else {
-            None
-        };
+        let initializer = self
+            .current_matches(punct!("="))
+            .then_try(|| self.parse_initializer())?;
 
         let span = self.span_from(span_start);
         Ok(BindingElement {
