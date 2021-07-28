@@ -1,10 +1,9 @@
 use crate::ast::{Statement, VariableDeclaration, VariableKind, VariableStatement};
-use crate::error::Result;
+use crate::error::{Result, ThenTry};
 use crate::Parser;
 use fajt_common::io::PeekRead;
 use fajt_lexer::punct;
 use fajt_lexer::token::{Span, Token};
-use fajt_lexer::token_matches;
 
 impl<I> Parser<'_, I>
 where
@@ -15,8 +14,7 @@ where
         let token = self.reader.consume()?;
         let start = token.span.start;
 
-        // TODO parse all declarations
-        let declarations = vec![self.parse_variable_declaration()?];
+        let declarations = self.parse_variable_declarations()?;
         let end = self.reader.position();
 
         let span = Span::new(start, end);
@@ -28,19 +26,33 @@ where
         .into())
     }
 
+    fn parse_variable_declarations(&mut self) -> Result<Vec<VariableDeclaration>> {
+        let mut declarations = Vec::new();
+        declarations.push(self.parse_variable_declaration()?);
+
+        loop {
+            if self.current_matches(punct!(",")) {
+                self.reader.consume()?;
+                declarations.push(self.parse_variable_declaration()?);
+            } else {
+                break;
+            }
+        }
+
+        if self.current_matches(punct!(";")) {
+            self.reader.consume()?;
+        }
+
+        Ok(declarations)
+    }
+
     /// Parses the `VariableDeclaration` or `LexicalBinding` goal symbol.
     fn parse_variable_declaration(&mut self) -> Result<VariableDeclaration> {
         let span_start = self.position();
         let pattern = self.parse_binding_pattern()?;
-        let initializer = match self.reader.current()? {
-            token_matches!(punct!("=")) => Some(self.parse_initializer()?),
-            token_matches!(punct!(";")) => {
-                self.reader.consume()?;
-                None
-            }
-            _ => None,
-        };
-
+        let initializer = self
+            .current_matches(punct!("="))
+            .then_try(|| self.parse_initializer())?;
         let span = self.span_from(span_start);
         Ok(VariableDeclaration {
             span,
