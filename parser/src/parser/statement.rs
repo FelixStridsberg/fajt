@@ -272,26 +272,34 @@ where
                 break;
             }
 
-            if self.current_matches(keyword!("case")) {
-                todo!("Implement non default case")
-            } else {
-                let span_start = self.position();
-                self.consume_assert(keyword!("default"))?;
-                self.consume_assert(punct!(":"))?;
-
-                let consequent = self.parse_switch_case_statement_list()?;
-                let span = self.span_from(span_start);
-                cases.push(SwitchCase {
-                    span,
-                    test: None,
-                    consequent,
-                });
-            }
+            cases.push(self.parse_switch_case()?);
         }
 
         self.consume_assert(punct!("}"))?;
 
         Ok(cases)
+    }
+
+    fn parse_switch_case(&mut self) -> Result<SwitchCase> {
+        let span_start = self.position();
+        let test = if self.current_matches(keyword!("case")) {
+            self.consume_assert(keyword!("case"))?;
+            let test = self.parse_expression()?;
+            self.consume_assert(punct!(":"))?;
+            Some(test)
+        } else {
+            self.consume_assert(keyword!("default"))?;
+            self.consume_assert(punct!(":"))?;
+            None
+        };
+
+        let consequent = self.parse_switch_case_statement_list()?;
+        let span = self.span_from(span_start);
+        Ok(SwitchCase {
+            span,
+            test,
+            consequent,
+        })
     }
 
     fn parse_switch_case_statement_list(&mut self) -> Result<Vec<Statement>> {
