@@ -14,6 +14,7 @@ pub enum Statement {
     Break(BreakStatement),
     Continue(ContinueStatement),
     Throw(ThrowStatement),
+    Debugger(DebuggerStatement),
 }
 
 impl From<BlockStatement> for Statement {
@@ -67,6 +68,12 @@ impl From<ContinueStatement> for Statement {
 impl From<ThrowStatement> for Statement {
     fn from(expr: ThrowStatement) -> Self {
         Self::Throw(expr)
+    }
+}
+
+impl From<DebuggerStatement> for Statement {
+    fn from(expr: DebuggerStatement) -> Self {
+        Self::Debugger(expr)
     }
 }
 
@@ -154,4 +161,9 @@ pub struct ContinueStatement {
 pub struct ThrowStatement {
     pub span: Span,
     pub argument: Option<Expression>,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct DebuggerStatement {
+    pub span: Span,
 }

@@ -1,7 +1,7 @@
 use crate::ast::Statement::Expression;
 use crate::ast::{
-    BlockStatement, BreakStatement, ContinueStatement, EmptyStatement, ReturnStatement, Statement,
-    ThrowStatement, VariableKind,
+    BlockStatement, BreakStatement, ContinueStatement, DebuggerStatement, EmptyStatement,
+    ReturnStatement, Statement, ThrowStatement, VariableKind,
 };
 use crate::error::Result;
 use crate::Parser;
@@ -31,7 +31,7 @@ where
             token_matches!(keyword!("with")) => todo!("WithStatement"),
             token_matches!(keyword!("throw")) => self.parse_throw_statement()?,
             token_matches!(keyword!("try")) => todo!("TryStatement"),
-            token_matches!(keyword!("debugger")) => todo!("DebuggerStatement"),
+            token_matches!(keyword!("debugger")) => self.parse_debugger_statement()?,
             // TODO LabelledStatement
             _ if self.is_expression_statement()? => self.parse_expression_statement()?,
 
@@ -172,5 +172,13 @@ where
 
         let span = self.span_from(span_start);
         Ok(ThrowStatement { span, argument }.into())
+    }
+
+    /// Parses the `DebuggerStatement` goal symbol.
+    fn parse_debugger_statement(&mut self) -> Result<Statement> {
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, keyword!("debugger")));
+
+        Ok(DebuggerStatement { span: token.span }.into())
     }
 }

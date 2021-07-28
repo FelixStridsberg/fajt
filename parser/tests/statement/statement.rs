@@ -2,6 +2,18 @@ use fajt_lexer::token::Span;
 use fajt_parser::ast::*;
 
 #[test]
+fn debugger() {
+    parser_test!(
+        input: "debugger",
+        output: [
+            DebuggerStatement {
+                span: Span::new(0, 8),
+            }.into()
+        ]
+    );
+}
+
+#[test]
 fn empty_statement() {
     parser_test!(
         input: ";",
