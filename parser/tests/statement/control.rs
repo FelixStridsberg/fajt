@@ -1,6 +1,6 @@
 use fajt_lexer::token::Span;
 use fajt_parser::ast::{
-    BreakStatement, ContinueStatement, Ident, IfStatement, ReturnStatement, Statement,
+    BreakStatement, ContinueStatement, Ident, IfStatement, ReturnStatement, Statement, SwitchCase,
     SwitchStatement,
 };
 
@@ -121,6 +121,26 @@ fn empty_switch() {
                 span: Span::new(0, 14),
                 discriminant: Ident::new("a", (8, 9)).into(),
                 cases: vec![],
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn switch_default_empty_case() {
+    parser_test!(
+        input: "switch (a) { default: }",
+        output: [
+            SwitchStatement {
+                span: Span::new(0, 23),
+                discriminant: Ident::new("a", (8, 9)).into(),
+                cases: vec![
+                    SwitchCase {
+                        span: Span::new(13, 21),
+                        test: None,
+                        consequent: vec![],
+                    }
+                ],
             }.into()
         ]
     );

@@ -264,12 +264,50 @@ where
     }
 
     fn parse_switch_cases(&mut self) -> Result<Vec<SwitchCase>> {
-        let cases = Vec::new();
-
         self.consume_assert(punct!("{"))?;
-        // TODO
+
+        let mut cases = Vec::new();
+        loop {
+            if self.current_matches(punct!("}")) {
+                break;
+            }
+
+            if self.current_matches(keyword!("case")) {
+                todo!("Implement non default case")
+            } else {
+                let span_start = self.position();
+                self.consume_assert(keyword!("default"))?;
+                self.consume_assert(punct!(":"))?;
+
+                let consequent = self.parse_switch_case_statement_list()?;
+                let span = self.span_from(span_start);
+                cases.push(SwitchCase {
+                    span,
+                    test: None,
+                    consequent,
+                });
+            }
+        }
+
         self.consume_assert(punct!("}"))?;
 
         Ok(cases)
+    }
+
+    fn parse_switch_case_statement_list(&mut self) -> Result<Vec<Statement>> {
+        let mut statements = Vec::new();
+
+        loop {
+            if token_matches!(
+                self.reader.current(),
+                ok: punct!("}") | keyword!("case") | keyword!("default")
+            ) {
+                break;
+            }
+
+            todo!("Parse statements")
+        }
+
+        Ok(statements)
     }
 }
