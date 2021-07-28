@@ -1,5 +1,5 @@
 use crate::ast::{ClassElement, ClassExpression, ClassMethod, ClassMethodKind, Expression};
-use crate::error::{ErrorKind, Result};
+use crate::error::{Result, ThenTry};
 use crate::Parser;
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
@@ -21,12 +21,10 @@ where
             .is_identifier()
             .then(|| self.parse_identifier().unwrap());
 
-        let super_class = if token_matches!(self.reader.current(), ok: keyword!("extends")) {
+        let super_class = self.current_matches(keyword!("extends")).then_try(|| {
             self.reader.consume()?;
-            Some(self.parse_left_hand_side_expression()?)
-        } else {
-            None
-        };
+            self.parse_left_hand_side_expression()
+        })?;
 
         let body = self.parse_class_body()?;
         let span = self.span_from(span_start);
@@ -40,11 +38,7 @@ where
     }
 
     fn parse_class_body(&mut self) -> Result<Vec<ClassElement>> {
-        if !token_matches!(self.reader.current(), ok: punct!("{")) {
-            return err!(ErrorKind::UnexpectedToken(self.reader.consume()?));
-        }
-
-        self.reader.consume()?;
+        self.consume_known(punct!("{"))?;
         let mut class_body = Vec::new();
 
         loop {
