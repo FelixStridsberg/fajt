@@ -203,12 +203,19 @@ where
 
         let consequent = self.parse_statement()?;
 
+        let alternate = if token_matches!(self.reader.current(), ok: keyword!("else")) {
+            self.reader.consume()?;
+            Some(self.parse_statement()?)
+        } else {
+            None
+        };
+
         let span = self.span_from(span_start);
         Ok(IfStatement {
             span,
             condition,
             consequent,
-            alternate: None,
+            alternate,
         }
         .into())
     }

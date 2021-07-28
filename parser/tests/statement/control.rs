@@ -95,3 +95,18 @@ fn if_no_else() {
         ]
     );
 }
+
+#[test]
+fn if_with_else() {
+    parser_test!(
+        input: "if ( a ) b else c",
+        output: [
+            IfStatement {
+                span: Span::new(0, 17),
+                condition: Ident::new("a", (5, 6)).into(),
+                consequent: Statement::Expression(Ident::new("b", (9, 10)).into()),
+                alternate: Some(Statement::Expression(Ident::new("c", (16, 17)).into())),
+            }.into()
+        ]
+    );
+}
