@@ -19,6 +19,7 @@ pub enum Statement {
     If(Box<IfStatement>),
     With(Box<WithStatement>),
     Try(Box<TryStatement>),
+    Switch(Box<SwitchStatement>),
 }
 
 impl Statement {
@@ -106,6 +107,12 @@ impl From<WithStatement> for Statement {
 impl From<TryStatement> for Statement {
     fn from(expr: TryStatement) -> Self {
         Self::Try(Box::new(expr))
+    }
+}
+
+impl From<SwitchStatement> for Statement {
+    fn from(expr: SwitchStatement) -> Self {
+        Self::Switch(Box::new(expr))
     }
 }
 
@@ -228,4 +235,18 @@ pub struct CatchClause {
     pub span: Span,
     pub parameter: Option<BindingPattern>,
     pub body: BlockStatement,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct SwitchStatement {
+    pub span: Span,
+    pub discriminant: Expression,
+    pub cases: Vec<SwitchCase>,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct SwitchCase {
+    pub span: Span,
+    pub test: Option<Expression>,
+    pub consequent: Vec<Statement>,
 }

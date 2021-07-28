@@ -1,8 +1,8 @@
 use crate::ast::Statement::Expression;
 use crate::ast::{
     BlockStatement, BreakStatement, CatchClause, ContinueStatement, DebuggerStatement,
-    EmptyStatement, IfStatement, ReturnStatement, Statement, ThrowStatement, TryStatement,
-    VariableKind, WithStatement,
+    EmptyStatement, IfStatement, ReturnStatement, Statement, SwitchCase, SwitchStatement,
+    ThrowStatement, TryStatement, VariableKind, WithStatement,
 };
 use crate::error::{Result, ThenTry};
 use crate::Parser;
@@ -34,6 +34,8 @@ where
             token_matches!(keyword!("try")) => self.parse_try_statement()?,
             token_matches!(keyword!("debugger")) => self.parse_debugger_statement()?,
             // TODO LabelledStatement
+            // TODO IterationStatement
+            token_matches!(keyword!("switch")) => self.parse_switch_statement()?,
             _ if self.is_expression_statement()? => self.parse_expression_statement()?,
 
             // Declarations are handles as statements
@@ -41,9 +43,6 @@ where
             token_matches!(keyword!("async")) if self.peek_matches(keyword!("function")) => {
                 self.parse_async_function_declaration()?
             }
-
-            // TODO IterationStatement
-            // TODO SwishStatement
             t => unimplemented!("Invalid statement error handling {:?}", t),
         })
     }
@@ -243,5 +242,34 @@ where
             parameter,
             body,
         })
+    }
+
+    fn parse_switch_statement(&mut self) -> Result<Statement> {
+        let span_start = self.position();
+        self.consume_assert(keyword!("switch"))?;
+        self.consume_assert(punct!("("))?;
+
+        let discriminant = self.parse_expression()?;
+        self.consume_assert(punct!(")"))?;
+
+        let cases = self.parse_switch_cases()?;
+
+        let span = self.span_from(span_start);
+        Ok(SwitchStatement {
+            span,
+            discriminant,
+            cases,
+        }
+        .into())
+    }
+
+    fn parse_switch_cases(&mut self) -> Result<Vec<SwitchCase>> {
+        let cases = Vec::new();
+
+        self.consume_assert(punct!("{"))?;
+        // TODO
+        self.consume_assert(punct!("}"))?;
+
+        Ok(cases)
     }
 }

@@ -1,6 +1,7 @@
 use fajt_lexer::token::Span;
 use fajt_parser::ast::{
     BreakStatement, ContinueStatement, Ident, IfStatement, ReturnStatement, Statement,
+    SwitchStatement,
 };
 
 #[test]
@@ -106,6 +107,20 @@ fn if_with_else() {
                 condition: Ident::new("a", (5, 6)).into(),
                 consequent: Statement::Expression(Ident::new("b", (9, 10)).into()),
                 alternate: Some(Statement::Expression(Ident::new("c", (16, 17)).into())),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn empty_switch() {
+    parser_test!(
+        input: "switch (a) { }",
+        output: [
+            SwitchStatement {
+                span: Span::new(0, 14),
+                discriminant: Ident::new("a", (8, 9)).into(),
+                cases: vec![],
             }.into()
         ]
     );
