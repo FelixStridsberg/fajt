@@ -202,38 +202,27 @@ where
         }
     }
 
-    /// TODO 3 similar functions, merge them to one (consume_*_delimiter)
     fn consume_array_delimiter(&mut self) -> Result<()> {
-        match self.reader.current()? {
-            token_matches!(punct!(",")) => {
-                self.reader.consume()?;
-                Ok(())
-            }
-            token_matches!(punct!("]")) => Ok(()),
-            _ => err!(UnexpectedToken(self.reader.consume()?)),
-        }
+        self.consume_list_delimiter(punct!("]"))
     }
 
     fn consume_object_delimiter(&mut self) -> Result<()> {
-        match self.reader.current()? {
-            token_matches!(punct!(",")) => {
-                self.reader.consume()?;
-                Ok(())
-            }
-            token_matches!(punct!("}")) => Ok(()),
-            _ => err!(UnexpectedToken(self.reader.consume()?)),
-        }
+        self.consume_list_delimiter(punct!("}"))
     }
 
     fn consume_parameter_delimiter(&mut self) -> Result<()> {
-        match self.reader.current()? {
-            token_matches!(punct!(",")) => {
-                self.reader.consume()?;
-                Ok(())
-            }
-            token_matches!(punct!(")")) => Ok(()),
-            _ => err!(UnexpectedToken(self.reader.consume()?)),
+        self.consume_list_delimiter(punct!(")"))
+    }
+
+    fn consume_list_delimiter(&mut self, list_end: TokenValue) -> Result<()> {
+        if self.current_matches(punct!(",")) {
+            self.reader.consume()?;
         }
+        else if !self.current_matches(list_end) {
+            return err!(UnexpectedToken(self.reader.consume()?))
+        }
+
+        return Ok(())
     }
 }
 
@@ -244,9 +233,9 @@ fn is_identifier(token: Option<&Token>, keyword_context: KeywordContext) -> bool
             ..
         }) => true,
         Some(Token {
-            value: TokenValue::Keyword(k),
+            value: TokenValue::Keyword(keyword),
             ..
-        }) => k.is_allows_as_identifier(keyword_context),
+        }) => keyword.is_allows_as_identifier(keyword_context),
         _ => false,
     }
 }
