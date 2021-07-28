@@ -49,19 +49,18 @@ where
     /// Check if current position matches the start of an expression statement as specified in the
     /// `ExpressionStatement` goal symbol.
     fn is_expression_statement(&self) -> Result<bool> {
-        let token = self.reader.current()?;
         if matches!(
-            token.value,
+            self.reader.current()?.value,
             punct!("{") | keyword!("function") | keyword!("class")
         ) {
             return Ok(false);
         }
 
-        if matches!(token.value, keyword!("let")) && self.peek_matches(punct!("[")) {
+        if self.current_matches(keyword!("let")) && self.peek_matches(punct!("[")) {
             return Ok(false);
         }
 
-        if matches!(token.value, keyword!("async")) && self.peek_matches(keyword!("function")) {
+        if self.current_matches(keyword!("async")) && self.peek_matches(keyword!("function")) {
             return Ok(self.followed_by_new_lined());
         }
 
@@ -76,15 +75,12 @@ where
 
         let mut statements = Vec::new();
         loop {
-            match self.reader.current()? {
-                token_matches!(punct!("}")) => {
-                    self.reader.consume()?;
-                    break;
-                }
-                _ => {
-                    let statement = self.parse_statement()?;
-                    statements.push(statement)
-                }
+            if self.current_matches(punct!("}")) {
+                self.reader.consume()?;
+                break;
+            } else {
+                let statement = self.parse_statement()?;
+                statements.push(statement)
             }
         }
 
@@ -185,7 +181,6 @@ where
         self.consume_known(punct!(")"))?;
 
         let consequent = self.parse_statement()?;
-
         let alternate = self.current_matches(keyword!("else")).then_maybe(|| {
             self.reader.consume()?;
             self.parse_statement()
