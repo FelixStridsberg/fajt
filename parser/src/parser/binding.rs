@@ -27,8 +27,7 @@ where
     /// Parses the `ObjectBindingPattern` goal symbol.
     fn parse_object_binding_pattern(&mut self) -> Result<BindingPattern> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert_eq!(token.value, punct!("{"));
+        self.consume_assert(punct!("{"))?;
 
         let mut props = Vec::new();
 
@@ -78,8 +77,7 @@ where
     /// Parses the `ArrayBindingPattern` goal symbol.
     fn parse_array_binding_pattern(&mut self) -> Result<BindingPattern> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert_eq!(token.value, punct!("["));
+        self.consume_assert(punct!("["))?;
 
         let mut elements = Vec::new();
 
@@ -142,8 +140,7 @@ where
 
     /// Parses the `BindingRestElement` goal symbol.
     pub(super) fn parse_binding_rest_element(&mut self) -> Result<BindingPattern> {
-        let token = self.reader.consume()?;
-        debug_assert_eq!(token.value, punct!("..."));
+        self.consume_assert(punct!("..."))?;
         self.parse_binding_pattern()
     }
 

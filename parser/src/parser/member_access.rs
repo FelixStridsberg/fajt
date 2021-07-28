@@ -2,7 +2,6 @@ use crate::ast::{
     Expression, MemberExpression, MemberObject, MemberProperty, OptionalCallExpression,
     OptionalMemberExpression,
 };
-use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 use crate::Parser;
 use fajt_common::io::PeekRead;
@@ -137,12 +136,10 @@ where
     }
 
     fn parse_computed_property(&mut self) -> Result<Expression> {
-        let open_bracket = self.reader.consume()?;
-        debug_assert!(token_matches!(open_bracket, punct!("[")));
-
+        self.consume_assert(punct!("["))?;
         let expression = self.parse_expression()?;
-
         self.consume_assert(punct!("]"))?;
+
         Ok(expression)
     }
 }

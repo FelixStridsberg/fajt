@@ -149,8 +149,7 @@ where
     /// Parses the `YieldExpression` goal symbol.
     fn parse_yield_expression(&mut self) -> Result<Expression> {
         let span_start = self.position();
-        let yield_token = self.reader.consume()?;
-        debug_assert!(token_matches!(yield_token, keyword!("yield")));
+        self.consume_assert(keyword!("yield"))?;
 
         if self.reader.is_end() {
             let span = self.span_from(span_start);
@@ -424,8 +423,7 @@ where
     /// Parses the `Arguments` goal symbol.
     pub(super) fn parse_arguments(&mut self) -> Result<(Span, Vec<Argument>)> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, punct!("(")));
+        self.consume_assert(punct!("("))?;
 
         let mut arguments = Vec::new();
 
@@ -558,9 +556,7 @@ where
 
     /// Parses the `this` expression which is part of the `PrimaryExpression` goal symbol.
     fn parse_this_expression(&mut self) -> Result<Expression> {
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, keyword!("this")));
-
+        let token = self.consume_assert(keyword!("this"))?;
         Ok(ThisExpression::new(token.span).into())
     }
 

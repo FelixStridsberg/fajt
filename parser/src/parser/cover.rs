@@ -28,9 +28,7 @@ where
     pub(super) fn parse_cover_call_and_async_arrow_head(
         &mut self,
     ) -> Result<CoverCallExpressionAndAsyncArrowHead> {
-        let async_token = self.reader.consume()?;
-        debug_assert!(token_matches!(async_token, keyword!("async")));
-
+        let async_token = self.consume_assert(keyword!("async"))?;
         let span_start = self.position();
         let mut tokens = vec![async_token];
 
@@ -41,9 +39,7 @@ where
     }
 
     fn collect_parenthesized_tokens(&mut self, tokens: &mut Vec<Token>) -> Result<()> {
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, punct!("(")));
-
+        let token = self.consume_assert(punct!("("))?;
         tokens.push(token);
 
         let mut depth = 1;

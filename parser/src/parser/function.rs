@@ -64,8 +64,7 @@ where
     /// Parses the `FunctionExpression` goal symbol.
     pub(super) fn parse_function_expression(&mut self) -> Result<Expression> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, keyword!("function")));
+        self.consume_assert(keyword!("function"))?;
 
         let generator = self.consume_generator_token();
         let identifier = self.parse_optional_identifier()?;
@@ -87,11 +86,9 @@ where
     /// Parses the `AsyncFunctionExpression` goal symbol.
     pub(super) fn parse_async_function_expression(&mut self) -> Result<Expression> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, keyword!("async")));
+        self.consume_assert(keyword!("async"))?;
 
-        let function_token = self.reader.consume()?;
-        debug_assert!(token_matches!(function_token, keyword!("function")));
+        let function_token = self.consume_assert(keyword!("function"))?;
         debug_assert_eq!(function_token.first_on_line, false);
 
         let generator = self.consume_generator_token();
@@ -114,8 +111,7 @@ where
     /// Parses the `FunctionDeclaration` goal symbol.
     pub(super) fn parse_function_declaration(&mut self) -> Result<Statement> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, keyword!("function")));
+        self.consume_assert(keyword!("function"))?;
 
         let generator = self.consume_generator_token();
         let ident = self.parse_identifier()?;
@@ -127,11 +123,9 @@ where
     /// Parses the `AsyncFunctionDeclaration` goal symbol.
     pub(super) fn parse_async_function_declaration(&mut self) -> Result<Statement> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, keyword!("async")));
+        self.consume_assert(keyword!("async"))?;
 
-        let function_token = self.reader.consume()?;
-        debug_assert!(token_matches!(function_token, keyword!("function")));
+        let function_token = self.consume_assert(keyword!("function"))?;
         debug_assert_eq!(function_token.first_on_line, false);
 
         let generator = self.consume_generator_token();
@@ -208,8 +202,7 @@ where
 
     /// Parses the `FunctionBody` or `AsyncFunctionBody` goal symbol.
     pub(super) fn parse_function_body(&mut self) -> Result<Vec<Statement>> {
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, punct!("{")));
+        self.consume_assert(punct!("{"))?;
 
         let mut body = Vec::new();
         loop {

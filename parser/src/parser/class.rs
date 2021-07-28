@@ -14,8 +14,7 @@ where
     /// Parses the `ClassExpression` goal symbol.
     pub(super) fn parse_class_expression(&mut self) -> Result<Expression> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, keyword!("class")));
+        self.consume_assert(keyword!("class"))?;
 
         let identifier = self
             .is_identifier()

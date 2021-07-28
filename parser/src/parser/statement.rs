@@ -70,8 +70,7 @@ where
     /// Parses the `BlockStatement` goal symbol.
     fn parse_block_statement(&mut self) -> Result<Statement> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, punct!("{")));
+        self.consume_assert(punct!("{"))?;
 
         let mut statements = Vec::new();
         loop {
@@ -95,17 +94,14 @@ where
 
     /// Parses the `EmptyStatement` goal symbol.
     fn parse_empty_statement(&mut self) -> Result<Statement> {
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, punct!(";")));
-
+        let token = self.consume_assert(punct!(";"))?;
         Ok(Statement::Empty(EmptyStatement { span: token.span }))
     }
 
     /// Parses the `BreakStatement` goal symbol.
     fn parse_break_statement(&mut self) -> Result<Statement> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, keyword!("break")));
+        self.consume_assert(keyword!("break"))?;
 
         let label = self
             .statement_not_ended()
@@ -117,8 +113,7 @@ where
     /// Parses the `ContinueStatement` goal symbol.
     fn parse_continue_statement(&mut self) -> Result<Statement> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, keyword!("continue")));
+        self.consume_assert(keyword!("continue"))?;
 
         let label = self
             .statement_not_ended()
@@ -130,8 +125,7 @@ where
     /// Parses the `ReturnStatement` goal symbol.
     fn parse_return_statement(&mut self) -> Result<Statement> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, keyword!("return")));
+        self.consume_assert(keyword!("return"))?;
 
         let argument = self
             .statement_not_ended()
@@ -143,8 +137,7 @@ where
     /// Parses the `ThrowStatement` goal symbol.
     fn parse_throw_statement(&mut self) -> Result<Statement> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, keyword!("throw")));
+        self.consume_assert(keyword!("throw"))?;
 
         let argument = self
             .statement_not_ended()
@@ -164,18 +157,14 @@ where
 
     /// Parses the `DebuggerStatement` goal symbol.
     fn parse_debugger_statement(&mut self) -> Result<Statement> {
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, keyword!("debugger")));
-
+        let token = self.consume_assert(keyword!("debugger"))?;
         Ok(DebuggerStatement { span: token.span }.into())
     }
 
     /// Parses the `IfStatement` goal symbol.
     fn parse_if_statement(&mut self) -> Result<Statement> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, keyword!("if")));
-
+        self.consume_assert(keyword!("if"))?;
         self.consume_assert(punct!("("))?;
         let condition = self.parse_expression()?;
         self.consume_assert(punct!(")"))?;
@@ -199,9 +188,7 @@ where
     /// Parses the `WithStatement` goal symbol.
     fn parse_with_statement(&mut self) -> Result<Statement> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, keyword!("with")));
-
+        self.consume_assert(keyword!("with"))?;
         self.consume_assert(punct!("("))?;
         let object = self.parse_expression()?;
         self.consume_assert(punct!(")"))?;
@@ -214,8 +201,7 @@ where
     /// Parses the `TryStatement` goal symbol.
     fn parse_try_statement(&mut self) -> Result<Statement> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, keyword!("try")));
+        self.consume_assert(keyword!("try"))?;
 
         let block = self.parse_block_statement()?.unwrap_block_statement();
         let handler = self
@@ -238,8 +224,7 @@ where
 
     fn parse_catch_clause(&mut self) -> Result<CatchClause> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        debug_assert!(token_matches!(token, keyword!("catch")));
+        self.consume_assert(keyword!("catch"))?;
 
         let parameter = self.current_matches(punct!("(")).then_try(|| {
             self.reader.consume()?;
