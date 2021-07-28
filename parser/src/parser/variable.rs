@@ -3,7 +3,7 @@ use crate::error::{Result, ThenTry};
 use crate::Parser;
 use fajt_common::io::PeekRead;
 use fajt_lexer::punct;
-use fajt_lexer::token::{Span, Token};
+use fajt_lexer::token::Token;
 
 impl<I> Parser<'_, I>
 where

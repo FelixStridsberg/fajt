@@ -140,3 +140,63 @@ fn for_with_var_declaration() {
         ]
     );
 }
+
+#[test]
+fn for_with_let_declaration() {
+    parser_test!(
+        input: "for (let a;;) ;",
+        output: [
+            ForStatement {
+                span: Span::new(0, 15),
+                init: Some(ForInit::Declaration(
+                    VariableStatement {
+                        span: Span::new(5, 10),
+                        kind: VariableKind::Let,
+                        declarations: vec![
+                            VariableDeclaration {
+                                span: Span::new(9, 10),
+                                pattern: BindingPattern::Ident(Ident::new("a", (9, 10))),
+                                initializer: None,
+                            }
+                        ]
+                    }
+                )),
+                test: None,
+                update: None,
+                body: EmptyStatement {
+                   span: Span::new(14, 15),
+                }.into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn for_with_const_declaration() {
+    parser_test!(
+        input: "for (const a;;) ;",
+        output: [
+            ForStatement {
+                span: Span::new(0, 17),
+                init: Some(ForInit::Declaration(
+                    VariableStatement {
+                        span: Span::new(5, 12),
+                        kind: VariableKind::Const,
+                        declarations: vec![
+                            VariableDeclaration {
+                                span: Span::new(11, 12),
+                                pattern: BindingPattern::Ident(Ident::new("a", (11, 12))),
+                                initializer: None,
+                            }
+                        ]
+                    }
+                )),
+                test: None,
+                update: None,
+                body: EmptyStatement {
+                   span: Span::new(16, 17),
+                }.into(),
+            }.into()
+        ]
+    );
+}

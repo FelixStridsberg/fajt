@@ -79,8 +79,8 @@ where
         let span_start = self.position();
         let variable_kind = match self.reader.current()? {
             token_matches!(keyword!("var")) => Some(VariableKind::Var),
-            token_matches!(keyword!("let")) => todo!("for ( let ..."),
-            token_matches!(keyword!("const")) => todo!("for ( const ..."),
+            token_matches!(keyword!("let")) => Some(VariableKind::Let),
+            token_matches!(keyword!("const")) => Some(VariableKind::Const),
             _ => None,
         };
 
