@@ -21,6 +21,7 @@ mod expression {
 
 mod statement {
     mod control;
+    mod exception;
     mod statement;
     mod variable;
 }

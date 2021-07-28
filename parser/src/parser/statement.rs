@@ -1,7 +1,7 @@
 use crate::ast::Statement::Expression;
 use crate::ast::{
     BlockStatement, BreakStatement, ContinueStatement, EmptyStatement, ReturnStatement, Statement,
-    VariableKind,
+    ThrowStatement, VariableKind,
 };
 use crate::error::Result;
 use crate::Parser;
@@ -29,7 +29,7 @@ where
             token_matches!(keyword!("continue")) => self.parse_continue_statement()?,
             token_matches!(keyword!("return")) => self.parse_return_statement()?,
             token_matches!(keyword!("with")) => todo!("WithStatement"),
-            token_matches!(keyword!("throw")) => todo!("ThrowStatement"),
+            token_matches!(keyword!("throw")) => self.parse_throw_statement()?,
             token_matches!(keyword!("try")) => todo!("TryStatement"),
             token_matches!(keyword!("debugger")) => todo!("DebuggerStatement"),
             // TODO LabelledStatement
@@ -156,5 +156,21 @@ where
 
         let span = self.span_from(span_start);
         Ok(ReturnStatement { span, argument }.into())
+    }
+
+    /// Parses the `ThrowStatement` goal symbol.
+    fn parse_throw_statement(&mut self) -> Result<Statement> {
+        let span_start = self.position();
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, keyword!("throw")));
+
+        let argument = match self.reader.current() {
+            token_matches!(ok: punct!(";")) | Err(_) => None,
+            Ok(token) if token.first_on_line => None,
+            _ => Some(self.parse_expression()?),
+        };
+
+        let span = self.span_from(span_start);
+        Ok(ThrowStatement { span, argument }.into())
     }
 }

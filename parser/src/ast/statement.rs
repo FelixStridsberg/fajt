@@ -13,6 +13,7 @@ pub enum Statement {
     Return(ReturnStatement),
     Break(BreakStatement),
     Continue(ContinueStatement),
+    Throw(ThrowStatement),
 }
 
 impl From<BlockStatement> for Statement {
@@ -60,6 +61,12 @@ impl From<BreakStatement> for Statement {
 impl From<ContinueStatement> for Statement {
     fn from(expr: ContinueStatement) -> Self {
         Self::Continue(expr)
+    }
+}
+
+impl From<ThrowStatement> for Statement {
+    fn from(expr: ThrowStatement) -> Self {
+        Self::Throw(expr)
     }
 }
 
@@ -141,4 +148,10 @@ pub struct BreakStatement {
 pub struct ContinueStatement {
     pub span: Span,
     pub label: Option<Ident>,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct ThrowStatement {
+    pub span: Span,
+    pub argument: Option<Expression>,
 }
