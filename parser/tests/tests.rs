@@ -20,6 +20,7 @@ mod expression {
 }
 
 mod statement {
+    mod control;
     mod statement;
     mod variable;
 }

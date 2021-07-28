@@ -10,6 +10,7 @@ pub enum Statement {
     Variable(VariableStatement),
     Expression(Expression),
     FunctionDeclaration(FunctionDeclaration),
+    Return(ReturnStatement),
 }
 
 impl From<BlockStatement> for Statement {
@@ -39,6 +40,12 @@ impl From<Expression> for Statement {
 impl From<FunctionDeclaration> for Statement {
     fn from(expr: FunctionDeclaration) -> Self {
         Self::FunctionDeclaration(expr)
+    }
+}
+
+impl From<ReturnStatement> for Statement {
+    fn from(expr: ReturnStatement) -> Self {
+        Self::Return(expr)
     }
 }
 
@@ -102,4 +109,10 @@ pub enum VariableKind {
     Const,
     Let,
     Var,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct ReturnStatement {
+    pub span: Span,
+    pub argument: Option<Expression>,
 }
