@@ -142,7 +142,7 @@ where
 
         let expression = self.parse_expression()?;
 
-        self.consume_known(punct!("]"))?;
+        self.consume_assert(punct!("]"))?;
         Ok(expression)
     }
 }

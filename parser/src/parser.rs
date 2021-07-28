@@ -149,7 +149,7 @@ where
         }
     }
 
-    fn consume_known(&mut self, value: TokenValue) -> Result<()> {
+    fn consume_assert(&mut self, value: TokenValue) -> Result<()> {
         let token = self.reader.consume()?;
         if token.value != value {
             return err!(UnexpectedToken(token));

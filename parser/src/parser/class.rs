@@ -38,7 +38,7 @@ where
     }
 
     fn parse_class_body(&mut self) -> Result<Vec<ClassElement>> {
-        self.consume_known(punct!("{"))?;
+        self.consume_assert(punct!("{"))?;
         let mut class_body = Vec::new();
 
         loop {

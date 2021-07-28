@@ -46,7 +46,7 @@ where
                 }
                 _ if token_matches!(self.reader.peek(), opt: punct!(":")) => {
                     let property_name = self.parse_property_name()?;
-                    self.consume_known(punct!(":"))?;
+                    self.consume_assert(punct!(":"))?;
 
                     let binding_element = self.parse_binding_element()?;
                     props.push(ObjectBindingProp::KeyValue(property_name, binding_element));

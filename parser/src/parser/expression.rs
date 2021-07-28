@@ -188,7 +188,7 @@ where
             self.reader.consume()?;
             let consequent = self.parse_assignment_expression()?;
 
-            self.consume_known(punct!(":"))?;
+            self.consume_assert(punct!(":"))?;
 
             let alternate = self.parse_assignment_expression()?;
             let span = self.span_from(span_start);
@@ -385,9 +385,9 @@ where
     fn parse_import_argument(&mut self) -> Result<(Span, Vec<Argument>)> {
         let span_start = self.position();
 
-        self.consume_known(punct!("("))?;
+        self.consume_assert(punct!("("))?;
         let expression = self.parse_assignment_expression()?;
-        self.consume_known(punct!(")"))?;
+        self.consume_assert(punct!(")"))?;
 
         let span = self.span_from(span_start);
         Ok((span, vec![Argument::Expression(expression)]))

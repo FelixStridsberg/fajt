@@ -24,7 +24,7 @@ where
         asynchronous: bool,
         parameters: FormalParameters,
     ) -> Result<Expression> {
-        self.consume_known(punct!("=>"))?;
+        self.consume_assert(punct!("=>"))?;
 
         let body = if self.current_matches(punct!("{")) {
             ArrowFunctionBody::Block(self.parse_function_body()?)
@@ -177,7 +177,7 @@ where
     pub(crate) fn parse_formal_parameters(&mut self) -> Result<FormalParameters> {
         let span_start = self.position();
 
-        self.consume_known(punct!("("))?;
+        self.consume_assert(punct!("("))?;
 
         let mut parameters = Vec::new();
         let mut rest = None;

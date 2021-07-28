@@ -176,9 +176,9 @@ where
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, keyword!("if")));
 
-        self.consume_known(punct!("("))?;
+        self.consume_assert(punct!("("))?;
         let condition = self.parse_expression()?;
-        self.consume_known(punct!(")"))?;
+        self.consume_assert(punct!(")"))?;
 
         let consequent = self.parse_statement()?;
         let alternate = self.current_matches(keyword!("else")).then_try(|| {
@@ -202,9 +202,9 @@ where
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, keyword!("with")));
 
-        self.consume_known(punct!("("))?;
+        self.consume_assert(punct!("("))?;
         let object = self.parse_expression()?;
-        self.consume_known(punct!(")"))?;
+        self.consume_assert(punct!(")"))?;
 
         let body = self.parse_statement()?;
         let span = self.span_from(span_start);
@@ -244,7 +244,7 @@ where
         let parameter = self.current_matches(punct!("(")).then_try(|| {
             self.reader.consume()?;
             let pattern = self.parse_binding_pattern()?;
-            self.consume_known(punct!(")"))?;
+            self.consume_assert(punct!(")"))?;
             Ok(pattern)
         })?;
 
