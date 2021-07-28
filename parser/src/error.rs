@@ -19,6 +19,26 @@ macro_rules! err {
 
 pub type Result<T> = std::result::Result<T, Error>;
 
+/// Similar trait to bool.then, but handles closures returning `Result`.
+pub trait ThenMaybe {
+    fn then_maybe<T, F>(self, f: F) -> Result<Option<T>>
+    where
+        F: FnOnce() -> Result<T>;
+}
+
+impl ThenMaybe for bool {
+    fn then_maybe<T, F>(self, f: F) -> Result<Option<T>>
+    where
+        F: FnOnce() -> Result<T>,
+    {
+        if self {
+            f().map(|r| Some(r))
+        } else {
+            Ok(None)
+        }
+    }
+}
+
 #[derive(Debug, PartialEq)]
 pub struct Error {
     kind: ErrorKind,
