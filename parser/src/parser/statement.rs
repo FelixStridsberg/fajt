@@ -37,6 +37,7 @@ where
             // TODO IterationStatement
             token_matches!(keyword!("do")) => self.parse_do_while_statement()?,
             token_matches!(keyword!("while")) => self.parse_while_statement()?,
+            token_matches!(keyword!("for")) => self.parse_for_statement()?,
             token_matches!(keyword!("switch")) => self.parse_switch_statement()?,
             _ if self.is_expression_statement()? => self.parse_expression_statement()?,
 
