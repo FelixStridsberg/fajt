@@ -41,7 +41,7 @@ where
         loop {
             match self.reader.current() {
                 token_matches!(ok: punct!("?.")) => {
-                    if token_matches!(self.reader.peek(), opt: punct!("(")) {
+                    if self.peek_matches(punct!("(")) {
                         object = self.parse_optional_call_expression(span_start, object)?;
                     } else {
                         object = self.parse_optional_member_expression(span_start, object)?;
@@ -65,7 +65,7 @@ where
         span_start: usize,
         callee: Expression,
     ) -> Result<Expression> {
-        let optional = token_matches!(self.reader.current(), ok: punct!("?."));
+        let optional = self.current_matches(punct!("?."));
         if optional {
             self.reader.consume()?;
         }
@@ -88,7 +88,7 @@ where
         span_start: usize,
         object: Expression,
     ) -> Result<Expression> {
-        let optional = token_matches!(self.reader.current(), ok: punct!("?."));
+        let optional = self.current_matches(punct!("?."));
         let property = self.parse_optional_member_property()?;
         let span = self.span_from(span_start);
 
@@ -103,9 +103,7 @@ where
 
     fn parse_optional_member_property(&mut self) -> Result<MemberProperty> {
         match self.reader.current() {
-            token_matches!(ok: punct!("?."))
-                if token_matches!(self.reader.peek(), opt: punct!("[")) =>
-            {
+            token_matches!(ok: punct!("?.")) if self.peek_matches(punct!("[")) => {
                 self.reader.consume()?;
                 let property = self.parse_computed_property()?;
                 Ok(MemberProperty::Expression(property))
@@ -143,11 +141,8 @@ where
         debug_assert!(token_matches!(open_bracket, punct!("[")));
 
         let expression = self.parse_expression()?;
-        let closing_bracket = self.reader.consume()?;
-        if !token_matches!(closing_bracket, punct!("]")) {
-            return err!(UnexpectedToken(closing_bracket));
-        }
 
+        self.consume_known(punct!("]"))?;
         Ok(expression)
     }
 }
