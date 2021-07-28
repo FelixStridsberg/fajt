@@ -111,12 +111,9 @@ where
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, keyword!("break")));
 
-        let label = match self.reader.current() {
-            token_matches!(ok: punct!(";")) | Err(_) => None,
-            Ok(token) if token.first_on_line => None,
-            _ => Some(self.parse_identifier()?),
-        };
-
+        let label = self
+            .statement_not_ended()
+            .then_maybe(|| self.parse_identifier())?;
         let span = self.span_from(span_start);
         Ok(BreakStatement { span, label }.into())
     }
@@ -127,12 +124,9 @@ where
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, keyword!("continue")));
 
-        let label = match self.reader.current() {
-            token_matches!(ok: punct!(";")) | Err(_) => None,
-            Ok(token) if token.first_on_line => None,
-            _ => Some(self.parse_identifier()?),
-        };
-
+        let label = self
+            .statement_not_ended()
+            .then_maybe(|| self.parse_identifier())?;
         let span = self.span_from(span_start);
         Ok(ContinueStatement { span, label }.into())
     }
@@ -143,12 +137,9 @@ where
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, keyword!("return")));
 
-        let argument = match self.reader.current() {
-            token_matches!(ok: punct!(";")) | Err(_) => None,
-            Ok(token) if token.first_on_line => None,
-            _ => Some(self.parse_expression()?),
-        };
-
+        let argument = self
+            .statement_not_ended()
+            .then_maybe(|| self.parse_expression())?;
         let span = self.span_from(span_start);
         Ok(ReturnStatement { span, argument }.into())
     }
@@ -159,14 +150,20 @@ where
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, keyword!("throw")));
 
-        let argument = match self.reader.current() {
-            token_matches!(ok: punct!(";")) | Err(_) => None,
-            Ok(token) if token.first_on_line => None,
-            _ => Some(self.parse_expression()?),
-        };
-
+        let argument = self
+            .statement_not_ended()
+            .then_maybe(|| self.parse_expression())?;
         let span = self.span_from(span_start);
         Ok(ThrowStatement { span, argument }.into())
+    }
+
+    /// True if the current token is not preceded by a line feed or is a semi colon.
+    fn statement_not_ended(&self) -> bool {
+        match self.reader.current() {
+            token_matches!(ok: punct!(";")) | Err(_) => false,
+            Ok(token) if token.first_on_line => false,
+            _ => true,
+        }
     }
 
     /// Parses the `DebuggerStatement` goal symbol.
