@@ -1,5 +1,5 @@
 use fajt_lexer::token::Span;
-use fajt_parser::ast::{Ident, ReturnStatement, BreakStatement};
+use fajt_parser::ast::{BreakStatement, ContinueStatement, Ident, ReturnStatement};
 
 #[test]
 fn return_void() {
@@ -48,6 +48,32 @@ fn break_labelled() {
             BreakStatement {
                 span: Span::new(0, 7),
                 label: Some(Ident::new("a", (6, 7)).into()),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn continue_() {
+    parser_test!(
+        input: "continue",
+        output: [
+            ContinueStatement {
+                span: Span::new(0, 8),
+                label: None,
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn continue_labelled() {
+    parser_test!(
+        input: "continue a",
+        output: [
+            ContinueStatement {
+                span: Span::new(0, 10),
+                label: Some(Ident::new("a", (9, 10)).into()),
             }.into()
         ]
     );

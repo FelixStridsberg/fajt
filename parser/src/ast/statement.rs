@@ -12,6 +12,7 @@ pub enum Statement {
     FunctionDeclaration(FunctionDeclaration),
     Return(ReturnStatement),
     Break(BreakStatement),
+    Continue(ContinueStatement),
 }
 
 impl From<BlockStatement> for Statement {
@@ -53,6 +54,12 @@ impl From<ReturnStatement> for Statement {
 impl From<BreakStatement> for Statement {
     fn from(expr: BreakStatement) -> Self {
         Self::Break(expr)
+    }
+}
+
+impl From<ContinueStatement> for Statement {
+    fn from(expr: ContinueStatement) -> Self {
+        Self::Continue(expr)
     }
 }
 
@@ -126,6 +133,12 @@ pub struct ReturnStatement {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct BreakStatement {
+    pub span: Span,
+    pub label: Option<Ident>,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct ContinueStatement {
     pub span: Span,
     pub label: Option<Ident>,
 }
