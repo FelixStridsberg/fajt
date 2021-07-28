@@ -2,7 +2,7 @@ use crate::ast::{
     ArrowFunctionBody, ArrowFunctionExpression, BindingElement, Expression, FormalParameters,
     FunctionDeclaration, FunctionExpression, Ident, Statement,
 };
-use crate::error::{ErrorKind, Result};
+use crate::error::Result;
 use crate::parser::ContextModify;
 use crate::Parser;
 use fajt_common::io::PeekRead;
@@ -24,12 +24,9 @@ where
         asynchronous: bool,
         parameters: FormalParameters,
     ) -> Result<Expression> {
-        let arrow = self.reader.consume()?;
-        if !token_matches!(arrow, punct!("=>")) {
-            return err!(ErrorKind::UnexpectedToken(arrow));
-        }
+        self.consume_known(punct!("=>"))?;
 
-        let body = if token_matches!(self.reader.current()?, punct!("{")) {
+        let body = if self.current_matches(punct!("{")) {
             ArrowFunctionBody::Block(self.parse_function_body()?)
         } else {
             ArrowFunctionBody::Expression(self.parse_assignment_expression()?)
@@ -179,10 +176,8 @@ where
     /// Parses the `FormalParameters` goal symbol.
     pub(crate) fn parse_formal_parameters(&mut self) -> Result<FormalParameters> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
-        if !token_matches!(token, punct!("(")) {
-            return err!(ErrorKind::UnexpectedToken(token));
-        }
+
+        self.consume_known(punct!("("))?;
 
         let mut parameters = Vec::new();
         let mut rest = None;
@@ -218,7 +213,7 @@ where
 
         let mut body = Vec::new();
         loop {
-            if token_matches!(self.reader.current()?, punct!("}")) {
+            if self.current_matches(punct!("}")) {
                 self.reader.consume()?;
                 break;
             }
@@ -230,7 +225,7 @@ where
 
     /// If the current token is '*', it is consumed and true is returned, otherwise false.
     pub(super) fn consume_generator_token(&mut self) -> bool {
-        let generator = token_matches!(self.reader.current(), ok: punct!("*"));
+        let generator = self.current_matches(punct!("*"));
         if generator {
             self.reader.consume().unwrap();
             true
