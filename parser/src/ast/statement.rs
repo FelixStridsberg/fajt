@@ -20,6 +20,7 @@ pub enum Statement {
     With(Box<WithStatement>),
     Try(Box<TryStatement>),
     Switch(Box<SwitchStatement>),
+    DoWhile(Box<DoWhileStatement>),
 }
 
 impl Statement {
@@ -113,6 +114,12 @@ impl From<TryStatement> for Statement {
 impl From<SwitchStatement> for Statement {
     fn from(expr: SwitchStatement) -> Self {
         Self::Switch(Box::new(expr))
+    }
+}
+
+impl From<DoWhileStatement> for Statement {
+    fn from(expr: DoWhileStatement) -> Self {
+        Self::DoWhile(Box::new(expr))
     }
 }
 
@@ -249,4 +256,11 @@ pub struct SwitchCase {
     pub span: Span,
     pub test: Option<Expression>,
     pub consequent: Vec<Statement>,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct DoWhileStatement {
+    pub span: Span,
+    pub body: Statement,
+    pub test: Expression,
 }

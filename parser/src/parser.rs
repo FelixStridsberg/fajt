@@ -13,6 +13,7 @@ mod class;
 mod cover;
 mod expression;
 mod function;
+mod iteration;
 mod literal;
 mod member_access;
 mod statement;

@@ -35,6 +35,7 @@ where
             token_matches!(keyword!("debugger")) => self.parse_debugger_statement()?,
             // TODO LabelledStatement
             // TODO IterationStatement
+            token_matches!(keyword!("do")) => self.parse_do_while_statement()?,
             token_matches!(keyword!("switch")) => self.parse_switch_statement()?,
             _ if self.is_expression_statement()? => self.parse_expression_statement()?,
 
