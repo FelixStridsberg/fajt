@@ -102,7 +102,7 @@ fn with_initializer() {
                 kind: Var,
                 declarations: vec![
                     VariableDeclaration {
-                        span: Span::new(4, 12),
+                        span: Span::new(4, 12), // TODO these should not include semi colon
                         pattern: Ident::new("foo", (4, 7)).into(),
                         initializer: Some(Ident::new("a", (10, 11)).into())
                     }
