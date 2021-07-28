@@ -2,6 +2,7 @@ use super::Ident;
 use crate::ast::{BindingElement, BindingPattern, Expression};
 use fajt_lexer::token::Span;
 
+// TODO harmonize this so it looks like Expression
 /// Note: Declarations are handles as statements since they can appear in the same contexts.
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Statement {
@@ -17,6 +18,17 @@ pub enum Statement {
     Debugger(DebuggerStatement),
     If(Box<IfStatement>),
     With(Box<WithStatement>),
+    Try(Box<TryStatement>),
+}
+
+impl Statement {
+    pub fn unwrap_block_statement(self) -> BlockStatement {
+        if let Statement::Block(block) = self {
+            block
+        } else {
+            panic!("Tried to unwrap {:?} as a block statement", self);
+        }
+    }
 }
 
 impl From<BlockStatement> for Statement {
@@ -88,6 +100,12 @@ impl From<IfStatement> for Statement {
 impl From<WithStatement> for Statement {
     fn from(expr: WithStatement) -> Self {
         Self::With(Box::new(expr))
+    }
+}
+
+impl From<TryStatement> for Statement {
+    fn from(expr: TryStatement) -> Self {
+        Self::Try(Box::new(expr))
     }
 }
 
@@ -195,4 +213,19 @@ pub struct WithStatement {
     pub span: Span,
     pub object: Expression,
     pub body: Statement,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct TryStatement {
+    pub span: Span,
+    pub block: BlockStatement,
+    pub handler: Option<CatchClause>,
+    pub finalizer: Option<BlockStatement>,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct CatchClause {
+    pub span: Span,
+    pub parameter: Option<BindingPattern>,
+    pub body: BlockStatement,
 }

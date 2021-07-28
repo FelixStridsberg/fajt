@@ -1,7 +1,8 @@
 use crate::ast::Statement::Expression;
 use crate::ast::{
-    BlockStatement, BreakStatement, ContinueStatement, DebuggerStatement, EmptyStatement,
-    IfStatement, ReturnStatement, Statement, ThrowStatement, VariableKind, WithStatement,
+    BlockStatement, BreakStatement, CatchClause, ContinueStatement, DebuggerStatement,
+    EmptyStatement, IfStatement, ReturnStatement, Statement, ThrowStatement, TryStatement,
+    VariableKind, WithStatement,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
@@ -31,7 +32,7 @@ where
             token_matches!(keyword!("return")) => self.parse_return_statement()?,
             token_matches!(keyword!("with")) => self.parse_with_statement()?,
             token_matches!(keyword!("throw")) => self.parse_throw_statement()?,
-            token_matches!(keyword!("try")) => todo!("TryStatement"),
+            token_matches!(keyword!("try")) => self.parse_try_statement()?,
             token_matches!(keyword!("debugger")) => self.parse_debugger_statement()?,
             // TODO LabelledStatement
             _ if self.is_expression_statement()? => self.parse_expression_statement()?,
@@ -241,5 +242,50 @@ where
         let body = self.parse_statement()?;
         let span = self.span_from(span_start);
         Ok(WithStatement { span, object, body }.into())
+    }
+
+    /// Parses the `TryStatement` goal symbol.
+    fn parse_try_statement(&mut self) -> Result<Statement> {
+        let span_start = self.position();
+        let token = self.reader.consume()?;
+        debug_assert!(token_matches!(token, keyword!("try")));
+
+        let block = self.parse_block_statement()?.unwrap_block_statement();
+
+        let handler = if token_matches!(self.reader.current(), ok: keyword!("catch")) {
+            let span_start = self.position();
+            self.reader.consume()?;
+            let parameter = if token_matches!(self.reader.current(), ok: punct!("(")) {
+                self.reader.consume()?;
+                let pattern = self.parse_binding_pattern()?;
+                let close_paren = self.reader.consume()?;
+                if !token_matches!(close_paren, punct!(")")) {
+                    return err!(UnexpectedToken(close_paren));
+                }
+                Some(pattern)
+            } else {
+                None
+            };
+
+            let body = self.parse_block_statement()?.unwrap_block_statement();
+
+            let span = self.span_from(span_start);
+            Some(CatchClause {
+                span,
+                parameter,
+                body,
+            })
+        } else {
+            None
+        };
+
+        let span = self.span_from(span_start);
+        Ok(TryStatement {
+            span,
+            block,
+            handler,
+            finalizer: None,
+        }
+        .into())
     }
 }

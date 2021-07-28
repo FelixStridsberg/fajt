@@ -1,5 +1,5 @@
 use fajt_lexer::token::Span;
-use fajt_parser::ast::{Ident, ThrowStatement};
+use fajt_parser::ast::{BlockStatement, CatchClause, Ident, ThrowStatement, TryStatement};
 
 #[test]
 fn return_void() {
@@ -22,6 +22,56 @@ fn return_expression() {
             ThrowStatement {
                 span: Span::new(0, 7),
                 argument: Some(Ident::new("a", (6, 7)).into()),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn try_catch_no_param() {
+    parser_test!(
+        input: "try {} catch {}",
+        output: [
+            TryStatement {
+                span: Span::new(0, 15),
+                block: BlockStatement {
+                    span: Span::new(4, 6),
+                    statements: vec![],
+                }.into(),
+                handler: Some(CatchClause {
+                    span: Span::new(7, 15),
+                    parameter: None,
+                    body: BlockStatement {
+                        span: Span::new(13, 15),
+                        statements: vec![],
+                    }.into(),
+                }),
+                finalizer: None,
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn try_catch_with_param() {
+    parser_test!(
+        input: "try {} catch(e) {}",
+        output: [
+            TryStatement {
+                span: Span::new(0, 18),
+                block: BlockStatement {
+                    span: Span::new(4, 6),
+                    statements: vec![],
+                }.into(),
+                handler: Some(CatchClause {
+                    span: Span::new(7, 18),
+                    parameter: Some(Ident::new("e", (13, 14)).into()),
+                    body: BlockStatement {
+                        span: Span::new(16, 18),
+                        statements: vec![],
+                    }.into(),
+                }),
+                finalizer: None,
             }.into()
         ]
     );
