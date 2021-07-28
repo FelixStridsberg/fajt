@@ -1,4 +1,4 @@
-use crate::ast::{DoWhileStatement, Statement};
+use crate::ast::{DoWhileStatement, Statement, WhileStatement};
 use crate::error::Result;
 use crate::Parser;
 use fajt_common::io::PeekRead;
@@ -25,5 +25,20 @@ where
 
         let span = self.span_from(span_start);
         Ok(DoWhileStatement { span, body, test }.into())
+    }
+
+    pub(super) fn parse_while_statement(&mut self) -> Result<Statement> {
+        let span_start = self.position();
+        self.consume_assert(keyword!("while"))?;
+        self.consume_assert(punct!("("))?;
+
+        let test = self.parse_expression()?;
+
+        self.consume_assert(punct!(")"))?;
+
+        let body = self.parse_statement()?;
+
+        let span = self.span_from(span_start);
+        Ok(WhileStatement { span, test, body }.into())
     }
 }
