@@ -57,3 +57,25 @@ fn block_statement() {
         ]
     );
 }
+
+#[test]
+fn with_statement() {
+    parser_test!(
+        input: "with ({}) {}",
+        output: [
+            WithStatement {
+                span: Span::new(0, 12),
+                object: LiteralExpression {
+                    span: Span::new(6, 8),
+                    literal: Literal::Object(Object {
+                        props: vec![],
+                    })
+                }.into(),
+                body: BlockStatement {
+                    span: Span::new(10, 12),
+                    statements: vec![],
+                }.into(),
+            }.into()
+        ]
+    );
+}

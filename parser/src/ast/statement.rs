@@ -16,6 +16,7 @@ pub enum Statement {
     Throw(ThrowStatement),
     Debugger(DebuggerStatement),
     If(Box<IfStatement>),
+    With(Box<WithStatement>),
 }
 
 impl From<BlockStatement> for Statement {
@@ -81,6 +82,12 @@ impl From<DebuggerStatement> for Statement {
 impl From<IfStatement> for Statement {
     fn from(expr: IfStatement) -> Self {
         Self::If(Box::new(expr))
+    }
+}
+
+impl From<WithStatement> for Statement {
+    fn from(expr: WithStatement) -> Self {
+        Self::With(Box::new(expr))
     }
 }
 
@@ -181,4 +188,11 @@ pub struct IfStatement {
     pub condition: Expression,
     pub consequent: Statement,
     pub alternate: Option<Statement>,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct WithStatement {
+    pub span: Span,
+    pub object: Expression,
+    pub body: Statement,
 }
