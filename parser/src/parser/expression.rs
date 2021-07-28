@@ -3,8 +3,8 @@ use crate::ast::{
     Expression, Ident, Literal, MemberObject, MetaPropertyExpression, NewExpression,
     SequenceExpression, Super, ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
 };
-use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
-use crate::error::Result;
+use crate::error::ErrorKind::SyntaxError;
+use crate::error::{Result, ThenTry};
 use crate::Parser;
 
 use fajt_common::io::PeekRead;
@@ -22,7 +22,7 @@ where
         let span_start = self.position();
         let expression = self.parse_assignment_expression()?;
 
-        if token_matches!(self.reader.current(), ok: punct!(",")) {
+        if self.current_matches(punct!(",")) {
             return self.parse_expression_sequence(span_start, expression);
         }
 
@@ -39,7 +39,7 @@ where
         expressions.push(initial_expression);
 
         loop {
-            if token_matches!(self.reader.current(), ok: punct!(",")) {
+            if self.current_matches(punct!(",")) {
                 self.reader.consume()?;
                 expressions.push(self.parse_assignment_expression()?);
             } else {
@@ -59,8 +59,8 @@ where
             token_matches!(ok: keyword!("async")) => self.parse_assignment_expression_async(),
             token_matches!(ok: punct!("(")) => self.parse_assignment_expression_open_parentheses(),
             _ if self.is_identifier()
-                && token_matches!(self.reader.peek(), opt: punct!("=>"))
-                && !self.reader.peek().unwrap().first_on_line =>
+                && !self.followed_by_new_lined()
+                && self.peek_matches(punct!("=>")) =>
             {
                 let span_start = self.position();
                 let parameters = self.parse_arrow_identifier_argument()?;
@@ -111,9 +111,7 @@ where
         let parenthesized_or_arrow_parameters =
             self.parse_cover_parenthesized_and_arrow_parameters()?;
 
-        if token_matches!(self.reader.current(), ok: punct!("=>"))
-            && !self.reader.current().unwrap().first_on_line
-        {
+        if self.current_matches(punct!("=>")) && !self.reader.current().unwrap().first_on_line {
             let parameters = parenthesized_or_arrow_parameters.into_arrow_parameters()?;
             self.parse_arrow_function_expression(span_start, false, false, parameters)
         } else {
@@ -134,10 +132,10 @@ where
             return self.parse_arrow_function_expression(span_start, true, true, parameters);
         }
 
-        if token_matches!(self.reader.peek(), opt: punct!("(")) {
+        if self.peek_matches(punct!("(")) {
             let span_start = self.position();
             let call_or_arrow_parameters = self.parse_cover_call_and_async_arrow_head()?;
-            if token_matches!(self.reader.current(), ok: punct!("=>")) {
+            if self.current_matches(punct!("=>")) {
                 let parameters = call_or_arrow_parameters.into_arrow_parameters()?;
                 self.parse_arrow_function_expression(span_start, false, true, parameters)
             } else {
@@ -171,11 +169,7 @@ where
             self.reader.consume()?;
         }
 
-        let argument = if has_argument {
-            Some(self.parse_assignment_expression()?)
-        } else {
-            None
-        };
+        let argument = has_argument.then_try(|| self.parse_assignment_expression())?;
         let span = self.span_from(span_start);
         Ok(YieldExpression {
             span,
@@ -190,14 +184,11 @@ where
         let span_start = self.position();
         let expression = self.parse_short_circuit_expression()?;
 
-        if token_matches!(self.reader.current(), ok: punct!("?")) {
+        if self.current_matches(punct!("?")) {
             self.reader.consume()?;
             let consequent = self.parse_assignment_expression()?;
 
-            let token = self.reader.consume()?;
-            if !token_matches!(token, punct!(":")) {
-                return err!(UnexpectedToken(token));
-            }
+            self.consume_known(punct!(":"))?;
 
             let alternate = self.parse_assignment_expression()?;
             let span = self.span_from(span_start);
@@ -302,19 +293,13 @@ where
     pub(super) fn parse_left_hand_side_expression(&mut self) -> Result<Expression> {
         let span_start = self.position();
         let expression = match self.reader.current() {
-            token_matches!(ok: keyword!("new"))
-                if !token_matches!(self.reader.peek(), opt: punct!(".")) =>
-            {
+            token_matches!(ok: keyword!("new")) if !self.peek_matches(punct!(".")) => {
                 self.parse_new_expression()
             }
-            token_matches!(ok: keyword!("super"))
-                if token_matches!(self.reader.peek(), opt: punct!("(")) =>
-            {
+            token_matches!(ok: keyword!("super")) if self.peek_matches(punct!("(")) => {
                 self.parse_super_call_expression()
             }
-            token_matches!(ok: keyword!("import"))
-                if token_matches!(self.reader.peek(), opt: punct!("(")) =>
-            {
+            token_matches!(ok: keyword!("import")) if self.peek_matches(punct!("(")) => {
                 self.parse_import_call_expression()
             }
             _ => {
@@ -349,7 +334,7 @@ where
             }
         }?;
 
-        if token_matches!(self.reader.current(), ok: punct!("?.")) {
+        if self.current_matches(punct!("?.")) {
             // The NewExpression goal symbol handles nested news and is not included in the
             // OptionalExpression goal symbol as a base for the chain.
             if expression.is_nested_new() {
@@ -399,17 +384,10 @@ where
 
     fn parse_import_argument(&mut self) -> Result<(Span, Vec<Argument>)> {
         let span_start = self.position();
-        let open_parentheses = self.reader.consume()?;
-        if !token_matches!(open_parentheses, punct!("(")) {
-            return err!(UnexpectedToken(open_parentheses));
-        }
 
+        self.consume_known(punct!("("))?;
         let expression = self.parse_assignment_expression()?;
-
-        let close_parentheses = self.reader.consume()?;
-        if !token_matches!(close_parentheses, punct!(")")) {
-            return err!(UnexpectedToken(open_parentheses));
-        }
+        self.consume_known(punct!(")"))?;
 
         let span = self.span_from(span_start);
         Ok((span, vec![Argument::Expression(expression)]))
@@ -417,21 +395,18 @@ where
 
     /// Parses the `NewExpression` goal symbol.
     fn parse_new_expression(&mut self) -> Result<Expression> {
-        if token_matches!(self.reader.current(), ok: keyword!("new"))
-            && !token_matches!(self.reader.peek(), opt: punct!("."))
-        {
+        if self.current_matches(keyword!("new")) && !self.current_matches(punct!(".")) {
             let span_start = self.position();
             self.reader.consume()?;
 
             let callee = self.parse_new_expression()?;
 
-            let (arguments_span, arguments) =
-                if token_matches!(self.reader.current(), ok: punct!("(")) {
-                    self.parse_arguments()
-                        .map(|(span, args)| (Some(span), args))?
-                } else {
-                    (None, Vec::new())
-                };
+            let (arguments_span, arguments) = if self.current_matches(punct!("(")) {
+                self.parse_arguments()
+                    .map(|(span, args)| (Some(span), args))?
+            } else {
+                (None, Vec::new())
+            };
 
             let span = self.span_from(span_start);
             Ok(NewExpression {
@@ -500,7 +475,6 @@ where
 
     /// Parses the non recursive parts of `MemberExpressions`.
     fn parse_member_expression_non_recursive(&mut self) -> Result<Expression> {
-        let peek = self.reader.peek();
         match self.reader.current()? {
             token_matches!(keyword!("super")) => {
                 let span_start = self.position();
@@ -517,7 +491,7 @@ where
                     }),
                 )
             }
-            token_matches!(keyword!("new")) if token_matches!(peek, opt: punct!(".")) => {
+            token_matches!(keyword!("new")) if self.peek_matches(punct!(".")) => {
                 let span_start = self.position();
                 let new_token = self.reader.consume()?;
                 self.reader.consume()?; // .
@@ -535,7 +509,7 @@ where
                 }
                 .into())
             }
-            token_matches!(keyword!("import")) if token_matches!(peek, opt: punct!(".")) => {
+            token_matches!(keyword!("import")) if self.peek_matches(punct!(".")) => {
                 let span_start = self.position();
                 let import_token = self.reader.consume()?;
                 self.reader.consume()?; // .
@@ -595,7 +569,7 @@ where
         let ident = self.parse_identifier()?;
 
         // Consume potential trailing semi colon TODO how to handle these in general?
-        if token_matches!(self.reader.current(), ok: punct!(";")) {
+        if self.current_matches(punct!(";")) {
             self.reader.consume()?;
         }
 
