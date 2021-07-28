@@ -145,3 +145,25 @@ fn switch_default_empty_case() {
         ]
     );
 }
+
+#[test]
+fn switch_default() {
+    parser_test!(
+        input: "switch (a) { default: b }",
+        output: [
+            SwitchStatement {
+                span: Span::new(0, 25),
+                discriminant: Ident::new("a", (8, 9)).into(),
+                cases: vec![
+                    SwitchCase {
+                        span: Span::new(13, 23),
+                        test: None,
+                        consequent: vec![
+                            Statement::Expression(Ident::new("b", (22, 23)).into())
+                        ],
+                    }
+                ],
+            }.into()
+        ]
+    );
+}

@@ -305,7 +305,7 @@ where
                 break;
             }
 
-            todo!("Parse statements")
+            statements.push(self.parse_statement()?);
         }
 
         Ok(statements)
