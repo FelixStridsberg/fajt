@@ -563,12 +563,6 @@ where
     /// Parses the `IdentifierReference` goal symbol.
     fn parse_identifier_reference(&mut self) -> Result<Expression> {
         let ident = self.parse_identifier()?;
-
-        // Consume potential trailing semi colon TODO how to handle these in general?
-        if self.current_matches(punct!(";")) {
-            self.reader.consume()?;
-        }
-
         Ok(ident.into())
     }
 

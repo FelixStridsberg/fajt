@@ -65,11 +65,6 @@ where
             }
         }
 
-        // TODO this should be handled generally (and probably not be part of the span?)
-        if self.reader.current()?.value == punct!(";") {
-            self.reader.consume()?;
-        }
-
         let span = self.span_from(span_start);
         Ok(ObjectBinding { span, props, rest }.into())
     }

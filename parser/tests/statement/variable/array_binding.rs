@@ -13,7 +13,7 @@ fn empty() {
                 kind: Var,
                 declarations: vec![
                     VariableDeclaration {
-                        span: Span::new(4, 11),
+                        span: Span::new(4, 10),
                         pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 6),
@@ -39,7 +39,7 @@ fn identifier_binding() {
                 kind: Var,
                 declarations: vec![
                     VariableDeclaration {
-                        span: Span::new(4, 14),
+                        span: Span::new(4, 13),
                         pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 9),
@@ -71,7 +71,7 @@ fn identifier_binding_with_initializer() {
                 kind: Var,
                 declarations: vec![
                     VariableDeclaration {
-                        span: Span::new(4, 18),
+                        span: Span::new(4, 17),
                         pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 13),
@@ -103,7 +103,7 @@ fn trailing_comma() {
                 kind: Var,
                 declarations: vec![
                     VariableDeclaration {
-                        span: Span::new(4, 15),
+                        span: Span::new(4, 14),
                         pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 10),
@@ -135,7 +135,7 @@ fn single_elision() {
                 kind: Var,
                 declarations: vec![
                     VariableDeclaration {
-                        span: Span::new(4, 14),
+                        span: Span::new(4, 13),
                         pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 9),
@@ -161,7 +161,7 @@ fn rest_element() {
                 kind: Var,
                 declarations: vec![
                     VariableDeclaration {
-                        span: Span::new(4, 17),
+                        span: Span::new(4, 16),
                         pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 12),
@@ -187,7 +187,7 @@ fn mixed_elision_and_identifiers() {
                 kind: Var,
                 declarations: vec![
                     VariableDeclaration {
-                        span: Span::new(4, 19),
+                        span: Span::new(4, 18),
                         pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 14),
@@ -228,7 +228,7 @@ fn await_as_identifier() {
                 kind: Var,
                 declarations: vec![
                     VariableDeclaration {
-                        span: Span::new(4, 28),
+                        span: Span::new(4, 27),
                         pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 23),
@@ -264,7 +264,7 @@ fn yield_as_identifier() {
                 kind: Var,
                 declarations: vec![
                     VariableDeclaration {
-                        span: Span::new(4, 28),
+                        span: Span::new(4, 27),
                         pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 23),
@@ -314,7 +314,7 @@ fn nested_object_binding() {
                 kind: Var,
                 declarations: vec![
                     VariableDeclaration {
-                        span: Span::new(4, 18),
+                        span: Span::new(4, 17),
                         pattern: BindingPattern::Array(
                             ArrayBinding {
                                 span: Span::new(4, 13),
