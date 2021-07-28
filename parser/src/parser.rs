@@ -1,6 +1,6 @@
 use fajt_common::io::{PeekRead, PeekReader};
 use fajt_lexer::punct;
-use fajt_lexer::token::{KeywordContext, Span, Token, TokenValue};
+use fajt_lexer::token::{Keyword, KeywordContext, Span, Token, TokenValue};
 use fajt_lexer::token_matches;
 
 use crate::ast::{Expression, Ident, Program, PropertyName};
@@ -130,6 +130,22 @@ where
         Parser {
             context: self.context.modify(modify),
             reader: &mut self.reader,
+        }
+    }
+
+    fn current_matches(&self, value: TokenValue) -> bool {
+        if let Ok(token) = self.reader.current() {
+            token.value == value
+        } else {
+            false
+        }
+    }
+
+    fn peek_matches(&self, value: TokenValue) -> bool {
+        if let Some(token) = self.reader.peek() {
+            token.value == value
+        } else {
+            false
         }
     }
 

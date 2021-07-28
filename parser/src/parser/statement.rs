@@ -39,9 +39,7 @@ where
 
             // Declarations are handles as statements
             token_matches!(keyword!("function")) => self.parse_function_declaration()?,
-            token_matches!(keyword!("async"))
-                if token_matches!(self.reader.peek(), opt: keyword!("function")) =>
-            {
+            token_matches!(keyword!("async")) if self.peek_matches(keyword!("function")) => {
                 self.parse_async_function_declaration()?
             }
 
@@ -60,15 +58,11 @@ where
             return Ok(false);
         }
 
-        if matches!(token.value, keyword!("let"))
-            && token_matches!(self.reader.peek(), opt: punct!("["))
-        {
+        if matches!(token.value, keyword!("let")) && self.peek_matches(punct!("[")) {
             return Ok(false);
         }
 
-        if matches!(token.value, keyword!("async"))
-            && token_matches!(self.reader.peek(), opt: keyword!("function"))
-        {
+        if matches!(token.value, keyword!("async")) && self.peek_matches(keyword!("function")) {
             return Ok(self.followed_by_new_lined());
         }
 
@@ -204,11 +198,10 @@ where
 
         let consequent = self.parse_statement()?;
 
-        let alternate =
-            token_matches!(self.reader.current(), ok: keyword!("else")).then_maybe(|| {
-                self.reader.consume()?;
-                self.parse_statement()
-            })?;
+        let alternate = self.current_matches(keyword!("else")).then_maybe(|| {
+            self.reader.consume()?;
+            self.parse_statement()
+        })?;
 
         let span = self.span_from(span_start);
         Ok(IfStatement {
@@ -250,13 +243,13 @@ where
         debug_assert!(token_matches!(token, keyword!("try")));
 
         let block = self.parse_block_statement()?.unwrap_block_statement();
-        let handler = token_matches!(self.reader.current(), ok: keyword!("catch"))
+        let handler = self
+            .current_matches(keyword!("catch"))
             .then_maybe(|| self.parse_catch_clause())?;
-        let finalizer =
-            token_matches!(self.reader.current(), ok: keyword!("finally")).then_maybe(|| {
-                self.reader.consume()?;
-                Ok(self.parse_block_statement()?.unwrap_block_statement())
-            })?;
+        let finalizer = self.current_matches(keyword!("finally")).then_maybe(|| {
+            self.reader.consume()?;
+            Ok(self.parse_block_statement()?.unwrap_block_statement())
+        })?;
 
         let span = self.span_from(span_start);
         Ok(TryStatement {
@@ -271,16 +264,15 @@ where
     fn parse_catch_clause(&mut self) -> Result<CatchClause> {
         let span_start = self.position();
         self.reader.consume()?;
-        let parameter =
-            token_matches!(self.reader.current(), ok: punct!("(")).then_maybe(|| {
-                self.reader.consume()?;
-                let pattern = self.parse_binding_pattern()?;
-                let close_paren = self.reader.consume()?;
-                if !token_matches!(close_paren, punct!(")")) {
-                    return err!(UnexpectedToken(close_paren));
-                }
-                Ok(pattern)
-            })?;
+        let parameter = self.current_matches(punct!("(")).then_maybe(|| {
+            self.reader.consume()?;
+            let pattern = self.parse_binding_pattern()?;
+            let close_paren = self.reader.consume()?;
+            if !token_matches!(close_paren, punct!(")")) {
+                return err!(UnexpectedToken(close_paren));
+            }
+            Ok(pattern)
+        })?;
 
         let body = self.parse_block_statement()?.unwrap_block_statement();
 
