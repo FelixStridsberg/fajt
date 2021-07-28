@@ -4,7 +4,7 @@ use crate::ast::{
     EmptyStatement, IfStatement, ReturnStatement, Statement, ThrowStatement, TryStatement,
     VariableKind, WithStatement,
 };
-use crate::error::{Result, ThenMaybe};
+use crate::error::{Result, ThenTry};
 use crate::Parser;
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
@@ -109,7 +109,7 @@ where
 
         let label = self
             .statement_not_ended()
-            .then_maybe(|| self.parse_identifier())?;
+            .then_try(|| self.parse_identifier())?;
         let span = self.span_from(span_start);
         Ok(BreakStatement { span, label }.into())
     }
@@ -122,7 +122,7 @@ where
 
         let label = self
             .statement_not_ended()
-            .then_maybe(|| self.parse_identifier())?;
+            .then_try(|| self.parse_identifier())?;
         let span = self.span_from(span_start);
         Ok(ContinueStatement { span, label }.into())
     }
@@ -135,7 +135,7 @@ where
 
         let argument = self
             .statement_not_ended()
-            .then_maybe(|| self.parse_expression())?;
+            .then_try(|| self.parse_expression())?;
         let span = self.span_from(span_start);
         Ok(ReturnStatement { span, argument }.into())
     }
@@ -148,7 +148,7 @@ where
 
         let argument = self
             .statement_not_ended()
-            .then_maybe(|| self.parse_expression())?;
+            .then_try(|| self.parse_expression())?;
         let span = self.span_from(span_start);
         Ok(ThrowStatement { span, argument }.into())
     }
@@ -181,7 +181,7 @@ where
         self.consume_known(punct!(")"))?;
 
         let consequent = self.parse_statement()?;
-        let alternate = self.current_matches(keyword!("else")).then_maybe(|| {
+        let alternate = self.current_matches(keyword!("else")).then_try(|| {
             self.reader.consume()?;
             self.parse_statement()
         })?;
@@ -220,8 +220,8 @@ where
         let block = self.parse_block_statement()?.unwrap_block_statement();
         let handler = self
             .current_matches(keyword!("catch"))
-            .then_maybe(|| self.parse_catch_clause())?;
-        let finalizer = self.current_matches(keyword!("finally")).then_maybe(|| {
+            .then_try(|| self.parse_catch_clause())?;
+        let finalizer = self.current_matches(keyword!("finally")).then_try(|| {
             self.reader.consume()?;
             Ok(self.parse_block_statement()?.unwrap_block_statement())
         })?;
@@ -241,7 +241,7 @@ where
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, keyword!("catch")));
 
-        let parameter = self.current_matches(punct!("(")).then_maybe(|| {
+        let parameter = self.current_matches(punct!("(")).then_try(|| {
             self.reader.consume()?;
             let pattern = self.parse_binding_pattern()?;
             self.consume_known(punct!(")"))?;
