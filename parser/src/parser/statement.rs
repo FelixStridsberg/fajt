@@ -1,4 +1,3 @@
-use crate::ast::Statement::Expression;
 use crate::ast::{
     BlockStatement, BreakStatement, CatchClause, ContinueStatement, DebuggerStatement,
     EmptyStatement, IfStatement, ReturnStatement, Statement, SwitchCase, SwitchStatement,
@@ -100,13 +99,13 @@ where
             self.reader.consume()?;
         }
 
-        Ok(Expression(expr))
+        Ok(expr.into())
     }
 
     /// Parses the `EmptyStatement` goal symbol.
     fn parse_empty_statement(&mut self) -> Result<Statement> {
         let token = self.consume_assert(punct!(";"))?;
-        Ok(Statement::Empty(EmptyStatement { span: token.span }))
+        Ok(EmptyStatement { span: token.span }.into())
     }
 
     /// Parses the `BreakStatement` goal symbol.
