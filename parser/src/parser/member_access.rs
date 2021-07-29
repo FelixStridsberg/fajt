@@ -100,11 +100,11 @@ where
             token_matches!(ok: punct!("?.")) if self.peek_matches(punct!("[")) => {
                 self.reader.consume()?;
                 let property = self.parse_computed_property()?;
-                Ok(MemberProperty::Expression(property.into()))
+                Ok(MemberProperty::Expr(property.into()))
             }
             token_matches!(ok: punct!("[")) => {
                 let property = self.parse_computed_property()?;
-                Ok(MemberProperty::Expression(property.into()))
+                Ok(MemberProperty::Expr(property.into()))
             }
             token_matches!(ok: punct!("?.")) | token_matches!(ok: punct!(".")) => {
                 self.reader.consume()?;
@@ -124,7 +124,7 @@ where
             }
             token_matches!(ok: punct!("[")) => {
                 let member = self.parse_computed_property()?;
-                Ok(MemberProperty::Expression(member.into()))
+                Ok(MemberProperty::Expr(member.into()))
             }
             _ => unreachable!(),
         }

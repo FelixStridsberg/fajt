@@ -313,7 +313,7 @@ where
                             let span = self.span_from(span_start);
                             expression = ExprCall {
                                 span,
-                                callee: Callee::Expression(expression.into()),
+                                callee: Callee::Expr(expression.into()),
                                 arguments_span,
                                 arguments,
                             }
@@ -322,7 +322,7 @@ where
                         token_matches!(ok: punct!(".")) | token_matches!(ok: punct!("[")) => {
                             expression = self.parse_member_expression_right_side(
                                 span_start,
-                                MemberObject::Expression(expression.into()),
+                                MemberObject::Expr(expression.into()),
                             )?;
                         }
                         // TODO CallExpression TemplateLiteral
@@ -390,7 +390,7 @@ where
         self.consume_assert(punct!(")"))?;
 
         let span = self.span_from(span_start);
-        Ok((span, vec![Argument::Expression(expression)]))
+        Ok((span, vec![Argument::Expr(expression)]))
     }
 
     /// Parses the `NewExpression` goal symbol.
@@ -440,7 +440,7 @@ where
                     self.consume_parameter_delimiter()?;
                 }
                 _ => {
-                    arguments.push(Argument::Expression(self.parse_assignment_expression()?));
+                    arguments.push(Argument::Expr(self.parse_assignment_expression()?));
                     self.consume_parameter_delimiter()?;
                 }
             }
@@ -460,7 +460,7 @@ where
             if token_matches!(self.reader.current(), ok: punct!(".") | punct!("[")) {
                 expression = self.parse_member_expression_right_side(
                     span_start,
-                    MemberObject::Expression(expression.into()),
+                    MemberObject::Expr(expression.into()),
                 )?;
             } else {
                 break;

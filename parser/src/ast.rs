@@ -1,9 +1,9 @@
 pub use binding::*;
 pub use class::*;
 pub(crate) use cover::*;
-pub use expression::*;
+pub use expr::*;
 pub use literal::*;
-pub use statement::*;
+pub use stmt::*;
 
 use fajt_lexer::token::Span;
 
@@ -12,11 +12,11 @@ mod macros;
 
 mod binding;
 #[macro_use]
-mod expression;
+mod expr;
 mod class;
 mod cover;
 mod literal;
-mod statement;
+mod stmt;
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct Body<T> {

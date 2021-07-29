@@ -13,7 +13,7 @@ fn do_while() {
         output: [
             StmtDoWhile {
                 span: Span::new(0, 18),
-                body: Stmt::expression(Ident::new("a", (3, 4))).into(),
+                body: Stmt::expr(Ident::new("a", (3, 4))).into(),
                 test: ExprLiteral {
                     span: Span::new(13, 17),
                     literal: Literal::Boolean(true),
@@ -34,7 +34,7 @@ fn r#while() {
                     span: Span::new(7, 11),
                     literal: Literal::Boolean(true),
                 }.into(),
-                body: Stmt::expression(Ident::new("a", (13, 14))).into(),
+                body: Stmt::expr(Ident::new("a", (13, 14))).into(),
             }.into()
         ]
     );

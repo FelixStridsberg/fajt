@@ -60,7 +60,7 @@ fn new_empty_arguments_member() {
                 span: Span::new(0, 9),
                 callee: ExprMember {
                     span: Span::new(4, 7),
-                    object: MemberObject::Expression(
+                    object: MemberObject::Expr(
                         ExprIdentifier::Ident(Ident::new("a", (4, 5))).into()
                     ),
                     property: MemberProperty::Ident(Ident::new("b", (6, 7))),
@@ -82,10 +82,10 @@ fn new_with_arguments() {
                 callee: ExprIdentifier::Ident(Ident::new("a", (4, 5))).into(),
                 arguments_span: Some(Span::new(5, 15)),
                 arguments: vec![
-                    Argument::Expression(
+                    Argument::Expr(
                         ExprIdentifier::Ident(Ident::new("b", (6, 7))).into()
                     ),
-                    Argument::Expression(
+                    Argument::Expr(
                         ExprUnary {
                             span: Span::new(9, 14),
                             operator: UnaryOperator::Not,
@@ -112,7 +112,7 @@ fn new_with_spread_arguments() {
                 arguments_span: Some(Span::new(5, 21)),
                 arguments: vec![
                     Argument::Spread(ExprIdentifier::Ident(Ident::new("b", (9, 10))).into()),
-                    Argument::Expression(ExprIdentifier::Ident(Ident::new("c", (12, 13))).into()),
+                    Argument::Expr(ExprIdentifier::Ident(Ident::new("c", (12, 13))).into()),
                     Argument::Spread(
                         ExprLiteral {
                             span: Span::new(18, 20),

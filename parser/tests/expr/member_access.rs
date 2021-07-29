@@ -9,7 +9,7 @@ fn identifier() {
         expr_output: [
             ExprMember {
                 span: Span::new(0, 3),
-                object: MemberObject::Expression(
+                object: MemberObject::Expr(
                     ExprIdentifier::Ident(Ident::new("a", (0, 1))).into()
                 ),
                 property: MemberProperty::Ident(Ident::new("b", (2, 3))),
@@ -43,10 +43,10 @@ fn identifier_nested() {
         expr_output: [
             ExprMember {
                 span: Span::new(0, 5),
-                object: MemberObject::Expression(
+                object: MemberObject::Expr(
                     ExprMember {
                         span: Span::new(0, 3),
-                        object: MemberObject::Expression(
+                        object: MemberObject::Expr(
                             ExprIdentifier::Ident(Ident::new("a", (0, 1))).into()
                         ),
                         property: MemberProperty::Ident(Ident::new("b", (2, 3))),
@@ -65,10 +65,10 @@ fn computed() {
         expr_output: [
             ExprMember {
                 span: Span::new(0, 4),
-                object: MemberObject::Expression(
+                object: MemberObject::Expr(
                     ExprIdentifier::Ident(Ident::new("a", (0, 1))).into()
                 ),
-                property: MemberProperty::Expression(
+                property: MemberProperty::Expr(
                     ExprIdentifier::Ident(Ident::new("b", (2, 3))).into()
                 ),
             }.into()
@@ -86,7 +86,7 @@ fn super_computed() {
                 object: MemberObject::Super(Super {
                     span: Span::new(0, 5)
                 }),
-                property: MemberProperty::Expression(
+                property: MemberProperty::Expr(
                     ExprIdentifier::Ident(Ident::new("b", (6, 7))).into()
                 ),
             }.into()
@@ -101,18 +101,18 @@ fn computed_nested() {
         expr_output: [
             ExprMember {
                 span: Span::new(0, 7),
-                object: MemberObject::Expression(
+                object: MemberObject::Expr(
                     ExprMember {
                         span: Span::new(0, 4),
-                        object: MemberObject::Expression(
+                        object: MemberObject::Expr(
                             ExprIdentifier::Ident(Ident::new("a", (0, 1))).into()
                         ),
-                        property: MemberProperty::Expression(
+                        property: MemberProperty::Expr(
                             ExprIdentifier::Ident(Ident::new("b", (2, 3))).into()
                         ),
                     }.into(),
                 ),
-                property: MemberProperty::Expression(
+                property: MemberProperty::Expr(
                     ExprIdentifier::Ident(Ident::new("c", (5, 6))).into()
                 ),
             }.into()
@@ -127,16 +127,16 @@ fn nested_mixed() {
         expr_output: [
             ExprMember {
                 span: Span::new(0, 9),
-                object: MemberObject::Expression(
+                object: MemberObject::Expr(
                     ExprMember {
                         span: Span::new(0, 6),
-                        object: MemberObject::Expression(
+                        object: MemberObject::Expr(
                             ExprMember {
                                 span: Span::new(0, 4),
-                                object: MemberObject::Expression(
+                                object: MemberObject::Expr(
                                     ExprIdentifier::Ident(Ident::new("a", (0, 1))).into()
                                 ),
-                                property: MemberProperty::Expression(
+                                property: MemberProperty::Expr(
                                     ExprIdentifier::Ident(Ident::new("b", (2, 3))).into()
                                 )
                             }.into(),
@@ -144,7 +144,7 @@ fn nested_mixed() {
                         property: MemberProperty::Ident(Ident::new("c", (5, 6))),
                     }.into(),
                 ),
-                property: MemberProperty::Expression(
+                property: MemberProperty::Expr(
                     ExprIdentifier::Ident(Ident::new("d", (7, 8))).into()
                 ),
             }.into()
@@ -203,7 +203,7 @@ fn optional_member_computed() {
             ExprOptionalMember {
                 span: Span::new(0, 6),
                 object: Ident::new("a", (0, 1)).into(),
-                property: MemberProperty::Expression(Ident::new("b", (4, 5)).into()),
+                property: MemberProperty::Expr(Ident::new("b", (4, 5)).into()),
                 optional: true,
             }.into()
         ]
@@ -246,13 +246,13 @@ fn optional_member_mixed() {
                     span: Span::new(0, 6),
                     object: ExprMember {
                         span: Span::new(0, 3),
-                        object: MemberObject::Expression(Ident::new("a", (0, 1)).into()),
+                        object: MemberObject::Expr(Ident::new("a", (0, 1)).into()),
                         property: MemberProperty::Ident(Ident::new("b", (2, 3))),
                     }.into(),
                     property: MemberProperty::Ident(Ident::new("c", (5, 6))),
                     optional: true,
                 }.into(),
-                property: MemberProperty::Expression(Ident::new("d", (7, 8)).into()),
+                property: MemberProperty::Expr(Ident::new("d", (7, 8)).into()),
                 optional: false,
             }.into()
         ]
@@ -270,7 +270,7 @@ fn fail_invalid_optional_chain_from_new_expression() {
     parser_test!(
         input: "new new a()?.b",
         expr_error: SyntaxError(
-            "Invalid optional chain from new expression".to_owned(),
+            "Invalid optional chain from new expr".to_owned(),
             Span::new(11, 13)
         )
     );
@@ -363,7 +363,7 @@ fn optional_chain_mixed_call_and_member() {
                             span: Span::new(0, 6),
                             object: ExprMember {
                                 span: Span::new(0, 3),
-                                object: MemberObject::Expression(Ident::new("a", (0, 1)).into()),
+                                object: MemberObject::Expr(Ident::new("a", (0, 1)).into()),
                                 property: MemberProperty::Ident(Ident::new("b", (2, 3))),
                             }.into(),
                             property: MemberProperty::Ident(Ident::new("c", (5, 6))),

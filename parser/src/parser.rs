@@ -7,16 +7,16 @@ use crate::ast::{Expr, Ident, Program, PropertyName};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 
-mod binary_expression;
+mod binary_expr;
 mod binding;
 mod class;
 mod cover;
-mod expression;
+mod expr;
 mod function;
 mod iteration;
 mod literal;
 mod member_access;
-mod statement;
+mod stmt;
 mod variable;
 
 #[derive(Default)]

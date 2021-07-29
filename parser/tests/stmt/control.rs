@@ -89,7 +89,7 @@ fn if_no_else() {
             StmtIf {
                 span: Span::new(0, 10),
                 condition: Ident::new("a", (5, 6)).into(),
-                consequent: Stmt::expression(Ident::new("b", (9, 10))).into(),
+                consequent: Stmt::expr(Ident::new("b", (9, 10))).into(),
                 alternate: None,
             }.into()
         ]
@@ -104,8 +104,8 @@ fn if_with_else() {
             StmtIf {
                 span: Span::new(0, 17),
                 condition: Ident::new("a", (5, 6)).into(),
-                consequent: Stmt::expression(Ident::new("b", (9, 10))).into(),
-                alternate: Some(Stmt::expression(Ident::new("c", (16, 17))).into()),
+                consequent: Stmt::expr(Ident::new("b", (9, 10))).into(),
+                alternate: Some(Stmt::expr(Ident::new("c", (16, 17))).into()),
             }.into()
         ]
     );
@@ -158,7 +158,7 @@ fn switch_default() {
                         span: Span::new(13, 23),
                         test: None,
                         consequent: vec![
-                            Stmt::expression(Ident::new("b", (22, 23)))
+                            Stmt::expr(Ident::new("b", (22, 23)))
                         ],
                     }
                 ],
@@ -200,8 +200,8 @@ fn switch_case() {
                         span: Span::new(13, 25),
                         test: Some(Ident::new("b", (18, 19)).into()),
                         consequent: vec![
-                            Stmt::expression(Ident::new("c", (21, 22))),
-                            Stmt::expression(Ident::new("d", (24, 25))),
+                            Stmt::expr(Ident::new("c", (21, 22))),
+                            Stmt::expr(Ident::new("d", (24, 25))),
                         ],
                     }
                 ],
@@ -228,7 +228,7 @@ fn switch_mixed() {
                         span: Span::new(21, 31),
                         test: Some(Ident::new("c", (26, 27)).into()),
                         consequent: vec![
-                            Stmt::expression(Ident::new("d", (29, 30))),
+                            Stmt::expr(Ident::new("d", (29, 30))),
                         ],
                     },
                     SwitchCase {

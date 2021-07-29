@@ -29,11 +29,11 @@ ast_enum! {
 }
 
 impl Stmt {
-    pub fn expression<E>(expression: E) -> Self
+    pub fn expr<E>(expr: E) -> Self
     where
         E: Into<Expr>,
     {
-        Self::Expression(expression.into())
+        Self::Expression(expr.into())
     }
 
     pub fn unwrap_block_statement(self) -> StmtBlock {

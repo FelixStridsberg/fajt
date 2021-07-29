@@ -275,7 +275,7 @@ pub struct ExprArrowFunction {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum ArrowFunctionBody {
-    Expression(Box<Expr>),
+    Expr(Box<Expr>),
     Block(Vec<Stmt>),
 }
 
@@ -302,7 +302,7 @@ pub struct ExprOptionalMember {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum MemberObject {
-    Expression(Box<Expr>),
+    Expr(Box<Expr>),
     Super(Super),
 }
 
@@ -314,7 +314,7 @@ pub struct Super {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum MemberProperty {
     Ident(Ident),
-    Expression(Box<Expr>),
+    Expr(Box<Expr>),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -334,7 +334,7 @@ pub struct ExprNew {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Argument {
-    Expression(Expr),
+    Expr(Expr),
     Spread(Expr),
 }
 
@@ -403,5 +403,5 @@ pub struct ExprOptionalCall {
 pub enum Callee {
     Super,
     Import,
-    Expression(Box<Expr>),
+    Expr(Box<Expr>),
 }
