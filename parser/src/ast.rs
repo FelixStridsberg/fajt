@@ -7,6 +7,9 @@ pub use statement::*;
 
 use fajt_lexer::token::Span;
 
+#[macro_use]
+mod macros;
+
 mod binding;
 #[macro_use]
 mod expression;

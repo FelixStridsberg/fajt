@@ -5,30 +5,32 @@ use crate::ast::class::ExprClass;
 use crate::ast::literal::*;
 use crate::ast::{FormalParameters, Ident, Stmt};
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum Expr {
-    ArrowFunction(ExprArrowFunction),
-    Assignment(ExprAssignment),
-    Await(ExprAwait),
-    Binary(ExprBinary),
-    Call(ExprCall),
-    Class(ExprClass),
-    Conditional(ExprConditional),
-    Function(ExprFunction),
-    Identifier(ExprIdentifier),
-    Literal(ExprLiteral),
-    Logical(ExprLogical),
-    Member(ExprMember),
-    MetaProperty(ExprMetaProperty),
-    New(ExprNew),
-    OptionalCall(ExprOptionalCall),
-    OptionalMember(ExprOptionalMember),
-    Parenthesized(ExprParenthesized),
-    Sequence(ExprSequence),
-    This(ExprThis),
-    Unary(ExprUnary),
-    Update(ExprUpdate),
-    Yield(ExprYield),
+ast_enum! {
+    #[derive(Debug, PartialOrd, PartialEq)]
+    pub enum Expr {
+        ArrowFunction(ExprArrowFunction),
+        Assignment(ExprAssignment),
+        Await(ExprAwait),
+        Binary(ExprBinary),
+        Call(ExprCall),
+        Class(ExprClass),
+        Conditional(ExprConditional),
+        Function(ExprFunction),
+        Identifier(ExprIdentifier),
+        Literal(ExprLiteral),
+        Logical(ExprLogical),
+        Member(ExprMember),
+        MetaProperty(ExprMetaProperty),
+        New(ExprNew),
+        OptionalCall(ExprOptionalCall),
+        OptionalMember(ExprOptionalMember),
+        Parenthesized(ExprParenthesized),
+        Sequence(ExprSequence),
+        This(ExprThis),
+        Unary(ExprUnary),
+        Update(ExprUpdate),
+        Yield(ExprYield),
+    }
 }
 
 impl Expr {
@@ -41,207 +43,15 @@ impl Expr {
     }
 }
 
-impl From<ExprThis> for Expr {
-    fn from(expr: ExprThis) -> Self {
-        Self::This(expr)
-    }
-}
-
-impl From<ExprLiteral> for Expr {
-    fn from(expr: ExprLiteral) -> Self {
-        Self::Literal(expr)
-    }
-}
-
-impl From<Ident> for Expr {
-    fn from(ident: Ident) -> Self {
-        Self::Identifier(ident.into())
-    }
-}
-
-impl Into<Box<Expr>> for ExprIdentifier {
-    fn into(self) -> Box<Expr> {
-        Box::new(Expr::Identifier(self))
-    }
-}
-
-impl Into<Box<Expr>> for ExprBinary {
-    fn into(self) -> Box<Expr> {
-        Box::new(Expr::Binary(self))
-    }
-}
-
-impl Into<Box<Expr>> for ExprLogical {
-    fn into(self) -> Box<Expr> {
-        Box::new(Expr::Logical(self))
-    }
-}
-
-impl Into<Box<Expr>> for ExprCall {
-    fn into(self) -> Box<Expr> {
-        Box::new(Expr::Call(self))
-    }
-}
-
-impl Into<Box<Expr>> for ExprMember {
-    fn into(self) -> Box<Expr> {
-        Box::new(Expr::Member(self))
-    }
-}
-
-impl Into<Box<Expr>> for ExprLiteral {
-    fn into(self) -> Box<Expr> {
-        Box::new(Expr::Literal(self))
-    }
-}
-
-impl Into<Box<Expr>> for ExprSequence {
-    fn into(self) -> Box<Expr> {
-        Box::new(Expr::Sequence(self))
-    }
-}
-
-impl Into<Box<Expr>> for ExprOptionalMember {
-    fn into(self) -> Box<Expr> {
-        Box::new(Expr::OptionalMember(self))
-    }
-}
-
-impl Into<Box<Expr>> for ExprOptionalCall {
-    fn into(self) -> Box<Expr> {
-        Box::new(Expr::OptionalCall(self))
-    }
-}
-
-impl Into<Box<Expr>> for ExprNew {
-    fn into(self) -> Box<Expr> {
-        Box::new(Expr::New(self))
-    }
-}
-
 impl Into<Box<Expr>> for Ident {
     fn into(self) -> Box<Expr> {
         Box::new(Expr::Identifier(self.into()))
     }
 }
 
-impl From<ExprIdentifier> for Expr {
-    fn from(expr: ExprIdentifier) -> Self {
-        Self::Identifier(expr)
-    }
-}
-
-impl From<ExprBinary> for Expr {
-    fn from(expr: ExprBinary) -> Self {
-        Self::Binary(expr)
-    }
-}
-
-impl From<ExprLogical> for Expr {
-    fn from(expr: ExprLogical) -> Self {
-        Self::Logical(expr)
-    }
-}
-
-impl From<ExprUnary> for Expr {
-    fn from(expr: ExprUnary) -> Self {
-        Self::Unary(expr)
-    }
-}
-
-impl From<ExprUpdate> for Expr {
-    fn from(expr: ExprUpdate) -> Self {
-        Self::Update(expr)
-    }
-}
-
-impl From<ExprConditional> for Expr {
-    fn from(expr: ExprConditional) -> Self {
-        Self::Conditional(expr)
-    }
-}
-
-impl From<ExprYield> for Expr {
-    fn from(expr: ExprYield) -> Self {
-        Self::Yield(expr)
-    }
-}
-
-impl From<ExprAwait> for Expr {
-    fn from(expr: ExprAwait) -> Self {
-        Self::Await(expr)
-    }
-}
-
-impl From<ExprSequence> for Expr {
-    fn from(expr: ExprSequence) -> Self {
-        Self::Sequence(expr)
-    }
-}
-
-impl From<ExprClass> for Expr {
-    fn from(expr: ExprClass) -> Self {
-        Self::Class(expr)
-    }
-}
-
-impl From<ExprFunction> for Expr {
-    fn from(expr: ExprFunction) -> Self {
-        Self::Function(expr)
-    }
-}
-
-impl From<ExprArrowFunction> for Expr {
-    fn from(expr: ExprArrowFunction) -> Self {
-        Self::ArrowFunction(expr)
-    }
-}
-
-impl From<ExprParenthesized> for Expr {
-    fn from(expr: ExprParenthesized) -> Self {
-        Self::Parenthesized(expr)
-    }
-}
-
-impl From<ExprMember> for Expr {
-    fn from(expr: ExprMember) -> Self {
-        Self::Member(expr)
-    }
-}
-
-impl From<ExprOptionalMember> for Expr {
-    fn from(expr: ExprOptionalMember) -> Self {
-        Self::OptionalMember(expr)
-    }
-}
-
-impl From<ExprNew> for Expr {
-    fn from(expr: ExprNew) -> Self {
-        Self::New(expr)
-    }
-}
-
-impl From<ExprAssignment> for Expr {
-    fn from(expr: ExprAssignment) -> Self {
-        Self::Assignment(expr)
-    }
-}
-
-impl From<ExprCall> for Expr {
-    fn from(expr: ExprCall) -> Self {
-        Self::Call(expr)
-    }
-}
-
-impl From<ExprOptionalCall> for Expr {
-    fn from(expr: ExprOptionalCall) -> Self {
-        Self::OptionalCall(expr)
-    }
-}
-
-impl From<ExprMetaProperty> for Expr {
-    fn from(expr: ExprMetaProperty) -> Self {
-        Self::MetaProperty(expr)
+impl From<Ident> for Expr {
+    fn from(ident: Ident) -> Self {
+        Self::Identifier(ident.into())
     }
 }
 

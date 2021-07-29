@@ -2,28 +2,30 @@ use super::Ident;
 use crate::ast::{BindingElement, BindingPattern, Expr};
 use fajt_lexer::token::Span;
 
-/// Note: Declarations are handles as statements since they can appear in the same contexts.
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum Stmt {
-    FunctionDecl(DeclFunction),
-    Block(StmtBlock),
-    Break(StmtBreak),
-    Continue(StmtContinue),
-    Debugger(StmtDebugger),
-    DoWhile(StmtDoWhile),
-    Empty(StmtEmpty),
-    Expression(Expr),
-    For(StmtFor),
-    ForIn(StmtForIn),
-    ForOf(StmtForOf),
-    If(StmtIf),
-    Return(StmtReturn),
-    Switch(StmtSwitch),
-    Throw(StmtThrow),
-    Try(StmtTry),
-    Variable(StmtVariable),
-    While(StmtWhile),
-    With(StmtWith),
+ast_enum! {
+    /// Note: Declarations are handles as statements since they can appear in the same contexts.
+    #[derive(Debug, PartialOrd, PartialEq)]
+    pub enum Stmt {
+        FunctionDecl(DeclFunction),
+        Block(StmtBlock),
+        Break(StmtBreak),
+        Continue(StmtContinue),
+        Debugger(StmtDebugger),
+        DoWhile(StmtDoWhile),
+        Empty(StmtEmpty),
+        Expression(Expr),
+        For(StmtFor),
+        ForIn(StmtForIn),
+        ForOf(StmtForOf),
+        If(StmtIf),
+        Return(StmtReturn),
+        Switch(StmtSwitch),
+        Throw(StmtThrow),
+        Try(StmtTry),
+        Variable(StmtVariable),
+        While(StmtWhile),
+        With(StmtWith),
+    }
 }
 
 impl Stmt {
@@ -40,133 +42,6 @@ impl Stmt {
         } else {
             panic!("Tried to unwrap {:?} as a block statement", self);
         }
-    }
-}
-
-// TODO macrofy this
-impl From<StmtBlock> for Stmt {
-    fn from(stmt: StmtBlock) -> Self {
-        Self::Block(stmt)
-    }
-}
-
-impl Into<Box<Stmt>> for StmtEmpty {
-    fn into(self) -> Box<Stmt> {
-        Box::new(Stmt::Empty(self))
-    }
-}
-
-impl Into<Box<Stmt>> for StmtBlock {
-    fn into(self) -> Box<Stmt> {
-        Box::new(Stmt::Block(self))
-    }
-}
-
-impl From<StmtEmpty> for Stmt {
-    fn from(stmt: StmtEmpty) -> Self {
-        Self::Empty(stmt)
-    }
-}
-
-impl From<StmtVariable> for Stmt {
-    fn from(stmt: StmtVariable) -> Self {
-        Self::Variable(stmt)
-    }
-}
-
-impl From<Expr> for Stmt {
-    fn from(expr: Expr) -> Self {
-        Self::Expression(expr)
-    }
-}
-
-impl From<DeclFunction> for Stmt {
-    fn from(decl: DeclFunction) -> Self {
-        Self::FunctionDecl(decl)
-    }
-}
-
-impl From<StmtReturn> for Stmt {
-    fn from(stmt: StmtReturn) -> Self {
-        Self::Return(stmt)
-    }
-}
-
-impl From<StmtBreak> for Stmt {
-    fn from(stmt: StmtBreak) -> Self {
-        Self::Break(stmt)
-    }
-}
-
-impl From<StmtContinue> for Stmt {
-    fn from(stmt: StmtContinue) -> Self {
-        Self::Continue(stmt)
-    }
-}
-
-impl From<StmtThrow> for Stmt {
-    fn from(stmt: StmtThrow) -> Self {
-        Self::Throw(stmt)
-    }
-}
-
-impl From<StmtDebugger> for Stmt {
-    fn from(stmt: StmtDebugger) -> Self {
-        Self::Debugger(stmt)
-    }
-}
-
-impl From<StmtIf> for Stmt {
-    fn from(stmt: StmtIf) -> Self {
-        Self::If(stmt)
-    }
-}
-
-impl From<StmtWith> for Stmt {
-    fn from(stmt: StmtWith) -> Self {
-        Self::With(stmt)
-    }
-}
-
-impl From<StmtTry> for Stmt {
-    fn from(stmt: StmtTry) -> Self {
-        Self::Try(stmt)
-    }
-}
-
-impl From<StmtSwitch> for Stmt {
-    fn from(stmt: StmtSwitch) -> Self {
-        Self::Switch(stmt)
-    }
-}
-
-impl From<StmtDoWhile> for Stmt {
-    fn from(stmt: StmtDoWhile) -> Self {
-        Self::DoWhile(stmt)
-    }
-}
-
-impl From<StmtWhile> for Stmt {
-    fn from(stmt: StmtWhile) -> Self {
-        Self::While(stmt)
-    }
-}
-
-impl From<StmtFor> for Stmt {
-    fn from(stmt: StmtFor) -> Self {
-        Self::For(stmt)
-    }
-}
-
-impl From<StmtForIn> for Stmt {
-    fn from(stmt: StmtForIn) -> Self {
-        Self::ForIn(stmt)
-    }
-}
-
-impl From<StmtForOf> for Stmt {
-    fn from(stmt: StmtForOf) -> Self {
-        Self::ForOf(stmt)
     }
 }
 
