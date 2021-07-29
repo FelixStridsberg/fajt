@@ -7,34 +7,34 @@ use crate::ast::{FormalParameters, Ident, Stmt};
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Expr {
-    ArrowFunction(Box<ExprArrowFunction>),
-    Assignment(Box<ExprAssignment>),
-    Await(Box<ExprAwait>),
-    Binary(Box<ExprBinary>),
-    Call(Box<ExprCall>),
-    Class(Box<ExprClass>),
-    Conditional(Box<ExprConditional>),
-    Function(Box<ExprFunction>),
-    Identifier(Box<ExprIdentifier>),
-    Literal(Box<ExprLiteral>),
-    Logical(Box<ExprLogical>),
-    Member(Box<ExprMember>),
-    MetaProperty(Box<ExprMetaProperty>),
-    New(Box<ExprNew>),
-    OptionalCall(Box<ExprOptionalCall>),
-    OptionalMember(Box<ExprOptionalMember>),
-    Parenthesized(Box<ExprParenthesized>),
-    Sequence(Box<ExprSequence>),
-    This(Box<ExprThis>),
-    Unary(Box<ExprUnary>),
-    Update(Box<ExprUpdate>),
-    Yield(Box<ExprYield>),
+    ArrowFunction(ExprArrowFunction),
+    Assignment(ExprAssignment),
+    Await(ExprAwait),
+    Binary(ExprBinary),
+    Call(ExprCall),
+    Class(ExprClass),
+    Conditional(ExprConditional),
+    Function(ExprFunction),
+    Identifier(ExprIdentifier),
+    Literal(ExprLiteral),
+    Logical(ExprLogical),
+    Member(ExprMember),
+    MetaProperty(ExprMetaProperty),
+    New(ExprNew),
+    OptionalCall(ExprOptionalCall),
+    OptionalMember(ExprOptionalMember),
+    Parenthesized(ExprParenthesized),
+    Sequence(ExprSequence),
+    This(ExprThis),
+    Unary(ExprUnary),
+    Update(ExprUpdate),
+    Yield(ExprYield),
 }
 
 impl Expr {
     pub fn is_nested_new(&self) -> bool {
         if let Expr::New(expr) = &self {
-            matches!(expr.callee, Expr::New(_))
+            matches!(*expr.callee, Expr::New(_))
         } else {
             false
         }
@@ -43,139 +43,205 @@ impl Expr {
 
 impl From<ExprThis> for Expr {
     fn from(expr: ExprThis) -> Self {
-        Self::This(Box::new(expr))
+        Self::This(expr)
     }
 }
 
 impl From<ExprLiteral> for Expr {
     fn from(expr: ExprLiteral) -> Self {
-        Self::Literal(Box::new(expr))
+        Self::Literal(expr)
     }
 }
 
 impl From<Ident> for Expr {
     fn from(ident: Ident) -> Self {
-        Self::Identifier(Box::new(ident.into()))
+        Self::Identifier(ident.into())
+    }
+}
+
+impl Into<Box<Expr>> for ExprIdentifier {
+    fn into(self) -> Box<Expr> {
+        Box::new(Expr::Identifier(self))
+    }
+}
+
+impl Into<Box<Expr>> for ExprBinary {
+    fn into(self) -> Box<Expr> {
+        Box::new(Expr::Binary(self))
+    }
+}
+
+impl Into<Box<Expr>> for ExprLogical {
+    fn into(self) -> Box<Expr> {
+        Box::new(Expr::Logical(self))
+    }
+}
+
+impl Into<Box<Expr>> for ExprCall {
+    fn into(self) -> Box<Expr> {
+        Box::new(Expr::Call(self))
+    }
+}
+
+impl Into<Box<Expr>> for ExprMember {
+    fn into(self) -> Box<Expr> {
+        Box::new(Expr::Member(self))
+    }
+}
+
+impl Into<Box<Expr>> for ExprLiteral {
+    fn into(self) -> Box<Expr> {
+        Box::new(Expr::Literal(self))
+    }
+}
+
+impl Into<Box<Expr>> for ExprSequence {
+    fn into(self) -> Box<Expr> {
+        Box::new(Expr::Sequence(self))
+    }
+}
+
+impl Into<Box<Expr>> for ExprOptionalMember {
+    fn into(self) -> Box<Expr> {
+        Box::new(Expr::OptionalMember(self))
+    }
+}
+
+impl Into<Box<Expr>> for ExprOptionalCall {
+    fn into(self) -> Box<Expr> {
+        Box::new(Expr::OptionalCall(self))
+    }
+}
+
+impl Into<Box<Expr>> for ExprNew {
+    fn into(self) -> Box<Expr> {
+        Box::new(Expr::New(self))
+    }
+}
+
+impl Into<Box<Expr>> for Ident {
+    fn into(self) -> Box<Expr> {
+        Box::new(Expr::Identifier(self.into()))
     }
 }
 
 impl From<ExprIdentifier> for Expr {
     fn from(expr: ExprIdentifier) -> Self {
-        Self::Identifier(Box::new(expr))
+        Self::Identifier(expr)
     }
 }
 
 impl From<ExprBinary> for Expr {
     fn from(expr: ExprBinary) -> Self {
-        Self::Binary(Box::new(expr))
+        Self::Binary(expr)
     }
 }
 
 impl From<ExprLogical> for Expr {
     fn from(expr: ExprLogical) -> Self {
-        Self::Logical(Box::new(expr))
+        Self::Logical(expr)
     }
 }
 
 impl From<ExprUnary> for Expr {
     fn from(expr: ExprUnary) -> Self {
-        Self::Unary(Box::new(expr))
+        Self::Unary(expr)
     }
 }
 
 impl From<ExprUpdate> for Expr {
     fn from(expr: ExprUpdate) -> Self {
-        Self::Update(Box::new(expr))
+        Self::Update(expr)
     }
 }
 
 impl From<ExprConditional> for Expr {
     fn from(expr: ExprConditional) -> Self {
-        Self::Conditional(Box::new(expr))
+        Self::Conditional(expr)
     }
 }
 
 impl From<ExprYield> for Expr {
     fn from(expr: ExprYield) -> Self {
-        Self::Yield(Box::new(expr))
+        Self::Yield(expr)
     }
 }
 
 impl From<ExprAwait> for Expr {
     fn from(expr: ExprAwait) -> Self {
-        Self::Await(Box::new(expr))
+        Self::Await(expr)
     }
 }
 
 impl From<ExprSequence> for Expr {
     fn from(expr: ExprSequence) -> Self {
-        Self::Sequence(Box::new(expr))
+        Self::Sequence(expr)
     }
 }
 
 impl From<ExprClass> for Expr {
     fn from(expr: ExprClass) -> Self {
-        Self::Class(Box::new(expr))
+        Self::Class(expr)
     }
 }
 
 impl From<ExprFunction> for Expr {
     fn from(expr: ExprFunction) -> Self {
-        Self::Function(Box::new(expr))
+        Self::Function(expr)
     }
 }
 
 impl From<ExprArrowFunction> for Expr {
     fn from(expr: ExprArrowFunction) -> Self {
-        Self::ArrowFunction(Box::new(expr))
+        Self::ArrowFunction(expr)
     }
 }
 
 impl From<ExprParenthesized> for Expr {
     fn from(expr: ExprParenthesized) -> Self {
-        Self::Parenthesized(Box::new(expr))
+        Self::Parenthesized(expr)
     }
 }
 
 impl From<ExprMember> for Expr {
     fn from(expr: ExprMember) -> Self {
-        Self::Member(Box::new(expr))
+        Self::Member(expr)
     }
 }
 
 impl From<ExprOptionalMember> for Expr {
     fn from(expr: ExprOptionalMember) -> Self {
-        Self::OptionalMember(Box::new(expr))
+        Self::OptionalMember(expr)
     }
 }
 
 impl From<ExprNew> for Expr {
     fn from(expr: ExprNew) -> Self {
-        Self::New(Box::new(expr))
+        Self::New(expr)
     }
 }
 
 impl From<ExprAssignment> for Expr {
     fn from(expr: ExprAssignment) -> Self {
-        Self::Assignment(Box::new(expr))
+        Self::Assignment(expr)
     }
 }
 
 impl From<ExprCall> for Expr {
     fn from(expr: ExprCall) -> Self {
-        Self::Call(Box::new(expr))
+        Self::Call(expr)
     }
 }
 
 impl From<ExprOptionalCall> for Expr {
     fn from(expr: ExprOptionalCall) -> Self {
-        Self::OptionalCall(Box::new(expr))
+        Self::OptionalCall(expr)
     }
 }
 
 impl From<ExprMetaProperty> for Expr {
     fn from(expr: ExprMetaProperty) -> Self {
-        Self::MetaProperty(Box::new(expr))
+        Self::MetaProperty(expr)
     }
 }
 
@@ -216,8 +282,8 @@ impl From<Ident> for ExprIdentifier {
 pub struct ExprBinary {
     pub span: Span,
     pub operator: BinaryOperator,
-    pub left: Expr,
-    pub right: Expr,
+    pub left: Box<Expr>,
+    pub right: Box<Expr>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq, FromString)]
@@ -278,8 +344,8 @@ pub enum BinaryOperator {
 pub struct ExprLogical {
     pub span: Span,
     pub operator: LogicalOperator,
-    pub left: Expr,
-    pub right: Expr,
+    pub left: Box<Expr>,
+    pub right: Box<Expr>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq, FromString)]
@@ -302,7 +368,7 @@ pub enum LogicalOperator {
 pub struct ExprUnary {
     pub span: Span,
     pub operator: UnaryOperator,
-    pub argument: Expr,
+    pub argument: Box<Expr>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq, FromString)]
@@ -334,7 +400,7 @@ pub struct ExprUpdate {
     pub span: Span,
     pub operator: UpdateOperator,
     pub prefix: bool,
-    pub argument: Expr,
+    pub argument: Box<Expr>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq, FromString)]
@@ -354,22 +420,22 @@ pub enum UpdateOperator {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ExprYield {
     pub span: Span,
-    pub argument: Option<Expr>,
+    pub argument: Option<Box<Expr>>,
     pub delegate: bool,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ExprConditional {
     pub span: Span,
-    pub condition: Expr,
-    pub consequent: Expr,
-    pub alternate: Expr,
+    pub condition: Box<Expr>,
+    pub consequent: Box<Expr>,
+    pub alternate: Box<Expr>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ExprAwait {
     pub span: Span,
-    pub argument: Expr,
+    pub argument: Box<Expr>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -399,14 +465,14 @@ pub struct ExprArrowFunction {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum ArrowFunctionBody {
-    Expression(Expr),
+    Expression(Box<Expr>),
     Block(Vec<Stmt>),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ExprParenthesized {
     pub span: Span,
-    pub expression: Expr,
+    pub expression: Box<Expr>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -419,14 +485,14 @@ pub struct ExprMember {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ExprOptionalMember {
     pub span: Span,
-    pub object: Expr,
+    pub object: Box<Expr>,
     pub property: MemberProperty,
     pub optional: bool,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum MemberObject {
-    Expression(Expr),
+    Expression(Box<Expr>),
     Super(Super),
 }
 
@@ -438,7 +504,7 @@ pub struct Super {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum MemberProperty {
     Ident(Ident),
-    Expression(Expr),
+    Expression(Box<Expr>),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -451,7 +517,7 @@ pub struct ExprMetaProperty {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ExprNew {
     pub span: Span,
-    pub callee: Expr,
+    pub callee: Box<Expr>,
     pub arguments_span: Option<Span>,
     pub arguments: Vec<Argument>,
 }
@@ -466,8 +532,8 @@ pub enum Argument {
 pub struct ExprAssignment {
     pub span: Span,
     pub operator: AssignmentOperator,
-    pub left: Expr,
-    pub right: Expr,
+    pub left: Box<Expr>,
+    pub right: Box<Expr>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq, FromString)]
@@ -517,7 +583,7 @@ pub struct ExprCall {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ExprOptionalCall {
     pub span: Span,
-    pub callee: Expr,
+    pub callee: Box<Expr>,
     pub arguments_span: Span,
     pub arguments: Vec<Argument>,
     pub optional: bool,
@@ -527,5 +593,5 @@ pub struct ExprOptionalCall {
 pub enum Callee {
     Super,
     Import,
-    Expression(Expr),
+    Expression(Box<Expr>),
 }

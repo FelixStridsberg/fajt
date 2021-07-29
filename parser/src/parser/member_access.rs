@@ -69,7 +69,7 @@ where
 
         Ok(ExprOptionalCall {
             span,
-            callee,
+            callee: callee.into(),
             arguments_span,
             arguments,
             optional,
@@ -88,7 +88,7 @@ where
 
         Ok(ExprOptionalMember {
             span,
-            object,
+            object: object.into(),
             property,
             optional,
         }
@@ -100,11 +100,11 @@ where
             token_matches!(ok: punct!("?.")) if self.peek_matches(punct!("[")) => {
                 self.reader.consume()?;
                 let property = self.parse_computed_property()?;
-                Ok(MemberProperty::Expression(property))
+                Ok(MemberProperty::Expression(property.into()))
             }
             token_matches!(ok: punct!("[")) => {
                 let property = self.parse_computed_property()?;
-                Ok(MemberProperty::Expression(property))
+                Ok(MemberProperty::Expression(property.into()))
             }
             token_matches!(ok: punct!("?.")) | token_matches!(ok: punct!(".")) => {
                 self.reader.consume()?;
@@ -124,7 +124,7 @@ where
             }
             token_matches!(ok: punct!("[")) => {
                 let member = self.parse_computed_property()?;
-                Ok(MemberProperty::Expression(member))
+                Ok(MemberProperty::Expression(member.into()))
             }
             _ => unreachable!(),
         }

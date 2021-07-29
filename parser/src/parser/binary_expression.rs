@@ -160,8 +160,8 @@ where
         self.parse_recursive_binary_expression(next, map_operator, |span, left, right, operator| {
             ExprBinary {
                 span,
-                left,
-                right,
+                left: left.into(),
+                right: right.into(),
                 operator,
             }
             .into()
@@ -182,8 +182,8 @@ where
         self.parse_recursive_binary_expression(next, map_operator, |span, left, right, operator| {
             ExprLogical {
                 span,
-                left,
-                right,
+                left: left.into(),
+                right: right.into(),
                 operator,
             }
             .into()

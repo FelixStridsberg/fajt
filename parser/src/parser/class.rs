@@ -22,7 +22,7 @@ where
 
         let super_class = self.current_matches(keyword!("extends")).then_try(|| {
             self.reader.consume()?;
-            self.parse_left_hand_side_expression()
+            Ok(Box::new(self.parse_left_hand_side_expression()?))
         })?;
 
         let body = self.parse_class_body()?;

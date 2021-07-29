@@ -29,7 +29,7 @@ where
         let body = if self.current_matches(punct!("{")) {
             ArrowFunctionBody::Block(self.parse_function_body()?)
         } else {
-            ArrowFunctionBody::Expression(self.parse_assignment_expression()?)
+            ArrowFunctionBody::Expression(self.parse_assignment_expression()?.into())
         };
 
         let span = self.span_from(span_start);

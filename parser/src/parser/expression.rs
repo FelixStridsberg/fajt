@@ -94,8 +94,8 @@ where
                     Ok(ExprAssignment {
                         span,
                         operator,
-                        left: expression,
-                        right,
+                        left: expression.into(),
+                        right: right.into(),
                     }
                     .into())
                 } else {
@@ -168,7 +168,8 @@ where
             self.reader.consume()?;
         }
 
-        let argument = has_argument.then_try(|| self.parse_assignment_expression())?;
+        let argument =
+            has_argument.then_try(|| Ok(Box::new(self.parse_assignment_expression()?)))?;
         let span = self.span_from(span_start);
         Ok(ExprYield {
             span,
@@ -193,9 +194,9 @@ where
             let span = self.span_from(span_start);
             Ok(ExprConditional {
                 span,
-                condition: expression,
-                consequent,
-                alternate,
+                condition: expression.into(),
+                consequent: consequent.into(),
+                alternate: alternate.into(),
             }
             .into())
         } else {
@@ -216,7 +217,7 @@ where
             token_matches!(keyword!("await")) if self.context.is_await => {
                 let span_start = self.position();
                 self.reader.consume()?;
-                let argument = self.parse_unary_expression()?;
+                let argument = self.parse_unary_expression()?.into();
                 let span = self.span_from(span_start);
                 return Ok(ExprAwait { span, argument }.into());
             }
@@ -226,7 +227,7 @@ where
         if let Some(operator) = operator {
             let span_start = self.position();
             self.reader.consume()?;
-            let argument = self.parse_unary_expression()?;
+            let argument = self.parse_unary_expression()?.into();
             let span = self.span_from(span_start);
             Ok(ExprUnary {
                 span,
@@ -250,7 +251,7 @@ where
         if let Some(operator) = prefix_operator {
             let span_start = self.position();
             self.reader.consume()?;
-            let argument = self.parse_unary_expression()?;
+            let argument = self.parse_unary_expression()?.into();
             let span = self.span_from(span_start);
             return Ok(ExprUpdate {
                 span,
@@ -280,7 +281,7 @@ where
                 span,
                 operator,
                 prefix: false,
-                argument,
+                argument: argument.into(),
             }
             .into())
         } else {
@@ -312,7 +313,7 @@ where
                             let span = self.span_from(span_start);
                             expression = ExprCall {
                                 span,
-                                callee: Callee::Expression(expression),
+                                callee: Callee::Expression(expression.into()),
                                 arguments_span,
                                 arguments,
                             }
@@ -321,7 +322,7 @@ where
                         token_matches!(ok: punct!(".")) | token_matches!(ok: punct!("[")) => {
                             expression = self.parse_member_expression_right_side(
                                 span_start,
-                                MemberObject::Expression(expression),
+                                MemberObject::Expression(expression.into()),
                             )?;
                         }
                         // TODO CallExpression TemplateLiteral
@@ -398,7 +399,7 @@ where
             let span_start = self.position();
             self.reader.consume()?;
 
-            let callee = self.parse_new_expression()?;
+            let callee = self.parse_new_expression()?.into();
 
             let (arguments_span, arguments) = if self.current_matches(punct!("(")) {
                 self.parse_arguments()
@@ -459,7 +460,7 @@ where
             if token_matches!(self.reader.current(), ok: punct!(".") | punct!("[")) {
                 expression = self.parse_member_expression_right_side(
                     span_start,
-                    MemberObject::Expression(expression),
+                    MemberObject::Expression(expression.into()),
                 )?;
             } else {
                 break;

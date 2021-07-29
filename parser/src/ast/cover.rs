@@ -29,11 +29,11 @@ impl CoverParenthesizedAndArrowParameters {
         let mut reader = PeekReader::new(tokens).unwrap();
         let mut parser = Parser::new(&mut reader).unwrap();
 
-        let expression = parser.parse_expression().unwrap();
+        let expr = parser.parse_expression().unwrap();
 
         Ok(ExprParenthesized {
             span: self.span,
-            expression,
+            expression: expr.into(),
         }
         .into())
     }

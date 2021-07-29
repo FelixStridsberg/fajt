@@ -5,7 +5,7 @@ use fajt_lexer::token::Span;
 pub struct ExprClass {
     pub span: Span,
     pub identifier: Option<Ident>,
-    pub super_class: Option<Expr>,
+    pub super_class: Option<Box<Expr>>,
     pub body: Vec<ClassElement>,
 }
 
