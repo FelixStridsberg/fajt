@@ -2,29 +2,28 @@ use super::Ident;
 use crate::ast::{BindingElement, BindingPattern, Expr};
 use fajt_lexer::token::Span;
 
-// TODO harmonize this so it looks like Expression
 /// Note: Declarations are handles as statements since they can appear in the same contexts.
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Stmt {
-    FunctionDecl(Box<DeclFunction>),
-    Block(Box<StmtBlock>),
-    Break(Box<StmtBreak>),
-    Continue(Box<StmtContinue>),
-    Debugger(Box<StmtDebugger>),
-    DoWhile(Box<StmtDoWhile>),
-    Empty(Box<StmtEmpty>),
-    Expression(Box<Expr>),
-    For(Box<StmtFor>),
-    ForIn(Box<StmtForIn>),
-    ForOf(Box<StmtForOf>),
-    If(Box<StmtIf>),
-    Return(Box<StmtReturn>),
-    Switch(Box<StmtSwitch>),
-    Throw(Box<StmtThrow>),
-    Try(Box<StmtTry>),
-    Variable(Box<StmtVariable>),
-    While(Box<StmtWhile>),
-    With(Box<StmtWith>),
+    FunctionDecl(DeclFunction),
+    Block(StmtBlock),
+    Break(StmtBreak),
+    Continue(StmtContinue),
+    Debugger(StmtDebugger),
+    DoWhile(StmtDoWhile),
+    Empty(StmtEmpty),
+    Expression(Expr),
+    For(StmtFor),
+    ForIn(StmtForIn),
+    ForOf(StmtForOf),
+    If(StmtIf),
+    Return(StmtReturn),
+    Switch(StmtSwitch),
+    Throw(StmtThrow),
+    Try(StmtTry),
+    Variable(StmtVariable),
+    While(StmtWhile),
+    With(StmtWith),
 }
 
 impl Stmt {
@@ -32,129 +31,142 @@ impl Stmt {
     where
         E: Into<Expr>,
     {
-        Self::Expression(Box::new(expression.into()))
+        Self::Expression(expression.into())
     }
 
     pub fn unwrap_block_statement(self) -> StmtBlock {
         if let Stmt::Block(block) = self {
-            *block
+            block
         } else {
             panic!("Tried to unwrap {:?} as a block statement", self);
         }
     }
 }
 
+// TODO macrofy this
 impl From<StmtBlock> for Stmt {
     fn from(stmt: StmtBlock) -> Self {
-        Self::Block(Box::new(stmt))
+        Self::Block(stmt)
+    }
+}
+
+impl Into<Box<Stmt>> for StmtEmpty {
+    fn into(self) -> Box<Stmt> {
+        Box::new(Stmt::Empty(self))
+    }
+}
+
+impl Into<Box<Stmt>> for StmtBlock {
+    fn into(self) -> Box<Stmt> {
+        Box::new(Stmt::Block(self))
     }
 }
 
 impl From<StmtEmpty> for Stmt {
     fn from(stmt: StmtEmpty) -> Self {
-        Self::Empty(Box::new(stmt))
+        Self::Empty(stmt)
     }
 }
 
 impl From<StmtVariable> for Stmt {
     fn from(stmt: StmtVariable) -> Self {
-        Self::Variable(Box::new(stmt))
+        Self::Variable(stmt)
     }
 }
 
 impl From<Expr> for Stmt {
     fn from(expr: Expr) -> Self {
-        Self::Expression(Box::new(expr))
+        Self::Expression(expr)
     }
 }
 
 impl From<DeclFunction> for Stmt {
-    fn from(expr: DeclFunction) -> Self {
-        Self::FunctionDecl(Box::new(expr))
+    fn from(decl: DeclFunction) -> Self {
+        Self::FunctionDecl(decl)
     }
 }
 
 impl From<StmtReturn> for Stmt {
-    fn from(expr: StmtReturn) -> Self {
-        Self::Return(Box::new(expr))
+    fn from(stmt: StmtReturn) -> Self {
+        Self::Return(stmt)
     }
 }
 
 impl From<StmtBreak> for Stmt {
-    fn from(expr: StmtBreak) -> Self {
-        Self::Break(Box::new(expr))
+    fn from(stmt: StmtBreak) -> Self {
+        Self::Break(stmt)
     }
 }
 
 impl From<StmtContinue> for Stmt {
-    fn from(expr: StmtContinue) -> Self {
-        Self::Continue(Box::new(expr))
+    fn from(stmt: StmtContinue) -> Self {
+        Self::Continue(stmt)
     }
 }
 
 impl From<StmtThrow> for Stmt {
-    fn from(expr: StmtThrow) -> Self {
-        Self::Throw(Box::new(expr))
+    fn from(stmt: StmtThrow) -> Self {
+        Self::Throw(stmt)
     }
 }
 
 impl From<StmtDebugger> for Stmt {
-    fn from(expr: StmtDebugger) -> Self {
-        Self::Debugger(Box::new(expr))
+    fn from(stmt: StmtDebugger) -> Self {
+        Self::Debugger(stmt)
     }
 }
 
 impl From<StmtIf> for Stmt {
-    fn from(expr: StmtIf) -> Self {
-        Self::If(Box::new(expr))
+    fn from(stmt: StmtIf) -> Self {
+        Self::If(stmt)
     }
 }
 
 impl From<StmtWith> for Stmt {
-    fn from(expr: StmtWith) -> Self {
-        Self::With(Box::new(expr))
+    fn from(stmt: StmtWith) -> Self {
+        Self::With(stmt)
     }
 }
 
 impl From<StmtTry> for Stmt {
-    fn from(expr: StmtTry) -> Self {
-        Self::Try(Box::new(expr))
+    fn from(stmt: StmtTry) -> Self {
+        Self::Try(stmt)
     }
 }
 
 impl From<StmtSwitch> for Stmt {
-    fn from(expr: StmtSwitch) -> Self {
-        Self::Switch(Box::new(expr))
+    fn from(stmt: StmtSwitch) -> Self {
+        Self::Switch(stmt)
     }
 }
 
 impl From<StmtDoWhile> for Stmt {
-    fn from(expr: StmtDoWhile) -> Self {
-        Self::DoWhile(Box::new(expr))
+    fn from(stmt: StmtDoWhile) -> Self {
+        Self::DoWhile(stmt)
     }
 }
 
 impl From<StmtWhile> for Stmt {
-    fn from(expr: StmtWhile) -> Self {
-        Self::While(Box::new(expr))
+    fn from(stmt: StmtWhile) -> Self {
+        Self::While(stmt)
     }
 }
 
 impl From<StmtFor> for Stmt {
-    fn from(expr: StmtFor) -> Self {
-        Self::For(Box::new(expr))
+    fn from(stmt: StmtFor) -> Self {
+        Self::For(stmt)
     }
 }
 
 impl From<StmtForIn> for Stmt {
-    fn from(expr: StmtForIn) -> Self {
-        Self::ForIn(Box::new(expr))
+    fn from(stmt: StmtForIn) -> Self {
+        Self::ForIn(stmt)
     }
 }
 
 impl From<StmtForOf> for Stmt {
-    fn from(expr: StmtForOf) -> Self {
-        Self::ForOf(Box::new(expr))
+    fn from(stmt: StmtForOf) -> Self {
+        Self::ForOf(stmt)
     }
 }
 
@@ -253,15 +265,15 @@ pub struct StmtDebugger {
 pub struct StmtIf {
     pub span: Span,
     pub condition: Expr,
-    pub consequent: Stmt,
-    pub alternate: Option<Stmt>,
+    pub consequent: Box<Stmt>,
+    pub alternate: Option<Box<Stmt>>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct StmtWith {
     pub span: Span,
     pub object: Expr,
-    pub body: Stmt,
+    pub body: Box<Stmt>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -296,7 +308,7 @@ pub struct SwitchCase {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct StmtDoWhile {
     pub span: Span,
-    pub body: Stmt,
+    pub body: Box<Stmt>,
     pub test: Expr,
 }
 
@@ -304,7 +316,7 @@ pub struct StmtDoWhile {
 pub struct StmtWhile {
     pub span: Span,
     pub test: Expr,
-    pub body: Stmt,
+    pub body: Box<Stmt>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -313,7 +325,7 @@ pub struct StmtFor {
     pub init: Option<ForInit>,
     pub test: Option<Expr>,
     pub update: Option<Expr>,
-    pub body: Stmt,
+    pub body: Box<Stmt>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -321,7 +333,7 @@ pub struct StmtForIn {
     pub span: Span,
     pub left: ForInit,
     pub right: Expr,
-    pub body: Stmt,
+    pub body: Box<Stmt>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -329,7 +341,7 @@ pub struct StmtForOf {
     pub span: Span,
     pub left: ForInit,
     pub right: Expr,
-    pub body: Stmt,
+    pub body: Box<Stmt>,
     pub wait: bool,
 }
 

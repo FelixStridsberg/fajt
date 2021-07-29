@@ -181,14 +181,14 @@ where
         let consequent = self.parse_statement()?;
         let alternate = self.current_matches(keyword!("else")).then_try(|| {
             self.reader.consume()?;
-            self.parse_statement()
+            Ok(Box::new(self.parse_statement()?))
         })?;
 
         let span = self.span_from(span_start);
         Ok(StmtIf {
             span,
             condition,
-            consequent,
+            consequent: consequent.into(),
             alternate,
         }
         .into())
@@ -204,7 +204,12 @@ where
 
         let body = self.parse_statement()?;
         let span = self.span_from(span_start);
-        Ok(StmtWith { span, object, body }.into())
+        Ok(StmtWith {
+            span,
+            object,
+            body: body.into(),
+        }
+        .into())
     }
 
     /// Parses the `TryStatement` goal symbol.

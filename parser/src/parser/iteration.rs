@@ -29,7 +29,12 @@ where
         self.consume_assert(punct!(")"))?;
 
         let span = self.span_from(span_start);
-        Ok(StmtDoWhile { span, body, test }.into())
+        Ok(StmtDoWhile {
+            span,
+            body: body.into(),
+            test,
+        }
+        .into())
     }
 
     pub(super) fn parse_while_statement(&mut self) -> Result<Stmt> {
@@ -44,7 +49,12 @@ where
         let body = self.parse_statement()?;
 
         let span = self.span_from(span_start);
-        Ok(StmtWhile { span, test, body }.into())
+        Ok(StmtWhile {
+            span,
+            test,
+            body: body.into(),
+        }
+        .into())
     }
 
     pub(super) fn parse_for_statement(&mut self) -> Result<Stmt> {
@@ -85,7 +95,7 @@ where
             init,
             test,
             update,
-            body,
+            body: body.into(),
         }
         .into())
     }
@@ -107,7 +117,7 @@ where
             span,
             left,
             right,
-            body,
+            body: body.into(),
         }
         .into())
     }
@@ -141,7 +151,7 @@ where
             span,
             left,
             right,
-            body,
+            body: body.into(),
             wait,
         }
         .into())

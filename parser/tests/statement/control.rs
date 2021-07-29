@@ -89,7 +89,7 @@ fn if_no_else() {
             StmtIf {
                 span: Span::new(0, 10),
                 condition: Ident::new("a", (5, 6)).into(),
-                consequent: Stmt::expression(Ident::new("b", (9, 10))),
+                consequent: Stmt::expression(Ident::new("b", (9, 10))).into(),
                 alternate: None,
             }.into()
         ]
@@ -104,8 +104,8 @@ fn if_with_else() {
             StmtIf {
                 span: Span::new(0, 17),
                 condition: Ident::new("a", (5, 6)).into(),
-                consequent: Stmt::expression(Ident::new("b", (9, 10))),
-                alternate: Some(Stmt::expression(Ident::new("c", (16, 17)))),
+                consequent: Stmt::expression(Ident::new("b", (9, 10))).into(),
+                alternate: Some(Stmt::expression(Ident::new("c", (16, 17))).into()),
             }.into()
         ]
     );
