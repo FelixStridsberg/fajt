@@ -11,10 +11,13 @@ macro_rules! parse {
         parser.with_context(&$context).parse_expr()
     }};
     ($input:literal) => {{
+        parse!($input, context: fajt_parser::ContextModify::default())
+    }};
+    ($input:literal, context: $context:expr) => {{
         let lexer = fajt_lexer::Lexer::new(&$input).unwrap();
         let mut reader = fajt_common::io::PeekReader::new(lexer).unwrap();
         let mut parser = fajt_parser::Parser::new(&mut reader).unwrap();
-        parser.parse()
+        parser.with_context(&$context).parse()
     }};
 }
 
@@ -25,6 +28,10 @@ macro_rules! parser_test {
     };
     (input: $input:literal, output:[$($output:expr),*]) => {
         let program = parse!($input).unwrap();
+        assert_eq!(program, fajt_parser::ast::Program::from_body(vec![$($output),*]))
+    };
+    (input: $input:literal, $(context: $context:expr,)? output:[$($output:expr),*]) => {
+        let program = parse!($input $(, context: $context)?).unwrap();
         assert_eq!(program, fajt_parser::ast::Program::from_body(vec![$($output),*]))
     };
     (input: $input:literal, $(context: $context:expr,)? expr_output:[$output:expr]) => {

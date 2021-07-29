@@ -5,6 +5,7 @@ use fajt_parser::ast::{
     VariableStatement, WhileStatement,
 };
 use fajt_parser::error::ErrorKind::SyntaxError;
+use fajt_parser::ContextModify;
 
 #[test]
 fn do_while() {
@@ -271,6 +272,25 @@ fn for_of() {
                    span: Span::new(13, 14),
                 }.into(),
                 wait: false,
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn for_await_of() {
+    parser_test!(
+        input: "for await (a of b) ;",
+        context: ContextModify::new().set_await(true),
+        output: [
+            ForOfStatement {
+                span: Span::new(0, 20),
+                left: ForInit::Expression(Ident::new("a", (11, 12)).into()),
+                right: Ident::new("b", (16, 17)).into(),
+                body: EmptyStatement {
+                   span: Span::new(19, 20),
+                }.into(),
+                wait: true,
             }.into()
         ]
     );

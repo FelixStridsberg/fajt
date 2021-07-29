@@ -51,7 +51,17 @@ where
         let span_start = self.position();
         self.consume_assert(keyword!("for"))?;
 
-        // TODO await
+        if self.context.is_await && self.current_matches(keyword!("await")) {
+            self.reader.consume()?;
+            self.consume_assert(punct!("("))?;
+
+            let init = self.parse_for_first_argument()?;
+            if init.is_none() {
+                return err!(UnexpectedToken(self.reader.consume()?));
+            }
+
+            return self.parse_for_of(span_start, init.unwrap(), true);
+        }
 
         self.consume_assert(punct!("("))?;
 
@@ -59,7 +69,7 @@ where
         match self.reader.current() {
             token_matches!(ok: punct!(";")) => self.parse_plain_for(span_start, init),
             token_matches!(ok: keyword!("of")) if init.is_some() => {
-                self.parse_for_of(span_start, init.unwrap())
+                self.parse_for_of(span_start, init.unwrap(), false)
             }
             token_matches!(ok: keyword!("in")) if init.is_some() => {
                 self.parse_for_in(span_start, init.unwrap())
@@ -112,7 +122,7 @@ where
         .into())
     }
 
-    fn parse_for_of(&mut self, span_start: usize, left: ForInit) -> Result<Statement> {
+    fn parse_for_of(&mut self, span_start: usize, left: ForInit, wait: bool) -> Result<Statement> {
         // TODO verify that `left` is a valid LeftHandSideExpression if not declaration.
 
         self.consume_assert(keyword!("of"))?;
@@ -131,7 +141,7 @@ where
             left,
             right,
             body,
-            wait: false,
+            wait,
         }
         .into())
     }
