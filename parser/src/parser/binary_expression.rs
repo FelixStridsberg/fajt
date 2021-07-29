@@ -93,13 +93,14 @@ where
 
     /// Parses the `RelationalExpression` goal symbol.
     fn parse_relational_expression(&mut self) -> Result<Expression> {
+        let in_keyword_allowed = self.context.is_in;
         self.parse_binary_expression(Self::parse_shift_expression, |token| match token {
             token_matches!(punct!("<")) => Some(binary_op!("<")),
             token_matches!(punct!(">")) => Some(binary_op!(">")),
             token_matches!(punct!("<=")) => Some(binary_op!("<=")),
             token_matches!(punct!(">=")) => Some(binary_op!(">=")),
             token_matches!(keyword!("instanceof")) => Some(binary_op!("instanceof")),
-            token_matches!(keyword!("in")) => Some(binary_op!("in")),
+            token_matches!(keyword!("in")) if in_keyword_allowed => Some(binary_op!("in")),
             _ => None,
         })
     }
@@ -150,11 +151,14 @@ where
     /// `next` is a method for retrieving the result of the _next_ goal symbol (i.e. right hand).
     /// `map_operator` is a function for mapping a token to a binary operator.
     #[inline]
-    fn parse_binary_expression(
+    fn parse_binary_expression<F>(
         &mut self,
         next: fn(&mut Self) -> Result<Expression>,
-        map_operator: fn(&Token) -> Option<BinaryOperator>,
-    ) -> Result<Expression> {
+        map_operator: F,
+    ) -> Result<Expression>
+    where
+        F: Fn(&Token) -> Option<BinaryOperator>,
+    {
         self.parse_recursive_binary_expression(next, map_operator, |span, left, right, operator| {
             BinaryExpression {
                 span,
@@ -189,17 +193,20 @@ where
     }
 
     #[inline]
-    fn parse_recursive_binary_expression<T>(
+    fn parse_recursive_binary_expression<T, F>(
         &mut self,
         next: fn(&mut Self) -> Result<Expression>,
-        map_operator: fn(&Token) -> Option<T>,
+        map_operator: F,
         create_expression: fn(
             span: Span,
             left: Expression,
             right: Expression,
             operator: T,
         ) -> Expression,
-    ) -> Result<Expression> {
+    ) -> Result<Expression>
+    where
+        F: Fn(&Token) -> Option<T>,
+    {
         let span_start = self.position();
         let mut expression = next(self)?;
         loop {

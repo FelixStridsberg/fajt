@@ -1,9 +1,10 @@
 use crate::ast::{
-    DoWhileStatement, ForInit, ForStatement, Statement, VariableKind, VariableStatement,
-    WhileStatement,
+    DoWhileStatement, ForInStatement, ForInit, ForStatement, Statement, VariableKind,
+    VariableStatement, WhileStatement,
 };
+use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenTry};
-use crate::Parser;
+use crate::{ContextModify, Parser};
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
@@ -55,6 +56,17 @@ where
         self.consume_assert(punct!("("))?;
 
         let init = self.parse_for_first_argument()?;
+        match self.reader.current() {
+            token_matches!(ok: punct!(";")) => self.parse_plain_for(span_start, init),
+            token_matches!(ok: keyword!("of")) if init.is_some() => todo!("for of"),
+            token_matches!(ok: keyword!("in")) if init.is_some() => {
+                self.parse_for_in(span_start, init.unwrap())
+            }
+            _ => return err!(UnexpectedToken(self.reader.consume()?)),
+        }
+    }
+
+    fn parse_plain_for(&mut self, span_start: usize, init: Option<ForInit>) -> Result<Statement> {
         self.consume_assert(punct!(";"))?; // TODO of, in
 
         let test = (!self.current_matches(punct!(";"))).then_try(|| self.parse_expression())?;
@@ -65,14 +77,37 @@ where
         let body = self.parse_statement()?;
 
         let span = self.span_from(span_start);
-        return Ok(ForStatement {
+        Ok(ForStatement {
             span,
             init,
             test,
             update,
             body,
         }
-        .into());
+        .into())
+    }
+
+    fn parse_for_in(&mut self, span_start: usize, left: ForInit) -> Result<Statement> {
+        // TODO verify that `left` is a valid LeftHandSideExpression if not declaration.
+
+        self.consume_assert(keyword!("in"))?;
+
+        let right = self
+            .with_context(ContextModify::new().set_in(true))
+            .parse_expression()?;
+
+        self.consume_assert(punct!(")"))?;
+
+        let body = self.parse_statement()?;
+
+        let span = self.span_from(span_start);
+        Ok(ForInStatement {
+            span,
+            left,
+            right,
+            body,
+        }
+        .into())
     }
 
     pub(super) fn parse_for_first_argument(&mut self) -> Result<Option<ForInit>> {
@@ -86,7 +121,9 @@ where
 
         if let Some(kind) = variable_kind {
             self.reader.consume()?; // var, let, const
-            let declarations = self.parse_variable_declarations()?;
+            let declarations = self
+                .with_context(ContextModify::new().set_in(false))
+                .parse_variable_declarations()?;
 
             let span = self.span_from(span_start);
             return Ok(Some(ForInit::Declaration(VariableStatement {
@@ -98,7 +135,10 @@ where
 
         Ok(match self.reader.current()? {
             _ if self.current_matches(punct!(";")) => None,
-            _ => Some(ForInit::Expression(self.parse_expression()?)),
+            _ => Some(ForInit::Expression(
+                self.with_context(ContextModify::new().set_in(false))
+                    .parse_expression()?,
+            )),
         })
     }
 }

@@ -317,7 +317,7 @@ fn instance_of() {
 }
 
 #[test]
-fn in_() {
+fn r#in() {
     parser_test!(
         input: "a in b in c",
         expr_output: [

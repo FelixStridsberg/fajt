@@ -1,9 +1,10 @@
 use fajt_lexer::token::Span;
 use fajt_parser::ast::{
-    BindingPattern, DoWhileStatement, EmptyStatement, ForInit, ForStatement, Ident, Literal,
-    LiteralExpression, Statement, VariableDeclaration, VariableKind, VariableStatement,
+    BindingPattern, DoWhileStatement, EmptyStatement, ForInStatement, ForInit, ForStatement, Ident,
+    Literal, LiteralExpression, Statement, VariableDeclaration, VariableKind, VariableStatement,
     WhileStatement,
 };
+use fajt_parser::error::ErrorKind::SyntaxError;
 
 #[test]
 fn do_while() {
@@ -198,5 +199,61 @@ fn for_with_const_declaration() {
                 }.into(),
             }.into()
         ]
+    );
+}
+
+#[test]
+fn for_in() {
+    parser_test!(
+        input: "for (a in b) ;",
+        output: [
+            ForInStatement {
+                span: Span::new(0, 14),
+                left: ForInit::Expression(Ident::new("a", (5, 6)).into()),
+                right: Ident::new("b", (10, 11)).into(),
+                body: EmptyStatement {
+                   span: Span::new(13, 14),
+                }.into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn for_in_with_declaration() {
+    parser_test!(
+        input: "for (var a in b) ;",
+        output: [
+            ForInStatement {
+                span: Span::new(0, 18),
+                left: ForInit::Declaration(VariableStatement {
+                    span: Span::new(5, 10),
+                    kind: VariableKind::Var,
+                    declarations: vec![
+                        VariableDeclaration {
+                            span: Span::new(9, 10),
+                            pattern: Ident::new("a", (9, 10)).into(),
+                            initializer: None,
+                        }
+                    ]
+                }),
+                right: Ident::new("b", (14, 15)).into(),
+                body: EmptyStatement {
+                   span: Span::new(17, 18),
+                }.into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+#[ignore] // TODO
+fn fail_for_in_with_multiple_declarations() {
+    parser_test!(
+        input: "for (var a, b in c) ;",
+        error: SyntaxError(
+            "Invalid left-hand side in for-in loop: Must have a single binding.".to_owned(),
+            Span::new(5, 13)
+        )
     );
 }

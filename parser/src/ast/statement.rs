@@ -23,6 +23,7 @@ pub enum Statement {
     DoWhile(Box<DoWhileStatement>),
     While(Box<WhileStatement>),
     For(Box<ForStatement>),
+    ForIn(Box<ForInStatement>),
 }
 
 impl Statement {
@@ -134,6 +135,12 @@ impl From<WhileStatement> for Statement {
 impl From<ForStatement> for Statement {
     fn from(expr: ForStatement) -> Self {
         Self::For(Box::new(expr))
+    }
+}
+
+impl From<ForInStatement> for Statement {
+    fn from(expr: ForInStatement) -> Self {
+        Self::ForIn(Box::new(expr))
     }
 }
 
@@ -292,6 +299,14 @@ pub struct ForStatement {
     pub init: Option<ForInit>,
     pub test: Option<Expression>,
     pub update: Option<Expression>,
+    pub body: Statement,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct ForInStatement {
+    pub span: Span,
+    pub left: ForInit,
+    pub right: Expression,
     pub body: Statement,
 }
 

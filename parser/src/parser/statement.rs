@@ -5,7 +5,7 @@ use crate::ast::{
     ThrowStatement, TryStatement, VariableKind, WithStatement,
 };
 use crate::error::{Result, ThenTry};
-use crate::Parser;
+use crate::{ContextModify, Parser};
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
@@ -39,7 +39,9 @@ where
             token_matches!(keyword!("while")) => self.parse_while_statement()?,
             token_matches!(keyword!("for")) => self.parse_for_statement()?,
             token_matches!(keyword!("switch")) => self.parse_switch_statement()?,
-            _ if self.is_expression_statement()? => self.parse_expression_statement()?,
+            _ if self.is_expression_statement()? => self
+                .with_context(ContextModify::new().set_in(true))
+                .parse_expression_statement()?,
 
             // Declarations are handles as statements
             token_matches!(keyword!("function")) => self.parse_function_declaration()?,

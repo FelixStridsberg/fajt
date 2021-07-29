@@ -23,6 +23,7 @@ mod variable;
 pub struct ContextModify {
     is_await: Option<bool>,
     is_yield: Option<bool>,
+    is_in: Option<bool>,
 }
 
 impl ContextModify {
@@ -30,6 +31,7 @@ impl ContextModify {
         Self {
             is_await: None,
             is_yield: None,
+            is_in: None,
         }
     }
 
@@ -42,12 +44,18 @@ impl ContextModify {
         self.is_await = Some(value);
         self
     }
+
+    pub fn set_in(&mut self, value: bool) -> &mut Self {
+        self.is_in = Some(value);
+        self
+    }
 }
 
 #[derive(Clone)]
 pub struct Context {
     is_await: bool,
     is_yield: bool,
+    is_in: bool,
 }
 
 impl Context {
@@ -59,6 +67,10 @@ impl Context {
 
         if let Some(is_yield) = modify.is_yield {
             context.is_yield = is_yield;
+        }
+
+        if let Some(is_in) = modify.is_in {
+            context.is_in = is_in;
         }
 
         context
@@ -83,6 +95,7 @@ impl Default for Context {
         Self {
             is_await: false,
             is_yield: false,
+            is_in: false,
         }
     }
 }
@@ -113,7 +126,8 @@ where
 
     // TODO probably not appropriate, used for testing parsing expressions currently.
     pub fn parse_expr(&mut self) -> Result<Expression> {
-        self.parse_expression()
+        self.with_context(ContextModify::new().set_in(true))
+            .parse_expression()
     }
 
     fn position(&self) -> usize {
