@@ -15,16 +15,16 @@ impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
-    pub(super) fn parse_do_while_statement(&mut self) -> Result<Stmt> {
+    pub(super) fn parse_do_while_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("do"))?;
 
-        let body = self.parse_statement()?;
+        let body = self.parse_stmt()?;
 
         self.consume_assert(keyword!("while"))?;
         self.consume_assert(punct!("("))?;
 
-        let test = self.parse_expression()?;
+        let test = self.parse_expr()?;
 
         self.consume_assert(punct!(")"))?;
 
@@ -37,16 +37,16 @@ where
         .into())
     }
 
-    pub(super) fn parse_while_statement(&mut self) -> Result<Stmt> {
+    pub(super) fn parse_while_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("while"))?;
         self.consume_assert(punct!("("))?;
 
-        let test = self.parse_expression()?;
+        let test = self.parse_expr()?;
 
         self.consume_assert(punct!(")"))?;
 
-        let body = self.parse_statement()?;
+        let body = self.parse_stmt()?;
 
         let span = self.span_from(span_start);
         Ok(StmtWhile {
@@ -57,7 +57,7 @@ where
         .into())
     }
 
-    pub(super) fn parse_for_statement(&mut self) -> Result<Stmt> {
+    pub(super) fn parse_for_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("for"))?;
 
@@ -83,12 +83,12 @@ where
     fn parse_plain_for(&mut self, span_start: usize, init: Option<ForInit>) -> Result<Stmt> {
         self.consume_assert(punct!(";"))?;
 
-        let test = (!self.current_matches(punct!(";"))).then_try(|| self.parse_expression())?;
+        let test = (!self.current_matches(punct!(";"))).then_try(|| self.parse_expr())?;
         self.consume_assert(punct!(";"))?;
-        let update = (!self.current_matches(punct!(")"))).then_try(|| self.parse_expression())?;
+        let update = (!self.current_matches(punct!(")"))).then_try(|| self.parse_expr())?;
         self.consume_assert(punct!(")"))?;
 
-        let body = self.parse_statement()?;
+        let body = self.parse_stmt()?;
         let span = self.span_from(span_start);
         Ok(StmtFor {
             span,
@@ -107,11 +107,11 @@ where
 
         let right = self
             .with_context(ContextModify::new().set_in(true))
-            .parse_expression()?;
+            .parse_expr()?;
 
         self.consume_assert(punct!(")"))?;
 
-        let body = self.parse_statement()?;
+        let body = self.parse_stmt()?;
         let span = self.span_from(span_start);
         Ok(StmtForIn {
             span,
@@ -141,11 +141,11 @@ where
 
         let right = self
             .with_context(ContextModify::new().set_in(true))
-            .parse_expression()?;
+            .parse_expr()?;
 
         self.consume_assert(punct!(")"))?;
 
-        let body = self.parse_statement()?;
+        let body = self.parse_stmt()?;
         let span = self.span_from(span_start);
         Ok(StmtForOf {
             span,
@@ -182,9 +182,9 @@ where
 
         Ok(match self.reader.current()? {
             _ if self.current_matches(punct!(";")) => None,
-            _ => Some(ForInit::Expression(
+            _ => Some(ForInit::Expr(
                 self.with_context(ContextModify::new().set_in(false))
-                    .parse_expression()?,
+                    .parse_expr()?,
             )),
         })
     }

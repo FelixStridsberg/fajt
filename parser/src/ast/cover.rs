@@ -21,7 +21,7 @@ impl CoverParenthesizedAndArrowParameters {
         parser.parse_formal_parameters()
     }
 
-    pub fn into_expression(mut self) -> crate::error::Result<Expr> {
+    pub fn into_expr(mut self) -> crate::error::Result<Expr> {
         self.tokens.drain(0..1);
         self.tokens.pop();
 
@@ -29,7 +29,7 @@ impl CoverParenthesizedAndArrowParameters {
         let mut reader = PeekReader::new(tokens).unwrap();
         let mut parser = Parser::new(&mut reader).unwrap();
 
-        let expr = parser.parse_expression().unwrap();
+        let expr = parser.parse_expr().unwrap();
 
         Ok(ExprParenthesized {
             span: self.span,
@@ -40,12 +40,12 @@ impl CoverParenthesizedAndArrowParameters {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub(crate) struct CoverCallExpressionAndAsyncArrowHead {
+pub(crate) struct CoverCallExprAndAsyncArrowHead {
     pub span: Span,
     pub tokens: Vec<Token>,
 }
 
-impl CoverCallExpressionAndAsyncArrowHead {
+impl CoverCallExprAndAsyncArrowHead {
     pub fn into_arrow_parameters(mut self) -> crate::error::Result<FormalParameters> {
         self.tokens.drain(0..1); // Skip 'async' of 'async (...)'
 

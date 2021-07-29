@@ -56,12 +56,12 @@ where
                 }
                 token_matches!(punct!("...")) => {
                     self.reader.consume()?;
-                    let expr = self.parse_assignment_expression()?;
+                    let expr = self.parse_assignment_expr()?;
                     elements.push(ArrayElement::Spread(expr));
                     self.consume_array_delimiter()?;
                 }
                 _ => {
-                    let expr = self.parse_assignment_expression()?;
+                    let expr = self.parse_assignment_expr()?;
                     elements.push(ArrayElement::Expr(expr));
                     self.consume_array_delimiter()?;
                 }
@@ -91,7 +91,7 @@ where
                 }
                 token_matches!(punct!("...")) => {
                     self.reader.consume()?;
-                    let expr = self.parse_assignment_expression()?;
+                    let expr = self.parse_assignment_expr()?;
                     props.push(PropertyDefinition::Spread(expr));
                     self.consume_object_delimiter()?;
                 }

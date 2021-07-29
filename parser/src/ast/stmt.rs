@@ -13,7 +13,7 @@ ast_enum! {
         Debugger(StmtDebugger),
         DoWhile(StmtDoWhile),
         Empty(StmtEmpty),
-        Expression(Expr),
+        Expr(Expr),
         For(StmtFor),
         ForIn(StmtForIn),
         ForOf(StmtForOf),
@@ -33,10 +33,10 @@ impl Stmt {
     where
         E: Into<Expr>,
     {
-        Self::Expression(expr.into())
+        Self::Expr(expr.into())
     }
 
-    pub fn unwrap_block_statement(self) -> StmtBlock {
+    pub fn unwrap_block_stmt(self) -> StmtBlock {
         if let Stmt::Block(block) = self {
             block
         } else {
@@ -222,6 +222,6 @@ pub struct StmtForOf {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum ForInit {
-    Expression(Expr),
+    Expr(Expr),
     Declaration(StmtVariable),
 }

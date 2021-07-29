@@ -8,7 +8,7 @@ fn sequence_expression() {
         expr_output: [
             ExprSequence {
                 span: Span::new(0, 7),
-                expressions: vec![
+                expr: vec![
                     Ident::new("a", (0, 1)).into(),
                     Ident::new("b", (3, 4)).into(),
                     Ident::new("c", (6, 7)).into(),
@@ -40,7 +40,7 @@ fn parenthesized_expression_sequence() {
                 span: Span::new(0, 6),
                 expression: ExprSequence {
                     span: Span::new(1, 5),
-                    expressions: vec![
+                    expr: vec![
                         Ident::new("a", (1, 2)).into(),
                         Ident::new("b", (4, 5)).into(),
                     ]

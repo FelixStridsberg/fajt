@@ -270,7 +270,7 @@ fn fail_invalid_optional_chain_from_new_expression() {
     parser_test!(
         input: "new new a()?.b",
         expr_error: SyntaxError(
-            "Invalid optional chain from new expr".to_owned(),
+            "Invalid optional chain from new expression".to_owned(),
             Span::new(11, 13)
         )
     );

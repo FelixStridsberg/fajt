@@ -65,7 +65,7 @@ fn for_with_init() {
         output: [
             StmtFor {
                 span: Span::new(0, 11),
-                init: Some(ForInit::Expression(Ident::new("a", (5, 6)).into())),
+                init: Some(ForInit::Expr(Ident::new("a", (5, 6)).into())),
                 test: None,
                 update: None,
                 body: StmtEmpty {
@@ -209,7 +209,7 @@ fn for_in() {
         output: [
             StmtForIn {
                 span: Span::new(0, 14),
-                left: ForInit::Expression(Ident::new("a", (5, 6)).into()),
+                left: ForInit::Expr(Ident::new("a", (5, 6)).into()),
                 right: Ident::new("b", (10, 11)).into(),
                 body: StmtEmpty {
                    span: Span::new(13, 14),
@@ -265,7 +265,7 @@ fn for_of() {
         output: [
             StmtForOf {
                 span: Span::new(0, 14),
-                left: ForInit::Expression(Ident::new("a", (5, 6)).into()),
+                left: ForInit::Expr(Ident::new("a", (5, 6)).into()),
                 right: Ident::new("b", (10, 11)).into(),
                 body: StmtEmpty {
                    span: Span::new(13, 14),
@@ -284,7 +284,7 @@ fn for_await_of() {
         output: [
             StmtForOf {
                 span: Span::new(0, 20),
-                left: ForInit::Expression(Ident::new("a", (11, 12)).into()),
+                left: ForInit::Expr(Ident::new("a", (11, 12)).into()),
                 right: Ident::new("b", (16, 17)).into(),
                 body: StmtEmpty {
                    span: Span::new(19, 20),

@@ -13,7 +13,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `MemberExpression` goal symbol when you already know the left side.
-    pub(crate) fn parse_member_expression_right_side(
+    pub(crate) fn parse_member_expr_right_side(
         &mut self,
         span_start: usize,
         left: MemberObject,
@@ -29,27 +29,23 @@ where
     }
 
     /// Parses the `OptionalExpression` goal symbol. Left side must be known.
-    pub(crate) fn parse_optional_expression(
-        &mut self,
-        span_start: usize,
-        left: Expr,
-    ) -> Result<Expr> {
+    pub(crate) fn parse_optional_expr(&mut self, span_start: usize, left: Expr) -> Result<Expr> {
         let mut object = left;
 
         loop {
             match self.reader.current() {
                 token_matches!(ok: punct!("?.")) => {
                     if self.peek_matches(punct!("(")) {
-                        object = self.parse_optional_call_expression(span_start, object)?;
+                        object = self.parse_optional_call_expr(span_start, object)?;
                     } else {
-                        object = self.parse_optional_member_expression(span_start, object)?;
+                        object = self.parse_optional_member_expr(span_start, object)?;
                     }
                 }
                 token_matches!(ok: punct!(".")) | token_matches!(ok: punct!("[")) => {
-                    object = self.parse_optional_member_expression(span_start, object)?;
+                    object = self.parse_optional_member_expr(span_start, object)?;
                 }
                 token_matches!(ok: punct!("(")) => {
-                    object = self.parse_optional_call_expression(span_start, object)?;
+                    object = self.parse_optional_call_expr(span_start, object)?;
                 }
                 _ => break,
             }
@@ -58,7 +54,7 @@ where
         Ok(object)
     }
 
-    fn parse_optional_call_expression(&mut self, span_start: usize, callee: Expr) -> Result<Expr> {
+    fn parse_optional_call_expr(&mut self, span_start: usize, callee: Expr) -> Result<Expr> {
         let optional = self.current_matches(punct!("?."));
         if optional {
             self.reader.consume()?;
@@ -77,11 +73,7 @@ where
         .into())
     }
 
-    fn parse_optional_member_expression(
-        &mut self,
-        span_start: usize,
-        object: Expr,
-    ) -> Result<Expr> {
+    fn parse_optional_member_expr(&mut self, span_start: usize, object: Expr) -> Result<Expr> {
         let optional = self.current_matches(punct!("?."));
         let property = self.parse_optional_member_property()?;
         let span = self.span_from(span_start);
@@ -132,9 +124,9 @@ where
 
     fn parse_computed_property(&mut self) -> Result<Expr> {
         self.consume_assert(punct!("["))?;
-        let expression = self.parse_expression()?;
+        let expr = self.parse_expr()?;
         self.consume_assert(punct!("]"))?;
 
-        Ok(expression)
+        Ok(expr)
     }
 }

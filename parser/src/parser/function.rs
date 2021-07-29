@@ -17,7 +17,7 @@ where
 {
     /// Parses the `ArrowFunction` goal symbol, but expects the parameters as input since that may
     /// be a non terminal before we know if it is an arrow function or parenthesized expression.
-    pub(super) fn parse_arrow_function_expression(
+    pub(super) fn parse_arrow_function_expr(
         &mut self,
         span_start: usize,
         binding_parameter: bool,
@@ -29,7 +29,7 @@ where
         let body = if self.current_matches(punct!("{")) {
             ArrowFunctionBody::Block(self.parse_function_body()?)
         } else {
-            ArrowFunctionBody::Expr(self.parse_assignment_expression()?.into())
+            ArrowFunctionBody::Expr(self.parse_assignment_expr()?.into())
         };
 
         let span = self.span_from(span_start);
@@ -62,7 +62,7 @@ where
     }
 
     /// Parses the `FunctionExpression` goal symbol.
-    pub(super) fn parse_function_expression(&mut self) -> Result<Expr> {
+    pub(super) fn parse_function_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.consume_assert(keyword!("function"))?;
 
@@ -84,7 +84,7 @@ where
     }
 
     /// Parses the `AsyncFunctionExpression` goal symbol.
-    pub(super) fn parse_async_function_expression(&mut self) -> Result<Expr> {
+    pub(super) fn parse_async_function_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.consume_assert(keyword!("async"))?;
 
@@ -211,7 +211,7 @@ where
                 break;
             }
 
-            body.push(self.parse_statement()?);
+            body.push(self.parse_stmt()?);
         }
         Ok(body)
     }

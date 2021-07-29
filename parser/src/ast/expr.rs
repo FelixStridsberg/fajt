@@ -251,7 +251,7 @@ pub struct ExprAwait {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ExprSequence {
     pub span: Span,
-    pub expressions: Vec<Expr>,
+    pub expr: Vec<Expr>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]

@@ -12,7 +12,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `ClassExpression` goal symbol.
-    pub(super) fn parse_class_expression(&mut self) -> Result<Expr> {
+    pub(super) fn parse_class_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.consume_assert(keyword!("class"))?;
 
@@ -22,7 +22,7 @@ where
 
         let super_class = self.current_matches(keyword!("extends")).then_try(|| {
             self.reader.consume()?;
-            Ok(Box::new(self.parse_left_hand_side_expression()?))
+            Ok(Box::new(self.parse_left_hand_side_expr()?))
         })?;
 
         let body = self.parse_class_body()?;

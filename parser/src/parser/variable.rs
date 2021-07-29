@@ -10,7 +10,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `VariableStatement` or `LexicalDeclaration` goal symbol.
-    pub(super) fn parse_variable_statement(&mut self, kind: VariableKind) -> Result<Stmt> {
+    pub(super) fn parse_variable_stmt(&mut self, kind: VariableKind) -> Result<Stmt> {
         let token = self.reader.consume()?;
         let span_start = token.span.start;
 

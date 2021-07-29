@@ -120,14 +120,14 @@ where
     }
 
     pub fn parse(&mut self) -> Result<Program> {
-        let stmt = self.parse_statement()?;
+        let stmt = self.parse_stmt()?;
         Ok(Program::from_body(vec![stmt]))
     }
 
     // TODO probably not appropriate, used for testing parsing expressions currently.
-    pub fn parse_expr(&mut self) -> Result<Expr> {
+    pub fn parse_expression(&mut self) -> Result<Expr> {
         self.with_context(ContextModify::new().set_in(true))
-            .parse_expression()
+            .parse_expr()
     }
 
     fn position(&self) -> usize {

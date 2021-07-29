@@ -8,7 +8,7 @@ macro_rules! parse {
         let mut reader = fajt_common::io::PeekReader::new(lexer).unwrap();
         let mut parser = fajt_parser::Parser::new(&mut reader).unwrap();
 
-        parser.with_context(&$context).parse_expr()
+        parser.with_context(&$context).parse_expression()
     }};
     ($input:literal) => {{
         parse!($input, context: fajt_parser::ContextModify::default())

@@ -13,8 +13,8 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `ShortCircuitExpression` goal symbol.
-    pub(super) fn parse_short_circuit_expression(&mut self) -> Result<Expr> {
-        self.parse_logical_expression(Self::parse_logical_or_expression, |token| {
+    pub(super) fn parse_short_circuit_expr(&mut self) -> Result<Expr> {
+        self.parse_logical_expr(Self::parse_logical_or_expr, |token| {
             if token_matches!(token, punct!("??")) {
                 Some(logical_op!("??"))
             } else {
@@ -24,8 +24,8 @@ where
     }
 
     /// Parses the `LogicalORExpression` goal symbol.
-    fn parse_logical_or_expression(&mut self) -> Result<Expr> {
-        self.parse_logical_expression(Self::parse_logical_and_expression, |token| {
+    fn parse_logical_or_expr(&mut self) -> Result<Expr> {
+        self.parse_logical_expr(Self::parse_logical_and_expr, |token| {
             if token_matches!(token, punct!("||")) {
                 Some(logical_op!("||"))
             } else {
@@ -35,8 +35,8 @@ where
     }
 
     /// Parses the `LogicalANDExpression` goal symbol.
-    fn parse_logical_and_expression(&mut self) -> Result<Expr> {
-        self.parse_logical_expression(Self::parse_bitwise_or_expression, |token| {
+    fn parse_logical_and_expr(&mut self) -> Result<Expr> {
+        self.parse_logical_expr(Self::parse_bitwise_or_expr, |token| {
             if token_matches!(token, punct!("&&")) {
                 Some(logical_op!("&&"))
             } else {
@@ -46,8 +46,8 @@ where
     }
 
     /// Parses the `BitwiseORExpression` goal symbol.
-    fn parse_bitwise_or_expression(&mut self) -> Result<Expr> {
-        self.parse_binary_expression(Self::parse_bitwise_xor_expression, |token| {
+    fn parse_bitwise_or_expr(&mut self) -> Result<Expr> {
+        self.parse_binary_expr(Self::parse_bitwise_xor_expr, |token| {
             if token_matches!(token, punct!("|")) {
                 Some(binary_op!("|"))
             } else {
@@ -57,8 +57,8 @@ where
     }
 
     /// Parses the `BitwiseXORExpression` goal symbol.
-    fn parse_bitwise_xor_expression(&mut self) -> Result<Expr> {
-        self.parse_binary_expression(Self::parse_bitwise_and_expression, |token| {
+    fn parse_bitwise_xor_expr(&mut self) -> Result<Expr> {
+        self.parse_binary_expr(Self::parse_bitwise_and_expr, |token| {
             if token_matches!(token, punct!("^")) {
                 Some(binary_op!("^"))
             } else {
@@ -68,8 +68,8 @@ where
     }
 
     /// Parses the `BitwiseANDExpression` goal symbol.
-    fn parse_bitwise_and_expression(&mut self) -> Result<Expr> {
-        self.parse_binary_expression(Self::parse_equality_expression, |token| {
+    fn parse_bitwise_and_expr(&mut self) -> Result<Expr> {
+        self.parse_binary_expr(Self::parse_equality_expr, |token| {
             if token_matches!(token, punct!("&")) {
                 Some(binary_op!("&"))
             } else {
@@ -79,8 +79,8 @@ where
     }
 
     /// Parses the `EqualityExpression` goal symbol.
-    fn parse_equality_expression(&mut self) -> Result<Expr> {
-        self.parse_binary_expression(Self::parse_relational_expression, |token| match token {
+    fn parse_equality_expr(&mut self) -> Result<Expr> {
+        self.parse_binary_expr(Self::parse_relational_expr, |token| match token {
             token_matches!(punct!("==")) => Some(binary_op!("==")),
             token_matches!(punct!("!=")) => Some(binary_op!("!=")),
             token_matches!(punct!("===")) => Some(binary_op!("===")),
@@ -90,9 +90,9 @@ where
     }
 
     /// Parses the `RelationalExpression` goal symbol.
-    fn parse_relational_expression(&mut self) -> Result<Expr> {
+    fn parse_relational_expr(&mut self) -> Result<Expr> {
         let in_keyword_allowed = self.context.is_in;
-        self.parse_binary_expression(Self::parse_shift_expression, |token| match token {
+        self.parse_binary_expr(Self::parse_shift_expr, |token| match token {
             token_matches!(punct!("<")) => Some(binary_op!("<")),
             token_matches!(punct!(">")) => Some(binary_op!(">")),
             token_matches!(punct!("<=")) => Some(binary_op!("<=")),
@@ -104,8 +104,8 @@ where
     }
 
     /// Parses the `ShiftExpression` goal symbol.
-    fn parse_shift_expression(&mut self) -> Result<Expr> {
-        self.parse_binary_expression(Self::parse_additive_expression, |token| match token {
+    fn parse_shift_expr(&mut self) -> Result<Expr> {
+        self.parse_binary_expr(Self::parse_additive_expr, |token| match token {
             token_matches!(punct!("<<")) => Some(binary_op!("<<")),
             token_matches!(punct!(">>")) => Some(binary_op!(">>")),
             token_matches!(punct!(">>>")) => Some(binary_op!(">>>")),
@@ -114,8 +114,8 @@ where
     }
 
     /// Parses the `AdditiveExpression` goal symbol.
-    fn parse_additive_expression(&mut self) -> Result<Expr> {
-        self.parse_binary_expression(Self::parse_multiplicative_expression, |token| match token {
+    fn parse_additive_expr(&mut self) -> Result<Expr> {
+        self.parse_binary_expr(Self::parse_multiplicative_expr, |token| match token {
             token_matches!(punct!("+")) => Some(binary_op!("+")),
             token_matches!(punct!("-")) => Some(binary_op!("-")),
             _ => None,
@@ -123,8 +123,8 @@ where
     }
 
     /// Parses the `MultiplicativeExpression` goal symbol.
-    fn parse_multiplicative_expression(&mut self) -> Result<Expr> {
-        self.parse_binary_expression(Self::parse_exponentiation_expression, |token| match token {
+    fn parse_multiplicative_expr(&mut self) -> Result<Expr> {
+        self.parse_binary_expr(Self::parse_exponentiation_expr, |token| match token {
             token_matches!(punct!("*")) => Some(binary_op!("*")),
             token_matches!(punct!("/")) => Some(binary_op!("/")),
             token_matches!(punct!("%")) => Some(binary_op!("%")),
@@ -133,8 +133,8 @@ where
     }
 
     /// Parses the `ExponentiationExpression` goal symbol.
-    fn parse_exponentiation_expression(&mut self) -> Result<Expr> {
-        self.parse_binary_expression(Self::parse_unary_expression, |token| {
+    fn parse_exponentiation_expr(&mut self) -> Result<Expr> {
+        self.parse_binary_expr(Self::parse_unary_expr, |token| {
             if token_matches!(token, punct!("**")) {
                 Some(binary_op!("**"))
             } else {
@@ -149,7 +149,7 @@ where
     /// `next` is a method for retrieving the result of the _next_ goal symbol (i.e. right hand).
     /// `map_operator` is a function for mapping a token to a binary operator.
     #[inline]
-    fn parse_binary_expression<F>(
+    fn parse_binary_expr<F>(
         &mut self,
         next: fn(&mut Self) -> Result<Expr>,
         map_operator: F,
@@ -157,7 +157,7 @@ where
     where
         F: Fn(&Token) -> Option<BinaryOperator>,
     {
-        self.parse_recursive_binary_expression(next, map_operator, |span, left, right, operator| {
+        self.parse_recursive_binary_expr(next, map_operator, |span, left, right, operator| {
             ExprBinary {
                 span,
                 left: left.into(),
@@ -174,12 +174,12 @@ where
     /// `next` is a method for retrieving the result of the _next_ goal symbol (i.e. right hand).
     /// `map_operator` is a function for mapping a token to a binary operator.
     #[inline]
-    fn parse_logical_expression(
+    fn parse_logical_expr(
         &mut self,
         next: fn(&mut Self) -> Result<Expr>,
         map_operator: fn(&Token) -> Option<LogicalOperator>,
     ) -> Result<Expr> {
-        self.parse_recursive_binary_expression(next, map_operator, |span, left, right, operator| {
+        self.parse_recursive_binary_expr(next, map_operator, |span, left, right, operator| {
             ExprLogical {
                 span,
                 left: left.into(),
@@ -191,17 +191,17 @@ where
     }
 
     #[inline]
-    fn parse_recursive_binary_expression<T, F>(
+    fn parse_recursive_binary_expr<T, F>(
         &mut self,
         next: fn(&mut Self) -> Result<Expr>,
         map_operator: F,
-        create_expression: fn(span: Span, left: Expr, right: Expr, operator: T) -> Expr,
+        create_expr: fn(span: Span, left: Expr, right: Expr, operator: T) -> Expr,
     ) -> Result<Expr>
     where
         F: Fn(&Token) -> Option<T>,
     {
         let span_start = self.position();
-        let mut expression = next(self)?;
+        let mut expr = next(self)?;
         loop {
             let operator = self.reader.current().map(|t| map_operator(t));
 
@@ -210,12 +210,12 @@ where
                 let right = next(self)?;
                 let span = self.span_from(span_start);
 
-                expression = create_expression(span, expression, right, operator);
+                expr = create_expr(span, expr, right, operator);
             } else {
                 break;
             }
         }
 
-        Ok(expression)
+        Ok(expr)
     }
 }
