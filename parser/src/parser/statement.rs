@@ -1,7 +1,6 @@
 use crate::ast::{
-    BlockStatement, BreakStatement, CatchClause, ContinueStatement, DebuggerStatement,
-    EmptyStatement, IfStatement, ReturnStatement, Stmt, SwitchCase, SwitchStatement,
-    ThrowStatement, TryStatement, VariableKind, WithStatement,
+    CatchClause, Stmt, StmtBlock, StmtBreak, StmtContinue, StmtDebugger, StmtEmpty, StmtIf,
+    StmtReturn, StmtSwitch, StmtThrow, StmtTry, StmtWith, SwitchCase, VariableKind,
 };
 use crate::error::{Result, ThenTry};
 use crate::{ContextModify, Parser};
@@ -89,7 +88,7 @@ where
         }
 
         let span = self.span_from(span_start);
-        Ok(BlockStatement { span, statements }.into())
+        Ok(StmtBlock { span, statements }.into())
     }
 
     fn parse_expression_statement(&mut self) -> Result<Stmt> {
@@ -105,7 +104,7 @@ where
     /// Parses the `EmptyStatement` goal symbol.
     fn parse_empty_statement(&mut self) -> Result<Stmt> {
         let token = self.consume_assert(punct!(";"))?;
-        Ok(EmptyStatement { span: token.span }.into())
+        Ok(StmtEmpty { span: token.span }.into())
     }
 
     /// Parses the `BreakStatement` goal symbol.
@@ -117,7 +116,7 @@ where
             .statement_not_ended()
             .then_try(|| self.parse_identifier())?;
         let span = self.span_from(span_start);
-        Ok(BreakStatement { span, label }.into())
+        Ok(StmtBreak { span, label }.into())
     }
 
     /// Parses the `ContinueStatement` goal symbol.
@@ -129,7 +128,7 @@ where
             .statement_not_ended()
             .then_try(|| self.parse_identifier())?;
         let span = self.span_from(span_start);
-        Ok(ContinueStatement { span, label }.into())
+        Ok(StmtContinue { span, label }.into())
     }
 
     /// Parses the `ReturnStatement` goal symbol.
@@ -141,7 +140,7 @@ where
             .statement_not_ended()
             .then_try(|| self.parse_expression())?;
         let span = self.span_from(span_start);
-        Ok(ReturnStatement { span, argument }.into())
+        Ok(StmtReturn { span, argument }.into())
     }
 
     /// Parses the `ThrowStatement` goal symbol.
@@ -153,7 +152,7 @@ where
             .statement_not_ended()
             .then_try(|| self.parse_expression())?;
         let span = self.span_from(span_start);
-        Ok(ThrowStatement { span, argument }.into())
+        Ok(StmtThrow { span, argument }.into())
     }
 
     /// True if the current token is not preceded by a line feed or is a semi colon.
@@ -168,7 +167,7 @@ where
     /// Parses the `DebuggerStatement` goal symbol.
     fn parse_debugger_statement(&mut self) -> Result<Stmt> {
         let token = self.consume_assert(keyword!("debugger"))?;
-        Ok(DebuggerStatement { span: token.span }.into())
+        Ok(StmtDebugger { span: token.span }.into())
     }
 
     /// Parses the `IfStatement` goal symbol.
@@ -186,7 +185,7 @@ where
         })?;
 
         let span = self.span_from(span_start);
-        Ok(IfStatement {
+        Ok(StmtIf {
             span,
             condition,
             consequent,
@@ -205,7 +204,7 @@ where
 
         let body = self.parse_statement()?;
         let span = self.span_from(span_start);
-        Ok(WithStatement { span, object, body }.into())
+        Ok(StmtWith { span, object, body }.into())
     }
 
     /// Parses the `TryStatement` goal symbol.
@@ -223,7 +222,7 @@ where
         })?;
 
         let span = self.span_from(span_start);
-        Ok(TryStatement {
+        Ok(StmtTry {
             span,
             block,
             handler,
@@ -264,7 +263,7 @@ where
         let cases = self.parse_switch_cases()?;
 
         let span = self.span_from(span_start);
-        Ok(SwitchStatement {
+        Ok(StmtSwitch {
             span,
             discriminant,
             cases,

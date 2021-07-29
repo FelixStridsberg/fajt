@@ -6,7 +6,7 @@ fn sequence_expression() {
     parser_test!(
         input: "a, b, c",
         expr_output: [
-            SequenceExpression {
+            ExprSequence {
                 span: Span::new(0, 7),
                 expressions: vec![
                     Ident::new("a", (0, 1)).into(),
@@ -23,7 +23,7 @@ fn parenthesized_expression() {
     parser_test!(
         input: "(a)",
         expr_output: [
-            ParenthesizedExpression {
+            ExprParenthesized {
                 span: Span::new(0, 3),
                 expression: Ident::new("a", (1, 2)).into(),
             }.into()
@@ -36,9 +36,9 @@ fn parenthesized_expression_sequence() {
     parser_test!(
         input: "(a, b)",
         expr_output: [
-            ParenthesizedExpression {
+            ExprParenthesized {
                 span: Span::new(0, 6),
-                expression: SequenceExpression {
+                expression: ExprSequence {
                     span: Span::new(1, 5),
                     expressions: vec![
                         Ident::new("a", (1, 2)).into(),

@@ -6,7 +6,7 @@ fn empty_yield() {
     parser_test!(
         input: "yield",
         expr_output: [
-            YieldExpression {
+            ExprYield {
                 span: Span::new(0, 5),
                 argument: None,
                 delegate: false,
@@ -20,9 +20,9 @@ fn yield_a() {
     parser_test!(
         input: "yield a",
         expr_output: [
-            YieldExpression {
+            ExprYield {
                 span: Span::new(0, 7),
-                argument: Some(IdentifierReference::Ident(Ident::new("a", (6, 7))).into()),
+                argument: Some(ExprIdentifier::Ident(Ident::new("a", (6, 7))).into()),
                 delegate: false,
             }.into()
         ]
@@ -34,9 +34,9 @@ fn delegated_yield() {
     parser_test!(
         input: "yield* a",
         expr_output: [
-            YieldExpression {
+            ExprYield {
                 span: Span::new(0, 8),
-                argument: Some(IdentifierReference::Ident(Ident::new("a", (7, 8))).into()),
+                argument: Some(ExprIdentifier::Ident(Ident::new("a", (7, 8))).into()),
                 delegate: true,
             }.into()
         ]
@@ -48,7 +48,7 @@ fn yield_new_line() {
     parser_test!(
         input: "yield\na",
         expr_output: [
-            YieldExpression {
+            ExprYield {
                 span: Span::new(0, 5),
                 argument: None,
                 delegate: false,
@@ -62,7 +62,7 @@ fn yield_new_line_delegate() {
     parser_test!(
         input: "yield\n* a",
         expr_output: [
-            YieldExpression {
+            ExprYield {
                 span: Span::new(0, 5),
                 argument: None,
                 delegate: false,

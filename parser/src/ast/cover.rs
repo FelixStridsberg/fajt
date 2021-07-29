@@ -2,7 +2,7 @@
 //! raw tokens that later can be parsed when the actual goal symbol is determined.
 //!
 //! These will never appear in the final AST.
-use crate::ast::{Expr, FormalParameters, ParenthesizedExpression};
+use crate::ast::{Expr, ExprParenthesized, FormalParameters};
 use crate::Parser;
 use fajt_common::io::PeekReader;
 use fajt_lexer::token::{Span, Token};
@@ -31,7 +31,7 @@ impl CoverParenthesizedAndArrowParameters {
 
         let expression = parser.parse_expression().unwrap();
 
-        Ok(ParenthesizedExpression {
+        Ok(ExprParenthesized {
             span: self.span,
             expression,
         }

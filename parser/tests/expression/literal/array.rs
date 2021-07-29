@@ -7,7 +7,7 @@ fn empty_array_literal() {
     parser_test!(
         input: "[]",
         expr_output: [
-            LiteralExpression {
+            ExprLiteral {
                 span: Span::new(0, 2),
                 literal: Literal::Array(Array {
                     elements: vec![]
@@ -30,7 +30,7 @@ fn elision_array_literal() {
     parser_test!(
         input: "[, ]",
         expr_output: [
-            LiteralExpression {
+            ExprLiteral {
                 span: Span::new(0, 4),
                 literal: Literal::Array(Array {
                     elements: vec![ArrayElement::None]
@@ -45,7 +45,7 @@ fn single_element_array_literal() {
     parser_test!(
         input: "[ a ]",
         expr_output: [
-            LiteralExpression {
+            ExprLiteral {
                 span: Span::new(0, 5),
                 literal: Literal::Array(
                     Array {
@@ -64,7 +64,7 @@ fn mixed_element_array_literal() {
     parser_test!(
         input: "[ a,, b ]",
         expr_output: [
-            LiteralExpression {
+            ExprLiteral {
                 span: Span::new(0, 9),
                 literal: Literal::Array(
                     Array {
@@ -85,7 +85,7 @@ fn array_literal_spread_element() {
     parser_test!(
         input: "[ ...a ]",
         expr_output: [
-            LiteralExpression {
+            ExprLiteral {
                 span: Span::new(0, 8),
                 literal: Literal::Array(
                     Array {

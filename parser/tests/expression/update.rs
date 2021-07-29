@@ -6,11 +6,11 @@ fn prefix_increase() {
     parser_test!(
         input: "++a",
         expr_output: [
-            UpdateExpression {
+            ExprUpdate {
                 span: Span::new(0, 3),
                 operator: UpdateOperator::Increase,
                 prefix: true,
-                argument: IdentifierReference::Ident(Ident::new("a", (2, 3))).into(),
+                argument: ExprIdentifier::Ident(Ident::new("a", (2, 3))).into(),
             }.into()
         ]
     );
@@ -21,11 +21,11 @@ fn prefix_decrease() {
     parser_test!(
         input: "--a",
         expr_output: [
-            UpdateExpression {
+            ExprUpdate {
                 span: Span::new(0, 3),
                 operator: UpdateOperator::Decrease,
                 prefix: true,
-                argument: IdentifierReference::Ident(Ident::new("a", (2, 3))).into(),
+                argument: ExprIdentifier::Ident(Ident::new("a", (2, 3))).into(),
             }.into()
         ]
     );
@@ -36,11 +36,11 @@ fn suffix_increase() {
     parser_test!(
         input: "a++",
         expr_output: [
-            UpdateExpression {
+            ExprUpdate {
                 span: Span::new(0, 3),
                 operator: UpdateOperator::Increase,
                 prefix: false,
-                argument: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                argument: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
             }.into()
         ]
     );
@@ -51,11 +51,11 @@ fn suffix_decrease() {
     parser_test!(
         input: "a--",
         expr_output: [
-            UpdateExpression {
+            ExprUpdate {
                 span: Span::new(0, 3),
                 operator: UpdateOperator::Decrease,
                 prefix: false,
-                argument: IdentifierReference::Ident(Ident::new("a", (0, 1))).into(),
+                argument: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
             }.into()
         ]
     );

@@ -2,7 +2,7 @@ use crate::ast::{Expr, FormalParameters, Ident, PropertyName, Stmt};
 use fajt_lexer::token::Span;
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct ClassExpression {
+pub struct ExprClass {
     pub span: Span,
     pub identifier: Option<Ident>,
     pub super_class: Option<Expr>,

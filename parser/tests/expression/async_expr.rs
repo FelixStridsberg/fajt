@@ -18,9 +18,9 @@ fn await_() {
         input: "await a",
         context: ContextModify::new().set_await(true),
         expr_output: [
-            AwaitExpression {
+            ExprAwait {
                 span: Span::new(0, 7),
-                argument: IdentifierReference::Ident(Ident::new("a", (6, 7))).into(),
+                argument: ExprIdentifier::Ident(Ident::new("a", (6, 7))).into(),
             }.into()
         ]
     );

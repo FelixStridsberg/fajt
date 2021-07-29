@@ -1,6 +1,4 @@
-use crate::ast::{
-    Array, ArrayElement, Expr, Literal, LiteralExpression, Object, PropertyDefinition,
-};
+use crate::ast::{Array, ArrayElement, Expr, ExprLiteral, Literal, Object, PropertyDefinition};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 use crate::Parser;
@@ -16,7 +14,7 @@ where
     /// Consumes a know literal token from the reader and returns an expression of it.
     pub(super) fn consume_literal(&mut self, literal: Literal) -> Result<Expr> {
         let token = self.reader.consume()?;
-        Ok(LiteralExpression {
+        Ok(ExprLiteral {
             span: token.span,
             literal,
         }
@@ -29,7 +27,7 @@ where
         debug_assert!(token_matches!(token, @literal));
 
         if let TokenValue::Literal(literal) = token.value {
-            Ok(LiteralExpression {
+            Ok(ExprLiteral {
                 span: token.span,
                 literal: literal.into(),
             }
@@ -71,7 +69,7 @@ where
         }
 
         let span = self.span_from(span_start);
-        Ok(LiteralExpression {
+        Ok(ExprLiteral {
             span,
             literal: Literal::Array(Array { elements }),
         }
@@ -107,7 +105,7 @@ where
         }
 
         let span = self.span_from(span_start);
-        Ok(LiteralExpression {
+        Ok(ExprLiteral {
             span,
             literal: Literal::Object(Object { props }),
         }

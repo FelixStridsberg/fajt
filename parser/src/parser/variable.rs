@@ -1,4 +1,4 @@
-use crate::ast::{Stmt, VariableDeclaration, VariableKind, VariableStatement};
+use crate::ast::{Stmt, StmtVariable, VariableDeclaration, VariableKind};
 use crate::error::{Result, ThenTry};
 use crate::Parser;
 use fajt_common::io::PeekRead;
@@ -20,7 +20,7 @@ where
         }
 
         let span = self.span_from(span_start);
-        Ok(VariableStatement {
+        Ok(StmtVariable {
             span,
             kind,
             declarations,

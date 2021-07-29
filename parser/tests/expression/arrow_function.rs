@@ -6,7 +6,7 @@ fn identifier_argument() {
     parser_test!(
         input: "a => {}",
         expr_output: [
-            ArrowFunctionExpression {
+            ExprArrowFunction {
                 span: Span::new(0, 7),
                 asynchronous: false,
                 binding_parameter: true,
@@ -32,7 +32,7 @@ fn async_identifier_argument() {
     parser_test!(
         input: "async a => {}",
         expr_output: [
-            ArrowFunctionExpression {
+            ExprArrowFunction {
                 span: Span::new(0, 13),
                 asynchronous: true,
                 binding_parameter: true,
@@ -58,7 +58,7 @@ fn identifier_argument_expression_body() {
     parser_test!(
         input: "a => b",
         expr_output: [
-            ArrowFunctionExpression {
+            ExprArrowFunction {
                 span: Span::new(0, 6),
                 asynchronous: false,
                 binding_parameter: true,
@@ -74,7 +74,7 @@ fn identifier_argument_expression_body() {
                     rest: None,
                 },
                 body: ArrowFunctionBody::Expression(
-                    IdentifierReference::Ident(Ident::new("b", (5, 6))).into()
+                    ExprIdentifier::Ident(Ident::new("b", (5, 6))).into()
                 )
             }.into()
         ]
@@ -86,7 +86,7 @@ fn async_identifier_argument_expression_body() {
     parser_test!(
         input: "async a => b",
         expr_output: [
-            ArrowFunctionExpression {
+            ExprArrowFunction {
                 span: Span::new(0, 12),
                 asynchronous: true,
                 binding_parameter: true,
@@ -102,7 +102,7 @@ fn async_identifier_argument_expression_body() {
                     rest: None,
                 },
                 body: ArrowFunctionBody::Expression(
-                    IdentifierReference::Ident(Ident::new("b", (11, 12))).into()
+                    ExprIdentifier::Ident(Ident::new("b", (11, 12))).into()
                 )
             }.into()
         ]
@@ -114,7 +114,7 @@ fn no_parameters() {
     parser_test!(
         input: "() => {}",
         expr_output: [
-            ArrowFunctionExpression {
+            ExprArrowFunction {
                 span: Span::new(0, 8),
                 asynchronous: false,
                 binding_parameter: false,
@@ -130,7 +130,7 @@ fn async_no_parameters() {
     parser_test!(
         input: "async () => {}",
         expr_output: [
-            ArrowFunctionExpression {
+            ExprArrowFunction {
                 span: Span::new(0, 14),
                 asynchronous: true,
                 binding_parameter: false,
@@ -146,7 +146,7 @@ fn parameters_and_body() {
     parser_test!(
         input: "(a) => { ; }",
         expr_output: [
-            ArrowFunctionExpression {
+            ExprArrowFunction {
                 span: Span::new(0, 12),
                 asynchronous: false,
                 binding_parameter: false,
@@ -162,7 +162,7 @@ fn parameters_and_body() {
                     rest: None,
                 },
                 body: ArrowFunctionBody::Block(vec![
-                    EmptyStatement {
+                    StmtEmpty {
                         span: Span::new(9, 10),
                     }.into()
                 ])
@@ -176,7 +176,7 @@ fn multiple_parameters() {
     parser_test!(
         input: "(a, b, ...rest) => { ; }",
         expr_output: [
-            ArrowFunctionExpression {
+            ExprArrowFunction {
                 span: Span::new(0, 24),
                 asynchronous: false,
                 binding_parameter: false,
@@ -197,7 +197,7 @@ fn multiple_parameters() {
                     rest: Some(BindingPattern::Ident(Ident::new("rest", (10, 14)))),
                 },
                 body: ArrowFunctionBody::Block(vec![
-                    EmptyStatement {
+                    StmtEmpty {
                         span: Span::new(21, 22),
                     }.into()
                 ])
@@ -211,7 +211,7 @@ fn async_multiple_parameters() {
     parser_test!(
         input: "async (a, b, ...rest) => { ; }",
         expr_output: [
-            ArrowFunctionExpression {
+            ExprArrowFunction {
                 span: Span::new(0, 30),
                 asynchronous: true,
                 binding_parameter: false,
@@ -232,7 +232,7 @@ fn async_multiple_parameters() {
                     rest: Some(BindingPattern::Ident(Ident::new("rest", (16, 20)))),
                 },
                 body: ArrowFunctionBody::Block(vec![
-                    EmptyStatement {
+                    StmtEmpty {
                         span: Span::new(27, 28),
                     }.into()
                 ])

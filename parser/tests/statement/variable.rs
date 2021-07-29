@@ -12,7 +12,7 @@ fn no_initializer() {
     parser_test!(
         input: "var foo;",
         output: [
-            VariableStatement {
+            StmtVariable {
                 span: Span::new(0, 8),
                 kind: Var,
                 declarations: vec![
@@ -32,7 +32,7 @@ fn multiple_no_initializer() {
     parser_test!(
         input: "var a, b;",
         output: [
-            VariableStatement {
+            StmtVariable {
                 span: Span::new(0, 9),
                 kind: Var,
                 declarations: vec![
@@ -57,7 +57,7 @@ fn let_no_initializer() {
     parser_test!(
         input: "let foo;",
         output: [
-            VariableStatement {
+            StmtVariable {
                 span: Span::new(0, 8),
                 kind: Let,
                 declarations: vec![
@@ -77,7 +77,7 @@ fn const_no_initializer() {
     parser_test!(
         input: "const foo;",
         output: [
-            VariableStatement {
+            StmtVariable {
                 span: Span::new(0, 10),
                 kind: Const,
                 declarations: vec![
@@ -97,7 +97,7 @@ fn with_initializer() {
     parser_test!(
         input: "var foo = a;",
         output: [
-            VariableStatement {
+            StmtVariable {
                 span: Span::new(0, 12),
                 kind: Var,
                 declarations: vec![
@@ -117,7 +117,7 @@ fn multiple_with_initializer() {
     parser_test!(
         input: "var a = b, c;",
         output: [
-            VariableStatement {
+            StmtVariable {
                 span: Span::new(0, 13),
                 kind: Var,
                 declarations: vec![

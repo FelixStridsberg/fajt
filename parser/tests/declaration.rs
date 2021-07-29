@@ -13,7 +13,7 @@ fn function_declaration() {
     parser_test!(
         input: "function fn() {}",
         output: [
-            FunctionDeclaration {
+            DeclFunction {
                 span: Span::new(0, 16),
                 asynchronous: false,
                 generator: false,
@@ -30,7 +30,7 @@ fn generator_declaration() {
     parser_test!(
         input: "function *fn() {}",
         output: [
-            FunctionDeclaration {
+            DeclFunction {
                 span: Span::new(0, 17),
                 asynchronous: false,
                 generator: true,
@@ -47,14 +47,14 @@ fn function_declaration_with_body() {
     parser_test!(
         input: "function fn() { var a = 1 }",
         output: [
-            FunctionDeclaration {
+            DeclFunction {
                 span: Span::new(0, 27),
                 asynchronous: false,
                 generator: false,
                 identifier: Ident::new("fn", (9, 11)),
                 parameters: FormalParameters::empty((11, 13)),
                 body: vec![
-                    VariableStatement {
+                    StmtVariable {
                         span: Span::new(16, 25),
                         kind: VariableKind::Var,
                         declarations: vec![
@@ -62,7 +62,7 @@ fn function_declaration_with_body() {
                                 span: Span::new(20, 25),
                                 pattern: Ident::new("a", (20, 21)).into(),
                                 initializer: Some(
-                                    LiteralExpression {
+                                    ExprLiteral {
                                         span: Span::new(24, 25),
                                         literal: Literal::Number(Number::Integer(1, Decimal))
                                     }.into()
@@ -81,7 +81,7 @@ fn async_function_declaration() {
     parser_test!(
         input: "async function fn() {}",
         output: [
-            FunctionDeclaration {
+            DeclFunction {
                 span: Span::new(0, 22),
                 asynchronous: true,
                 generator: false,
@@ -98,7 +98,7 @@ fn async_generator_declaration() {
     parser_test!(
         input: "async function *fn() {}",
         output: [
-            FunctionDeclaration {
+            DeclFunction {
                 span: Span::new(0, 23),
                 asynchronous: true,
                 generator: true,
@@ -115,14 +115,14 @@ fn async_function_declaration_with_body() {
     parser_test!(
         input: "async function fn() { var a = 1 }",
         output: [
-            FunctionDeclaration {
+            DeclFunction {
                 span: Span::new(0, 33),
                 asynchronous: true,
                 generator: false,
                 identifier: Ident::new("fn", (15, 17)),
                 parameters: FormalParameters::empty((17, 19)),
                 body: vec![
-                    VariableStatement {
+                    StmtVariable {
                         span: Span::new(22, 31),
                         kind: VariableKind::Var,
                         declarations: vec![
@@ -130,7 +130,7 @@ fn async_function_declaration_with_body() {
                                 span: Span::new(26, 31),
                                 pattern: Ident::new("a", (26, 27)).into(),
                                 initializer: Some(
-                                    LiteralExpression {
+                                    ExprLiteral {
                                         span: Span::new(30, 31),
                                         literal: Literal::Number(Number::Integer(1, Decimal))
                                     }.into()
@@ -165,7 +165,7 @@ fn function_declaration_with_parameters() {
     parser_test!(
         input: "function fn(a, b = c) { }",
         output: [
-            FunctionDeclaration {
+            DeclFunction {
                 span: Span::new(0, 25),
                 asynchronous: false,
                 generator: false,
@@ -199,7 +199,7 @@ fn function_declaration_with_rest_parameter() {
     parser_test!(
         input: "function fn(...a) { }",
         output: [
-            FunctionDeclaration {
+            DeclFunction {
                 span: Span::new(0, 21),
                 asynchronous: false,
                 generator: false,

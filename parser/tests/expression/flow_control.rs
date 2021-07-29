@@ -6,11 +6,11 @@ fn conditional() {
     parser_test!(
         input: "test ? consequent : alternate",
         expr_output: [
-            ConditionalExpression {
+            ExprConditional {
                 span: Span::new(0, 29),
-                condition: IdentifierReference::Ident(Ident::new("test", (0, 4))).into(),
-                consequent: IdentifierReference::Ident(Ident::new("consequent", (7, 17))).into(),
-                alternate: IdentifierReference::Ident(Ident::new("alternate", (20, 29))).into(),
+                condition: ExprIdentifier::Ident(Ident::new("test", (0, 4))).into(),
+                consequent: ExprIdentifier::Ident(Ident::new("consequent", (7, 17))).into(),
+                alternate: ExprIdentifier::Ident(Ident::new("alternate", (20, 29))).into(),
             }.into()
         ]
     );

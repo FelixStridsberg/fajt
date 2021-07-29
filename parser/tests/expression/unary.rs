@@ -6,10 +6,10 @@ fn plus() {
     parser_test!(
         input: "+a",
         expr_output: [
-            UnaryExpression {
+            ExprUnary {
                 span: Span::new(0, 2),
                 operator: UnaryOperator::Plus,
-                argument: IdentifierReference::Ident(Ident::new("a", (1, 2))).into(),
+                argument: ExprIdentifier::Ident(Ident::new("a", (1, 2))).into(),
             }.into()
         ]
     );
@@ -20,10 +20,10 @@ fn minus() {
     parser_test!(
         input: "-a",
         expr_output: [
-            UnaryExpression {
+            ExprUnary {
                 span: Span::new(0, 2),
                 operator: UnaryOperator::Minus,
-                argument: IdentifierReference::Ident(Ident::new("a", (1, 2))).into(),
+                argument: ExprIdentifier::Ident(Ident::new("a", (1, 2))).into(),
             }.into()
         ]
     );
@@ -34,10 +34,10 @@ fn bitwise_not() {
     parser_test!(
         input: "~a",
         expr_output: [
-            UnaryExpression {
+            ExprUnary {
                 span: Span::new(0, 2),
                 operator: UnaryOperator::BitwiseNot,
-                argument: IdentifierReference::Ident(Ident::new("a", (1, 2))).into(),
+                argument: ExprIdentifier::Ident(Ident::new("a", (1, 2))).into(),
             }.into()
         ]
     );
@@ -48,10 +48,10 @@ fn not() {
     parser_test!(
         input: "!a",
         expr_output: [
-            UnaryExpression {
+            ExprUnary {
                 span: Span::new(0, 2),
                 operator: UnaryOperator::Not,
-                argument: IdentifierReference::Ident(Ident::new("a", (1, 2))).into(),
+                argument: ExprIdentifier::Ident(Ident::new("a", (1, 2))).into(),
             }.into()
         ]
     );
@@ -62,10 +62,10 @@ fn delete() {
     parser_test!(
         input: "delete a",
         expr_output: [
-            UnaryExpression {
+            ExprUnary {
                 span: Span::new(0, 8),
                 operator: UnaryOperator::Delete,
-                argument: IdentifierReference::Ident(Ident::new("a", (7, 8))).into(),
+                argument: ExprIdentifier::Ident(Ident::new("a", (7, 8))).into(),
             }.into()
         ]
     );
@@ -76,10 +76,10 @@ fn void() {
     parser_test!(
         input: "void a",
         expr_output: [
-            UnaryExpression {
+            ExprUnary {
                 span: Span::new(0, 6),
                 operator: UnaryOperator::Void,
-                argument: IdentifierReference::Ident(Ident::new("a", (5, 6))).into(),
+                argument: ExprIdentifier::Ident(Ident::new("a", (5, 6))).into(),
             }.into()
         ]
     );
@@ -90,10 +90,10 @@ fn typeof_() {
     parser_test!(
         input: "typeof a",
         expr_output: [
-            UnaryExpression {
+            ExprUnary {
                 span: Span::new(0, 8),
                 operator: UnaryOperator::Typeof,
-                argument: IdentifierReference::Ident(Ident::new("a", (7, 8))).into(),
+                argument: ExprIdentifier::Ident(Ident::new("a", (7, 8))).into(),
             }.into()
         ]
     );

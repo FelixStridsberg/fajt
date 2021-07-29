@@ -1,4 +1,4 @@
-use crate::ast::{ClassElement, ClassExpression, ClassMethod, ClassMethodKind, Expr};
+use crate::ast::{ClassElement, ClassMethod, ClassMethodKind, Expr, ExprClass};
 use crate::error::{Result, ThenTry};
 use crate::Parser;
 use fajt_common::io::PeekRead;
@@ -27,7 +27,7 @@ where
 
         let body = self.parse_class_body()?;
         let span = self.span_from(span_start);
-        Ok(ClassExpression {
+        Ok(ExprClass {
             span,
             identifier,
             super_class,

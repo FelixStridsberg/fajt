@@ -6,7 +6,7 @@ fn super_call() {
     parser_test!(
         input: "super()",
         expr_output: [
-            CallExpression {
+            ExprCall {
                 span: Span::new(0, 7),
                 callee: Callee::Super,
                 arguments_span: Span::new(5, 7),
@@ -21,7 +21,7 @@ fn super_call_with_args() {
     parser_test!(
         input: "super(a, b)",
         expr_output: [
-            CallExpression {
+            ExprCall {
                 span: Span::new(0, 11),
                 callee: Callee::Super,
                 arguments_span: Span::new(5, 11),
@@ -39,7 +39,7 @@ fn import_call() {
     parser_test!(
         input: "import(a)",
         expr_output: [
-            CallExpression {
+            ExprCall {
                 span: Span::new(0, 9),
                 callee: Callee::Import,
                 arguments_span: Span::new(6, 9),
@@ -56,7 +56,7 @@ fn empty_call_expression() {
     parser_test!(
         input: "fn()",
         expr_output: [
-            CallExpression {
+            ExprCall {
                 span: Span::new(0, 4),
                 callee: Callee::Expression(Ident::new("fn", (0, 2)).into()),
                 arguments_span: Span::new(2, 4),
@@ -71,7 +71,7 @@ fn call_expression() {
     parser_test!(
         input: "fn(a, ...b)",
         expr_output: [
-            CallExpression {
+            ExprCall {
                 span: Span::new(0, 11),
                 callee: Callee::Expression(Ident::new("fn", (0, 2)).into()),
                 arguments_span: Span::new(2, 11),
@@ -89,10 +89,10 @@ fn empty_call_member_identifier() {
     parser_test!(
         input: "fn().a",
         expr_output: [
-            MemberExpression {
+            ExprMember {
                 span: Span::new(0, 6),
                 object: MemberObject::Expression(
-                    CallExpression {
+                    ExprCall {
                         span: Span::new(0, 4),
                         callee: Callee::Expression(Ident::new("fn", (0, 2)).into()),
                         arguments_span: Span::new(2, 4),
@@ -110,13 +110,13 @@ fn nested_call_member() {
     parser_test!(
         input: "f1().f2()",
         expr_output: [
-            CallExpression {
+            ExprCall {
                 span: Span::new(0, 9),
                 callee: Callee::Expression(
-                    MemberExpression {
+                    ExprMember {
                         span: Span::new(0, 7),
                         object: MemberObject::Expression(
-                            CallExpression {
+                            ExprCall {
                                 span: Span::new(0, 4),
                                 callee: Callee::Expression(Ident::new("f1", (0, 2)).into()),
                                 arguments_span: Span::new(2, 4),
@@ -138,20 +138,20 @@ fn nested_call_member_computed() {
     parser_test!(
         input: r#"f1()["f2"]()"#,
         expr_output: [
-            CallExpression {
+            ExprCall {
                 span: Span::new(0, 12),
                 callee: Callee::Expression(
-                    MemberExpression {
+                    ExprMember {
                         span: Span::new(0, 10),
                         object: MemberObject::Expression(
-                            CallExpression {
+                            ExprCall {
                                 span: Span::new(0, 4),
                                 callee: Callee::Expression(Ident::new("f1", (0, 2)).into()),
                                 arguments_span: Span::new(2, 4),
                                 arguments: vec![],
                             }.into()
                         ),
-                        property: MemberProperty::Expression(LiteralExpression {
+                        property: MemberProperty::Expression(ExprLiteral {
                             span: Span::new(5, 9),
                             literal: Literal::String("f2".to_owned(), '"')
                         }.into()),

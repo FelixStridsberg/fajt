@@ -1,8 +1,7 @@
 use fajt_lexer::token::Span;
 use fajt_parser::ast::{
-    BindingPattern, DoWhileStatement, EmptyStatement, ForInStatement, ForInit, ForOfStatement,
-    ForStatement, Ident, Literal, LiteralExpression, Stmt, VariableDeclaration, VariableKind,
-    VariableStatement, WhileStatement,
+    BindingPattern, ExprLiteral, ForInit, Ident, Literal, Stmt, StmtDoWhile, StmtEmpty, StmtFor,
+    StmtForIn, StmtForOf, StmtVariable, StmtWhile, VariableDeclaration, VariableKind,
 };
 use fajt_parser::error::ErrorKind::SyntaxError;
 use fajt_parser::ContextModify;
@@ -12,10 +11,10 @@ fn do_while() {
     parser_test!(
         input: "do a; while (true)",
         output: [
-            DoWhileStatement {
+            StmtDoWhile {
                 span: Span::new(0, 18),
                 body: Stmt::expression(Ident::new("a", (3, 4))),
-                test: LiteralExpression {
+                test: ExprLiteral {
                     span: Span::new(13, 17),
                     literal: Literal::Boolean(true),
                 }.into()
@@ -29,9 +28,9 @@ fn r#while() {
     parser_test!(
         input: "while (true) a",
         output: [
-            WhileStatement {
+            StmtWhile {
                 span: Span::new(0, 14),
-                test: LiteralExpression {
+                test: ExprLiteral {
                     span: Span::new(7, 11),
                     literal: Literal::Boolean(true),
                 }.into(),
@@ -46,12 +45,12 @@ fn empty_for() {
     parser_test!(
         input: "for (;;) ;",
         output: [
-            ForStatement {
+            StmtFor {
                 span: Span::new(0, 10),
                 init: None,
                 test: None,
                 update: None,
-                body: EmptyStatement {
+                body: StmtEmpty {
                    span: Span::new(9, 10),
                 }.into(),
             }.into()
@@ -64,12 +63,12 @@ fn for_with_init() {
     parser_test!(
         input: "for (a;;) ;",
         output: [
-            ForStatement {
+            StmtFor {
                 span: Span::new(0, 11),
                 init: Some(ForInit::Expression(Ident::new("a", (5, 6)).into())),
                 test: None,
                 update: None,
-                body: EmptyStatement {
+                body: StmtEmpty {
                    span: Span::new(10, 11),
                 }.into(),
             }.into()
@@ -82,12 +81,12 @@ fn for_with_test() {
     parser_test!(
         input: "for (;a;) ;",
         output: [
-            ForStatement {
+            StmtFor {
                 span: Span::new(0, 11),
                 init: None,
                 test: Some(Ident::new("a", (6, 7)).into()),
                 update: None,
-                body: EmptyStatement {
+                body: StmtEmpty {
                    span: Span::new(10, 11),
                 }.into(),
             }.into()
@@ -100,12 +99,12 @@ fn for_with_update() {
     parser_test!(
         input: "for (;;a) ;",
         output: [
-            ForStatement {
+            StmtFor {
                 span: Span::new(0, 11),
                 init: None,
                 test: None,
                 update: Some(Ident::new("a", (7, 8)).into()),
-                body: EmptyStatement {
+                body: StmtEmpty {
                    span: Span::new(10, 11),
                 }.into(),
             }.into()
@@ -118,10 +117,10 @@ fn for_with_var_declaration() {
     parser_test!(
         input: "for (var a;;) ;",
         output: [
-            ForStatement {
+            StmtFor {
                 span: Span::new(0, 15),
                 init: Some(ForInit::Declaration(
-                    VariableStatement {
+                    StmtVariable {
                         span: Span::new(5, 10),
                         kind: VariableKind::Var,
                         declarations: vec![
@@ -135,7 +134,7 @@ fn for_with_var_declaration() {
                 )),
                 test: None,
                 update: None,
-                body: EmptyStatement {
+                body: StmtEmpty {
                    span: Span::new(14, 15),
                 }.into(),
             }.into()
@@ -148,10 +147,10 @@ fn for_with_let_declaration() {
     parser_test!(
         input: "for (let a;;) ;",
         output: [
-            ForStatement {
+            StmtFor {
                 span: Span::new(0, 15),
                 init: Some(ForInit::Declaration(
-                    VariableStatement {
+                    StmtVariable {
                         span: Span::new(5, 10),
                         kind: VariableKind::Let,
                         declarations: vec![
@@ -165,7 +164,7 @@ fn for_with_let_declaration() {
                 )),
                 test: None,
                 update: None,
-                body: EmptyStatement {
+                body: StmtEmpty {
                    span: Span::new(14, 15),
                 }.into(),
             }.into()
@@ -178,10 +177,10 @@ fn for_with_const_declaration() {
     parser_test!(
         input: "for (const a;;) ;",
         output: [
-            ForStatement {
+            StmtFor {
                 span: Span::new(0, 17),
                 init: Some(ForInit::Declaration(
-                    VariableStatement {
+                    StmtVariable {
                         span: Span::new(5, 12),
                         kind: VariableKind::Const,
                         declarations: vec![
@@ -195,7 +194,7 @@ fn for_with_const_declaration() {
                 )),
                 test: None,
                 update: None,
-                body: EmptyStatement {
+                body: StmtEmpty {
                    span: Span::new(16, 17),
                 }.into(),
             }.into()
@@ -208,11 +207,11 @@ fn for_in() {
     parser_test!(
         input: "for (a in b) ;",
         output: [
-            ForInStatement {
+            StmtForIn {
                 span: Span::new(0, 14),
                 left: ForInit::Expression(Ident::new("a", (5, 6)).into()),
                 right: Ident::new("b", (10, 11)).into(),
-                body: EmptyStatement {
+                body: StmtEmpty {
                    span: Span::new(13, 14),
                 }.into(),
             }.into()
@@ -225,9 +224,9 @@ fn for_in_with_declaration() {
     parser_test!(
         input: "for (var a in b) ;",
         output: [
-            ForInStatement {
+            StmtForIn {
                 span: Span::new(0, 18),
-                left: ForInit::Declaration(VariableStatement {
+                left: ForInit::Declaration(StmtVariable {
                     span: Span::new(5, 10),
                     kind: VariableKind::Var,
                     declarations: vec![
@@ -239,7 +238,7 @@ fn for_in_with_declaration() {
                     ]
                 }),
                 right: Ident::new("b", (14, 15)).into(),
-                body: EmptyStatement {
+                body: StmtEmpty {
                    span: Span::new(17, 18),
                 }.into(),
             }.into()
@@ -264,11 +263,11 @@ fn for_of() {
     parser_test!(
         input: "for (a of b) ;",
         output: [
-            ForOfStatement {
+            StmtForOf {
                 span: Span::new(0, 14),
                 left: ForInit::Expression(Ident::new("a", (5, 6)).into()),
                 right: Ident::new("b", (10, 11)).into(),
-                body: EmptyStatement {
+                body: StmtEmpty {
                    span: Span::new(13, 14),
                 }.into(),
                 wait: false,
@@ -283,11 +282,11 @@ fn for_await_of() {
         input: "for await (a of b) ;",
         context: ContextModify::new().set_await(true),
         output: [
-            ForOfStatement {
+            StmtForOf {
                 span: Span::new(0, 20),
                 left: ForInit::Expression(Ident::new("a", (11, 12)).into()),
                 right: Ident::new("b", (16, 17)).into(),
-                body: EmptyStatement {
+                body: StmtEmpty {
                    span: Span::new(19, 20),
                 }.into(),
                 wait: true,
@@ -301,9 +300,9 @@ fn for_of_with_declaration() {
     parser_test!(
         input: "for (var a of b) ;",
         output: [
-            ForOfStatement {
+            StmtForOf {
                 span: Span::new(0, 18),
-                left: ForInit::Declaration(VariableStatement {
+                left: ForInit::Declaration(StmtVariable {
                     span: Span::new(5, 10),
                     kind: VariableKind::Var,
                     declarations: vec![
@@ -315,7 +314,7 @@ fn for_of_with_declaration() {
                     ]
                 }),
                 right: Ident::new("b", (14, 15)).into(),
-                body: EmptyStatement {
+                body: StmtEmpty {
                    span: Span::new(17, 18),
                 }.into(),
                 wait: false,

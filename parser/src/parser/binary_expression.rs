@@ -1,4 +1,4 @@
-use crate::ast::{BinaryExpression, BinaryOperator, Expr, LogicalExpression, LogicalOperator};
+use crate::ast::{BinaryOperator, Expr, ExprBinary, ExprLogical, LogicalOperator};
 use crate::error::Result;
 use crate::Parser;
 
@@ -158,7 +158,7 @@ where
         F: Fn(&Token) -> Option<BinaryOperator>,
     {
         self.parse_recursive_binary_expression(next, map_operator, |span, left, right, operator| {
-            BinaryExpression {
+            ExprBinary {
                 span,
                 left,
                 right,
@@ -180,7 +180,7 @@ where
         map_operator: fn(&Token) -> Option<LogicalOperator>,
     ) -> Result<Expr> {
         self.parse_recursive_binary_expression(next, map_operator, |span, left, right, operator| {
-            LogicalExpression {
+            ExprLogical {
                 span,
                 left,
                 right,

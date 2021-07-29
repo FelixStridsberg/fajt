@@ -7,7 +7,7 @@ fn empty_class() {
     parser_test!(
         input: "class MyClass {}",
         expr_output: [
-            ClassExpression {
+            ExprClass {
                 span: Span::new(0, 16),
                 identifier: Some(Ident::new("MyClass", (6, 13))),
                 super_class: None,
@@ -22,7 +22,7 @@ fn anonymous_empty_class() {
     parser_test!(
         input: "class {}",
         expr_output: [
-            ClassExpression {
+            ExprClass {
                 span: Span::new(0, 8),
                 identifier: None,
                 super_class: None,
@@ -37,7 +37,7 @@ fn empty_class_extends() {
     parser_test!(
         input: "class MyClass extends SuperClass {}",
         expr_output: [
-            ClassExpression {
+            ExprClass {
                 span: Span::new(0, 35),
                 identifier: Some(Ident::new("MyClass", (6, 13))),
                 super_class: Some(Ident::new("SuperClass", (22, 32)).into()),
@@ -52,7 +52,7 @@ fn class_with_empty_method() {
     parser_test!(
         input: "class { method1() {} }",
         expr_output: [
-            ClassExpression {
+            ExprClass {
                 span: Span::new(0, 22),
                 identifier: None,
                 super_class: None,
@@ -77,7 +77,7 @@ fn class_with_empty_generator_method() {
     parser_test!(
         input: "class { *method1() {} }",
         expr_output: [
-            ClassExpression {
+            ExprClass {
                 span: Span::new(0, 23),
                 identifier: None,
                 super_class: None,
@@ -102,7 +102,7 @@ fn class_with_empty_async_method() {
     parser_test!(
         input: "class { async method1() {} }",
         expr_output: [
-            ClassExpression {
+            ExprClass {
                 span: Span::new(0, 28),
                 identifier: None,
                 super_class: None,
@@ -127,7 +127,7 @@ fn class_with_empty_async_generator_method() {
     parser_test!(
         input: "class { async *method1() {} }",
         expr_output: [
-            ClassExpression {
+            ExprClass {
                 span: Span::new(0, 29),
                 identifier: None,
                 super_class: None,
@@ -152,7 +152,7 @@ fn class_empty_getter_method() {
     parser_test!(
         input: "class { get getter() {} }",
         expr_output: [
-            ClassExpression {
+            ExprClass {
                 span: Span::new(0, 25),
                 identifier: None,
                 super_class: None,
@@ -177,7 +177,7 @@ fn class_empty_setter_method() {
     parser_test!(
         input: "class { set setter(a) {} }",
         expr_output: [
-            ClassExpression {
+            ExprClass {
                 span: Span::new(0, 26),
                 identifier: None,
                 super_class: None,

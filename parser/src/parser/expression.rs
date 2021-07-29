@@ -1,7 +1,7 @@
 use crate::ast::{
-    Argument, AssignmentExpression, AwaitExpression, CallExpression, Callee, ConditionalExpression,
-    Expr, Ident, Literal, MemberObject, MetaPropertyExpression, NewExpression, SequenceExpression,
-    Super, ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
+    Argument, Callee, Expr, ExprAssignment, ExprAwait, ExprCall, ExprConditional, ExprMetaProperty,
+    ExprNew, ExprSequence, ExprThis, ExprUnary, ExprUpdate, ExprYield, Ident, Literal,
+    MemberObject, Super,
 };
 use crate::error::ErrorKind::SyntaxError;
 use crate::error::{Result, ThenTry};
@@ -48,7 +48,7 @@ where
         }
 
         let span = self.span_from(span_start);
-        Ok(SequenceExpression { span, expressions }.into())
+        Ok(ExprSequence { span, expressions }.into())
     }
 
     /// Parses the `AssignmentExpression` goal symbol.
@@ -91,7 +91,7 @@ where
                     self.reader.consume()?; // consume the operator
                     let right = self.parse_assignment_expression()?;
                     let span = self.span_from(span_start);
-                    Ok(AssignmentExpression {
+                    Ok(ExprAssignment {
                         span,
                         operator,
                         left: expression,
@@ -153,7 +153,7 @@ where
 
         if self.reader.is_end() {
             let span = self.span_from(span_start);
-            return Ok(YieldExpression {
+            return Ok(ExprYield {
                 span,
                 argument: None,
                 delegate: false,
@@ -170,7 +170,7 @@ where
 
         let argument = has_argument.then_try(|| self.parse_assignment_expression())?;
         let span = self.span_from(span_start);
-        Ok(YieldExpression {
+        Ok(ExprYield {
             span,
             argument,
             delegate,
@@ -191,7 +191,7 @@ where
 
             let alternate = self.parse_assignment_expression()?;
             let span = self.span_from(span_start);
-            Ok(ConditionalExpression {
+            Ok(ExprConditional {
                 span,
                 condition: expression,
                 consequent,
@@ -218,7 +218,7 @@ where
                 self.reader.consume()?;
                 let argument = self.parse_unary_expression()?;
                 let span = self.span_from(span_start);
-                return Ok(AwaitExpression { span, argument }.into());
+                return Ok(ExprAwait { span, argument }.into());
             }
             _ => None,
         };
@@ -228,7 +228,7 @@ where
             self.reader.consume()?;
             let argument = self.parse_unary_expression()?;
             let span = self.span_from(span_start);
-            Ok(UnaryExpression {
+            Ok(ExprUnary {
                 span,
                 operator,
                 argument,
@@ -252,7 +252,7 @@ where
             self.reader.consume()?;
             let argument = self.parse_unary_expression()?;
             let span = self.span_from(span_start);
-            return Ok(UpdateExpression {
+            return Ok(ExprUpdate {
                 span,
                 operator,
                 prefix: true,
@@ -276,7 +276,7 @@ where
 
             self.reader.consume()?;
             let span = self.span_from(span_start);
-            Ok(UpdateExpression {
+            Ok(ExprUpdate {
                 span,
                 operator,
                 prefix: false,
@@ -310,7 +310,7 @@ where
                         token_matches!(ok: punct!("(")) => {
                             let (arguments_span, arguments) = self.parse_arguments()?;
                             let span = self.span_from(span_start);
-                            expression = CallExpression {
+                            expression = ExprCall {
                                 span,
                                 callee: Callee::Expression(expression),
                                 arguments_span,
@@ -355,7 +355,7 @@ where
         self.reader.consume()?;
         let (arguments_span, arguments) = self.parse_arguments()?;
         let span = self.span_from(span_start);
-        Ok(CallExpression {
+        Ok(ExprCall {
             span,
             callee: Callee::Super,
             arguments_span,
@@ -372,7 +372,7 @@ where
         let (arguments_span, arguments) = self.parse_import_argument()?;
 
         let span = self.span_from(span_start);
-        Ok(CallExpression {
+        Ok(ExprCall {
             span,
             callee: Callee::Import,
             arguments_span,
@@ -408,7 +408,7 @@ where
             };
 
             let span = self.span_from(span_start);
-            Ok(NewExpression {
+            Ok(ExprNew {
                 span,
                 callee,
                 arguments_span,
@@ -500,7 +500,7 @@ where
                 }
 
                 let span = self.span_from(span_start);
-                Ok(MetaPropertyExpression {
+                Ok(ExprMetaProperty {
                     span,
                     meta: Ident::new("new", new_token.span),
                     property,
@@ -518,7 +518,7 @@ where
                 }
 
                 let span = self.span_from(span_start);
-                Ok(MetaPropertyExpression {
+                Ok(ExprMetaProperty {
                     span,
                     meta: Ident::new("import", import_token.span),
                     property,
@@ -557,7 +557,7 @@ where
     /// Parses the `this` expression which is part of the `PrimaryExpression` goal symbol.
     fn parse_this_expression(&mut self) -> Result<Expr> {
         let token = self.consume_assert(keyword!("this"))?;
-        Ok(ThisExpression::new(token.span).into())
+        Ok(ExprThis::new(token.span).into())
     }
 
     /// Parses the `IdentifierReference` goal symbol.

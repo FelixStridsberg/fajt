@@ -1,6 +1,5 @@
 use crate::ast::{
-    Expr, MemberExpression, MemberObject, MemberProperty, OptionalCallExpression,
-    OptionalMemberExpression,
+    Expr, ExprMember, ExprOptionalCall, ExprOptionalMember, MemberObject, MemberProperty,
 };
 use crate::error::Result;
 use crate::Parser;
@@ -21,7 +20,7 @@ where
     ) -> Result<Expr> {
         let property = self.parse_member_property()?;
         let span = self.span_from(span_start);
-        Ok(MemberExpression {
+        Ok(ExprMember {
             span,
             object: left,
             property,
@@ -68,7 +67,7 @@ where
         let (arguments_span, arguments) = self.parse_arguments()?;
         let span = self.span_from(span_start);
 
-        Ok(OptionalCallExpression {
+        Ok(ExprOptionalCall {
             span,
             callee,
             arguments_span,
@@ -87,7 +86,7 @@ where
         let property = self.parse_optional_member_property()?;
         let span = self.span_from(span_start);
 
-        Ok(OptionalMemberExpression {
+        Ok(ExprOptionalMember {
             span,
             object,
             property,

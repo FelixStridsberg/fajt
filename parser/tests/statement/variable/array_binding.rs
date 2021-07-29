@@ -8,7 +8,7 @@ fn empty() {
     parser_test!(
         input: "var [] = a;",
         output: [
-            VariableStatement {
+            StmtVariable {
                 span: Span::new(0, 11),
                 kind: Var,
                 declarations: vec![
@@ -34,7 +34,7 @@ fn identifier_binding() {
     parser_test!(
         input: "var [ a ] = b;",
         output: [
-            VariableStatement {
+            StmtVariable {
                 span: Span::new(0, 14),
                 kind: Var,
                 declarations: vec![
@@ -66,7 +66,7 @@ fn identifier_binding_with_initializer() {
     parser_test!(
         input: "var [ a = b ] = c;",
         output: [
-            VariableStatement {
+            StmtVariable {
                 span: Span::new(0, 18),
                 kind: Var,
                 declarations: vec![
@@ -98,7 +98,7 @@ fn trailing_comma() {
     parser_test!(
         input: "var [ a, ] = b;",
         output: [
-            VariableStatement {
+            StmtVariable {
                 span: Span::new(0, 15),
                 kind: Var,
                 declarations: vec![
@@ -130,7 +130,7 @@ fn single_elision() {
     parser_test!(
         input: "var [ , ] = b;",
         output: [
-            VariableStatement {
+            StmtVariable {
                 span: Span::new(0, 14),
                 kind: Var,
                 declarations: vec![
@@ -156,7 +156,7 @@ fn rest_element() {
     parser_test!(
         input: "var [ ...a ] = b;",
         output: [
-            VariableStatement {
+            StmtVariable {
                 span: Span::new(0, 17),
                 kind: Var,
                 declarations: vec![
@@ -182,7 +182,7 @@ fn mixed_elision_and_identifiers() {
     parser_test!(
         input: "var [ , a,,b ] = c;",
         output: [
-            VariableStatement {
+            StmtVariable {
                 span: Span::new(0, 19),
                 kind: Var,
                 declarations: vec![
@@ -223,7 +223,7 @@ fn await_as_identifier() {
     parser_test!(
         input: "var [ await, ...await ] = c;",
         output: [
-            VariableStatement {
+            StmtVariable {
                 span: Span::new(0, 28),
                 kind: Var,
                 declarations: vec![
@@ -259,7 +259,7 @@ fn yield_as_identifier() {
     parser_test!(
         input: "var [ yield, ...yield ] = c;",
         output: [
-            VariableStatement {
+            StmtVariable {
                 span: Span::new(0, 28),
                 kind: Var,
                 declarations: vec![
@@ -309,7 +309,7 @@ fn nested_object_binding() {
     parser_test!(
         input: "var [ { a } ] = b;",
         output: [
-            VariableStatement {
+            StmtVariable {
                 span: Span::new(0, 18),
                 kind: Var,
                 declarations: vec![

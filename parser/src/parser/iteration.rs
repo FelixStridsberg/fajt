@@ -1,6 +1,6 @@
 use crate::ast::{
-    DoWhileStatement, ForInStatement, ForInit, ForOfStatement, ForStatement, Stmt, VariableKind,
-    VariableStatement, WhileStatement,
+    ForInit, Stmt, StmtDoWhile, StmtFor, StmtForIn, StmtForOf, StmtVariable, StmtWhile,
+    VariableKind,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenTry};
@@ -29,7 +29,7 @@ where
         self.consume_assert(punct!(")"))?;
 
         let span = self.span_from(span_start);
-        Ok(DoWhileStatement { span, body, test }.into())
+        Ok(StmtDoWhile { span, body, test }.into())
     }
 
     pub(super) fn parse_while_statement(&mut self) -> Result<Stmt> {
@@ -44,7 +44,7 @@ where
         let body = self.parse_statement()?;
 
         let span = self.span_from(span_start);
-        Ok(WhileStatement { span, test, body }.into())
+        Ok(StmtWhile { span, test, body }.into())
     }
 
     pub(super) fn parse_for_statement(&mut self) -> Result<Stmt> {
@@ -80,7 +80,7 @@ where
 
         let body = self.parse_statement()?;
         let span = self.span_from(span_start);
-        Ok(ForStatement {
+        Ok(StmtFor {
             span,
             init,
             test,
@@ -103,7 +103,7 @@ where
 
         let body = self.parse_statement()?;
         let span = self.span_from(span_start);
-        Ok(ForInStatement {
+        Ok(StmtForIn {
             span,
             left,
             right,
@@ -137,7 +137,7 @@ where
 
         let body = self.parse_statement()?;
         let span = self.span_from(span_start);
-        Ok(ForOfStatement {
+        Ok(StmtForOf {
             span,
             left,
             right,
@@ -163,7 +163,7 @@ where
                 .parse_variable_declarations()?;
 
             let span = self.span_from(span_start);
-            return Ok(Some(ForInit::Declaration(VariableStatement {
+            return Ok(Some(ForInit::Declaration(StmtVariable {
                 span,
                 kind,
                 declarations,

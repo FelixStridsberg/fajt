@@ -1,6 +1,6 @@
 use crate::ast::{
-    ArrowFunctionBody, ArrowFunctionExpression, BindingElement, Expr, FormalParameters,
-    FunctionDeclaration, FunctionExpression, Ident, Stmt,
+    ArrowFunctionBody, BindingElement, DeclFunction, Expr, ExprArrowFunction, ExprFunction,
+    FormalParameters, Ident, Stmt,
 };
 use crate::error::Result;
 use crate::parser::ContextModify;
@@ -33,7 +33,7 @@ where
         };
 
         let span = self.span_from(span_start);
-        Ok(ArrowFunctionExpression {
+        Ok(ExprArrowFunction {
             span,
             asynchronous,
             binding_parameter,
@@ -72,7 +72,7 @@ where
         let body = self.parse_function_body()?;
 
         let span = self.span_from(span_start);
-        Ok(FunctionExpression {
+        Ok(ExprFunction {
             span,
             asynchronous: false,
             generator,
@@ -97,7 +97,7 @@ where
         let body = self.parse_function_body()?;
 
         let span = self.span_from(span_start);
-        Ok(FunctionExpression {
+        Ok(ExprFunction {
             span,
             asynchronous: true,
             generator,
@@ -156,7 +156,7 @@ where
         let body = self.parse_function_body()?;
 
         let span = self.span_from(span_start);
-        Ok(FunctionDeclaration {
+        Ok(DeclFunction {
             span,
             asynchronous,
             generator,

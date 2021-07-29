@@ -6,25 +6,25 @@ use fajt_lexer::token::Span;
 /// Note: Declarations are handles as statements since they can appear in the same contexts.
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Stmt {
-    FunctionDecl(Box<FunctionDeclaration>),
-    Block(Box<BlockStatement>),
-    Break(Box<BreakStatement>),
-    Continue(Box<ContinueStatement>),
-    Debugger(Box<DebuggerStatement>),
-    DoWhile(Box<DoWhileStatement>),
-    Empty(Box<EmptyStatement>),
+    FunctionDecl(Box<DeclFunction>),
+    Block(Box<StmtBlock>),
+    Break(Box<StmtBreak>),
+    Continue(Box<StmtContinue>),
+    Debugger(Box<StmtDebugger>),
+    DoWhile(Box<StmtDoWhile>),
+    Empty(Box<StmtEmpty>),
     Expression(Box<Expr>),
-    For(Box<ForStatement>),
-    ForIn(Box<ForInStatement>),
-    ForOf(Box<ForOfStatement>),
-    If(Box<IfStatement>),
-    Return(Box<ReturnStatement>),
-    Switch(Box<SwitchStatement>),
-    Throw(Box<ThrowStatement>),
-    Try(Box<TryStatement>),
-    Variable(Box<VariableStatement>),
-    While(Box<WhileStatement>),
-    With(Box<WithStatement>),
+    For(Box<StmtFor>),
+    ForIn(Box<StmtForIn>),
+    ForOf(Box<StmtForOf>),
+    If(Box<StmtIf>),
+    Return(Box<StmtReturn>),
+    Switch(Box<StmtSwitch>),
+    Throw(Box<StmtThrow>),
+    Try(Box<StmtTry>),
+    Variable(Box<StmtVariable>),
+    While(Box<StmtWhile>),
+    With(Box<StmtWith>),
 }
 
 impl Stmt {
@@ -35,7 +35,7 @@ impl Stmt {
         Self::Expression(Box::new(expression.into()))
     }
 
-    pub fn unwrap_block_statement(self) -> BlockStatement {
+    pub fn unwrap_block_statement(self) -> StmtBlock {
         if let Stmt::Block(block) = self {
             *block
         } else {
@@ -44,20 +44,20 @@ impl Stmt {
     }
 }
 
-impl From<BlockStatement> for Stmt {
-    fn from(stmt: BlockStatement) -> Self {
+impl From<StmtBlock> for Stmt {
+    fn from(stmt: StmtBlock) -> Self {
         Self::Block(Box::new(stmt))
     }
 }
 
-impl From<EmptyStatement> for Stmt {
-    fn from(stmt: EmptyStatement) -> Self {
+impl From<StmtEmpty> for Stmt {
+    fn from(stmt: StmtEmpty) -> Self {
         Self::Empty(Box::new(stmt))
     }
 }
 
-impl From<VariableStatement> for Stmt {
-    fn from(stmt: VariableStatement) -> Self {
+impl From<StmtVariable> for Stmt {
+    fn from(stmt: StmtVariable) -> Self {
         Self::Variable(Box::new(stmt))
     }
 }
@@ -68,98 +68,98 @@ impl From<Expr> for Stmt {
     }
 }
 
-impl From<FunctionDeclaration> for Stmt {
-    fn from(expr: FunctionDeclaration) -> Self {
+impl From<DeclFunction> for Stmt {
+    fn from(expr: DeclFunction) -> Self {
         Self::FunctionDecl(Box::new(expr))
     }
 }
 
-impl From<ReturnStatement> for Stmt {
-    fn from(expr: ReturnStatement) -> Self {
+impl From<StmtReturn> for Stmt {
+    fn from(expr: StmtReturn) -> Self {
         Self::Return(Box::new(expr))
     }
 }
 
-impl From<BreakStatement> for Stmt {
-    fn from(expr: BreakStatement) -> Self {
+impl From<StmtBreak> for Stmt {
+    fn from(expr: StmtBreak) -> Self {
         Self::Break(Box::new(expr))
     }
 }
 
-impl From<ContinueStatement> for Stmt {
-    fn from(expr: ContinueStatement) -> Self {
+impl From<StmtContinue> for Stmt {
+    fn from(expr: StmtContinue) -> Self {
         Self::Continue(Box::new(expr))
     }
 }
 
-impl From<ThrowStatement> for Stmt {
-    fn from(expr: ThrowStatement) -> Self {
+impl From<StmtThrow> for Stmt {
+    fn from(expr: StmtThrow) -> Self {
         Self::Throw(Box::new(expr))
     }
 }
 
-impl From<DebuggerStatement> for Stmt {
-    fn from(expr: DebuggerStatement) -> Self {
+impl From<StmtDebugger> for Stmt {
+    fn from(expr: StmtDebugger) -> Self {
         Self::Debugger(Box::new(expr))
     }
 }
 
-impl From<IfStatement> for Stmt {
-    fn from(expr: IfStatement) -> Self {
+impl From<StmtIf> for Stmt {
+    fn from(expr: StmtIf) -> Self {
         Self::If(Box::new(expr))
     }
 }
 
-impl From<WithStatement> for Stmt {
-    fn from(expr: WithStatement) -> Self {
+impl From<StmtWith> for Stmt {
+    fn from(expr: StmtWith) -> Self {
         Self::With(Box::new(expr))
     }
 }
 
-impl From<TryStatement> for Stmt {
-    fn from(expr: TryStatement) -> Self {
+impl From<StmtTry> for Stmt {
+    fn from(expr: StmtTry) -> Self {
         Self::Try(Box::new(expr))
     }
 }
 
-impl From<SwitchStatement> for Stmt {
-    fn from(expr: SwitchStatement) -> Self {
+impl From<StmtSwitch> for Stmt {
+    fn from(expr: StmtSwitch) -> Self {
         Self::Switch(Box::new(expr))
     }
 }
 
-impl From<DoWhileStatement> for Stmt {
-    fn from(expr: DoWhileStatement) -> Self {
+impl From<StmtDoWhile> for Stmt {
+    fn from(expr: StmtDoWhile) -> Self {
         Self::DoWhile(Box::new(expr))
     }
 }
 
-impl From<WhileStatement> for Stmt {
-    fn from(expr: WhileStatement) -> Self {
+impl From<StmtWhile> for Stmt {
+    fn from(expr: StmtWhile) -> Self {
         Self::While(Box::new(expr))
     }
 }
 
-impl From<ForStatement> for Stmt {
-    fn from(expr: ForStatement) -> Self {
+impl From<StmtFor> for Stmt {
+    fn from(expr: StmtFor) -> Self {
         Self::For(Box::new(expr))
     }
 }
 
-impl From<ForInStatement> for Stmt {
-    fn from(expr: ForInStatement) -> Self {
+impl From<StmtForIn> for Stmt {
+    fn from(expr: StmtForIn) -> Self {
         Self::ForIn(Box::new(expr))
     }
 }
 
-impl From<ForOfStatement> for Stmt {
-    fn from(expr: ForOfStatement) -> Self {
+impl From<StmtForOf> for Stmt {
+    fn from(expr: StmtForOf) -> Self {
         Self::ForOf(Box::new(expr))
     }
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct FunctionDeclaration {
+pub struct DeclFunction {
     pub span: Span,
     pub asynchronous: bool,
     pub generator: bool,
@@ -189,18 +189,18 @@ impl FormalParameters {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct BlockStatement {
+pub struct StmtBlock {
     pub span: Span,
     pub statements: Vec<Stmt>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct EmptyStatement {
+pub struct StmtEmpty {
     pub span: Span,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct VariableStatement {
+pub struct StmtVariable {
     pub span: Span,
     pub kind: VariableKind,
     pub declarations: Vec<VariableDeclaration>,
@@ -221,36 +221,36 @@ pub enum VariableKind {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct ReturnStatement {
+pub struct StmtReturn {
     pub span: Span,
     pub argument: Option<Expr>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct BreakStatement {
+pub struct StmtBreak {
     pub span: Span,
     pub label: Option<Ident>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct ContinueStatement {
+pub struct StmtContinue {
     pub span: Span,
     pub label: Option<Ident>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct ThrowStatement {
+pub struct StmtThrow {
     pub span: Span,
     pub argument: Option<Expr>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct DebuggerStatement {
+pub struct StmtDebugger {
     pub span: Span,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct IfStatement {
+pub struct StmtIf {
     pub span: Span,
     pub condition: Expr,
     pub consequent: Stmt,
@@ -258,29 +258,29 @@ pub struct IfStatement {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct WithStatement {
+pub struct StmtWith {
     pub span: Span,
     pub object: Expr,
     pub body: Stmt,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct TryStatement {
+pub struct StmtTry {
     pub span: Span,
-    pub block: BlockStatement,
+    pub block: StmtBlock,
     pub handler: Option<CatchClause>,
-    pub finalizer: Option<BlockStatement>,
+    pub finalizer: Option<StmtBlock>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct CatchClause {
     pub span: Span,
     pub parameter: Option<BindingPattern>,
-    pub body: BlockStatement,
+    pub body: StmtBlock,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct SwitchStatement {
+pub struct StmtSwitch {
     pub span: Span,
     pub discriminant: Expr,
     pub cases: Vec<SwitchCase>,
@@ -294,21 +294,21 @@ pub struct SwitchCase {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct DoWhileStatement {
+pub struct StmtDoWhile {
     pub span: Span,
     pub body: Stmt,
     pub test: Expr,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct WhileStatement {
+pub struct StmtWhile {
     pub span: Span,
     pub test: Expr,
     pub body: Stmt,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct ForStatement {
+pub struct StmtFor {
     pub span: Span,
     pub init: Option<ForInit>,
     pub test: Option<Expr>,
@@ -317,7 +317,7 @@ pub struct ForStatement {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct ForInStatement {
+pub struct StmtForIn {
     pub span: Span,
     pub left: ForInit,
     pub right: Expr,
@@ -325,7 +325,7 @@ pub struct ForInStatement {
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub struct ForOfStatement {
+pub struct StmtForOf {
     pub span: Span,
     pub left: ForInit,
     pub right: Expr,
@@ -336,5 +336,5 @@ pub struct ForOfStatement {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum ForInit {
     Expression(Expr),
-    Declaration(VariableStatement),
+    Declaration(StmtVariable),
 }

@@ -6,7 +6,7 @@ fn debugger() {
     parser_test!(
         input: "debugger",
         output: [
-            DebuggerStatement {
+            StmtDebugger {
                 span: Span::new(0, 8),
             }.into()
         ]
@@ -18,7 +18,7 @@ fn empty_statement() {
     parser_test!(
         input: ";",
         output: [
-            EmptyStatement {
+            StmtEmpty {
                 span: Span::new(0, 1)
             }.into()
         ]
@@ -30,7 +30,7 @@ fn empty_block_statement() {
     parser_test!(
         input: "{ }",
         output: [
-            BlockStatement {
+            StmtBlock {
                 span: Span::new(0, 3),
                 statements: vec![]
             }.into()
@@ -43,13 +43,13 @@ fn block_statement() {
     parser_test!(
         input: "{ ;; }",
         output: [
-            BlockStatement {
+            StmtBlock {
                 span: Span::new(0, 6),
                 statements: vec![
-                    EmptyStatement {
+                    StmtEmpty {
                         span: Span::new(2, 3),
                     }.into(),
-                    EmptyStatement {
+                    StmtEmpty {
                         span: Span::new(3, 4),
                     }.into()
                 ]
@@ -63,15 +63,15 @@ fn with_statement() {
     parser_test!(
         input: "with ({}) {}",
         output: [
-            WithStatement {
+            StmtWith {
                 span: Span::new(0, 12),
-                object: LiteralExpression {
+                object: ExprLiteral {
                     span: Span::new(6, 8),
                     literal: Literal::Object(Object {
                         props: vec![],
                     })
                 }.into(),
-                body: BlockStatement {
+                body: StmtBlock {
                     span: Span::new(10, 12),
                     statements: vec![],
                 }.into(),

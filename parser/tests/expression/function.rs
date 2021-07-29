@@ -6,7 +6,7 @@ fn empty_anonymous_function() {
     parser_test!(
         input: "function () {}",
         expr_output: [
-            FunctionExpression {
+            ExprFunction {
                 span: Span::new(0, 14),
                 asynchronous: false,
                 generator: false,
@@ -23,7 +23,7 @@ fn anonymous_function() {
     parser_test!(
         input: "function (param) { ; }",
         expr_output: [
-            FunctionExpression {
+            ExprFunction {
                 span: Span::new(0, 22),
                 asynchronous: false,
                 generator: false,
@@ -40,7 +40,7 @@ fn anonymous_function() {
                     rest: None,
                 },
                 body: vec![
-                    EmptyStatement { span: Span::new(19, 20) }.into()
+                    StmtEmpty { span: Span::new(19, 20) }.into()
                 ],
             }.into()
         ]
@@ -52,7 +52,7 @@ fn empty_function() {
     parser_test!(
         input: "function fn() {}",
         expr_output: [
-            FunctionExpression {
+            ExprFunction {
                 span: Span::new(0, 16),
                 asynchronous: false,
                 generator: false,
@@ -69,7 +69,7 @@ fn function() {
     parser_test!(
         input: "function fn(param) { ; }",
         expr_output: [
-            FunctionExpression {
+            ExprFunction {
                 span: Span::new(0, 24),
                 asynchronous: false,
                 generator: false,
@@ -86,7 +86,7 @@ fn function() {
                     rest: None,
                 },
                 body: vec![
-                    EmptyStatement { span: Span::new(21, 22) }.into()
+                    StmtEmpty { span: Span::new(21, 22) }.into()
                 ],
             }.into()
         ]
@@ -98,7 +98,7 @@ fn empty_anonymous_generator() {
     parser_test!(
         input: "function *() {}",
         expr_output: [
-            FunctionExpression {
+            ExprFunction {
                 span: Span::new(0, 15),
                 asynchronous: false,
                 generator: true,
@@ -115,7 +115,7 @@ fn empty_generator() {
     parser_test!(
         input: "function *fn() {}",
         expr_output: [
-            FunctionExpression {
+            ExprFunction {
                 span: Span::new(0, 17),
                 asynchronous: false,
                 generator: true,
@@ -132,7 +132,7 @@ fn generator() {
     parser_test!(
         input: "function *(param) { ; }",
         expr_output: [
-            FunctionExpression {
+            ExprFunction {
                 span: Span::new(0, 23),
                 asynchronous: false,
                 generator: true,
@@ -149,7 +149,7 @@ fn generator() {
                     rest: None,
                 },
                 body: vec![
-                    EmptyStatement { span: Span::new(20, 21) }.into()
+                    StmtEmpty { span: Span::new(20, 21) }.into()
                 ],
             }.into()
         ]
@@ -161,7 +161,7 @@ fn empty_anonymous_async_function() {
     parser_test!(
         input: "async function () {}",
         expr_output: [
-            FunctionExpression {
+            ExprFunction {
                 span: Span::new(0, 20),
                 asynchronous: true,
                 generator: false,
@@ -178,7 +178,7 @@ fn anonymous_async_function() {
     parser_test!(
         input: "async function (param) { ; }",
         expr_output: [
-            FunctionExpression {
+            ExprFunction {
                 span: Span::new(0, 28),
                 asynchronous: true,
                 generator: false,
@@ -195,7 +195,7 @@ fn anonymous_async_function() {
                     rest: None,
                 },
                 body: vec![
-                    EmptyStatement { span: Span::new(25, 26) }.into()
+                    StmtEmpty { span: Span::new(25, 26) }.into()
                 ],
             }.into()
         ]
@@ -207,7 +207,7 @@ fn empty_async_function() {
     parser_test!(
         input: "async function fn() {}",
         expr_output: [
-            FunctionExpression {
+            ExprFunction {
                 span: Span::new(0, 22),
                 asynchronous: true,
                 generator: false,
@@ -224,7 +224,7 @@ fn async_function() {
     parser_test!(
         input: "async function fn(param) { ; }",
         expr_output: [
-            FunctionExpression {
+            ExprFunction {
                 span: Span::new(0, 30),
                 asynchronous: true,
                 generator: false,
@@ -241,7 +241,7 @@ fn async_function() {
                     rest: None,
                 },
                 body: vec![
-                    EmptyStatement { span: Span::new(27, 28) }.into()
+                    StmtEmpty { span: Span::new(27, 28) }.into()
                 ],
             }.into()
         ]
@@ -253,7 +253,7 @@ fn empty_anonymous_async_generator() {
     parser_test!(
         input: "async function *() {}",
         expr_output: [
-            FunctionExpression {
+            ExprFunction {
                 span: Span::new(0, 21),
                 asynchronous: true,
                 generator: true,
@@ -270,7 +270,7 @@ fn anonymous_async_generator() {
     parser_test!(
         input: "async function *(param) { ; }",
         expr_output: [
-            FunctionExpression {
+            ExprFunction {
                 span: Span::new(0, 29),
                 asynchronous: true,
                 generator: true,
@@ -287,7 +287,7 @@ fn anonymous_async_generator() {
                     rest: None,
                 },
                 body: vec![
-                    EmptyStatement { span: Span::new(26, 27) }.into()
+                    StmtEmpty { span: Span::new(26, 27) }.into()
                 ],
             }.into()
         ]
@@ -299,7 +299,7 @@ fn empty_async_generator() {
     parser_test!(
         input: "async function *fn() {}",
         expr_output: [
-            FunctionExpression {
+            ExprFunction {
                 span: Span::new(0, 23),
                 asynchronous: true,
                 generator: true,
@@ -316,7 +316,7 @@ fn async_generator() {
     parser_test!(
         input: "async function* fn(param) { ; }",
         expr_output: [
-            FunctionExpression {
+            ExprFunction {
                 span: Span::new(0, 31),
                 asynchronous: true,
                 generator: true,
@@ -333,7 +333,7 @@ fn async_generator() {
                     rest: None,
                 },
                 body: vec![
-                    EmptyStatement { span: Span::new(28, 29) }.into()
+                    StmtEmpty { span: Span::new(28, 29) }.into()
                 ],
             }.into()
         ]

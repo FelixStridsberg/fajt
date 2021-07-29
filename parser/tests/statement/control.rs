@@ -1,7 +1,6 @@
 use fajt_lexer::token::Span;
 use fajt_parser::ast::{
-    BreakStatement, ContinueStatement, Ident, IfStatement, ReturnStatement, Stmt, SwitchCase,
-    SwitchStatement,
+    Ident, Stmt, StmtBreak, StmtContinue, StmtIf, StmtReturn, StmtSwitch, SwitchCase,
 };
 
 #[test]
@@ -9,7 +8,7 @@ fn return_void() {
     parser_test!(
         input: "return",
         output: [
-            ReturnStatement {
+            StmtReturn {
                 span: Span::new(0, 6),
                 argument: None,
             }.into()
@@ -22,7 +21,7 @@ fn return_expression() {
     parser_test!(
         input: "return a",
         output: [
-            ReturnStatement {
+            StmtReturn {
                 span: Span::new(0, 8),
                 argument: Some(Ident::new("a", (7, 8)).into()),
             }.into()
@@ -35,7 +34,7 @@ fn break_() {
     parser_test!(
         input: "break",
         output: [
-            BreakStatement {
+            StmtBreak {
                 span: Span::new(0, 5),
                 label: None,
             }.into()
@@ -48,7 +47,7 @@ fn break_labelled() {
     parser_test!(
         input: "break a",
         output: [
-            BreakStatement {
+            StmtBreak {
                 span: Span::new(0, 7),
                 label: Some(Ident::new("a", (6, 7)).into()),
             }.into()
@@ -61,7 +60,7 @@ fn continue_() {
     parser_test!(
         input: "continue",
         output: [
-            ContinueStatement {
+            StmtContinue {
                 span: Span::new(0, 8),
                 label: None,
             }.into()
@@ -74,7 +73,7 @@ fn continue_labelled() {
     parser_test!(
         input: "continue a",
         output: [
-            ContinueStatement {
+            StmtContinue {
                 span: Span::new(0, 10),
                 label: Some(Ident::new("a", (9, 10)).into()),
             }.into()
@@ -87,7 +86,7 @@ fn if_no_else() {
     parser_test!(
         input: "if ( a ) b",
         output: [
-            IfStatement {
+            StmtIf {
                 span: Span::new(0, 10),
                 condition: Ident::new("a", (5, 6)).into(),
                 consequent: Stmt::expression(Ident::new("b", (9, 10))),
@@ -102,7 +101,7 @@ fn if_with_else() {
     parser_test!(
         input: "if ( a ) b else c",
         output: [
-            IfStatement {
+            StmtIf {
                 span: Span::new(0, 17),
                 condition: Ident::new("a", (5, 6)).into(),
                 consequent: Stmt::expression(Ident::new("b", (9, 10))),
@@ -117,7 +116,7 @@ fn empty_switch() {
     parser_test!(
         input: "switch (a) { }",
         output: [
-            SwitchStatement {
+            StmtSwitch {
                 span: Span::new(0, 14),
                 discriminant: Ident::new("a", (8, 9)).into(),
                 cases: vec![],
@@ -131,7 +130,7 @@ fn switch_default_empty_case() {
     parser_test!(
         input: "switch (a) { default: }",
         output: [
-            SwitchStatement {
+            StmtSwitch {
                 span: Span::new(0, 23),
                 discriminant: Ident::new("a", (8, 9)).into(),
                 cases: vec![
@@ -151,7 +150,7 @@ fn switch_default() {
     parser_test!(
         input: "switch (a) { default: b }",
         output: [
-            SwitchStatement {
+            StmtSwitch {
                 span: Span::new(0, 25),
                 discriminant: Ident::new("a", (8, 9)).into(),
                 cases: vec![
@@ -173,7 +172,7 @@ fn switch_case_empty() {
     parser_test!(
         input: "switch (a) { case b: }",
         output: [
-            SwitchStatement {
+            StmtSwitch {
                 span: Span::new(0, 22),
                 discriminant: Ident::new("a", (8, 9)).into(),
                 cases: vec![
@@ -193,7 +192,7 @@ fn switch_case() {
     parser_test!(
         input: "switch (a) { case b: c; d }",
         output: [
-            SwitchStatement {
+            StmtSwitch {
                 span: Span::new(0, 27),
                 discriminant: Ident::new("a", (8, 9)).into(),
                 cases: vec![
@@ -216,7 +215,7 @@ fn switch_mixed() {
     parser_test!(
         input: "switch (a) { case b: case c: d; default: }",
         output: [
-            SwitchStatement {
+            StmtSwitch {
                 span: Span::new(0, 42),
                 discriminant: Ident::new("a", (8, 9)).into(),
                 cases: vec![
