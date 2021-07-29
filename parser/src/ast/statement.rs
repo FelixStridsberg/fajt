@@ -24,6 +24,7 @@ pub enum Statement {
     While(Box<WhileStatement>),
     For(Box<ForStatement>),
     ForIn(Box<ForInStatement>),
+    ForOf(Box<ForOfStatement>),
 }
 
 impl Statement {
@@ -141,6 +142,12 @@ impl From<ForStatement> for Statement {
 impl From<ForInStatement> for Statement {
     fn from(expr: ForInStatement) -> Self {
         Self::ForIn(Box::new(expr))
+    }
+}
+
+impl From<ForOfStatement> for Statement {
+    fn from(expr: ForOfStatement) -> Self {
+        Self::ForOf(Box::new(expr))
     }
 }
 
@@ -308,6 +315,15 @@ pub struct ForInStatement {
     pub left: ForInit,
     pub right: Expression,
     pub body: Statement,
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct ForOfStatement {
+    pub span: Span,
+    pub left: ForInit,
+    pub right: Expression,
+    pub body: Statement,
+    pub wait: bool,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]

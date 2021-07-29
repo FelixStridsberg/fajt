@@ -1,6 +1,6 @@
 use crate::ast::{
-    DoWhileStatement, ForInStatement, ForInit, ForStatement, Statement, VariableKind,
-    VariableStatement, WhileStatement,
+    DoWhileStatement, ForInStatement, ForInit, ForOfStatement, ForStatement, Statement,
+    VariableKind, VariableStatement, WhileStatement,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenTry};
@@ -58,7 +58,9 @@ where
         let init = self.parse_for_first_argument()?;
         match self.reader.current() {
             token_matches!(ok: punct!(";")) => self.parse_plain_for(span_start, init),
-            token_matches!(ok: keyword!("of")) if init.is_some() => todo!("for of"),
+            token_matches!(ok: keyword!("of")) if init.is_some() => {
+                self.parse_for_of(span_start, init.unwrap())
+            }
             token_matches!(ok: keyword!("in")) if init.is_some() => {
                 self.parse_for_in(span_start, init.unwrap())
             }
@@ -67,7 +69,7 @@ where
     }
 
     fn parse_plain_for(&mut self, span_start: usize, init: Option<ForInit>) -> Result<Statement> {
-        self.consume_assert(punct!(";"))?; // TODO of, in
+        self.consume_assert(punct!(";"))?;
 
         let test = (!self.current_matches(punct!(";"))).then_try(|| self.parse_expression())?;
         self.consume_assert(punct!(";"))?;
@@ -106,6 +108,30 @@ where
             left,
             right,
             body,
+        }
+        .into())
+    }
+
+    fn parse_for_of(&mut self, span_start: usize, left: ForInit) -> Result<Statement> {
+        // TODO verify that `left` is a valid LeftHandSideExpression if not declaration.
+
+        self.consume_assert(keyword!("of"))?;
+
+        let right = self
+            .with_context(ContextModify::new().set_in(true))
+            .parse_expression()?;
+
+        self.consume_assert(punct!(")"))?;
+
+        let body = self.parse_statement()?;
+
+        let span = self.span_from(span_start);
+        Ok(ForOfStatement {
+            span,
+            left,
+            right,
+            body,
+            wait: false,
         }
         .into())
     }
