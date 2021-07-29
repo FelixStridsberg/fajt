@@ -3,7 +3,7 @@ use fajt_lexer::punct;
 use fajt_lexer::token::{KeywordContext, Span, Token, TokenValue};
 use fajt_lexer::token_matches;
 
-use crate::ast::{Expression, Ident, Program, PropertyName};
+use crate::ast::{Expr, Ident, Program, PropertyName};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 
@@ -125,7 +125,7 @@ where
     }
 
     // TODO probably not appropriate, used for testing parsing expressions currently.
-    pub fn parse_expr(&mut self) -> Result<Expression> {
+    pub fn parse_expr(&mut self) -> Result<Expr> {
         self.with_context(ContextModify::new().set_in(true))
             .parse_expression()
     }

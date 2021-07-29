@@ -1,6 +1,6 @@
 use fajt_lexer::token::Span;
 use fajt_parser::ast::{
-    BreakStatement, ContinueStatement, Ident, IfStatement, ReturnStatement, Statement, SwitchCase,
+    BreakStatement, ContinueStatement, Ident, IfStatement, ReturnStatement, Stmt, SwitchCase,
     SwitchStatement,
 };
 
@@ -90,7 +90,7 @@ fn if_no_else() {
             IfStatement {
                 span: Span::new(0, 10),
                 condition: Ident::new("a", (5, 6)).into(),
-                consequent: Statement::expression(Ident::new("b", (9, 10))),
+                consequent: Stmt::expression(Ident::new("b", (9, 10))),
                 alternate: None,
             }.into()
         ]
@@ -105,8 +105,8 @@ fn if_with_else() {
             IfStatement {
                 span: Span::new(0, 17),
                 condition: Ident::new("a", (5, 6)).into(),
-                consequent: Statement::expression(Ident::new("b", (9, 10))),
-                alternate: Some(Statement::expression(Ident::new("c", (16, 17)))),
+                consequent: Stmt::expression(Ident::new("b", (9, 10))),
+                alternate: Some(Stmt::expression(Ident::new("c", (16, 17)))),
             }.into()
         ]
     );
@@ -159,7 +159,7 @@ fn switch_default() {
                         span: Span::new(13, 23),
                         test: None,
                         consequent: vec![
-                            Statement::expression(Ident::new("b", (22, 23)))
+                            Stmt::expression(Ident::new("b", (22, 23)))
                         ],
                     }
                 ],
@@ -201,8 +201,8 @@ fn switch_case() {
                         span: Span::new(13, 25),
                         test: Some(Ident::new("b", (18, 19)).into()),
                         consequent: vec![
-                            Statement::expression(Ident::new("c", (21, 22))),
-                            Statement::expression(Ident::new("d", (24, 25))),
+                            Stmt::expression(Ident::new("c", (21, 22))),
+                            Stmt::expression(Ident::new("d", (24, 25))),
                         ],
                     }
                 ],
@@ -229,7 +229,7 @@ fn switch_mixed() {
                         span: Span::new(21, 31),
                         test: Some(Ident::new("c", (26, 27)).into()),
                         consequent: vec![
-                            Statement::expression(Ident::new("d", (29, 30))),
+                            Stmt::expression(Ident::new("d", (29, 30))),
                         ],
                     },
                     SwitchCase {

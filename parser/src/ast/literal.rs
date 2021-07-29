@@ -1,4 +1,4 @@
-use crate::ast::{Expression, IdentifierReference};
+use crate::ast::{Expr, IdentifierReference};
 
 use fajt_lexer::token::Base as LexerBase;
 use fajt_lexer::token::Literal as LexerLiteral;
@@ -22,8 +22,8 @@ pub struct Array {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum ArrayElement {
     None,
-    Expr(Expression),
-    Spread(Expression),
+    Expr(Expr),
+    Spread(Expr),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -34,7 +34,7 @@ pub struct Object {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum PropertyDefinition {
     IdentifierReference(IdentifierReference),
-    Spread(Expression),
+    Spread(Expr),
 }
 
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Clone)]

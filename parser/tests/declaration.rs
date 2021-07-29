@@ -4,7 +4,7 @@ use fajt_lexer::token::Keyword;
 use fajt_lexer::token::TokenValue;
 use fajt_lexer::token::{Span, Token};
 use fajt_parser::ast::Base::Decimal;
-use fajt_parser::ast::Expression::IdentifierReference;
+use fajt_parser::ast::Expr::IdentifierReference;
 use fajt_parser::ast::*;
 use fajt_parser::error::ErrorKind::UnexpectedToken;
 

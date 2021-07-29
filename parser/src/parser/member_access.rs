@@ -1,5 +1,5 @@
 use crate::ast::{
-    Expression, MemberExpression, MemberObject, MemberProperty, OptionalCallExpression,
+    Expr, MemberExpression, MemberObject, MemberProperty, OptionalCallExpression,
     OptionalMemberExpression,
 };
 use crate::error::Result;
@@ -18,7 +18,7 @@ where
         &mut self,
         span_start: usize,
         left: MemberObject,
-    ) -> Result<Expression> {
+    ) -> Result<Expr> {
         let property = self.parse_member_property()?;
         let span = self.span_from(span_start);
         Ok(MemberExpression {
@@ -33,8 +33,8 @@ where
     pub(crate) fn parse_optional_expression(
         &mut self,
         span_start: usize,
-        left: Expression,
-    ) -> Result<Expression> {
+        left: Expr,
+    ) -> Result<Expr> {
         let mut object = left;
 
         loop {
@@ -59,11 +59,7 @@ where
         Ok(object)
     }
 
-    fn parse_optional_call_expression(
-        &mut self,
-        span_start: usize,
-        callee: Expression,
-    ) -> Result<Expression> {
+    fn parse_optional_call_expression(&mut self, span_start: usize, callee: Expr) -> Result<Expr> {
         let optional = self.current_matches(punct!("?."));
         if optional {
             self.reader.consume()?;
@@ -85,8 +81,8 @@ where
     fn parse_optional_member_expression(
         &mut self,
         span_start: usize,
-        object: Expression,
-    ) -> Result<Expression> {
+        object: Expr,
+    ) -> Result<Expr> {
         let optional = self.current_matches(punct!("?."));
         let property = self.parse_optional_member_property()?;
         let span = self.span_from(span_start);
@@ -135,7 +131,7 @@ where
         }
     }
 
-    fn parse_computed_property(&mut self) -> Result<Expression> {
+    fn parse_computed_property(&mut self) -> Result<Expr> {
         self.consume_assert(punct!("["))?;
         let expression = self.parse_expression()?;
         self.consume_assert(punct!("]"))?;

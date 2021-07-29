@@ -1,6 +1,6 @@
 use crate::ast::{
     BlockStatement, BreakStatement, CatchClause, ContinueStatement, DebuggerStatement,
-    EmptyStatement, IfStatement, ReturnStatement, Statement, SwitchCase, SwitchStatement,
+    EmptyStatement, IfStatement, ReturnStatement, Stmt, SwitchCase, SwitchStatement,
     ThrowStatement, TryStatement, VariableKind, WithStatement,
 };
 use crate::error::{Result, ThenTry};
@@ -15,7 +15,7 @@ impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
-    pub(super) fn parse_statement(&mut self) -> Result<Statement> {
+    pub(super) fn parse_statement(&mut self) -> Result<Stmt> {
         Ok(match self.reader.current()? {
             token_matches!(punct!(";")) => self.parse_empty_statement()?,
             token_matches!(punct!("{")) => self.parse_block_statement()?,
@@ -73,7 +73,7 @@ where
     }
 
     /// Parses the `BlockStatement` goal symbol.
-    fn parse_block_statement(&mut self) -> Result<Statement> {
+    fn parse_block_statement(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(punct!("{"))?;
 
@@ -92,7 +92,7 @@ where
         Ok(BlockStatement { span, statements }.into())
     }
 
-    fn parse_expression_statement(&mut self) -> Result<Statement> {
+    fn parse_expression_statement(&mut self) -> Result<Stmt> {
         let expr = self.parse_expression()?;
 
         if self.current_matches(punct!(";")) {
@@ -103,13 +103,13 @@ where
     }
 
     /// Parses the `EmptyStatement` goal symbol.
-    fn parse_empty_statement(&mut self) -> Result<Statement> {
+    fn parse_empty_statement(&mut self) -> Result<Stmt> {
         let token = self.consume_assert(punct!(";"))?;
         Ok(EmptyStatement { span: token.span }.into())
     }
 
     /// Parses the `BreakStatement` goal symbol.
-    fn parse_break_statement(&mut self) -> Result<Statement> {
+    fn parse_break_statement(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("break"))?;
 
@@ -121,7 +121,7 @@ where
     }
 
     /// Parses the `ContinueStatement` goal symbol.
-    fn parse_continue_statement(&mut self) -> Result<Statement> {
+    fn parse_continue_statement(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("continue"))?;
 
@@ -133,7 +133,7 @@ where
     }
 
     /// Parses the `ReturnStatement` goal symbol.
-    fn parse_return_statement(&mut self) -> Result<Statement> {
+    fn parse_return_statement(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("return"))?;
 
@@ -145,7 +145,7 @@ where
     }
 
     /// Parses the `ThrowStatement` goal symbol.
-    fn parse_throw_statement(&mut self) -> Result<Statement> {
+    fn parse_throw_statement(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("throw"))?;
 
@@ -166,13 +166,13 @@ where
     }
 
     /// Parses the `DebuggerStatement` goal symbol.
-    fn parse_debugger_statement(&mut self) -> Result<Statement> {
+    fn parse_debugger_statement(&mut self) -> Result<Stmt> {
         let token = self.consume_assert(keyword!("debugger"))?;
         Ok(DebuggerStatement { span: token.span }.into())
     }
 
     /// Parses the `IfStatement` goal symbol.
-    fn parse_if_statement(&mut self) -> Result<Statement> {
+    fn parse_if_statement(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("if"))?;
         self.consume_assert(punct!("("))?;
@@ -196,7 +196,7 @@ where
     }
 
     /// Parses the `WithStatement` goal symbol.
-    fn parse_with_statement(&mut self) -> Result<Statement> {
+    fn parse_with_statement(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("with"))?;
         self.consume_assert(punct!("("))?;
@@ -209,7 +209,7 @@ where
     }
 
     /// Parses the `TryStatement` goal symbol.
-    fn parse_try_statement(&mut self) -> Result<Statement> {
+    fn parse_try_statement(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("try"))?;
 
@@ -253,7 +253,7 @@ where
         })
     }
 
-    fn parse_switch_statement(&mut self) -> Result<Statement> {
+    fn parse_switch_statement(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("switch"))?;
         self.consume_assert(punct!("("))?;
@@ -311,7 +311,7 @@ where
         })
     }
 
-    fn parse_switch_case_statement_list(&mut self) -> Result<Vec<Statement>> {
+    fn parse_switch_case_statement_list(&mut self) -> Result<Vec<Stmt>> {
         let mut statements = Vec::new();
 
         loop {

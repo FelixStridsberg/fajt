@@ -1,4 +1,4 @@
-use crate::ast::{Expression, Ident, Number};
+use crate::ast::{Expr, Ident, Number};
 use fajt_lexer::token::Span;
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -42,7 +42,7 @@ pub struct ObjectBinding {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum ObjectBindingProp {
-    Single(Ident, Option<Expression>),
+    Single(Ident, Option<Expr>),
     KeyValue(PropertyName, BindingElement),
 }
 
@@ -57,12 +57,12 @@ pub enum PropertyName {
     Ident(Ident),
     String(String, char),
     Number(Number),
-    Computed(Expression),
+    Computed(Expr),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct BindingElement {
     pub span: Span,
     pub pattern: BindingPattern,
-    pub initializer: Option<Expression>,
+    pub initializer: Option<Expr>,
 }

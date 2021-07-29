@@ -2,7 +2,7 @@
 //! raw tokens that later can be parsed when the actual goal symbol is determined.
 //!
 //! These will never appear in the final AST.
-use crate::ast::{Expression, FormalParameters, ParenthesizedExpression};
+use crate::ast::{Expr, FormalParameters, ParenthesizedExpression};
 use crate::Parser;
 use fajt_common::io::PeekReader;
 use fajt_lexer::token::{Span, Token};
@@ -21,7 +21,7 @@ impl CoverParenthesizedAndArrowParameters {
         parser.parse_formal_parameters()
     }
 
-    pub fn into_expression(mut self) -> crate::error::Result<Expression> {
+    pub fn into_expression(mut self) -> crate::error::Result<Expr> {
         self.tokens.drain(0..1);
         self.tokens.pop();
 
@@ -55,7 +55,7 @@ impl CoverCallExpressionAndAsyncArrowHead {
         parser.parse_formal_parameters()
     }
 
-    pub fn into_call(self) -> crate::error::Result<Expression> {
+    pub fn into_call(self) -> crate::error::Result<Expr> {
         // This is call expressions like: async(), async(parameters) since async is not reserved.
         todo!("CoverCallExpressionAndAsyncArrowHead to call expression")
     }

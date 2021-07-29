@@ -1,11 +1,11 @@
-use crate::ast::{Expression, FormalParameters, Ident, PropertyName, Statement};
+use crate::ast::{Expr, FormalParameters, Ident, PropertyName, Stmt};
 use fajt_lexer::token::Span;
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ClassExpression {
     pub span: Span,
     pub identifier: Option<Ident>,
-    pub super_class: Option<Expression>,
+    pub super_class: Option<Expr>,
     pub body: Vec<ClassElement>,
 }
 
@@ -26,7 +26,7 @@ pub struct ClassMethod {
     pub name: PropertyName,
     pub kind: ClassMethodKind,
     pub parameters: FormalParameters,
-    pub body: Vec<Statement>,
+    pub body: Vec<Stmt>,
     pub generator: bool,
     pub asynchronous: bool,
 }

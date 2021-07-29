@@ -1,4 +1,4 @@
-use crate::ast::{ClassElement, ClassExpression, ClassMethod, ClassMethodKind, Expression};
+use crate::ast::{ClassElement, ClassExpression, ClassMethod, ClassMethodKind, Expr};
 use crate::error::{Result, ThenTry};
 use crate::Parser;
 use fajt_common::io::PeekRead;
@@ -12,7 +12,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `ClassExpression` goal symbol.
-    pub(super) fn parse_class_expression(&mut self) -> Result<Expression> {
+    pub(super) fn parse_class_expression(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.consume_assert(keyword!("class"))?;
 

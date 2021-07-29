@@ -1,7 +1,7 @@
 use fajt_lexer::token::Span;
 use fajt_parser::ast::{
     BindingPattern, DoWhileStatement, EmptyStatement, ForInStatement, ForInit, ForOfStatement,
-    ForStatement, Ident, Literal, LiteralExpression, Statement, VariableDeclaration, VariableKind,
+    ForStatement, Ident, Literal, LiteralExpression, Stmt, VariableDeclaration, VariableKind,
     VariableStatement, WhileStatement,
 };
 use fajt_parser::error::ErrorKind::SyntaxError;
@@ -14,7 +14,7 @@ fn do_while() {
         output: [
             DoWhileStatement {
                 span: Span::new(0, 18),
-                body: Statement::expression(Ident::new("a", (3, 4))),
+                body: Stmt::expression(Ident::new("a", (3, 4))),
                 test: LiteralExpression {
                     span: Span::new(13, 17),
                     literal: Literal::Boolean(true),
@@ -35,7 +35,7 @@ fn r#while() {
                     span: Span::new(7, 11),
                     literal: Literal::Boolean(true),
                 }.into(),
-                body: Statement::expression(Ident::new("a", (13, 14))),
+                body: Stmt::expression(Ident::new("a", (13, 14))),
             }.into()
         ]
     );

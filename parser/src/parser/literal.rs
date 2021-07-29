@@ -1,5 +1,5 @@
 use crate::ast::{
-    Array, ArrayElement, Expression, Literal, LiteralExpression, Object, PropertyDefinition,
+    Array, ArrayElement, Expr, Literal, LiteralExpression, Object, PropertyDefinition,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
@@ -14,7 +14,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
     /// Consumes a know literal token from the reader and returns an expression of it.
-    pub(super) fn consume_literal(&mut self, literal: Literal) -> Result<Expression> {
+    pub(super) fn consume_literal(&mut self, literal: Literal) -> Result<Expr> {
         let token = self.reader.consume()?;
         Ok(LiteralExpression {
             span: token.span,
@@ -24,7 +24,7 @@ where
     }
 
     /// Parses the `Literal` goal symbol.
-    pub(super) fn parse_literal(&mut self) -> Result<Expression> {
+    pub(super) fn parse_literal(&mut self) -> Result<Expr> {
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, @literal));
 
@@ -40,7 +40,7 @@ where
     }
 
     /// Parses the `ArrayLiteral` goal symbol.
-    pub(super) fn parse_array_literal(&mut self) -> Result<Expression> {
+    pub(super) fn parse_array_literal(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("[")));
@@ -79,7 +79,7 @@ where
     }
 
     /// Parses the `ObjectLiteral` goal symbol.
-    pub(super) fn parse_object_literal(&mut self) -> Result<Expression> {
+    pub(super) fn parse_object_literal(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let token = self.reader.consume()?;
         debug_assert!(token_matches!(token, punct!("{")));

@@ -3,10 +3,10 @@ use fajt_macros::FromString;
 
 use crate::ast::class::ClassExpression;
 use crate::ast::literal::*;
-use crate::ast::{FormalParameters, Ident, Statement};
+use crate::ast::{FormalParameters, Ident, Stmt};
 
 #[derive(Debug, PartialOrd, PartialEq)]
-pub enum Expression {
+pub enum Expr {
     ThisExpression(Box<ThisExpression>),
     IdentifierReference(Box<IdentifierReference>),
     Literal(Box<LiteralExpression>),
@@ -31,149 +31,149 @@ pub enum Expression {
     MetaPropertyExpression(Box<MetaPropertyExpression>),
 }
 
-impl Expression {
+impl Expr {
     pub fn is_nested_new(&self) -> bool {
-        if let Expression::NewExpression(expr) = &self {
-            matches!(expr.callee, Expression::NewExpression(_))
+        if let Expr::NewExpression(expr) = &self {
+            matches!(expr.callee, Expr::NewExpression(_))
         } else {
             false
         }
     }
 }
 
-impl From<ThisExpression> for Expression {
+impl From<ThisExpression> for Expr {
     fn from(expr: ThisExpression) -> Self {
         Self::ThisExpression(Box::new(expr))
     }
 }
 
-impl From<LiteralExpression> for Expression {
+impl From<LiteralExpression> for Expr {
     fn from(expr: LiteralExpression) -> Self {
         Self::Literal(Box::new(expr))
     }
 }
 
-impl From<Ident> for Expression {
+impl From<Ident> for Expr {
     fn from(ident: Ident) -> Self {
         Self::IdentifierReference(Box::new(ident.into()))
     }
 }
 
-impl From<IdentifierReference> for Expression {
+impl From<IdentifierReference> for Expr {
     fn from(expr: IdentifierReference) -> Self {
         Self::IdentifierReference(Box::new(expr))
     }
 }
 
-impl From<BinaryExpression> for Expression {
+impl From<BinaryExpression> for Expr {
     fn from(expr: BinaryExpression) -> Self {
         Self::BinaryExpression(Box::new(expr))
     }
 }
 
-impl From<LogicalExpression> for Expression {
+impl From<LogicalExpression> for Expr {
     fn from(expr: LogicalExpression) -> Self {
         Self::LogicalExpression(Box::new(expr))
     }
 }
 
-impl From<UnaryExpression> for Expression {
+impl From<UnaryExpression> for Expr {
     fn from(expr: UnaryExpression) -> Self {
         Self::UnaryExpression(Box::new(expr))
     }
 }
 
-impl From<UpdateExpression> for Expression {
+impl From<UpdateExpression> for Expr {
     fn from(expr: UpdateExpression) -> Self {
         Self::UpdateExpression(Box::new(expr))
     }
 }
 
-impl From<ConditionalExpression> for Expression {
+impl From<ConditionalExpression> for Expr {
     fn from(expr: ConditionalExpression) -> Self {
         Self::ConditionalExpression(Box::new(expr))
     }
 }
 
-impl From<YieldExpression> for Expression {
+impl From<YieldExpression> for Expr {
     fn from(expr: YieldExpression) -> Self {
         Self::YieldExpression(Box::new(expr))
     }
 }
 
-impl From<AwaitExpression> for Expression {
+impl From<AwaitExpression> for Expr {
     fn from(expr: AwaitExpression) -> Self {
         Self::AwaitExpression(Box::new(expr))
     }
 }
 
-impl From<SequenceExpression> for Expression {
+impl From<SequenceExpression> for Expr {
     fn from(expr: SequenceExpression) -> Self {
         Self::SequenceExpression(Box::new(expr))
     }
 }
 
-impl From<ClassExpression> for Expression {
+impl From<ClassExpression> for Expr {
     fn from(expr: ClassExpression) -> Self {
         Self::ClassExpression(Box::new(expr))
     }
 }
 
-impl From<FunctionExpression> for Expression {
+impl From<FunctionExpression> for Expr {
     fn from(expr: FunctionExpression) -> Self {
         Self::FunctionExpression(Box::new(expr))
     }
 }
 
-impl From<ArrowFunctionExpression> for Expression {
+impl From<ArrowFunctionExpression> for Expr {
     fn from(expr: ArrowFunctionExpression) -> Self {
         Self::ArrowFunctionExpression(Box::new(expr))
     }
 }
 
-impl From<ParenthesizedExpression> for Expression {
+impl From<ParenthesizedExpression> for Expr {
     fn from(expr: ParenthesizedExpression) -> Self {
         Self::ParenthesizedExpression(Box::new(expr))
     }
 }
 
-impl From<MemberExpression> for Expression {
+impl From<MemberExpression> for Expr {
     fn from(expr: MemberExpression) -> Self {
         Self::MemberExpression(Box::new(expr))
     }
 }
 
-impl From<OptionalMemberExpression> for Expression {
+impl From<OptionalMemberExpression> for Expr {
     fn from(expr: OptionalMemberExpression) -> Self {
         Self::OptionalMemberExpression(Box::new(expr))
     }
 }
 
-impl From<NewExpression> for Expression {
+impl From<NewExpression> for Expr {
     fn from(expr: NewExpression) -> Self {
         Self::NewExpression(Box::new(expr))
     }
 }
 
-impl From<AssignmentExpression> for Expression {
+impl From<AssignmentExpression> for Expr {
     fn from(expr: AssignmentExpression) -> Self {
         Self::AssignmentExpression(Box::new(expr))
     }
 }
 
-impl From<CallExpression> for Expression {
+impl From<CallExpression> for Expr {
     fn from(expr: CallExpression) -> Self {
         Self::CallExpression(Box::new(expr))
     }
 }
 
-impl From<OptionalCallExpression> for Expression {
+impl From<OptionalCallExpression> for Expr {
     fn from(expr: OptionalCallExpression) -> Self {
         Self::OptionalCallExpression(Box::new(expr))
     }
 }
 
-impl From<MetaPropertyExpression> for Expression {
+impl From<MetaPropertyExpression> for Expr {
     fn from(expr: MetaPropertyExpression) -> Self {
         Self::MetaPropertyExpression(Box::new(expr))
     }
@@ -216,8 +216,8 @@ impl From<Ident> for IdentifierReference {
 pub struct BinaryExpression {
     pub span: Span,
     pub operator: BinaryOperator,
-    pub left: Expression,
-    pub right: Expression,
+    pub left: Expr,
+    pub right: Expr,
 }
 
 #[derive(Debug, PartialOrd, PartialEq, FromString)]
@@ -278,8 +278,8 @@ pub enum BinaryOperator {
 pub struct LogicalExpression {
     pub span: Span,
     pub operator: LogicalOperator,
-    pub left: Expression,
-    pub right: Expression,
+    pub left: Expr,
+    pub right: Expr,
 }
 
 #[derive(Debug, PartialOrd, PartialEq, FromString)]
@@ -302,7 +302,7 @@ pub enum LogicalOperator {
 pub struct UnaryExpression {
     pub span: Span,
     pub operator: UnaryOperator,
-    pub argument: Expression,
+    pub argument: Expr,
 }
 
 #[derive(Debug, PartialOrd, PartialEq, FromString)]
@@ -334,7 +334,7 @@ pub struct UpdateExpression {
     pub span: Span,
     pub operator: UpdateOperator,
     pub prefix: bool,
-    pub argument: Expression,
+    pub argument: Expr,
 }
 
 #[derive(Debug, PartialOrd, PartialEq, FromString)]
@@ -354,28 +354,28 @@ pub enum UpdateOperator {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct YieldExpression {
     pub span: Span,
-    pub argument: Option<Expression>,
+    pub argument: Option<Expr>,
     pub delegate: bool,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ConditionalExpression {
     pub span: Span,
-    pub condition: Expression,
-    pub consequent: Expression,
-    pub alternate: Expression,
+    pub condition: Expr,
+    pub consequent: Expr,
+    pub alternate: Expr,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct AwaitExpression {
     pub span: Span,
-    pub argument: Expression,
+    pub argument: Expr,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct SequenceExpression {
     pub span: Span,
-    pub expressions: Vec<Expression>,
+    pub expressions: Vec<Expr>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -385,7 +385,7 @@ pub struct FunctionExpression {
     pub generator: bool,
     pub identifier: Option<Ident>,
     pub parameters: FormalParameters,
-    pub body: Vec<Statement>,
+    pub body: Vec<Stmt>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -399,14 +399,14 @@ pub struct ArrowFunctionExpression {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum ArrowFunctionBody {
-    Expression(Expression),
-    Block(Vec<Statement>),
+    Expression(Expr),
+    Block(Vec<Stmt>),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ParenthesizedExpression {
     pub span: Span,
-    pub expression: Expression,
+    pub expression: Expr,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -419,14 +419,14 @@ pub struct MemberExpression {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct OptionalMemberExpression {
     pub span: Span,
-    pub object: Expression,
+    pub object: Expr,
     pub property: MemberProperty,
     pub optional: bool,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum MemberObject {
-    Expression(Expression),
+    Expression(Expr),
     Super(Super),
 }
 
@@ -438,7 +438,7 @@ pub struct Super {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum MemberProperty {
     Ident(Ident),
-    Expression(Expression),
+    Expression(Expr),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
@@ -451,23 +451,23 @@ pub struct MetaPropertyExpression {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct NewExpression {
     pub span: Span,
-    pub callee: Expression,
+    pub callee: Expr,
     pub arguments_span: Option<Span>,
     pub arguments: Vec<Argument>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Argument {
-    Expression(Expression),
-    Spread(Expression),
+    Expression(Expr),
+    Spread(Expr),
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct AssignmentExpression {
     pub span: Span,
     pub operator: AssignmentOperator,
-    pub left: Expression,
-    pub right: Expression,
+    pub left: Expr,
+    pub right: Expr,
 }
 
 #[derive(Debug, PartialOrd, PartialEq, FromString)]
@@ -517,7 +517,7 @@ pub struct CallExpression {
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct OptionalCallExpression {
     pub span: Span,
-    pub callee: Expression,
+    pub callee: Expr,
     pub arguments_span: Span,
     pub arguments: Vec<Argument>,
     pub optional: bool,
@@ -527,5 +527,5 @@ pub struct OptionalCallExpression {
 pub enum Callee {
     Super,
     Import,
-    Expression(Expression),
+    Expression(Expr),
 }

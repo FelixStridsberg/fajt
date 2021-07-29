@@ -1,6 +1,6 @@
 use crate::ast::{
-    DoWhileStatement, ForInStatement, ForInit, ForOfStatement, ForStatement, Statement,
-    VariableKind, VariableStatement, WhileStatement,
+    DoWhileStatement, ForInStatement, ForInit, ForOfStatement, ForStatement, Stmt, VariableKind,
+    VariableStatement, WhileStatement,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenTry};
@@ -15,7 +15,7 @@ impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
-    pub(super) fn parse_do_while_statement(&mut self) -> Result<Statement> {
+    pub(super) fn parse_do_while_statement(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("do"))?;
 
@@ -32,7 +32,7 @@ where
         Ok(DoWhileStatement { span, body, test }.into())
     }
 
-    pub(super) fn parse_while_statement(&mut self) -> Result<Statement> {
+    pub(super) fn parse_while_statement(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("while"))?;
         self.consume_assert(punct!("("))?;
@@ -47,7 +47,7 @@ where
         Ok(WhileStatement { span, test, body }.into())
     }
 
-    pub(super) fn parse_for_statement(&mut self) -> Result<Statement> {
+    pub(super) fn parse_for_statement(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("for"))?;
 
@@ -70,7 +70,7 @@ where
         }
     }
 
-    fn parse_plain_for(&mut self, span_start: usize, init: Option<ForInit>) -> Result<Statement> {
+    fn parse_plain_for(&mut self, span_start: usize, init: Option<ForInit>) -> Result<Stmt> {
         self.consume_assert(punct!(";"))?;
 
         let test = (!self.current_matches(punct!(";"))).then_try(|| self.parse_expression())?;
@@ -90,7 +90,7 @@ where
         .into())
     }
 
-    fn parse_for_in(&mut self, span_start: usize, left: ForInit) -> Result<Statement> {
+    fn parse_for_in(&mut self, span_start: usize, left: ForInit) -> Result<Stmt> {
         // TODO verify that `left` is a valid LeftHandSideExpression if not declaration.
 
         self.consume_assert(keyword!("in"))?;
@@ -112,7 +112,7 @@ where
         .into())
     }
 
-    fn parse_for_await_of(&mut self, span_start: usize) -> Result<Statement> {
+    fn parse_for_await_of(&mut self, span_start: usize) -> Result<Stmt> {
         self.reader.consume()?;
         self.consume_assert(punct!("("))?;
 
@@ -124,7 +124,7 @@ where
         self.parse_for_of(span_start, init.unwrap(), true)
     }
 
-    fn parse_for_of(&mut self, span_start: usize, left: ForInit, wait: bool) -> Result<Statement> {
+    fn parse_for_of(&mut self, span_start: usize, left: ForInit, wait: bool) -> Result<Stmt> {
         // TODO verify that `left` is a valid LeftHandSideExpression if not declaration.
 
         self.consume_assert(keyword!("of"))?;

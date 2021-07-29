@@ -1,4 +1,4 @@
-use crate::ast::{Statement, VariableDeclaration, VariableKind, VariableStatement};
+use crate::ast::{Stmt, VariableDeclaration, VariableKind, VariableStatement};
 use crate::error::{Result, ThenTry};
 use crate::Parser;
 use fajt_common::io::PeekRead;
@@ -10,7 +10,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `VariableStatement` or `LexicalDeclaration` goal symbol.
-    pub(super) fn parse_variable_statement(&mut self, kind: VariableKind) -> Result<Statement> {
+    pub(super) fn parse_variable_statement(&mut self, kind: VariableKind) -> Result<Stmt> {
         let token = self.reader.consume()?;
         let span_start = token.span.start;
 

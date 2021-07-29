@@ -1,6 +1,6 @@
 use crate::ast::{
-    ArrowFunctionBody, ArrowFunctionExpression, BindingElement, Expression, FormalParameters,
-    FunctionDeclaration, FunctionExpression, Ident, Statement,
+    ArrowFunctionBody, ArrowFunctionExpression, BindingElement, Expr, FormalParameters,
+    FunctionDeclaration, FunctionExpression, Ident, Stmt,
 };
 use crate::error::Result;
 use crate::parser::ContextModify;
@@ -23,7 +23,7 @@ where
         binding_parameter: bool,
         asynchronous: bool,
         parameters: FormalParameters,
-    ) -> Result<Expression> {
+    ) -> Result<Expr> {
         self.consume_assert(punct!("=>"))?;
 
         let body = if self.current_matches(punct!("{")) {
@@ -62,7 +62,7 @@ where
     }
 
     /// Parses the `FunctionExpression` goal symbol.
-    pub(super) fn parse_function_expression(&mut self) -> Result<Expression> {
+    pub(super) fn parse_function_expression(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.consume_assert(keyword!("function"))?;
 
@@ -84,7 +84,7 @@ where
     }
 
     /// Parses the `AsyncFunctionExpression` goal symbol.
-    pub(super) fn parse_async_function_expression(&mut self) -> Result<Expression> {
+    pub(super) fn parse_async_function_expression(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.consume_assert(keyword!("async"))?;
 
@@ -109,7 +109,7 @@ where
     }
 
     /// Parses the `FunctionDeclaration` goal symbol.
-    pub(super) fn parse_function_declaration(&mut self) -> Result<Statement> {
+    pub(super) fn parse_function_declaration(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("function"))?;
 
@@ -121,7 +121,7 @@ where
     }
 
     /// Parses the `AsyncFunctionDeclaration` goal symbol.
-    pub(super) fn parse_async_function_declaration(&mut self) -> Result<Statement> {
+    pub(super) fn parse_async_function_declaration(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("async"))?;
 
@@ -151,7 +151,7 @@ where
         ident: Ident,
         generator: bool,
         asynchronous: bool,
-    ) -> Result<Statement> {
+    ) -> Result<Stmt> {
         let parameters = self.parse_formal_parameters()?;
         let body = self.parse_function_body()?;
 
@@ -201,7 +201,7 @@ where
     }
 
     /// Parses the `FunctionBody` or `AsyncFunctionBody` goal symbol.
-    pub(super) fn parse_function_body(&mut self) -> Result<Vec<Statement>> {
+    pub(super) fn parse_function_body(&mut self) -> Result<Vec<Stmt>> {
         self.consume_assert(punct!("{"))?;
 
         let mut body = Vec::new();

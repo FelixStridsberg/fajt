@@ -1,7 +1,7 @@
 use crate::ast::{
     Argument, AssignmentExpression, AwaitExpression, CallExpression, Callee, ConditionalExpression,
-    Expression, Ident, Literal, MemberObject, MetaPropertyExpression, NewExpression,
-    SequenceExpression, Super, ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
+    Expr, Ident, Literal, MemberObject, MetaPropertyExpression, NewExpression, SequenceExpression,
+    Super, ThisExpression, UnaryExpression, UpdateExpression, YieldExpression,
 };
 use crate::error::ErrorKind::SyntaxError;
 use crate::error::{Result, ThenTry};
@@ -18,7 +18,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `Expression` goal symbol.
-    pub(crate) fn parse_expression(&mut self) -> Result<Expression> {
+    pub(crate) fn parse_expression(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let expression = self.parse_assignment_expression()?;
 
@@ -33,8 +33,8 @@ where
     fn parse_expression_sequence(
         &mut self,
         span_start: usize,
-        initial_expression: Expression,
-    ) -> Result<Expression> {
+        initial_expression: Expr,
+    ) -> Result<Expr> {
         let mut expressions = Vec::with_capacity(5);
         expressions.push(initial_expression);
 
@@ -52,7 +52,7 @@ where
     }
 
     /// Parses the `AssignmentExpression` goal symbol.
-    pub(super) fn parse_assignment_expression(&mut self) -> Result<Expression> {
+    pub(super) fn parse_assignment_expression(&mut self) -> Result<Expr> {
         let span_start = self.position();
         match self.reader.current() {
             token_matches!(ok: keyword!("yield")) => self.parse_yield_expression(),
@@ -106,7 +106,7 @@ where
     }
 
     /// Parses the part of `AssignmentExpression` that start with the `(` punctuator.
-    fn parse_assignment_expression_open_parentheses(&mut self) -> Result<Expression> {
+    fn parse_assignment_expression_open_parentheses(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let parenthesized_or_arrow_parameters =
             self.parse_cover_parenthesized_and_arrow_parameters()?;
@@ -124,7 +124,7 @@ where
     /// 1. `async a => {}` // Async arrow function without parameter parentheses.
     /// 2. `async(a) => {}` // Async arrow function with parentheses.
     /// 3. `async(a)` // Function call where `async` is an identifier and not a keyword.
-    fn parse_assignment_expression_async(&mut self) -> Result<Expression> {
+    fn parse_assignment_expression_async(&mut self) -> Result<Expr> {
         if self.peek_is_identifier() {
             let span_start = self.position();
             self.reader.consume()?;
@@ -147,7 +147,7 @@ where
     }
 
     /// Parses the `YieldExpression` goal symbol.
-    fn parse_yield_expression(&mut self) -> Result<Expression> {
+    fn parse_yield_expression(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.consume_assert(keyword!("yield"))?;
 
@@ -179,7 +179,7 @@ where
     }
 
     /// Parses the `ConditionalExpression` goal symbol.
-    fn parse_conditional_expression(&mut self) -> Result<Expression> {
+    fn parse_conditional_expression(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let expression = self.parse_short_circuit_expression()?;
 
@@ -204,7 +204,7 @@ where
     }
 
     /// Parses the `UnaryExpression` goal symbol.
-    pub(super) fn parse_unary_expression(&mut self) -> Result<Expression> {
+    pub(super) fn parse_unary_expression(&mut self) -> Result<Expr> {
         let operator = match self.reader.current()? {
             token_matches!(punct!("+")) => Some(unary_op!("+")),
             token_matches!(punct!("-")) => Some(unary_op!("-")),
@@ -240,7 +240,7 @@ where
     }
 
     /// Parses the `UpdateExpression` goal symbol.
-    fn parse_update_expression(&mut self) -> Result<Expression> {
+    fn parse_update_expression(&mut self) -> Result<Expr> {
         let prefix_operator = match self.reader.current()? {
             token_matches!(punct!("++")) => Some(update_op!("++")),
             token_matches!(punct!("--")) => Some(update_op!("--")),
@@ -289,7 +289,7 @@ where
     }
 
     /// Parses the `LeftHandSideExpression` goal symbol.
-    pub(super) fn parse_left_hand_side_expression(&mut self) -> Result<Expression> {
+    pub(super) fn parse_left_hand_side_expression(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let expression = match self.reader.current() {
             token_matches!(ok: keyword!("new")) if !self.peek_matches(punct!(".")) => {
@@ -350,7 +350,7 @@ where
     }
 
     /// Parses the `SuperCall` goal symbol.
-    fn parse_super_call_expression(&mut self) -> Result<Expression> {
+    fn parse_super_call_expression(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.reader.consume()?;
         let (arguments_span, arguments) = self.parse_arguments()?;
@@ -365,7 +365,7 @@ where
     }
 
     /// Parses the `ImportCall` goal symbol.
-    fn parse_import_call_expression(&mut self) -> Result<Expression> {
+    fn parse_import_call_expression(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.reader.consume()?;
 
@@ -393,7 +393,7 @@ where
     }
 
     /// Parses the `NewExpression` goal symbol.
-    fn parse_new_expression(&mut self) -> Result<Expression> {
+    fn parse_new_expression(&mut self) -> Result<Expr> {
         if self.current_matches(keyword!("new")) && !self.current_matches(punct!(".")) {
             let span_start = self.position();
             self.reader.consume()?;
@@ -451,7 +451,7 @@ where
 
     /// Parses the `MemberExpression` goal symbol.
     /// NOTE: The `new MemberExpression Arguments` is parsed in `NewExpression`
-    pub fn parse_member_expression(&mut self) -> Result<Expression> {
+    pub fn parse_member_expression(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let mut expression = self.parse_member_expression_non_recursive()?;
 
@@ -472,7 +472,7 @@ where
     }
 
     /// Parses the non recursive parts of `MemberExpressions`.
-    fn parse_member_expression_non_recursive(&mut self) -> Result<Expression> {
+    fn parse_member_expression_non_recursive(&mut self) -> Result<Expr> {
         match self.reader.current()? {
             token_matches!(keyword!("super")) => {
                 let span_start = self.position();
@@ -530,7 +530,7 @@ where
     }
 
     /// Parses the `PrimaryExpression` goal symbol.
-    fn parse_primary_expression(&mut self) -> Result<Expression> {
+    fn parse_primary_expression(&mut self) -> Result<Expr> {
         Ok(match self.reader.current()? {
             token_matches!(keyword!("this")) => self.parse_this_expression()?,
             token_matches!(keyword!("null")) => self.consume_literal(Literal::Null)?,
@@ -555,19 +555,19 @@ where
     }
 
     /// Parses the `this` expression which is part of the `PrimaryExpression` goal symbol.
-    fn parse_this_expression(&mut self) -> Result<Expression> {
+    fn parse_this_expression(&mut self) -> Result<Expr> {
         let token = self.consume_assert(keyword!("this"))?;
         Ok(ThisExpression::new(token.span).into())
     }
 
     /// Parses the `IdentifierReference` goal symbol.
-    fn parse_identifier_reference(&mut self) -> Result<Expression> {
+    fn parse_identifier_reference(&mut self) -> Result<Expr> {
         let ident = self.parse_identifier()?;
         Ok(ident.into())
     }
 
     /// Parses the `Initializer` goal symbol.
-    pub(super) fn parse_initializer(&mut self) -> Result<Expression> {
+    pub(super) fn parse_initializer(&mut self) -> Result<Expr> {
         self.reader.consume()?; // Skip =
         self.parse_assignment_expression()
     }

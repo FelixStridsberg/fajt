@@ -1,6 +1,4 @@
-use crate::ast::{
-    BinaryExpression, BinaryOperator, Expression, LogicalExpression, LogicalOperator,
-};
+use crate::ast::{BinaryExpression, BinaryOperator, Expr, LogicalExpression, LogicalOperator};
 use crate::error::Result;
 use crate::Parser;
 
@@ -15,7 +13,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `ShortCircuitExpression` goal symbol.
-    pub(super) fn parse_short_circuit_expression(&mut self) -> Result<Expression> {
+    pub(super) fn parse_short_circuit_expression(&mut self) -> Result<Expr> {
         self.parse_logical_expression(Self::parse_logical_or_expression, |token| {
             if token_matches!(token, punct!("??")) {
                 Some(logical_op!("??"))
@@ -26,7 +24,7 @@ where
     }
 
     /// Parses the `LogicalORExpression` goal symbol.
-    fn parse_logical_or_expression(&mut self) -> Result<Expression> {
+    fn parse_logical_or_expression(&mut self) -> Result<Expr> {
         self.parse_logical_expression(Self::parse_logical_and_expression, |token| {
             if token_matches!(token, punct!("||")) {
                 Some(logical_op!("||"))
@@ -37,7 +35,7 @@ where
     }
 
     /// Parses the `LogicalANDExpression` goal symbol.
-    fn parse_logical_and_expression(&mut self) -> Result<Expression> {
+    fn parse_logical_and_expression(&mut self) -> Result<Expr> {
         self.parse_logical_expression(Self::parse_bitwise_or_expression, |token| {
             if token_matches!(token, punct!("&&")) {
                 Some(logical_op!("&&"))
@@ -48,7 +46,7 @@ where
     }
 
     /// Parses the `BitwiseORExpression` goal symbol.
-    fn parse_bitwise_or_expression(&mut self) -> Result<Expression> {
+    fn parse_bitwise_or_expression(&mut self) -> Result<Expr> {
         self.parse_binary_expression(Self::parse_bitwise_xor_expression, |token| {
             if token_matches!(token, punct!("|")) {
                 Some(binary_op!("|"))
@@ -59,7 +57,7 @@ where
     }
 
     /// Parses the `BitwiseXORExpression` goal symbol.
-    fn parse_bitwise_xor_expression(&mut self) -> Result<Expression> {
+    fn parse_bitwise_xor_expression(&mut self) -> Result<Expr> {
         self.parse_binary_expression(Self::parse_bitwise_and_expression, |token| {
             if token_matches!(token, punct!("^")) {
                 Some(binary_op!("^"))
@@ -70,7 +68,7 @@ where
     }
 
     /// Parses the `BitwiseANDExpression` goal symbol.
-    fn parse_bitwise_and_expression(&mut self) -> Result<Expression> {
+    fn parse_bitwise_and_expression(&mut self) -> Result<Expr> {
         self.parse_binary_expression(Self::parse_equality_expression, |token| {
             if token_matches!(token, punct!("&")) {
                 Some(binary_op!("&"))
@@ -81,7 +79,7 @@ where
     }
 
     /// Parses the `EqualityExpression` goal symbol.
-    fn parse_equality_expression(&mut self) -> Result<Expression> {
+    fn parse_equality_expression(&mut self) -> Result<Expr> {
         self.parse_binary_expression(Self::parse_relational_expression, |token| match token {
             token_matches!(punct!("==")) => Some(binary_op!("==")),
             token_matches!(punct!("!=")) => Some(binary_op!("!=")),
@@ -92,7 +90,7 @@ where
     }
 
     /// Parses the `RelationalExpression` goal symbol.
-    fn parse_relational_expression(&mut self) -> Result<Expression> {
+    fn parse_relational_expression(&mut self) -> Result<Expr> {
         let in_keyword_allowed = self.context.is_in;
         self.parse_binary_expression(Self::parse_shift_expression, |token| match token {
             token_matches!(punct!("<")) => Some(binary_op!("<")),
@@ -106,7 +104,7 @@ where
     }
 
     /// Parses the `ShiftExpression` goal symbol.
-    fn parse_shift_expression(&mut self) -> Result<Expression> {
+    fn parse_shift_expression(&mut self) -> Result<Expr> {
         self.parse_binary_expression(Self::parse_additive_expression, |token| match token {
             token_matches!(punct!("<<")) => Some(binary_op!("<<")),
             token_matches!(punct!(">>")) => Some(binary_op!(">>")),
@@ -116,7 +114,7 @@ where
     }
 
     /// Parses the `AdditiveExpression` goal symbol.
-    fn parse_additive_expression(&mut self) -> Result<Expression> {
+    fn parse_additive_expression(&mut self) -> Result<Expr> {
         self.parse_binary_expression(Self::parse_multiplicative_expression, |token| match token {
             token_matches!(punct!("+")) => Some(binary_op!("+")),
             token_matches!(punct!("-")) => Some(binary_op!("-")),
@@ -125,7 +123,7 @@ where
     }
 
     /// Parses the `MultiplicativeExpression` goal symbol.
-    fn parse_multiplicative_expression(&mut self) -> Result<Expression> {
+    fn parse_multiplicative_expression(&mut self) -> Result<Expr> {
         self.parse_binary_expression(Self::parse_exponentiation_expression, |token| match token {
             token_matches!(punct!("*")) => Some(binary_op!("*")),
             token_matches!(punct!("/")) => Some(binary_op!("/")),
@@ -135,7 +133,7 @@ where
     }
 
     /// Parses the `ExponentiationExpression` goal symbol.
-    fn parse_exponentiation_expression(&mut self) -> Result<Expression> {
+    fn parse_exponentiation_expression(&mut self) -> Result<Expr> {
         self.parse_binary_expression(Self::parse_unary_expression, |token| {
             if token_matches!(token, punct!("**")) {
                 Some(binary_op!("**"))
@@ -153,9 +151,9 @@ where
     #[inline]
     fn parse_binary_expression<F>(
         &mut self,
-        next: fn(&mut Self) -> Result<Expression>,
+        next: fn(&mut Self) -> Result<Expr>,
         map_operator: F,
-    ) -> Result<Expression>
+    ) -> Result<Expr>
     where
         F: Fn(&Token) -> Option<BinaryOperator>,
     {
@@ -178,9 +176,9 @@ where
     #[inline]
     fn parse_logical_expression(
         &mut self,
-        next: fn(&mut Self) -> Result<Expression>,
+        next: fn(&mut Self) -> Result<Expr>,
         map_operator: fn(&Token) -> Option<LogicalOperator>,
-    ) -> Result<Expression> {
+    ) -> Result<Expr> {
         self.parse_recursive_binary_expression(next, map_operator, |span, left, right, operator| {
             LogicalExpression {
                 span,
@@ -195,15 +193,10 @@ where
     #[inline]
     fn parse_recursive_binary_expression<T, F>(
         &mut self,
-        next: fn(&mut Self) -> Result<Expression>,
+        next: fn(&mut Self) -> Result<Expr>,
         map_operator: F,
-        create_expression: fn(
-            span: Span,
-            left: Expression,
-            right: Expression,
-            operator: T,
-        ) -> Expression,
-    ) -> Result<Expression>
+        create_expression: fn(span: Span, left: Expr, right: Expr, operator: T) -> Expr,
+    ) -> Result<Expr>
     where
         F: Fn(&Token) -> Option<T>,
     {
