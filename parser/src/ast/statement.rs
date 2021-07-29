@@ -6,25 +6,25 @@ use fajt_lexer::token::Span;
 /// Note: Declarations are handles as statements since they can appear in the same contexts.
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Stmt {
-    FunctionDeclaration(Box<FunctionDeclaration>),
-    BlockStatement(Box<BlockStatement>),
-    BreakStatement(Box<BreakStatement>),
-    ContinueStatement(Box<ContinueStatement>),
-    DebuggerStatement(Box<DebuggerStatement>),
-    DoWhileStatement(Box<DoWhileStatement>),
-    EmptyStatement(Box<EmptyStatement>),
-    ExpressionStatement(Box<Expr>),
-    ForInStatement(Box<ForInStatement>),
-    ForOfStatement(Box<ForOfStatement>),
-    ForStatement(Box<ForStatement>),
-    IfStatement(Box<IfStatement>),
-    ReturnStatement(Box<ReturnStatement>),
-    SwitchStatement(Box<SwitchStatement>),
-    ThrowStatement(Box<ThrowStatement>),
-    TryStatement(Box<TryStatement>),
-    VariableStatement(Box<VariableStatement>),
-    WhileStatement(Box<WhileStatement>),
-    WithStatement(Box<WithStatement>),
+    FunctionDecl(Box<FunctionDeclaration>),
+    Block(Box<BlockStatement>),
+    Break(Box<BreakStatement>),
+    Continue(Box<ContinueStatement>),
+    Debugger(Box<DebuggerStatement>),
+    DoWhile(Box<DoWhileStatement>),
+    Empty(Box<EmptyStatement>),
+    Expression(Box<Expr>),
+    For(Box<ForStatement>),
+    ForIn(Box<ForInStatement>),
+    ForOf(Box<ForOfStatement>),
+    If(Box<IfStatement>),
+    Return(Box<ReturnStatement>),
+    Switch(Box<SwitchStatement>),
+    Throw(Box<ThrowStatement>),
+    Try(Box<TryStatement>),
+    Variable(Box<VariableStatement>),
+    While(Box<WhileStatement>),
+    With(Box<WithStatement>),
 }
 
 impl Stmt {
@@ -32,11 +32,11 @@ impl Stmt {
     where
         E: Into<Expr>,
     {
-        Self::ExpressionStatement(Box::new(expression.into()))
+        Self::Expression(Box::new(expression.into()))
     }
 
     pub fn unwrap_block_statement(self) -> BlockStatement {
-        if let Stmt::BlockStatement(block) = self {
+        if let Stmt::Block(block) = self {
             *block
         } else {
             panic!("Tried to unwrap {:?} as a block statement", self);
@@ -46,115 +46,115 @@ impl Stmt {
 
 impl From<BlockStatement> for Stmt {
     fn from(stmt: BlockStatement) -> Self {
-        Self::BlockStatement(Box::new(stmt))
+        Self::Block(Box::new(stmt))
     }
 }
 
 impl From<EmptyStatement> for Stmt {
     fn from(stmt: EmptyStatement) -> Self {
-        Self::EmptyStatement(Box::new(stmt))
+        Self::Empty(Box::new(stmt))
     }
 }
 
 impl From<VariableStatement> for Stmt {
     fn from(stmt: VariableStatement) -> Self {
-        Self::VariableStatement(Box::new(stmt))
+        Self::Variable(Box::new(stmt))
     }
 }
 
 impl From<Expr> for Stmt {
     fn from(expr: Expr) -> Self {
-        Self::ExpressionStatement(Box::new(expr))
+        Self::Expression(Box::new(expr))
     }
 }
 
 impl From<FunctionDeclaration> for Stmt {
     fn from(expr: FunctionDeclaration) -> Self {
-        Self::FunctionDeclaration(Box::new(expr))
+        Self::FunctionDecl(Box::new(expr))
     }
 }
 
 impl From<ReturnStatement> for Stmt {
     fn from(expr: ReturnStatement) -> Self {
-        Self::ReturnStatement(Box::new(expr))
+        Self::Return(Box::new(expr))
     }
 }
 
 impl From<BreakStatement> for Stmt {
     fn from(expr: BreakStatement) -> Self {
-        Self::BreakStatement(Box::new(expr))
+        Self::Break(Box::new(expr))
     }
 }
 
 impl From<ContinueStatement> for Stmt {
     fn from(expr: ContinueStatement) -> Self {
-        Self::ContinueStatement(Box::new(expr))
+        Self::Continue(Box::new(expr))
     }
 }
 
 impl From<ThrowStatement> for Stmt {
     fn from(expr: ThrowStatement) -> Self {
-        Self::ThrowStatement(Box::new(expr))
+        Self::Throw(Box::new(expr))
     }
 }
 
 impl From<DebuggerStatement> for Stmt {
     fn from(expr: DebuggerStatement) -> Self {
-        Self::DebuggerStatement(Box::new(expr))
+        Self::Debugger(Box::new(expr))
     }
 }
 
 impl From<IfStatement> for Stmt {
     fn from(expr: IfStatement) -> Self {
-        Self::IfStatement(Box::new(expr))
+        Self::If(Box::new(expr))
     }
 }
 
 impl From<WithStatement> for Stmt {
     fn from(expr: WithStatement) -> Self {
-        Self::WithStatement(Box::new(expr))
+        Self::With(Box::new(expr))
     }
 }
 
 impl From<TryStatement> for Stmt {
     fn from(expr: TryStatement) -> Self {
-        Self::TryStatement(Box::new(expr))
+        Self::Try(Box::new(expr))
     }
 }
 
 impl From<SwitchStatement> for Stmt {
     fn from(expr: SwitchStatement) -> Self {
-        Self::SwitchStatement(Box::new(expr))
+        Self::Switch(Box::new(expr))
     }
 }
 
 impl From<DoWhileStatement> for Stmt {
     fn from(expr: DoWhileStatement) -> Self {
-        Self::DoWhileStatement(Box::new(expr))
+        Self::DoWhile(Box::new(expr))
     }
 }
 
 impl From<WhileStatement> for Stmt {
     fn from(expr: WhileStatement) -> Self {
-        Self::WhileStatement(Box::new(expr))
+        Self::While(Box::new(expr))
     }
 }
 
 impl From<ForStatement> for Stmt {
     fn from(expr: ForStatement) -> Self {
-        Self::ForStatement(Box::new(expr))
+        Self::For(Box::new(expr))
     }
 }
 
 impl From<ForInStatement> for Stmt {
     fn from(expr: ForInStatement) -> Self {
-        Self::ForInStatement(Box::new(expr))
+        Self::ForIn(Box::new(expr))
     }
 }
 
 impl From<ForOfStatement> for Stmt {
     fn from(expr: ForOfStatement) -> Self {
-        Self::ForOfStatement(Box::new(expr))
+        Self::ForOf(Box::new(expr))
     }
 }
 

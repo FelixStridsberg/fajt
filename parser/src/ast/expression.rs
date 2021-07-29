@@ -7,34 +7,34 @@ use crate::ast::{FormalParameters, Ident, Stmt};
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum Expr {
-    ThisExpression(Box<ThisExpression>),
-    IdentifierReference(Box<IdentifierReference>),
+    ArrowFunction(Box<ArrowFunctionExpression>),
+    Assignment(Box<AssignmentExpression>),
+    Await(Box<AwaitExpression>),
+    Binary(Box<BinaryExpression>),
+    Call(Box<CallExpression>),
+    Class(Box<ClassExpression>),
+    Conditional(Box<ConditionalExpression>),
+    Function(Box<FunctionExpression>),
+    Identifier(Box<IdentifierReference>),
     Literal(Box<LiteralExpression>),
-    BinaryExpression(Box<BinaryExpression>),
-    LogicalExpression(Box<LogicalExpression>),
-    UnaryExpression(Box<UnaryExpression>),
-    UpdateExpression(Box<UpdateExpression>),
-    YieldExpression(Box<YieldExpression>),
-    ConditionalExpression(Box<ConditionalExpression>),
-    AwaitExpression(Box<AwaitExpression>),
-    SequenceExpression(Box<SequenceExpression>),
-    ClassExpression(Box<ClassExpression>),
-    FunctionExpression(Box<FunctionExpression>),
-    ArrowFunctionExpression(Box<ArrowFunctionExpression>),
-    ParenthesizedExpression(Box<ParenthesizedExpression>),
-    MemberExpression(Box<MemberExpression>),
-    OptionalMemberExpression(Box<OptionalMemberExpression>),
-    NewExpression(Box<NewExpression>),
-    AssignmentExpression(Box<AssignmentExpression>),
-    CallExpression(Box<CallExpression>),
-    OptionalCallExpression(Box<OptionalCallExpression>),
-    MetaPropertyExpression(Box<MetaPropertyExpression>),
+    Logical(Box<LogicalExpression>),
+    Member(Box<MemberExpression>),
+    MetaProperty(Box<MetaPropertyExpression>),
+    New(Box<NewExpression>),
+    OptionalCall(Box<OptionalCallExpression>),
+    OptionalMember(Box<OptionalMemberExpression>),
+    Parenthesized(Box<ParenthesizedExpression>),
+    Sequence(Box<SequenceExpression>),
+    This(Box<ThisExpression>),
+    Unary(Box<UnaryExpression>),
+    Update(Box<UpdateExpression>),
+    Yield(Box<YieldExpression>),
 }
 
 impl Expr {
     pub fn is_nested_new(&self) -> bool {
-        if let Expr::NewExpression(expr) = &self {
-            matches!(expr.callee, Expr::NewExpression(_))
+        if let Expr::New(expr) = &self {
+            matches!(expr.callee, Expr::New(_))
         } else {
             false
         }
@@ -43,7 +43,7 @@ impl Expr {
 
 impl From<ThisExpression> for Expr {
     fn from(expr: ThisExpression) -> Self {
-        Self::ThisExpression(Box::new(expr))
+        Self::This(Box::new(expr))
     }
 }
 
@@ -55,127 +55,127 @@ impl From<LiteralExpression> for Expr {
 
 impl From<Ident> for Expr {
     fn from(ident: Ident) -> Self {
-        Self::IdentifierReference(Box::new(ident.into()))
+        Self::Identifier(Box::new(ident.into()))
     }
 }
 
 impl From<IdentifierReference> for Expr {
     fn from(expr: IdentifierReference) -> Self {
-        Self::IdentifierReference(Box::new(expr))
+        Self::Identifier(Box::new(expr))
     }
 }
 
 impl From<BinaryExpression> for Expr {
     fn from(expr: BinaryExpression) -> Self {
-        Self::BinaryExpression(Box::new(expr))
+        Self::Binary(Box::new(expr))
     }
 }
 
 impl From<LogicalExpression> for Expr {
     fn from(expr: LogicalExpression) -> Self {
-        Self::LogicalExpression(Box::new(expr))
+        Self::Logical(Box::new(expr))
     }
 }
 
 impl From<UnaryExpression> for Expr {
     fn from(expr: UnaryExpression) -> Self {
-        Self::UnaryExpression(Box::new(expr))
+        Self::Unary(Box::new(expr))
     }
 }
 
 impl From<UpdateExpression> for Expr {
     fn from(expr: UpdateExpression) -> Self {
-        Self::UpdateExpression(Box::new(expr))
+        Self::Update(Box::new(expr))
     }
 }
 
 impl From<ConditionalExpression> for Expr {
     fn from(expr: ConditionalExpression) -> Self {
-        Self::ConditionalExpression(Box::new(expr))
+        Self::Conditional(Box::new(expr))
     }
 }
 
 impl From<YieldExpression> for Expr {
     fn from(expr: YieldExpression) -> Self {
-        Self::YieldExpression(Box::new(expr))
+        Self::Yield(Box::new(expr))
     }
 }
 
 impl From<AwaitExpression> for Expr {
     fn from(expr: AwaitExpression) -> Self {
-        Self::AwaitExpression(Box::new(expr))
+        Self::Await(Box::new(expr))
     }
 }
 
 impl From<SequenceExpression> for Expr {
     fn from(expr: SequenceExpression) -> Self {
-        Self::SequenceExpression(Box::new(expr))
+        Self::Sequence(Box::new(expr))
     }
 }
 
 impl From<ClassExpression> for Expr {
     fn from(expr: ClassExpression) -> Self {
-        Self::ClassExpression(Box::new(expr))
+        Self::Class(Box::new(expr))
     }
 }
 
 impl From<FunctionExpression> for Expr {
     fn from(expr: FunctionExpression) -> Self {
-        Self::FunctionExpression(Box::new(expr))
+        Self::Function(Box::new(expr))
     }
 }
 
 impl From<ArrowFunctionExpression> for Expr {
     fn from(expr: ArrowFunctionExpression) -> Self {
-        Self::ArrowFunctionExpression(Box::new(expr))
+        Self::ArrowFunction(Box::new(expr))
     }
 }
 
 impl From<ParenthesizedExpression> for Expr {
     fn from(expr: ParenthesizedExpression) -> Self {
-        Self::ParenthesizedExpression(Box::new(expr))
+        Self::Parenthesized(Box::new(expr))
     }
 }
 
 impl From<MemberExpression> for Expr {
     fn from(expr: MemberExpression) -> Self {
-        Self::MemberExpression(Box::new(expr))
+        Self::Member(Box::new(expr))
     }
 }
 
 impl From<OptionalMemberExpression> for Expr {
     fn from(expr: OptionalMemberExpression) -> Self {
-        Self::OptionalMemberExpression(Box::new(expr))
+        Self::OptionalMember(Box::new(expr))
     }
 }
 
 impl From<NewExpression> for Expr {
     fn from(expr: NewExpression) -> Self {
-        Self::NewExpression(Box::new(expr))
+        Self::New(Box::new(expr))
     }
 }
 
 impl From<AssignmentExpression> for Expr {
     fn from(expr: AssignmentExpression) -> Self {
-        Self::AssignmentExpression(Box::new(expr))
+        Self::Assignment(Box::new(expr))
     }
 }
 
 impl From<CallExpression> for Expr {
     fn from(expr: CallExpression) -> Self {
-        Self::CallExpression(Box::new(expr))
+        Self::Call(Box::new(expr))
     }
 }
 
 impl From<OptionalCallExpression> for Expr {
     fn from(expr: OptionalCallExpression) -> Self {
-        Self::OptionalCallExpression(Box::new(expr))
+        Self::OptionalCall(Box::new(expr))
     }
 }
 
 impl From<MetaPropertyExpression> for Expr {
     fn from(expr: MetaPropertyExpression) -> Self {
-        Self::MetaPropertyExpression(Box::new(expr))
+        Self::MetaProperty(Box::new(expr))
     }
 }
 
