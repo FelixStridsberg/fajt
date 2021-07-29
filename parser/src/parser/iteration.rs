@@ -52,15 +52,7 @@ where
         self.consume_assert(keyword!("for"))?;
 
         if self.context.is_await && self.current_matches(keyword!("await")) {
-            self.reader.consume()?;
-            self.consume_assert(punct!("("))?;
-
-            let init = self.parse_for_first_argument()?;
-            if init.is_none() {
-                return err!(UnexpectedToken(self.reader.consume()?));
-            }
-
-            return self.parse_for_of(span_start, init.unwrap(), true);
+            return self.parse_for_await_of(span_start);
         }
 
         self.consume_assert(punct!("("))?;
@@ -87,7 +79,6 @@ where
         self.consume_assert(punct!(")"))?;
 
         let body = self.parse_statement()?;
-
         let span = self.span_from(span_start);
         Ok(ForStatement {
             span,
@@ -111,7 +102,6 @@ where
         self.consume_assert(punct!(")"))?;
 
         let body = self.parse_statement()?;
-
         let span = self.span_from(span_start);
         Ok(ForInStatement {
             span,
@@ -120,6 +110,18 @@ where
             body,
         }
         .into())
+    }
+
+    fn parse_for_await_of(&mut self, span_start: usize) -> Result<Statement> {
+        self.reader.consume()?;
+        self.consume_assert(punct!("("))?;
+
+        let init = self.parse_for_first_argument()?;
+        if init.is_none() {
+            return err!(UnexpectedToken(self.reader.consume()?));
+        }
+
+        self.parse_for_of(span_start, init.unwrap(), true)
     }
 
     fn parse_for_of(&mut self, span_start: usize, left: ForInit, wait: bool) -> Result<Statement> {
@@ -134,7 +136,6 @@ where
         self.consume_assert(punct!(")"))?;
 
         let body = self.parse_statement()?;
-
         let span = self.span_from(span_start);
         Ok(ForOfStatement {
             span,
