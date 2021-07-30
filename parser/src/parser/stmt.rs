@@ -93,9 +93,7 @@ where
         let span_start = self.position();
         let expr = self.parse_expr()?;
 
-        if self.current_matches(punct!(";")) {
-            self.reader.consume()?;
-        }
+        self.maybe_consume_semicolon()?;
 
         let span = self.span_from(span_start);
         Ok(StmtExpr { span, expr }.into())
@@ -113,6 +111,8 @@ where
         self.consume_assert(keyword!("break"))?;
 
         let label = self.stmt_not_ended().then_try(|| self.parse_identifier())?;
+        self.maybe_consume_semicolon()?;
+
         let span = self.span_from(span_start);
         Ok(StmtBreak { span, label }.into())
     }
@@ -322,5 +322,13 @@ where
         }
 
         Ok(statements)
+    }
+
+    fn maybe_consume_semicolon(&mut self) -> Result<()> {
+        if self.current_matches(punct!(";")) {
+            self.reader.consume()?;
+        }
+
+        Ok(())
     }
 }

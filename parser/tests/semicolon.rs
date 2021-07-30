@@ -1,18 +1,12 @@
 mod r#macro;
 
 use fajt_lexer::token::Span;
-use fajt_parser::ast::{Ident, StmtExpr};
 
 #[test]
 fn expr_stmt_with_semicolon() {
     parser_test!(
         input: "a;",
-        output: [
-            StmtExpr {
-                span: Span::new(0, 2),
-                expr: Ident::new("a", (0, 1)).into(),
-            }.into()
-        ]
+        program_span: Span::new(0, 2)
     );
 }
 
@@ -20,11 +14,22 @@ fn expr_stmt_with_semicolon() {
 fn expr_stmt_without_semicolon() {
     parser_test!(
         input: "a",
-        output: [
-            StmtExpr {
-                span: Span::new(0, 1),
-                expr: Ident::new("a", (0, 1)).into(),
-            }.into()
-        ]
+        program_span: Span::new(0, 1)
+    );
+}
+
+#[test]
+fn break_stmt_with_semicolon() {
+    parser_test!(
+        input: "break;",
+        program_span: Span::new(0, 6)
+    );
+}
+
+#[test]
+fn break_stmt_without_semicolon() {
+    parser_test!(
+        input: "break",
+        program_span: Span::new(0, 5)
     );
 }

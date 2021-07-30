@@ -32,10 +32,19 @@ pub enum Program {
 
 impl Program {
     pub fn from_body(body: Vec<Stmt>) -> Self {
+        let span_start = body.first().map(|s| s.span().start).unwrap_or(0);
+        let span_end = body.last().map(|s| s.span().end).unwrap_or(0);
         Program::Script(Body {
-            span: (0, 0).into(),
+            span: Span::new(span_start, span_end),
             body,
         })
+    }
+
+    pub fn span(&self) -> &Span {
+        match self {
+            Program::Script(body) => &body.span,
+            Program::Module(body) => &body.span,
+        }
     }
 }
 

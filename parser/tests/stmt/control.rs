@@ -1,6 +1,6 @@
 use fajt_lexer::token::Span;
 use fajt_parser::ast::{
-    Ident, Stmt, StmtBreak, StmtContinue, StmtIf, StmtReturn, StmtSwitch, SwitchCase,
+    Ident, StmtBreak, StmtContinue, StmtExpr, StmtIf, StmtReturn, StmtSwitch, SwitchCase,
 };
 
 #[test]
@@ -89,7 +89,10 @@ fn if_no_else() {
             StmtIf {
                 span: Span::new(0, 10),
                 condition: Ident::new("a", (5, 6)).into(),
-                consequent: Stmt::expr(Ident::new("b", (9, 10))).into(),
+                consequent: StmtExpr {
+                    span: Span::new(9, 10),
+                    expr: Ident::new("b", (9, 10)).into()
+                }.into(),
                 alternate: None,
             }.into()
         ]
@@ -104,8 +107,14 @@ fn if_with_else() {
             StmtIf {
                 span: Span::new(0, 17),
                 condition: Ident::new("a", (5, 6)).into(),
-                consequent: Stmt::expr(Ident::new("b", (9, 10))).into(),
-                alternate: Some(Stmt::expr(Ident::new("c", (16, 17))).into()),
+                consequent: StmtExpr {
+                    span: Span::new(9, 10),
+                    expr: Ident::new("b", (9, 10)).into(),
+                }.into(),
+                alternate: Some(StmtExpr {
+                    span: Span::new(16, 17),
+                    expr: Ident::new("c", (16, 17)).into(),
+                }.into()),
             }.into()
         ]
     );
@@ -158,7 +167,10 @@ fn switch_default() {
                         span: Span::new(13, 23),
                         test: None,
                         consequent: vec![
-                            Stmt::expr(Ident::new("b", (22, 23)))
+                            StmtExpr {
+                                span: Span::new(22, 23),
+                                expr: Ident::new("b", (22, 23)).into(),
+                            }.into()
                         ],
                     }
                 ],
@@ -200,8 +212,14 @@ fn switch_case() {
                         span: Span::new(13, 25),
                         test: Some(Ident::new("b", (18, 19)).into()),
                         consequent: vec![
-                            Stmt::expr(Ident::new("c", (21, 22))),
-                            Stmt::expr(Ident::new("d", (24, 25))),
+                            StmtExpr {
+                                span: Span::new(21, 23),
+                                expr: Ident::new("c", (21, 22)).into(),
+                            }.into(),
+                            StmtExpr {
+                                span: Span::new(24, 25),
+                                expr: Ident::new("d", (24, 25)).into(),
+                            }.into(),
                         ],
                     }
                 ],
@@ -228,7 +246,10 @@ fn switch_mixed() {
                         span: Span::new(21, 31),
                         test: Some(Ident::new("c", (26, 27)).into()),
                         consequent: vec![
-                            Stmt::expr(Ident::new("d", (29, 30))),
+                            StmtExpr {
+                                span: Span::new(29, 31),
+                                expr: Ident::new("d", (29, 30)).into(),
+                            }.into(),
                         ],
                     },
                     SwitchCase {

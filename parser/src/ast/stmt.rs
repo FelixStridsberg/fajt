@@ -29,17 +29,6 @@ ast_enum! {
 }
 
 impl Stmt {
-    pub fn expr<E>(expr: E) -> Self
-    where
-        E: Into<Expr>,
-    {
-        let expr = expr.into();
-        Self::Expr(StmtExpr {
-            span: expr.span().clone(),
-            expr,
-        })
-    }
-
     pub fn unwrap_block_stmt(self) -> StmtBlock {
         if let Stmt::Block(block) = self {
             block

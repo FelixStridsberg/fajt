@@ -26,6 +26,10 @@ macro_rules! parser_test {
     (input: $input:literal, success) => {
         parse!($input).expect("Expected success but got fail.");
     };
+    (input: $input:literal, program_span: $span:expr) => {
+        let program = parse!($input).unwrap();
+        assert_eq!(program.span(), &$span);
+    };
     (input: $input:literal, output:[$($output:expr),*]) => {
         let program = parse!($input).unwrap();
         assert_eq!(program, fajt_parser::ast::Program::from_body(vec![$($output),*]))

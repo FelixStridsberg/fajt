@@ -1,7 +1,7 @@
 use fajt_lexer::token::Span;
 use fajt_parser::ast::{
-    BindingPattern, ExprLiteral, ForInit, Ident, Literal, Stmt, StmtDoWhile, StmtEmpty, StmtFor,
-    StmtForIn, StmtForOf, StmtVariable, StmtWhile, VariableDeclaration, VariableKind,
+    BindingPattern, ExprLiteral, ForInit, Ident, Literal, StmtDoWhile, StmtEmpty, StmtExpr,
+    StmtFor, StmtForIn, StmtForOf, StmtVariable, StmtWhile, VariableDeclaration, VariableKind,
 };
 use fajt_parser::error::ErrorKind::SyntaxError;
 use fajt_parser::ContextModify;
@@ -13,7 +13,10 @@ fn do_while() {
         output: [
             StmtDoWhile {
                 span: Span::new(0, 18),
-                body: Stmt::expr(Ident::new("a", (3, 4))).into(),
+                body: StmtExpr {
+                    span: Span::new(3, 5),
+                    expr: Ident::new("a", (3, 4)).into(),
+                }.into(),
                 test: ExprLiteral {
                     span: Span::new(13, 17),
                     literal: Literal::Boolean(true),
@@ -34,7 +37,10 @@ fn r#while() {
                     span: Span::new(7, 11),
                     literal: Literal::Boolean(true),
                 }.into(),
-                body: Stmt::expr(Ident::new("a", (13, 14))).into(),
+                body: StmtExpr {
+                    span: Span::new(13, 14),
+                    expr: Ident::new("a", (13, 14)).into(),
+                }.into(),
             }.into()
         ]
     );
