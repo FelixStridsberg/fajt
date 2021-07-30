@@ -32,7 +32,7 @@ impl ThenTry for bool {
         F: FnOnce() -> Result<T>,
     {
         if self {
-            f().map(|r| Some(r))
+            f().map(Some)
         } else {
             Ok(None)
         }

@@ -97,7 +97,7 @@ where
                 }
                 _ if self.is_identifier() => {
                     let ident = self.parse_identifier()?;
-                    props.push(PropertyDefinition::IdentifierReference(ident.into()));
+                    props.push(PropertyDefinition::IdentRef(ident));
                     self.consume_object_delimiter()?;
                 }
                 _ => return err!(UnexpectedToken(self.reader.consume()?)),

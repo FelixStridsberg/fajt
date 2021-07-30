@@ -29,8 +29,7 @@ where
     }
 
     pub(super) fn parse_variable_declarations(&mut self) -> Result<Vec<VariableDeclaration>> {
-        let mut declarations = Vec::new();
-        declarations.push(self.parse_variable_declaration()?);
+        let mut declarations = vec![self.parse_variable_declaration()?];
 
         loop {
             if self.current_matches(punct!(",")) {

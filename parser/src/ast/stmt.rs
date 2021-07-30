@@ -36,7 +36,7 @@ impl Stmt {
         let expr = expr.into();
         Self::Expr(StmtExpr {
             span: expr.span().clone(),
-            expr: expr.into(),
+            expr,
         })
     }
 

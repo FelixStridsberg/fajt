@@ -35,9 +35,9 @@ macro_rules! ast_enum_struct_impl {
             }
         }
 
-        impl Into<Box<$enum_name>> for $member {
-            fn into(self) -> Box<$enum_name> {
-                Box::new($enum_name::$variant(self))
+        impl From<$member> for Box<$enum_name> {
+            fn from(f: $member) -> Self {
+                Box::new($enum_name::$variant(f))
             }
         }
     };

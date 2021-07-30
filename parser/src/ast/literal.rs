@@ -33,7 +33,7 @@ pub struct Object {
 
 #[derive(Debug, PartialOrd, PartialEq)]
 pub enum PropertyDefinition {
-    IdentifierReference(Ident),
+    IdentRef(Ident),
     Spread(Expr),
 }
 

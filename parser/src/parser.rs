@@ -236,7 +236,7 @@ where
             return err!(UnexpectedToken(self.reader.consume()?));
         }
 
-        return Ok(());
+        Ok(())
     }
 }
 

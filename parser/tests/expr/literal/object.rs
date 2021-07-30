@@ -27,7 +27,7 @@ fn single_prop_object_literal() {
                 span: Span::new(0, 5),
                 literal: Literal::Object(Object {
                     props: vec![
-                        PropertyDefinition::IdentifierReference(Ident::new("a", (2, 3)).into())
+                        PropertyDefinition::IdentRef(Ident::new("a", (2, 3)).into())
                     ]
                 })
             }.into()
@@ -44,7 +44,7 @@ fn single_prop_object_literal_trailing_comma() {
                 span: Span::new(0, 6),
                 literal: Literal::Object(Object {
                     props: vec![
-                        PropertyDefinition::IdentifierReference(Ident::new("a", (2, 3)).into())
+                        PropertyDefinition::IdentRef(Ident::new("a", (2, 3)).into())
                     ]
                 })
             }.into()
@@ -61,9 +61,9 @@ fn multiple_props_object_literal() {
                 span: Span::new(0, 10),
                 literal: Literal::Object(Object {
                     props: vec![
-                        PropertyDefinition::IdentifierReference(Ident::new("a", (2, 3)).into()),
-                        PropertyDefinition::IdentifierReference(Ident::new("b", (4, 5)).into()),
-                        PropertyDefinition::IdentifierReference(Ident::new("c", (7, 8)).into()),
+                        PropertyDefinition::IdentRef(Ident::new("a", (2, 3)).into()),
+                        PropertyDefinition::IdentRef(Ident::new("b", (4, 5)).into()),
+                        PropertyDefinition::IdentRef(Ident::new("c", (7, 8)).into()),
                     ]
                 })
             }.into()
