@@ -164,8 +164,13 @@ where
 
     /// Parses the `DebuggerStatement` goal symbol.
     fn parse_debugger_stmt(&mut self) -> Result<Stmt> {
-        let token = self.consume_assert(keyword!("debugger"))?;
-        Ok(StmtDebugger { span: token.span }.into())
+        let span_start = self.position();
+
+        self.consume_assert(keyword!("debugger"))?;
+        self.maybe_consume_semicolon()?;
+
+        let span = self.span_from(span_start);
+        Ok(StmtDebugger { span }.into())
     }
 
     /// Parses the `IfStatement` goal symbol.
