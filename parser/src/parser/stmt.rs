@@ -1,6 +1,6 @@
 use crate::ast::{
-    CatchClause, Stmt, StmtBlock, StmtBreak, StmtContinue, StmtDebugger, StmtEmpty, StmtIf,
-    StmtReturn, StmtSwitch, StmtThrow, StmtTry, StmtWith, SwitchCase, VariableKind,
+    CatchClause, Stmt, StmtBlock, StmtBreak, StmtContinue, StmtDebugger, StmtEmpty, StmtExpr,
+    StmtIf, StmtReturn, StmtSwitch, StmtThrow, StmtTry, StmtWith, SwitchCase, VariableKind,
 };
 use crate::error::{Result, ThenTry};
 use crate::{ContextModify, Parser};
@@ -90,13 +90,15 @@ where
     }
 
     fn parse_expr_stmt(&mut self) -> Result<Stmt> {
+        let span_start = self.position();
         let expr = self.parse_expr()?;
 
         if self.current_matches(punct!(";")) {
             self.reader.consume()?;
         }
 
-        Ok(Stmt::expr(expr))
+        let span = self.span_from(span_start);
+        Ok(StmtExpr { span, expr }.into())
     }
 
     /// Parses the `EmptyStatement` goal symbol.
