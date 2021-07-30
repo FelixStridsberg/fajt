@@ -123,6 +123,8 @@ where
         self.consume_assert(keyword!("continue"))?;
 
         let label = self.stmt_not_ended().then_try(|| self.parse_identifier())?;
+        self.maybe_consume_semicolon()?;
+
         let span = self.span_from(span_start);
         Ok(StmtContinue { span, label }.into())
     }
