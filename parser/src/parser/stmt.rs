@@ -147,6 +147,8 @@ where
         self.consume_assert(keyword!("throw"))?;
 
         let argument = self.stmt_not_ended().then_try(|| self.parse_expr())?;
+        self.maybe_consume_semicolon()?;
+
         let span = self.span_from(span_start);
         Ok(StmtThrow { span, argument }.into())
     }

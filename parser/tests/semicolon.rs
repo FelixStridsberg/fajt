@@ -67,6 +67,22 @@ fn return_stmt_without_semicolon() {
 }
 
 #[test]
+fn throw_stmt_with_semicolon() {
+    parser_test!(
+        input: "throw a;",
+        program_span: Span::new(0, 8)
+    );
+}
+
+#[test]
+fn throw_stmt_without_semicolon() {
+    parser_test!(
+        input: "throw a",
+        program_span: Span::new(0, 7)
+    );
+}
+
+#[test]
 fn var_stmt_with_semicolon() {
     parser_test!(
         input: "var a;",
