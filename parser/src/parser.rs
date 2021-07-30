@@ -172,6 +172,14 @@ where
         Ok(token)
     }
 
+    fn maybe_consume_semicolon(&mut self) -> Result<()> {
+        if self.current_matches(punct!(";")) {
+            self.reader.consume()?;
+        }
+
+        Ok(())
+    }
+
     fn followed_by_new_lined(&self) -> bool {
         self.reader.peek().map_or(false, |t| t.first_on_line)
     }

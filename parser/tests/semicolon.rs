@@ -33,3 +33,55 @@ fn break_stmt_without_semicolon() {
         program_span: Span::new(0, 5)
     );
 }
+
+#[test]
+fn var_stmt_with_semicolon() {
+    parser_test!(
+        input: "var a;",
+        program_span: Span::new(0, 6)
+    );
+
+    parser_test!(
+        input: "var a, b;",
+        program_span: Span::new(0, 9)
+    );
+
+    parser_test!(
+        input: "var a = 1;",
+        program_span: Span::new(0, 10)
+    );
+}
+
+#[test]
+fn var_stmt_without_semicolon() {
+    parser_test!(
+        input: "var a",
+        program_span: Span::new(0, 5)
+    );
+
+    parser_test!(
+        input: "var a, b",
+        program_span: Span::new(0, 8)
+    );
+
+    parser_test!(
+        input: "var a = 1",
+        program_span: Span::new(0, 9)
+    );
+}
+
+#[test]
+fn do_while_stmt_with_semicolon() {
+    parser_test!(
+        input: "do {} while (true);",
+        program_span: Span::new(0, 19)
+    );
+}
+
+#[test]
+fn do_while_stmt_without_semicolon() {
+    parser_test!(
+        input: "do {} while (true)",
+        program_span: Span::new(0, 18)
+    );
+}

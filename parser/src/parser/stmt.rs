@@ -323,12 +323,4 @@ where
 
         Ok(statements)
     }
-
-    fn maybe_consume_semicolon(&mut self) -> Result<()> {
-        if self.current_matches(punct!(";")) {
-            self.reader.consume()?;
-        }
-
-        Ok(())
-    }
 }
