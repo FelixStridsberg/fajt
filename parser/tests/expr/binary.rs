@@ -9,8 +9,8 @@ fn addition() {
             ExprBinary {
                 span: Span::new(0, 5),
                 operator: BinaryOperator::Plus,
-                left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                right: ExprIdentifier::Ident(Ident::new("b", (4, 5))).into(),
+                left: Ident::new("a", (0, 1)).into(),
+                right: Ident::new("b", (4, 5)).into(),
             }.into()
         ]
     );
@@ -30,12 +30,12 @@ fn addition_nested() {
                     left: ExprBinary {
                         span: Span::new(0, 5),
                         operator: BinaryOperator::Plus,
-                        left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                        right: ExprIdentifier::Ident(Ident::new("b", (4, 5))).into(),
+                        left: Ident::new("a", (0, 1)).into(),
+                        right: Ident::new("b", (4, 5)).into(),
                     }.into(),
-                    right: ExprIdentifier::Ident(Ident::new("c", (8, 9))).into(),
+                    right: Ident::new("c", (8, 9)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("d", (12, 13))).into(),
+                right: Ident::new("d", (12, 13)).into(),
             }.into()
         ]
     );
@@ -49,8 +49,8 @@ fn subtraction() {
             ExprBinary {
                 span: Span::new(0, 5),
                 operator: BinaryOperator::Minus,
-                left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                right: ExprIdentifier::Ident(Ident::new("b", (4, 5))).into(),
+                left: Ident::new("a", (0, 1)).into(),
+                right: Ident::new("b", (4, 5)).into(),
             }.into()
         ]
     );
@@ -67,10 +67,10 @@ fn subtraction_nested() {
                 left: ExprBinary {
                     span: Span::new(0, 5),
                     operator: BinaryOperator::Minus,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (4, 5))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (4, 5)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (8, 9))).into(),
+                right: Ident::new("c", (8, 9)).into(),
             }.into()
         ]
     );
@@ -87,10 +87,10 @@ fn multiplication() {
                 left: ExprBinary {
                     span: Span::new(0, 5),
                     operator: BinaryOperator::Multiplication,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (4, 5))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (4, 5)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (8, 9))).into(),
+                right: Ident::new("c", (8, 9)).into(),
             }.into()
         ]
     );
@@ -107,10 +107,10 @@ fn division() {
                 left: ExprBinary {
                     span: Span::new(0, 5),
                     operator: BinaryOperator::Division,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (4, 5))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (4, 5)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (8, 9))).into(),
+                right: Ident::new("c", (8, 9)).into(),
             }.into()
         ]
     );
@@ -127,10 +127,10 @@ fn modulus() {
                 left: ExprBinary {
                     span: Span::new(0, 5),
                     operator: BinaryOperator::Modulus,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (4, 5))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (4, 5)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (8, 9))).into(),
+                right: Ident::new("c", (8, 9)).into(),
             }.into()
         ]
     );
@@ -147,10 +147,10 @@ fn exponent() {
                 left: ExprBinary {
                     span: Span::new(0, 6),
                     operator: BinaryOperator::Exponent,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (5, 6)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (10, 11))).into(),
+                right: Ident::new("c", (10, 11)).into(),
             }.into()
         ]
     );
@@ -167,10 +167,10 @@ fn shift_left() {
                 left: ExprBinary {
                     span: Span::new(0, 6),
                     operator: BinaryOperator::ShiftLeft,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (5, 6)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (10, 11))).into(),
+                right: Ident::new("c", (10, 11)).into(),
             }.into()
         ]
     );
@@ -187,10 +187,10 @@ fn shift_right() {
                 left: ExprBinary {
                     span: Span::new(0, 6),
                     operator: BinaryOperator::ShiftRight,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (5, 6)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (10, 11))).into(),
+                right: Ident::new("c", (10, 11)).into(),
             }.into()
         ]
     );
@@ -207,10 +207,10 @@ fn shift_right_unsigned() {
                 left: ExprBinary {
                     span: Span::new(0, 7),
                     operator: BinaryOperator::ShiftRightUnsigned,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (6, 7))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (6, 7)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (12, 13))).into(),
+                right: Ident::new("c", (12, 13)).into(),
             }.into()
         ]
     );
@@ -227,10 +227,10 @@ fn less_than() {
                 left: ExprBinary {
                     span: Span::new(0, 5),
                     operator: BinaryOperator::LessThan,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (4, 5))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (4, 5)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (8, 9))).into(),
+                right: Ident::new("c", (8, 9)).into(),
             }.into()
         ]
     );
@@ -247,10 +247,10 @@ fn more_than() {
                 left: ExprBinary {
                     span: Span::new(0, 5),
                     operator: BinaryOperator::MoreThan,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (4, 5))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (4, 5)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (8, 9))).into(),
+                right: Ident::new("c", (8, 9)).into(),
             }.into()
         ]
     );
@@ -267,10 +267,10 @@ fn less_than_equals() {
                 left: ExprBinary {
                     span: Span::new(0, 6),
                     operator: BinaryOperator::LessThanEquals,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (5, 6)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (10, 11))).into(),
+                right: Ident::new("c", (10, 11)).into(),
             }.into()
         ]
     );
@@ -287,10 +287,10 @@ fn more_than_equals() {
                 left: ExprBinary {
                     span: Span::new(0, 6),
                     operator: BinaryOperator::MoreThanEquals,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (5, 6)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (10, 11))).into(),
+                right: Ident::new("c", (10, 11)).into(),
             }.into()
         ]
     );
@@ -307,10 +307,10 @@ fn instance_of() {
                 left: ExprBinary {
                     span: Span::new(0, 14),
                     operator: BinaryOperator::InstanceOf,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (13, 14))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (13, 14)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (26, 27))).into(),
+                right: Ident::new("c", (26, 27)).into(),
             }.into()
         ]
     );
@@ -327,10 +327,10 @@ fn r#in() {
                 left: ExprBinary {
                     span: Span::new(0, 6),
                     operator: BinaryOperator::In,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (5, 6)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (10, 11))).into(),
+                right: Ident::new("c", (10, 11)).into(),
             }.into()
         ]
     );
@@ -347,10 +347,10 @@ fn equal() {
                 left: ExprBinary {
                     span: Span::new(0, 6),
                     operator: BinaryOperator::Equal,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (5, 6)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (10, 11))).into(),
+                right: Ident::new("c", (10, 11)).into(),
             }.into()
         ]
     );
@@ -367,10 +367,10 @@ fn not_equal() {
                 left: ExprBinary {
                     span: Span::new(0, 6),
                     operator: BinaryOperator::NotEqual,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (5, 6)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (10, 11))).into(),
+                right: Ident::new("c", (10, 11)).into(),
             }.into()
         ]
     );
@@ -387,10 +387,10 @@ fn strict_equal() {
                 left: ExprBinary {
                     span: Span::new(0, 7),
                     operator: BinaryOperator::StrictEqual,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (6, 7))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (6, 7)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (12, 13))).into(),
+                right: Ident::new("c", (12, 13)).into(),
             }.into()
         ]
     );
@@ -407,10 +407,10 @@ fn strict_not_equal() {
                 left: ExprBinary {
                     span: Span::new(0, 7),
                     operator: BinaryOperator::StrictNotEqual,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (6, 7))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (6, 7)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (12, 13))).into(),
+                right: Ident::new("c", (12, 13)).into(),
             }.into()
         ]
     );
@@ -427,10 +427,10 @@ fn bitwise_and() {
                 left: ExprBinary {
                     span: Span::new(0, 5),
                     operator: BinaryOperator::BitwiseAnd,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (4, 5))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (4, 5)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (8, 9))).into(),
+                right: Ident::new("c", (8, 9)).into(),
             }.into()
         ]
     );
@@ -447,10 +447,10 @@ fn bitwise_xor() {
                 left: ExprBinary {
                     span: Span::new(0, 5),
                     operator: BinaryOperator::BitwiseXOR,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (4, 5))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (4, 5)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (8, 9))).into(),
+                right: Ident::new("c", (8, 9)).into(),
             }.into()
         ]
     );
@@ -467,10 +467,10 @@ fn bitwise_or() {
                 left: ExprBinary {
                     span: Span::new(0, 5),
                     operator: BinaryOperator::BitwiseOR,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (4, 5))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (4, 5)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (8, 9))).into(),
+                right: Ident::new("c", (8, 9)).into(),
             }.into()
         ]
     );
@@ -487,10 +487,10 @@ fn logical_or() {
                 left: ExprLogical {
                     span: Span::new(0, 6),
                     operator: LogicalOperator::Or,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (5, 6)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (10, 11))).into(),
+                right: Ident::new("c", (10, 11)).into(),
             }.into()
         ]
     );
@@ -507,10 +507,10 @@ fn logical_and() {
                 left: ExprLogical {
                     span: Span::new(0, 6),
                     operator: LogicalOperator::And,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (5, 6)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (10, 11))).into(),
+                right: Ident::new("c", (10, 11)).into(),
             }.into()
         ]
     );
@@ -527,10 +527,10 @@ fn coalesce() {
                 left: ExprLogical {
                     span: Span::new(0, 6),
                     operator: LogicalOperator::Coalesce,
-                    left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                    right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                    left: Ident::new("a", (0, 1)).into(),
+                    right: Ident::new("b", (5, 6)).into(),
                 }.into(),
-                right: ExprIdentifier::Ident(Ident::new("c", (10, 11))).into(),
+                right: Ident::new("c", (10, 11)).into(),
             }.into()
         ]
     );

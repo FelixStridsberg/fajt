@@ -8,7 +8,7 @@ fn new() {
         expr_output: [
             ExprNew {
                 span: Span::new(0, 5),
-                callee: ExprIdentifier::Ident(Ident::new("a", (4, 5))).into(),
+                callee: Ident::new("a", (4, 5)).into(),
                 arguments_span: None,
                 arguments: vec![],
             }.into()
@@ -25,7 +25,7 @@ fn new_nested() {
                 span: Span::new(0, 9),
                 callee: ExprNew {
                     span: Span::new(4, 9),
-                    callee: ExprIdentifier::Ident(Ident::new("a", (8, 9))).into(),
+                    callee: Ident::new("a", (8, 9)).into(),
                     arguments_span: None,
                     arguments: vec![],
                 }.into(),
@@ -43,7 +43,7 @@ fn new_empty_arguments() {
         expr_output: [
             ExprNew {
                 span: Span::new(0, 7),
-                callee: ExprIdentifier::Ident(Ident::new("a", (4, 5))).into(),
+                callee: Ident::new("a", (4, 5)).into(),
                 arguments_span: Some(Span::new(5, 7)),
                 arguments: vec![],
             }.into()
@@ -61,7 +61,7 @@ fn new_empty_arguments_member() {
                 callee: ExprMember {
                     span: Span::new(4, 7),
                     object: MemberObject::Expr(
-                        ExprIdentifier::Ident(Ident::new("a", (4, 5))).into()
+                        Ident::new("a", (4, 5)).into()
                     ),
                     property: MemberProperty::Ident(Ident::new("b", (6, 7))),
                 }.into(),
@@ -79,11 +79,11 @@ fn new_with_arguments() {
         expr_output: [
             ExprNew {
                 span: Span::new(0, 15),
-                callee: ExprIdentifier::Ident(Ident::new("a", (4, 5))).into(),
+                callee: Ident::new("a", (4, 5)).into(),
                 arguments_span: Some(Span::new(5, 15)),
                 arguments: vec![
                     Argument::Expr(
-                        ExprIdentifier::Ident(Ident::new("b", (6, 7))).into()
+                        Ident::new("b", (6, 7)).into()
                     ),
                     Argument::Expr(
                         ExprUnary {
@@ -108,11 +108,11 @@ fn new_with_spread_arguments() {
         expr_output: [
             ExprNew {
                 span: Span::new(0, 21),
-                callee: ExprIdentifier::Ident(Ident::new("a", (4, 5))).into(),
+                callee: Ident::new("a", (4, 5)).into(),
                 arguments_span: Some(Span::new(5, 21)),
                 arguments: vec![
-                    Argument::Spread(ExprIdentifier::Ident(Ident::new("b", (9, 10))).into()),
-                    Argument::Expr(ExprIdentifier::Ident(Ident::new("c", (12, 13))).into()),
+                    Argument::Spread(Ident::new("b", (9, 10)).into()),
+                    Argument::Expr(Ident::new("c", (12, 13)).into()),
                     Argument::Spread(
                         ExprLiteral {
                             span: Span::new(18, 20),

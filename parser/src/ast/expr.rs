@@ -16,7 +16,7 @@ ast_enum! {
         Class(ExprClass),
         Conditional(ExprConditional),
         Function(ExprFunction),
-        Identifier(ExprIdentifier),
+        IdentRef(Ident),
         Literal(ExprLiteral),
         Logical(ExprLogical),
         Member(ExprMember),
@@ -43,18 +43,6 @@ impl Expr {
     }
 }
 
-impl Into<Box<Expr>> for Ident {
-    fn into(self) -> Box<Expr> {
-        Box::new(Expr::Identifier(self.into()))
-    }
-}
-
-impl From<Ident> for Expr {
-    fn from(ident: Ident) -> Self {
-        Self::Identifier(ident.into())
-    }
-}
-
 #[derive(Debug, PartialOrd, PartialEq)]
 pub struct ExprLiteral {
     pub span: Span,
@@ -72,19 +60,6 @@ impl ExprThis {
         S: Into<Span>,
     {
         Self { span: span.into() }
-    }
-}
-
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum ExprIdentifier {
-    Ident(Ident),
-    Yield,
-    Await,
-}
-
-impl From<Ident> for ExprIdentifier {
-    fn from(ident: Ident) -> Self {
-        Self::Ident(ident)
     }
 }
 

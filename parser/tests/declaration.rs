@@ -4,7 +4,6 @@ use fajt_lexer::token::Keyword;
 use fajt_lexer::token::TokenValue;
 use fajt_lexer::token::{Span, Token};
 use fajt_parser::ast::Base::Decimal;
-use fajt_parser::ast::Expr::Identifier;
 use fajt_parser::ast::*;
 use fajt_parser::error::ErrorKind::UnexpectedToken;
 
@@ -181,9 +180,7 @@ fn function_declaration_with_parameters() {
                         BindingElement {
                             span: Span::new(15, 20),
                             pattern: BindingPattern::Ident(Ident::new("b", (15, 16))),
-                            initializer: Some(Identifier(
-                                Ident::new("c", (19, 20)).into()
-                            )),
+                            initializer: Some(Ident::new("c", (19, 20)).into()),
                         }
                     ],
                     rest: None

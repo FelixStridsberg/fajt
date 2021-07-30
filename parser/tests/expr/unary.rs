@@ -9,7 +9,7 @@ fn plus() {
             ExprUnary {
                 span: Span::new(0, 2),
                 operator: UnaryOperator::Plus,
-                argument: ExprIdentifier::Ident(Ident::new("a", (1, 2))).into(),
+                argument: Ident::new("a", (1, 2)).into(),
             }.into()
         ]
     );
@@ -23,7 +23,7 @@ fn minus() {
             ExprUnary {
                 span: Span::new(0, 2),
                 operator: UnaryOperator::Minus,
-                argument: ExprIdentifier::Ident(Ident::new("a", (1, 2))).into(),
+                argument: Ident::new("a", (1, 2)).into(),
             }.into()
         ]
     );
@@ -37,7 +37,7 @@ fn bitwise_not() {
             ExprUnary {
                 span: Span::new(0, 2),
                 operator: UnaryOperator::BitwiseNot,
-                argument: ExprIdentifier::Ident(Ident::new("a", (1, 2))).into(),
+                argument: Ident::new("a", (1, 2)).into(),
             }.into()
         ]
     );
@@ -51,7 +51,7 @@ fn not() {
             ExprUnary {
                 span: Span::new(0, 2),
                 operator: UnaryOperator::Not,
-                argument: ExprIdentifier::Ident(Ident::new("a", (1, 2))).into(),
+                argument: Ident::new("a", (1, 2)).into(),
             }.into()
         ]
     );
@@ -65,7 +65,7 @@ fn delete() {
             ExprUnary {
                 span: Span::new(0, 8),
                 operator: UnaryOperator::Delete,
-                argument: ExprIdentifier::Ident(Ident::new("a", (7, 8))).into(),
+                argument: Ident::new("a", (7, 8)).into(),
             }.into()
         ]
     );
@@ -79,7 +79,7 @@ fn void() {
             ExprUnary {
                 span: Span::new(0, 6),
                 operator: UnaryOperator::Void,
-                argument: ExprIdentifier::Ident(Ident::new("a", (5, 6))).into(),
+                argument: Ident::new("a", (5, 6)).into(),
             }.into()
         ]
     );
@@ -93,7 +93,7 @@ fn typeof_() {
             ExprUnary {
                 span: Span::new(0, 8),
                 operator: UnaryOperator::Typeof,
-                argument: ExprIdentifier::Ident(Ident::new("a", (7, 8))).into(),
+                argument: Ident::new("a", (7, 8)).into(),
             }.into()
         ]
     );

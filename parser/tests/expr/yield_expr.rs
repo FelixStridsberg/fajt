@@ -22,7 +22,7 @@ fn yield_a() {
         expr_output: [
             ExprYield {
                 span: Span::new(0, 7),
-                argument: Some(ExprIdentifier::Ident(Ident::new("a", (6, 7))).into()),
+                argument: Some(Ident::new("a", (6, 7)).into()),
                 delegate: false,
             }.into()
         ]
@@ -36,7 +36,7 @@ fn delegated_yield() {
         expr_output: [
             ExprYield {
                 span: Span::new(0, 8),
-                argument: Some(ExprIdentifier::Ident(Ident::new("a", (7, 8))).into()),
+                argument: Some(Ident::new("a", (7, 8)).into()),
                 delegate: true,
             }.into()
         ]

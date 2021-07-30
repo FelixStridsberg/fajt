@@ -10,7 +10,7 @@ fn identifier() {
             ExprMember {
                 span: Span::new(0, 3),
                 object: MemberObject::Expr(
-                    ExprIdentifier::Ident(Ident::new("a", (0, 1))).into()
+                    Ident::new("a", (0, 1)).into()
                 ),
                 property: MemberProperty::Ident(Ident::new("b", (2, 3))),
             }.into()
@@ -47,7 +47,7 @@ fn identifier_nested() {
                     ExprMember {
                         span: Span::new(0, 3),
                         object: MemberObject::Expr(
-                            ExprIdentifier::Ident(Ident::new("a", (0, 1))).into()
+                            Ident::new("a", (0, 1)).into()
                         ),
                         property: MemberProperty::Ident(Ident::new("b", (2, 3))),
                     }.into(),
@@ -66,10 +66,10 @@ fn computed() {
             ExprMember {
                 span: Span::new(0, 4),
                 object: MemberObject::Expr(
-                    ExprIdentifier::Ident(Ident::new("a", (0, 1))).into()
+                    Ident::new("a", (0, 1)).into()
                 ),
                 property: MemberProperty::Expr(
-                    ExprIdentifier::Ident(Ident::new("b", (2, 3))).into()
+                    Ident::new("b", (2, 3)).into()
                 ),
             }.into()
         ]
@@ -87,7 +87,7 @@ fn super_computed() {
                     span: Span::new(0, 5)
                 }),
                 property: MemberProperty::Expr(
-                    ExprIdentifier::Ident(Ident::new("b", (6, 7))).into()
+                    Ident::new("b", (6, 7)).into()
                 ),
             }.into()
         ]
@@ -105,15 +105,15 @@ fn computed_nested() {
                     ExprMember {
                         span: Span::new(0, 4),
                         object: MemberObject::Expr(
-                            ExprIdentifier::Ident(Ident::new("a", (0, 1))).into()
+                            Ident::new("a", (0, 1)).into()
                         ),
                         property: MemberProperty::Expr(
-                            ExprIdentifier::Ident(Ident::new("b", (2, 3))).into()
+                            Ident::new("b", (2, 3)).into()
                         ),
                     }.into(),
                 ),
                 property: MemberProperty::Expr(
-                    ExprIdentifier::Ident(Ident::new("c", (5, 6))).into()
+                    Ident::new("c", (5, 6)).into()
                 ),
             }.into()
         ]
@@ -134,10 +134,10 @@ fn nested_mixed() {
                             ExprMember {
                                 span: Span::new(0, 4),
                                 object: MemberObject::Expr(
-                                    ExprIdentifier::Ident(Ident::new("a", (0, 1))).into()
+                                    Ident::new("a", (0, 1)).into()
                                 ),
                                 property: MemberProperty::Expr(
-                                    ExprIdentifier::Ident(Ident::new("b", (2, 3))).into()
+                                    Ident::new("b", (2, 3)).into()
                                 )
                             }.into(),
                         ),
@@ -145,7 +145,7 @@ fn nested_mixed() {
                     }.into(),
                 ),
                 property: MemberProperty::Expr(
-                    ExprIdentifier::Ident(Ident::new("d", (7, 8))).into()
+                    Ident::new("d", (7, 8)).into()
                 ),
             }.into()
         ]

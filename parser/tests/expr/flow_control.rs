@@ -8,9 +8,9 @@ fn conditional() {
         expr_output: [
             ExprConditional {
                 span: Span::new(0, 29),
-                condition: ExprIdentifier::Ident(Ident::new("test", (0, 4))).into(),
-                consequent: ExprIdentifier::Ident(Ident::new("consequent", (7, 17))).into(),
-                alternate: ExprIdentifier::Ident(Ident::new("alternate", (20, 29))).into(),
+                condition: Ident::new("test", (0, 4)).into(),
+                consequent: Ident::new("consequent", (7, 17)).into(),
+                alternate: Ident::new("alternate", (20, 29)).into(),
             }.into()
         ]
     );

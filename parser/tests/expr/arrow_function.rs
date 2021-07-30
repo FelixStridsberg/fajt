@@ -74,7 +74,7 @@ fn identifier_argument_expression_body() {
                     rest: None,
                 },
                 body: ArrowFunctionBody::Expr(
-                    ExprIdentifier::Ident(Ident::new("b", (5, 6))).into()
+                    Ident::new("b", (5, 6)).into()
                 )
             }.into()
         ]
@@ -102,7 +102,7 @@ fn async_identifier_argument_expression_body() {
                     rest: None,
                 },
                 body: ArrowFunctionBody::Expr(
-                    ExprIdentifier::Ident(Ident::new("b", (11, 12))).into()
+                    Ident::new("b", (11, 12)).into()
                 )
             }.into()
         ]

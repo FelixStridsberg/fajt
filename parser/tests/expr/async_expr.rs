@@ -20,7 +20,7 @@ fn await_() {
         expr_output: [
             ExprAwait {
                 span: Span::new(0, 7),
-                argument: ExprIdentifier::Ident(Ident::new("a", (6, 7))).into(),
+                argument: Ident::new("a", (6, 7)).into(),
             }.into()
         ]
     );

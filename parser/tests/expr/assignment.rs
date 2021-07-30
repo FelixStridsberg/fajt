@@ -9,8 +9,8 @@ fn assign() {
             ExprAssignment {
                 span: Span::new(0, 5),
                 operator: AssignmentOperator::Assign,
-                left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                right: ExprIdentifier::Ident(Ident::new("b", (4, 5))).into(),
+                left: Ident::new("a", (0, 1)).into(),
+                right: Ident::new("b", (4, 5)).into(),
             }.into()
         ]
     );
@@ -24,8 +24,8 @@ fn assign_multiply() {
             ExprAssignment {
                 span: Span::new(0, 6),
                 operator: AssignmentOperator::Multiply,
-                left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                left: Ident::new("a", (0, 1)).into(),
+                right: Ident::new("b", (5, 6)).into(),
             }.into()
         ]
     );
@@ -39,8 +39,8 @@ fn assign_power() {
             ExprAssignment {
                 span: Span::new(0, 7),
                 operator: AssignmentOperator::Power,
-                left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                right: ExprIdentifier::Ident(Ident::new("b", (6, 7))).into(),
+                left: Ident::new("a", (0, 1)).into(),
+                right: Ident::new("b", (6, 7)).into(),
             }.into()
         ]
     );
@@ -54,8 +54,8 @@ fn assign_divide() {
             ExprAssignment {
                 span: Span::new(0, 6),
                 operator: AssignmentOperator::Divide,
-                left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                left: Ident::new("a", (0, 1)).into(),
+                right: Ident::new("b", (5, 6)).into(),
             }.into()
         ]
     );
@@ -69,8 +69,8 @@ fn assign_modulus() {
             ExprAssignment {
                 span: Span::new(0, 6),
                 operator: AssignmentOperator::Modulus,
-                left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                left: Ident::new("a", (0, 1)).into(),
+                right: Ident::new("b", (5, 6)).into(),
             }.into()
         ]
     );
@@ -84,8 +84,8 @@ fn assign_add() {
             ExprAssignment {
                 span: Span::new(0, 6),
                 operator: AssignmentOperator::Add,
-                left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                left: Ident::new("a", (0, 1)).into(),
+                right: Ident::new("b", (5, 6)).into(),
             }.into()
         ]
     );
@@ -99,8 +99,8 @@ fn assign_sub() {
             ExprAssignment {
                 span: Span::new(0, 6),
                 operator: AssignmentOperator::Sub,
-                left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                left: Ident::new("a", (0, 1)).into(),
+                right: Ident::new("b", (5, 6)).into(),
             }.into()
         ]
     );
@@ -114,8 +114,8 @@ fn assign_left_shift() {
             ExprAssignment {
                 span: Span::new(0, 7),
                 operator: AssignmentOperator::LeftShift,
-                left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                right: ExprIdentifier::Ident(Ident::new("b", (6, 7))).into(),
+                left: Ident::new("a", (0, 1)).into(),
+                right: Ident::new("b", (6, 7)).into(),
             }.into()
         ]
     );
@@ -129,8 +129,8 @@ fn assign_right_shift() {
             ExprAssignment {
                 span: Span::new(0, 7),
                 operator: AssignmentOperator::RightShift,
-                left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                right: ExprIdentifier::Ident(Ident::new("b", (6, 7))).into(),
+                left: Ident::new("a", (0, 1)).into(),
+                right: Ident::new("b", (6, 7)).into(),
             }.into()
         ]
     );
@@ -144,8 +144,8 @@ fn assign_unsigned_right_shift() {
             ExprAssignment {
                 span: Span::new(0, 8),
                 operator: AssignmentOperator::UnsignedRightShift,
-                left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                right: ExprIdentifier::Ident(Ident::new("b", (7, 8))).into(),
+                left: Ident::new("a", (0, 1)).into(),
+                right: Ident::new("b", (7, 8)).into(),
             }.into()
         ]
     );
@@ -159,8 +159,8 @@ fn assign_bitwise_and() {
             ExprAssignment {
                 span: Span::new(0, 6),
                 operator: AssignmentOperator::BitwiseAnd,
-                left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                left: Ident::new("a", (0, 1)).into(),
+                right: Ident::new("b", (5, 6)).into(),
             }.into()
         ]
     );
@@ -174,8 +174,8 @@ fn assign_bitwise_xor() {
             ExprAssignment {
                 span: Span::new(0, 6),
                 operator: AssignmentOperator::BitwiseXOr,
-                left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                left: Ident::new("a", (0, 1)).into(),
+                right: Ident::new("b", (5, 6)).into(),
             }.into()
         ]
     );
@@ -189,8 +189,8 @@ fn assign_bitwise_or() {
             ExprAssignment {
                 span: Span::new(0, 6),
                 operator: AssignmentOperator::BitwiseOr,
-                left: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
-                right: ExprIdentifier::Ident(Ident::new("b", (5, 6))).into(),
+                left: Ident::new("a", (0, 1)).into(),
+                right: Ident::new("b", (5, 6)).into(),
             }.into()
         ]
     );

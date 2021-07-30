@@ -10,7 +10,7 @@ fn prefix_increase() {
                 span: Span::new(0, 3),
                 operator: UpdateOperator::Increase,
                 prefix: true,
-                argument: ExprIdentifier::Ident(Ident::new("a", (2, 3))).into(),
+                argument: Ident::new("a", (2, 3)).into(),
             }.into()
         ]
     );
@@ -25,7 +25,7 @@ fn prefix_decrease() {
                 span: Span::new(0, 3),
                 operator: UpdateOperator::Decrease,
                 prefix: true,
-                argument: ExprIdentifier::Ident(Ident::new("a", (2, 3))).into(),
+                argument: Ident::new("a", (2, 3)).into(),
             }.into()
         ]
     );
@@ -40,7 +40,7 @@ fn suffix_increase() {
                 span: Span::new(0, 3),
                 operator: UpdateOperator::Increase,
                 prefix: false,
-                argument: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
+                argument: Ident::new("a", (0, 1)).into(),
             }.into()
         ]
     );
@@ -55,7 +55,7 @@ fn suffix_decrease() {
                 span: Span::new(0, 3),
                 operator: UpdateOperator::Decrease,
                 prefix: false,
-                argument: ExprIdentifier::Ident(Ident::new("a", (0, 1))).into(),
+                argument: Ident::new("a", (0, 1)).into(),
             }.into()
         ]
     );
