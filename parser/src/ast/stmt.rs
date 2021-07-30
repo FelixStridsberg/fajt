@@ -13,7 +13,7 @@ ast_enum! {
         Debugger(StmtDebugger),
         DoWhile(StmtDoWhile),
         Empty(StmtEmpty),
-        Expr(Expr),
+        Expr(StmtExpr),
         For(StmtFor),
         ForIn(StmtForIn),
         ForOf(StmtForOf),
@@ -33,7 +33,11 @@ impl Stmt {
     where
         E: Into<Expr>,
     {
-        Self::Expr(expr.into())
+        let expr = expr.into();
+        Self::Expr(StmtExpr {
+            span: expr.span().clone(),
+            expr: expr.into(),
+        })
     }
 
     pub fn unwrap_block_stmt(self) -> StmtBlock {
@@ -43,6 +47,12 @@ impl Stmt {
             panic!("Tried to unwrap {:?} as a block statement", self);
         }
     }
+}
+
+#[derive(Debug, PartialOrd, PartialEq)]
+pub struct StmtExpr {
+    pub span: Span,
+    pub expr: Expr,
 }
 
 #[derive(Debug, PartialOrd, PartialEq)]

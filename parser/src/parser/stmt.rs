@@ -96,7 +96,7 @@ where
             self.reader.consume()?;
         }
 
-        Ok(expr.into())
+        Ok(Stmt::expr(expr))
     }
 
     /// Parses the `EmptyStatement` goal symbol.

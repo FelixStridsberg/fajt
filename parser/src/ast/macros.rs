@@ -13,6 +13,16 @@ macro_rules! ast_enum {
             $( $variant($member), )*
         }
 
+        impl $name {
+            pub fn span(&self) -> &Span {
+                match self {
+                    $(
+                        Self::$variant(v) => &v.span,
+                    )*
+                }
+            }
+        }
+
         $( ast_enum_struct_impl!($name, $variant, $member); )*
     };
 }
