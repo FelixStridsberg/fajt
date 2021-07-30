@@ -1,28 +1,12 @@
 use crate::ast::{Expr, Ident, Number};
 use fajt_lexer::token::Span;
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum BindingPattern {
-    Ident(Ident),
-    Object(ObjectBinding),
-    Array(ArrayBinding),
-}
-
-impl From<Ident> for BindingPattern {
-    fn from(ident: Ident) -> Self {
-        Self::Ident(ident)
-    }
-}
-
-impl From<ObjectBinding> for BindingPattern {
-    fn from(binding: ObjectBinding) -> Self {
-        Self::Object(binding)
-    }
-}
-
-impl From<ArrayBinding> for BindingPattern {
-    fn from(binding: ArrayBinding) -> Self {
-        Self::Array(binding)
+ast_enum! {
+    #[derive(Debug, PartialOrd, PartialEq)]
+    pub enum BindingPattern {
+        Ident(Ident),
+        Object(ObjectBinding),
+        Array(ArrayBinding),
     }
 }
 
