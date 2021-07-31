@@ -179,8 +179,8 @@ where
         Ok(token)
     }
 
-    fn maybe_consume_semicolon(&mut self) -> Result<bool> {
-        if self.current_matches(punct!(";")) {
+    fn maybe_consume(&mut self, value: TokenValue) -> Result<bool> {
+        if self.current_matches(value) {
             self.reader.consume()?;
             Ok(true)
         } else {

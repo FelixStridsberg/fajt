@@ -27,7 +27,7 @@ where
         let test = self.parse_expr()?;
 
         self.consume_assert(punct!(")"))?;
-        self.maybe_consume_semicolon()?;
+        self.maybe_consume(punct!(";"))?;
 
         let span = self.span_from(span_start);
         Ok(StmtDoWhile {

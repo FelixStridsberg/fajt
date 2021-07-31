@@ -77,8 +77,7 @@ where
 
         let mut statements = Vec::new();
         loop {
-            if self.current_matches(punct!("}")) {
-                self.reader.consume()?;
+            if self.maybe_consume(punct!("}"))? {
                 break;
             } else {
                 let statement = self.parse_stmt()?;
@@ -94,7 +93,7 @@ where
         let span_start = self.position();
         let expr = self.parse_expr()?;
 
-        if !self.maybe_consume_semicolon()? && !self.valid_auto_semicolon()? {
+        if !self.maybe_consume(punct!(";"))? && !self.valid_auto_semicolon()? {
             return err!(UnexpectedToken(self.reader.consume()?));
         }
 
@@ -114,7 +113,7 @@ where
         self.consume_assert(keyword!("break"))?;
 
         let label = self.stmt_not_ended().then_try(|| self.parse_identifier())?;
-        self.maybe_consume_semicolon()?;
+        self.maybe_consume(punct!(";"))?;
 
         let span = self.span_from(span_start);
         Ok(StmtBreak { span, label }.into())
@@ -126,7 +125,7 @@ where
         self.consume_assert(keyword!("continue"))?;
 
         let label = self.stmt_not_ended().then_try(|| self.parse_identifier())?;
-        self.maybe_consume_semicolon()?;
+        self.maybe_consume(punct!(";"))?;
 
         let span = self.span_from(span_start);
         Ok(StmtContinue { span, label }.into())
@@ -138,7 +137,7 @@ where
         self.consume_assert(keyword!("return"))?;
 
         let argument = self.stmt_not_ended().then_try(|| self.parse_expr())?;
-        self.maybe_consume_semicolon()?;
+        self.maybe_consume(punct!(";"))?;
 
         let span = self.span_from(span_start);
         Ok(StmtReturn { span, argument }.into())
@@ -150,7 +149,7 @@ where
         self.consume_assert(keyword!("throw"))?;
 
         let argument = self.stmt_not_ended().then_try(|| self.parse_expr())?;
-        self.maybe_consume_semicolon()?;
+        self.maybe_consume(punct!(";"))?;
 
         let span = self.span_from(span_start);
         Ok(StmtThrow { span, argument }.into())
@@ -170,7 +169,7 @@ where
         let span_start = self.position();
 
         self.consume_assert(keyword!("debugger"))?;
-        self.maybe_consume_semicolon()?;
+        self.maybe_consume(punct!(";"))?;
 
         let span = self.span_from(span_start);
         Ok(StmtDebugger { span }.into())
@@ -185,10 +184,9 @@ where
         self.consume_assert(punct!(")"))?;
 
         let consequent = self.parse_stmt()?;
-        let alternate = self.current_matches(keyword!("else")).then_try(|| {
-            self.reader.consume()?;
-            Ok(Box::new(self.parse_stmt()?))
-        })?;
+        let alternate = self
+            .maybe_consume(keyword!("else"))?
+            .then_try(|| self.parse_stmt().map(Box::new))?;
 
         let span = self.span_from(span_start);
         Ok(StmtIf {
@@ -227,10 +225,9 @@ where
         let handler = self
             .current_matches(keyword!("catch"))
             .then_try(|| self.parse_catch_clause())?;
-        let finalizer = self.current_matches(keyword!("finally")).then_try(|| {
-            self.reader.consume()?;
-            Ok(self.parse_block_stmt()?.unwrap_block_stmt())
-        })?;
+        let finalizer = self
+            .maybe_consume(keyword!("finally"))?
+            .then_try(|| Ok(self.parse_block_stmt()?.unwrap_block_stmt()))?;
 
         let span = self.span_from(span_start);
         Ok(StmtTry {
@@ -246,8 +243,7 @@ where
         let span_start = self.position();
         self.consume_assert(keyword!("catch"))?;
 
-        let parameter = self.current_matches(punct!("(")).then_try(|| {
-            self.reader.consume()?;
+        let parameter = self.maybe_consume(punct!("("))?.then_try(|| {
             let pattern = self.parse_binding_pattern()?;
             self.consume_assert(punct!(")"))?;
             Ok(pattern)
@@ -301,8 +297,7 @@ where
 
     fn parse_switch_case(&mut self) -> Result<SwitchCase> {
         let span_start = self.position();
-        let test = if self.current_matches(keyword!("case")) {
-            self.consume_assert(keyword!("case"))?;
+        let test = if self.maybe_consume(keyword!("case"))? {
             let test = self.parse_expr()?;
             self.consume_assert(punct!(":"))?;
             Some(test)

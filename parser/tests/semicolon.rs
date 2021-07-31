@@ -1,7 +1,7 @@
 mod r#macro;
 
 use fajt_lexer::token::{Span, Token, TokenValue};
-use fajt_parser::ast::{Ident, StmtBlock, StmtExpr, StmtDoWhile, StmtEmpty};
+use fajt_parser::ast::{Ident, StmtBlock, StmtDoWhile, StmtEmpty, StmtExpr};
 use fajt_parser::error::ErrorKind::UnexpectedToken;
 
 #[test]

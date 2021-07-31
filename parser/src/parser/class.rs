@@ -20,10 +20,9 @@ where
             .is_identifier()
             .then(|| self.parse_identifier().unwrap());
 
-        let super_class = self.current_matches(keyword!("extends")).then_try(|| {
-            self.reader.consume()?;
-            Ok(Box::new(self.parse_left_hand_side_expr()?))
-        })?;
+        let super_class = self
+            .maybe_consume(keyword!("extends"))?
+            .then_try(|| self.parse_left_hand_side_expr().map(Box::new))?;
 
         let body = self.parse_class_body()?;
         let span = self.span_from(span_start);
