@@ -1,7 +1,6 @@
 mod r#macro;
 
 use fajt_lexer::token::Span;
-use fajt_parser::ast::Stmt;
 
 #[test]
 fn expr_stmt_with_semicolon() {

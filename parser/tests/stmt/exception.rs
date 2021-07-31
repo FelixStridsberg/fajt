@@ -1,8 +1,8 @@
 use fajt_lexer::token::Span;
-use fajt_parser::ast::{CatchClause, Ident, StmtBlock, StmtThrow, StmtTry};
+use fajt_parser::ast::{CatchClause, Ident, StmtBlock, StmtThrow, StmtTry, StmtExpr};
 
 #[test]
-fn return_void() {
+fn throw() {
     parser_test!(
         input: "throw",
         output: [
@@ -15,13 +15,30 @@ fn return_void() {
 }
 
 #[test]
-fn return_expression() {
+fn throw_with_argument() {
     parser_test!(
         input: "throw a",
         output: [
             StmtThrow {
                 span: Span::new(0, 7),
                 argument: Some(Ident::new("a", (6, 7)).into()),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn throw_with_new_line_before_argument() {
+    parser_test!(
+        input: "throw\na",
+        output: [
+            StmtThrow {
+                span: Span::new(0, 5),
+                argument: None,
+            }.into(),
+            StmtExpr {
+                span: Span::new(6, 7),
+                expr: Ident::new("a", (6, 7)).into()
             }.into()
         ]
     );

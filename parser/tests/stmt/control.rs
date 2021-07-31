@@ -30,7 +30,7 @@ fn return_expression() {
 }
 
 #[test]
-fn return_stmt_new_line_between_argument() {
+fn return_with_new_line_before_argument() {
     parser_test!(
         input: "return\na",
         output: [
@@ -47,7 +47,7 @@ fn return_stmt_new_line_between_argument() {
 }
 
 #[test]
-fn break_() {
+fn r#break() {
     parser_test!(
         input: "break",
         output: [
@@ -73,7 +73,24 @@ fn break_labelled() {
 }
 
 #[test]
-fn continue_() {
+fn return_with_new_line_before_label() {
+    parser_test!(
+        input: "break\na",
+        output: [
+            StmtBreak {
+                span: Span::new(0, 5),
+                label: None,
+            }.into(),
+            StmtExpr {
+                span: Span::new(6, 7),
+                expr: Ident::new("a", (6, 7)).into()
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn r#continue() {
     parser_test!(
         input: "continue",
         output: [
