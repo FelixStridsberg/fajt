@@ -30,6 +30,23 @@ fn return_expression() {
 }
 
 #[test]
+fn return_stmt_new_line_between_argument() {
+    parser_test!(
+        input: "return\na",
+        output: [
+            StmtReturn {
+                span: Span::new(0, 6),
+                argument: None,
+            }.into(),
+            StmtExpr {
+                span: Span::new(7, 8),
+                expr: Ident::new("a", (7, 8)).into()
+            }.into()
+        ]
+    );
+}
+
+#[test]
 fn break_() {
     parser_test!(
         input: "break",

@@ -120,8 +120,15 @@ where
     }
 
     pub fn parse(&mut self) -> Result<Program> {
-        let stmt = self.parse_stmt()?;
-        Ok(Program::from_body(vec![stmt]))
+        let mut body = Vec::new();
+        loop {
+            if self.reader.is_end() {
+                break;
+            }
+
+            body.push(self.parse_stmt()?);
+        }
+        Ok(Program::from_body(body))
     }
 
     // TODO probably not appropriate, used for testing parsing expressions currently.
