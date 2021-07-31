@@ -55,11 +55,7 @@ where
     }
 
     fn parse_optional_call_expr(&mut self, span_start: usize, callee: Expr) -> Result<Expr> {
-        let optional = self.current_matches(punct!("?."));
-        if optional {
-            self.reader.consume()?;
-        }
-
+        let optional = self.maybe_consume(punct!("?."))?;
         let (arguments_span, arguments) = self.parse_arguments()?;
         let span = self.span_from(span_start);
 

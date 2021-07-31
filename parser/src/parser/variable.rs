@@ -15,9 +15,7 @@ where
         let span_start = token.span.start;
 
         let declarations = self.parse_variable_declarations()?;
-        if self.current_matches(punct!(";")) {
-            self.reader.consume()?;
-        }
+        self.maybe_consume(punct!(";"))?;
 
         let span = self.span_from(span_start);
         Ok(StmtVariable {
@@ -32,8 +30,7 @@ where
         let mut declarations = vec![self.parse_variable_declaration()?];
 
         loop {
-            if self.current_matches(punct!(",")) {
-                self.reader.consume()?;
+            if self.maybe_consume(punct!(","))? {
                 declarations.push(self.parse_variable_declaration()?);
             } else {
                 break;

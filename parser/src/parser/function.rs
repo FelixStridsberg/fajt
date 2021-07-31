@@ -66,7 +66,7 @@ where
         let span_start = self.position();
         self.consume_assert(keyword!("function"))?;
 
-        let generator = self.consume_generator_token();
+        let generator = self.maybe_consume(punct!("*"))?;
         let identifier = self.parse_optional_identifier()?;
         let parameters = self.parse_formal_parameters()?;
         let body = self.parse_function_body()?;
@@ -91,7 +91,7 @@ where
         let function_token = self.consume_assert(keyword!("function"))?;
         debug_assert_eq!(function_token.first_on_line, false);
 
-        let generator = self.consume_generator_token();
+        let generator = self.maybe_consume(punct!("*"))?;
         let identifier = self.parse_optional_identifier()?;
         let parameters = self.parse_formal_parameters()?;
         let body = self.parse_function_body()?;
@@ -113,7 +113,7 @@ where
         let span_start = self.position();
         self.consume_assert(keyword!("function"))?;
 
-        let generator = self.consume_generator_token();
+        let generator = self.maybe_consume(punct!("*"))?;
         let ident = self.parse_identifier()?;
 
         self.with_context(ContextModify::new().set_yield(false).set_await(false))
@@ -128,7 +128,7 @@ where
         let function_token = self.consume_assert(keyword!("function"))?;
         debug_assert_eq!(function_token.first_on_line, false);
 
-        let generator = self.consume_generator_token();
+        let generator = self.maybe_consume(punct!("*"))?;
         let ident = self.parse_identifier()?;
 
         self.with_context(ContextModify::new().set_yield(false).set_await(true))
@@ -206,24 +206,12 @@ where
 
         let mut body = Vec::new();
         loop {
-            if self.current_matches(punct!("}")) {
-                self.reader.consume()?;
+            if self.maybe_consume(punct!("}"))? {
                 break;
             }
 
             body.push(self.parse_stmt()?);
         }
         Ok(body)
-    }
-
-    /// If the current token is '*', it is consumed and true is returned, otherwise false.
-    pub(super) fn consume_generator_token(&mut self) -> bool {
-        let generator = self.current_matches(punct!("*"));
-        if generator {
-            self.reader.consume().unwrap();
-            true
-        } else {
-            false
-        }
     }
 }

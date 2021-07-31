@@ -82,7 +82,7 @@ where
         let span_start = self.position();
         self.reader.consume()?;
 
-        let generator = self.consume_generator_token();
+        let generator = self.maybe_consume(punct!("*"))?;
         self.parse_class_method(span_start, ClassMethodKind::Method, generator, true)
     }
 
