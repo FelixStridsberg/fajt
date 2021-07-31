@@ -1,6 +1,8 @@
 mod r#macro;
 
-use fajt_lexer::token::Span;
+use fajt_lexer::token::{Span, Token, TokenValue};
+use fajt_parser::ast::{Ident, StmtBlock, StmtExpr, StmtDoWhile, StmtEmpty};
+use fajt_parser::error::ErrorKind::UnexpectedToken;
 
 #[test]
 fn expr_stmt_with_semicolon() {
@@ -147,5 +149,72 @@ fn do_while_stmt_without_semicolon() {
     parser_test!(
         input: "do {} while (true)",
         program_span: Span::new(0, 18)
+    );
+}
+
+#[test]
+fn missing_semicolon_between_expr_stmt() {
+    parser_test!(
+        input: "a b",
+        error: UnexpectedToken(Token::new(TokenValue::Identifier("b".to_owned()), false, (2, 3)))
+    );
+}
+
+#[test]
+fn auto_semicolon_separated_by_line() {
+    parser_test!(
+        input: "a\nb",
+        output: [
+            StmtExpr {
+                span: Span::new(0, 1),
+                expr: Ident::new("a", (0, 1)).into(),
+            }.into(),
+            StmtExpr {
+                span: Span::new(2, 3),
+                expr: Ident::new("b", (2, 3)).into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn auto_semicolon_separated_by_close_brace() {
+    parser_test!(
+        input: "{ a } b",
+        output: [
+            StmtBlock {
+                span: Span::new(0, 5),
+                statements: vec![
+                    StmtExpr {
+                        span: Span::new(2, 3),
+                        expr: Ident::new("a", (2, 3)).into(),
+                    }.into(),
+                ]
+            }.into(),
+            StmtExpr {
+                span: Span::new(6, 7),
+                expr: Ident::new("b", (6, 7)).into(),
+            }.into()
+        ]
+    );
+}
+
+#[test]
+fn auto_semicolon_after_do_while() {
+    parser_test!(
+        input: "do ; while(a) b",
+        output: [
+            StmtDoWhile {
+                span: Span::new(0, 13),
+                body: StmtEmpty {
+                    span: Span::new(3, 4),
+                }.into(),
+                test: Ident::new("a", (11, 12)).into(),
+            }.into(),
+            StmtExpr {
+                span: Span::new(14, 15),
+                expr:  Ident::new("b", (14, 15)).into(),
+            }.into()
+        ]
     );
 }

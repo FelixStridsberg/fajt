@@ -1,5 +1,5 @@
 use fajt_lexer::token::Span;
-use fajt_parser::ast::{CatchClause, Ident, StmtBlock, StmtThrow, StmtTry, StmtExpr};
+use fajt_parser::ast::{CatchClause, Ident, StmtBlock, StmtExpr, StmtThrow, StmtTry};
 
 #[test]
 fn throw() {

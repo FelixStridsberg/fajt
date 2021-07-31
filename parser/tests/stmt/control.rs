@@ -136,18 +136,18 @@ fn if_no_else() {
 #[test]
 fn if_with_else() {
     parser_test!(
-        input: "if ( a ) b else c",
+        input: "if ( a ) b; else c",
         output: [
             StmtIf {
-                span: Span::new(0, 17),
+                span: Span::new(0, 18),
                 condition: Ident::new("a", (5, 6)).into(),
                 consequent: StmtExpr {
-                    span: Span::new(9, 10),
+                    span: Span::new(9, 11),
                     expr: Ident::new("b", (9, 10)).into(),
                 }.into(),
                 alternate: Some(StmtExpr {
-                    span: Span::new(16, 17),
-                    expr: Ident::new("c", (16, 17)).into(),
+                    span: Span::new(17, 18),
+                    expr: Ident::new("c", (17, 18)).into(),
                 }.into()),
             }.into()
         ]

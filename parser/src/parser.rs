@@ -179,12 +179,13 @@ where
         Ok(token)
     }
 
-    fn maybe_consume_semicolon(&mut self) -> Result<()> {
+    fn maybe_consume_semicolon(&mut self) -> Result<bool> {
         if self.current_matches(punct!(";")) {
             self.reader.consume()?;
+            Ok(true)
+        } else {
+            Ok(false)
         }
-
-        Ok(())
     }
 
     fn followed_by_new_lined(&self) -> bool {

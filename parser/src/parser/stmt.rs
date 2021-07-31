@@ -2,6 +2,7 @@ use crate::ast::{
     CatchClause, Stmt, StmtBlock, StmtBreak, StmtContinue, StmtDebugger, StmtEmpty, StmtExpr,
     StmtIf, StmtReturn, StmtSwitch, StmtThrow, StmtTry, StmtWith, SwitchCase, VariableKind,
 };
+use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenTry};
 use crate::{ContextModify, Parser};
 use fajt_common::io::PeekRead;
@@ -93,7 +94,9 @@ where
         let span_start = self.position();
         let expr = self.parse_expr()?;
 
-        self.maybe_consume_semicolon()?;
+        if !self.maybe_consume_semicolon()? && !self.valid_auto_semicolon()? {
+            return err!(UnexpectedToken(self.reader.consume()?));
+        }
 
         let span = self.span_from(span_start);
         Ok(StmtExpr { span, expr }.into())
@@ -333,5 +336,16 @@ where
         }
 
         Ok(statements)
+    }
+
+    /// Check if it is valid to insert semicolon before the current token.
+    fn valid_auto_semicolon(&self) -> Result<bool> {
+        Ok(self.reader.is_end()
+            || self.current_matches(punct!("}"))
+            || self
+                .reader
+                .current()
+                .map(|t| t.first_on_line)
+                .unwrap_or(false))
     }
 }
