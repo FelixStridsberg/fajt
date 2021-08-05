@@ -41,7 +41,7 @@ where
                         object = self.parse_optional_member_expr(span_start, object)?;
                     }
                 }
-                token_matches!(ok: punct!(".")) | token_matches!(ok: punct!("[")) => {
+                token_matches!(ok: punct!(".") | punct!("[")) => {
                     object = self.parse_optional_member_expr(span_start, object)?;
                 }
                 token_matches!(ok: punct!("(")) => {
@@ -94,7 +94,7 @@ where
                 let property = self.parse_computed_property()?;
                 Ok(MemberProperty::Expr(property.into()))
             }
-            token_matches!(ok: punct!("?.")) | token_matches!(ok: punct!(".")) => {
+            token_matches!(ok: punct!("?.") | punct!(".")) => {
                 self.reader.consume()?;
                 let identifier = self.parse_identifier()?;
                 Ok(MemberProperty::Ident(identifier))

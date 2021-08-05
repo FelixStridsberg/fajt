@@ -314,7 +314,7 @@ where
                             }
                             .into();
                         }
-                        token_matches!(ok: punct!(".")) | token_matches!(ok: punct!("[")) => {
+                        token_matches!(ok: punct!(".") | punct!("[")) => {
                             expr = self.parse_member_expr_right_side(
                                 span_start,
                                 MemberObject::Expr(expr.into()),

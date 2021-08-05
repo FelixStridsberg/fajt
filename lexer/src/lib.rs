@@ -239,13 +239,13 @@ impl<'a> Lexer<'a> {
     fn read_number_literal(&mut self) -> Result<TokenValue> {
         let current = self.reader.current()?;
         let (base, number) = match self.reader.peek() {
-            Some(&'x') | Some(&'X') if current == &'0' => {
+            Some(&'x' | &'X') if current == &'0' => {
                 (Hex, self.read_number(16, char::is_ascii_hexdigit)?)
             }
-            Some(&'o') | Some(&'O') if current == &'0' => {
+            Some(&'o' | &'O') if current == &'0' => {
                 (Octal, self.read_number(8, |c| ('0'..='7').contains(&c))?)
             }
-            Some(&'b') | Some(&'B') if current == &'0' => {
+            Some(&'b' | &'B') if current == &'0' => {
                 (Binary, self.read_number(2, |c| c == &'0' || c == &'1')?)
             }
             _ => {

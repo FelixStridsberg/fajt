@@ -111,7 +111,7 @@ where
 
     pub(super) fn is_binding_element(&self) -> Result<bool> {
         match self.reader.current()? {
-            token_matches!(punct!("{")) | token_matches!(punct!("[")) => Ok(true),
+            token_matches!(punct!("{") | punct!("[")) => Ok(true),
             _ if self.is_identifier() => Ok(true),
             _ => Ok(false),
         }
