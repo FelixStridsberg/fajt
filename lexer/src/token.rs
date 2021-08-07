@@ -1,6 +1,7 @@
 use crate::error::{Error, ErrorKind};
 use fajt_common::io::PeekRead;
 use fajt_macros::FromString;
+use serde::{Deserialize, Serialize};
 use std::vec::IntoIter;
 
 #[macro_export]
@@ -361,7 +362,7 @@ pub enum TokenValue {
     Literal(Literal),
 }
 
-#[derive(Debug, PartialOrd, PartialEq, Clone)]
+#[derive(Debug, PartialOrd, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Span {
     pub start: usize,
     pub end: usize,

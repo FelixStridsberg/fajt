@@ -1,8 +1,7 @@
 use crate::ast::{Expr, Ident, Number};
 use fajt_lexer::token::Span;
 
-ast_enum! {
-    #[derive(Debug, PartialOrd, PartialEq)]
+ast_mapping! {
     pub enum BindingPattern {
         Ident(Ident),
         Object(ObjectBinding),
@@ -10,24 +9,27 @@ ast_enum! {
     }
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub struct ArrayBinding {
-    pub span: Span,
-    pub elements: Vec<Option<BindingElement>>,
-    pub rest: Option<Ident>,
+ast_struct! {
+    pub struct ArrayBinding {
+        pub span: Span,
+        pub elements: Vec<Option<BindingElement>>,
+        pub rest: Option<Ident>,
+    }
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub struct ObjectBinding {
-    pub span: Span,
-    pub props: Vec<ObjectBindingProp>,
-    pub rest: Option<Ident>,
+ast_struct! {
+    pub struct ObjectBinding {
+        pub span: Span,
+        pub props: Vec<ObjectBindingProp>,
+        pub rest: Option<Ident>,
+    }
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum ObjectBindingProp {
-    Single(Ident, Option<Expr>),
-    KeyValue(PropertyName, BindingElement),
+ast_struct! {
+    pub enum ObjectBindingProp {
+        Single(Ident, Option<Expr>),
+        KeyValue(PropertyName, BindingElement),
+    }
 }
 
 impl From<Ident> for ObjectBindingProp {
@@ -36,17 +38,19 @@ impl From<Ident> for ObjectBindingProp {
     }
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum PropertyName {
-    Ident(Ident),
-    String(String, char),
-    Number(Number),
-    Computed(Expr),
+ast_struct! {
+    pub enum PropertyName {
+        Ident(Ident),
+        String(String, char),
+        Number(Number),
+        Computed(Expr),
+    }
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub struct BindingElement {
-    pub span: Span,
-    pub pattern: BindingPattern,
-    pub initializer: Option<Expr>,
+ast_struct! {
+    pub struct BindingElement {
+        pub span: Span,
+        pub pattern: BindingPattern,
+        pub initializer: Option<Expr>,
+    }
 }

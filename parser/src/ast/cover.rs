@@ -7,10 +7,12 @@ use crate::Parser;
 use fajt_common::io::PeekReader;
 use fajt_lexer::token::{Span, Token};
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub(crate) struct CoverParenthesizedAndArrowParameters {
-    pub span: Span,
-    pub tokens: Vec<Token>,
+ast_struct! {
+    pub(crate) struct CoverParenthesizedAndArrowParameters {
+        pub span: Span,
+        #[serde(skip)]
+        pub tokens: Vec<Token>,
+    }
 }
 
 impl CoverParenthesizedAndArrowParameters {
@@ -39,10 +41,12 @@ impl CoverParenthesizedAndArrowParameters {
     }
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub(crate) struct CoverCallExprAndAsyncArrowHead {
-    pub span: Span,
-    pub tokens: Vec<Token>,
+ast_struct! {
+    pub(crate) struct CoverCallExprAndAsyncArrowHead {
+        pub span: Span,
+        #[serde(skip)]
+        pub tokens: Vec<Token>,
+    }
 }
 
 impl CoverCallExprAndAsyncArrowHead {

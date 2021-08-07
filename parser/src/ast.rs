@@ -48,17 +48,19 @@ impl Program {
     }
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum ModuleItem {
-    ImportDeclaration(/* TODO */),
-    ExportDeclaration(/* TODO */),
-    Statement(Stmt),
+ast_struct! {
+    pub enum ModuleItem {
+        ImportDeclaration(/* TODO */),
+        ExportDeclaration(/* TODO */),
+        Statement(Stmt),
+    }
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub struct Ident {
-    pub span: Span,
-    pub name: String,
+ast_struct! {
+    pub struct Ident {
+        pub span: Span,
+        pub name: String,
+    }
 }
 
 impl Ident {

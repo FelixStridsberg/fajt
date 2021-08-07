@@ -4,45 +4,51 @@ use fajt_lexer::token::Base as LexerBase;
 use fajt_lexer::token::Literal as LexerLiteral;
 use fajt_lexer::token::Number as LexerNumber;
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum Literal {
-    Null,
-    Boolean(bool),
-    String(String, char),
-    Number(Number),
-    Array(Array),
-    Object(Object),
+ast_struct! {
+    pub enum Literal {
+        Null,
+        Boolean(bool),
+        String(String, char),
+        Number(Number),
+        Array(Array),
+        Object(Object),
+    }
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub struct Array {
-    pub elements: Vec<ArrayElement>,
+ast_struct! {
+    pub struct Array {
+        pub elements: Vec<ArrayElement>,
+    }
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum ArrayElement {
-    None,
-    Expr(Expr),
-    Spread(Expr),
+ast_struct! {
+    pub enum ArrayElement {
+        None,
+        Expr(Expr),
+        Spread(Expr),
+    }
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub struct Object {
-    pub props: Vec<PropertyDefinition>,
+ast_struct! {
+    pub struct Object {
+        pub props: Vec<PropertyDefinition>,
+    }
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum PropertyDefinition {
-    IdentRef(Ident),
-    Spread(Expr),
+ast_struct! {
+    pub enum PropertyDefinition {
+        IdentRef(Ident),
+        Spread(Expr),
+    }
 }
 
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Clone)]
-pub enum Base {
-    Binary,
-    Decimal,
-    Hex,
-    Octal,
+ast_struct! {
+    pub enum Base {
+        Binary,
+        Decimal,
+        Hex,
+        Octal,
+    }
 }
 
 impl From<LexerBase> for Base {
@@ -56,10 +62,11 @@ impl From<LexerBase> for Base {
     }
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
-pub enum Number {
-    Integer(i64, Base),
-    Decimal(f64),
+ast_struct! {
+    pub enum Number {
+        Integer(i64, Base),
+        Decimal(f64),
+    }
 }
 
 impl From<LexerLiteral> for Literal {

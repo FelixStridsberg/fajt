@@ -1,5 +1,5 @@
 /// Adds common implementations for enum that builds up the ast.
-macro_rules! ast_enum {
+macro_rules! ast_mapping {
     (
         $(#[$enum_attr:meta])*
         $pub:ident $enum:ident $name:ident {
@@ -8,9 +8,11 @@ macro_rules! ast_enum {
             )*
         }
     ) => {
-        $(#[$enum_attr])*
-        $pub $enum $name {
-            $( $variant($member), )*
+        ast_struct! {
+            $(#[$enum_attr])*
+            $pub $enum $name {
+                $( $variant($member), )*
+            }
         }
 
         impl $name {
@@ -41,4 +43,16 @@ macro_rules! ast_enum_struct_impl {
             }
         }
     };
+}
+
+macro_rules! ast_struct {
+    (
+        $(#[$meta:meta])*
+        pub $( ($visibility:ident) )? $struct_or_enum:ident $name:ident $($rest:tt)*
+    ) => {
+        $(#[$meta])*
+        #[derive(Debug, PartialOrd, PartialEq)]
+        #[derive(serde::Serialize, serde::Deserialize)]
+        pub $( ($visibility) )? $struct_or_enum $name $($rest)*
+    }
 }

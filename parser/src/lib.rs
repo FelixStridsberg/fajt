@@ -1,4 +1,5 @@
 extern crate fajt_lexer;
+extern crate serde;
 
 #[macro_use]
 pub mod ast;
