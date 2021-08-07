@@ -1,4 +1,3 @@
-
 #[test]
 fn new() {
     parser_test_json!(

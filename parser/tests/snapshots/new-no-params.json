@@ -1,0 +1,13 @@
+{
+  "New": {
+    "span": "0:4",
+    "callee": {
+      "IdentRef": {
+        "span": "4:5",
+        "name": "a"
+      }
+    },
+    "arguments_span": null,
+    "arguments": []
+  }
+}
