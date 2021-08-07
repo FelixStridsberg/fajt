@@ -51,3 +51,34 @@ macro_rules! parser_test {
         assert_eq!(error.kind(), &$error)
     };
 }
+
+#[macro_export]
+macro_rules! parser_test_json {
+    (input: $input:literal, $(context: $context:expr,)? expr_output: $output:literal) => {
+        let expr = parse!(expr: $input $(, context: $context)?).unwrap();
+        let deserialized = serde_json::from_str($output);
+
+        if let Ok(expected_expr) = deserialized {
+            assert_eq!(
+                expr,
+                expected_expr,
+                "Expected output:\n{}",
+                serde_json::to_string_pretty(&expr).unwrap()
+            )
+        } else {
+            panic!(
+                "Failed to parse expected output. Valid case:\
+              \n    parser_test_json!(\
+              \n        input: \"{}\",\
+              \n        expr_output: r#\"\
+              \n            {}\
+              \n        \"#\
+              \n    );\
+                ",
+                $input,
+
+                serde_json::to_string_pretty(&expr).unwrap().replace('\n', "\n            ")
+            )
+        }
+    };
+}

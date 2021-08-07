@@ -1,128 +1,204 @@
-use fajt_lexer::token::Span;
-use fajt_parser::ast::*;
 
 #[test]
 fn new() {
-    parser_test!(
+    parser_test_json!(
         input: "new a",
-        expr_output: [
-            ExprNew {
-                span: Span::new(0, 5),
-                callee: Ident::new("a", (4, 5)).into(),
-                arguments_span: None,
-                arguments: vec![],
-            }.into()
-        ]
+        expr_output: r#"
+            {
+              "New": {
+                "span": "0:5",
+                "callee": {
+                  "IdentRef": {
+                    "span": "4:5",
+                    "name": "a"
+                  }
+                },
+                "arguments_span": null,
+                "arguments": []
+              }
+            }
+        "#
     );
 }
 
 #[test]
 fn new_nested() {
-    parser_test!(
+    parser_test_json!(
         input: "new new a",
-        expr_output: [
-            ExprNew {
-                span: Span::new(0, 9),
-                callee: ExprNew {
-                    span: Span::new(4, 9),
-                    callee: Ident::new("a", (8, 9)).into(),
-                    arguments_span: None,
-                    arguments: vec![],
-                }.into(),
-                arguments_span: None,
-                arguments: vec![],
-            }.into()
-        ]
+        expr_output: r#"
+            {
+              "New": {
+                "span": "0:9",
+                "callee": {
+                  "New": {
+                    "span": "4:9",
+                    "callee": {
+                      "IdentRef": {
+                        "span": "8:9",
+                        "name": "a"
+                      }
+                    },
+                    "arguments_span": null,
+                    "arguments": []
+                  }
+                },
+                "arguments_span": null,
+                "arguments": []
+              }
+            }
+        "#
     );
 }
 
 #[test]
 fn new_empty_arguments() {
-    parser_test!(
+    parser_test_json!(
         input: "new a()",
-        expr_output: [
-            ExprNew {
-                span: Span::new(0, 7),
-                callee: Ident::new("a", (4, 5)).into(),
-                arguments_span: Some(Span::new(5, 7)),
-                arguments: vec![],
-            }.into()
-        ]
+        expr_output: r#"
+            {
+              "New": {
+                "span": "0:7",
+                "callee": {
+                  "IdentRef": {
+                    "span": "4:5",
+                    "name": "a"
+                  }
+                },
+                "arguments_span": "5:7",
+                "arguments": []
+              }
+            }
+        "#
     );
 }
 
 #[test]
 fn new_empty_arguments_member() {
-    parser_test!(
+    parser_test_json!(
         input: "new a.b()",
-        expr_output: [
-            ExprNew {
-                span: Span::new(0, 9),
-                callee: ExprMember {
-                    span: Span::new(4, 7),
-                    object: MemberObject::Expr(
-                        Ident::new("a", (4, 5)).into()
-                    ),
-                    property: MemberProperty::Ident(Ident::new("b", (6, 7))),
-                }.into(),
-                arguments_span: Some(Span::new(7, 9)),
-                arguments: vec![],
-            }.into()
-        ]
+        expr_output: r#"
+            {
+              "New": {
+                "span": "0:9",
+                "callee": {
+                  "Member": {
+                    "span": "4:7",
+                    "object": {
+                      "Expr": {
+                        "IdentRef": {
+                          "span": "4:5",
+                          "name": "a"
+                        }
+                      }
+                    },
+                    "property": {
+                      "Ident": {
+                        "span": "6:7",
+                        "name": "b"
+                      }
+                    }
+                  }
+                },
+                "arguments_span": "7:9",
+                "arguments": []
+              }
+            }
+        "#
     );
 }
 
 #[test]
 fn new_with_arguments() {
-    parser_test!(
+    parser_test_json!(
         input: "new a(b, !null)",
-        expr_output: [
-            ExprNew {
-                span: Span::new(0, 15),
-                callee: Ident::new("a", (4, 5)).into(),
-                arguments_span: Some(Span::new(5, 15)),
-                arguments: vec![
-                    Argument::Expr(
-                        Ident::new("b", (6, 7)).into()
-                    ),
-                    Argument::Expr(
-                        ExprUnary {
-                            span: Span::new(9, 14),
-                            operator: UnaryOperator::Not,
-                            argument: ExprLiteral {
-                                span: Span::new(10, 14),
-                                literal: Literal::Null,
-                            }.into(),
-                        }.into()
-                    ),
-                ],
-            }.into()
-        ]
+        expr_output: r#"
+            {
+              "New": {
+                "span": "0:15",
+                "callee": {
+                  "IdentRef": {
+                    "span": "4:5",
+                    "name": "a"
+                  }
+                },
+                "arguments_span": "5:15",
+                "arguments": [
+                  {
+                    "Expr": {
+                      "IdentRef": {
+                        "span": "6:7",
+                        "name": "b"
+                      }
+                    }
+                  },
+                  {
+                    "Expr": {
+                      "Unary": {
+                        "span": "9:14",
+                        "operator": "Not",
+                        "argument": {
+                          "Literal": {
+                            "span": "10:14",
+                            "literal": "Null"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+        "#
     );
 }
 
 #[test]
 fn new_with_spread_arguments() {
-    parser_test!(
+    parser_test_json!(
         input: "new a(...b, c, ...[])",
-        expr_output: [
-            ExprNew {
-                span: Span::new(0, 21),
-                callee: Ident::new("a", (4, 5)).into(),
-                arguments_span: Some(Span::new(5, 21)),
-                arguments: vec![
-                    Argument::Spread(Ident::new("b", (9, 10)).into()),
-                    Argument::Expr(Ident::new("c", (12, 13)).into()),
-                    Argument::Spread(
-                        ExprLiteral {
-                            span: Span::new(18, 20),
-                            literal: Literal::Array(Array {
-                                elements: vec![]
-                            })
-                        }.into()
-                    ),
-                ],
-            }.into()
-        ]
+        expr_output: r#"
+            {
+              "New": {
+                "span": "0:21",
+                "callee": {
+                  "IdentRef": {
+                    "span": "4:5",
+                    "name": "a"
+                  }
+                },
+                "arguments_span": "5:21",
+                "arguments": [
+                  {
+                    "Spread": {
+                      "IdentRef": {
+                        "span": "9:10",
+                        "name": "b"
+                      }
+                    }
+                  },
+                  {
+                    "Expr": {
+                      "IdentRef": {
+                        "span": "12:13",
+                        "name": "c"
+                      }
+                    }
+                  },
+                  {
+                    "Spread": {
+                      "Literal": {
+                        "span": "18:20",
+                        "literal": {
+                          "Array": {
+                            "elements": []
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+        "#
     );
 }
