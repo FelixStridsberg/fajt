@@ -78,6 +78,24 @@ impl SnapshotTest {
     }
 }
 
+
+///
+/// Concept:
+///
+/// arbitrary file endings:
+///     .js         - syntax                - input
+///     .json       - ast                   - output
+///     .error.txt  - error output          - error output
+///
+/// run() -> result<output type>
+///     read the output type expected
+///     if no output type at all exists, create that output file with data
+///
+
+trait SnapshotConverter<T> {
+    fn from_string(data: &str) -> T;
+}
+
 struct SnapshotTester {
     tests: Vec<SnapshotTest>,
 }
@@ -150,7 +168,4 @@ fn snapshot_test() {
 
     let tester = SnapshotTester::from_path(snapshot_directory);
     tester.run();
-
-    println!("{:?}", tester.tests);
-    panic!()
 }
