@@ -5,6 +5,7 @@ extern crate fajt_macros;
 use fajt_testing::snapshot_tests;
 use fajt_lexer::Lexer;
 use fajt_common::io::PeekReader;
+use fajt_macros::for_each_file;
 use fajt_parser::Parser;
 use fajt_parser::ast::Expr;
 use std::fs::{File, OpenOptions};
@@ -44,7 +45,7 @@ fn generate_code_block(data: &str, annotation: &str) -> String {
     format!("{}{}\n{}\n{}\n", BLOCK_DELIMITER, annotation, data, BLOCK_DELIMITER)
 }
 
-fn snapshot_runner<P>(test_file: P, _result_files: HashMap<&str, P>) where P: AsRef<Path> + Display {
+fn snapshot_runner<P>(test_file: P) where P: AsRef<Path> + Display {
     println!("Parsing {}", test_file);
 
     let input = read_string(&test_file);
@@ -75,9 +76,16 @@ fn snapshot_runner<P>(test_file: P, _result_files: HashMap<&str, P>) where P: As
     }
 }
 
-snapshot_tests!(
-    dirs: ["parser/tests/snapshots"],
-    test_endings: ["md"],
-    result_endings: ["json"],
-    runner: snapshot_runner,
-);
+macro_rules! generate_test_case {
+    ("md", $file_path:literal, $ident:ident) => {
+        #[test]
+        fn $ident() {
+            snapshot_runner($file_path)
+        }
+    };
+    ($extension:literal, $file_path:literal, $ident:ident) => {
+        // Unknown file extensions, ignore...
+    }
+}
+
+for_each_file!("parser/tests/snapshots", generate_test_case);

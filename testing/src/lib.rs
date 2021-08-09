@@ -3,10 +3,10 @@ use quote::format_ident;
 use std::path::PathBuf;
 use syn::{bracketed, parse_macro_input};
 use proc_macro::TokenStream;
-use proc_macro2::{TokenStream as TokenSteam2};
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
-use crate::snapshot::TestSuite;
+use std::fs::read_dir;
+use syn::__private::TokenStream2;
 
 mod snapshot;
 
@@ -14,7 +14,6 @@ mod snapshot;
 struct SnapshotTestsInput {
     dirs: Vec<String>,
     test_endings: Vec<String>,
-    result_endings: Vec<String>,
     runner: syn::Ident,
 }
 
@@ -22,7 +21,6 @@ impl Parse for SnapshotTestsInput {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let mut dirs = None;
         let mut test_endings = None;
-        let mut result_endings = None;
         let mut runner = None;
 
         loop {
@@ -38,9 +36,6 @@ impl Parse for SnapshotTestsInput {
                 "test_endings" => {
                     test_endings = Some(parse_vector(&input)?);
                 }
-                "result_endings" => {
-                    result_endings = Some(parse_vector(&input)?);
-                }
                 "runner" => {
                     runner = Some(input.parse::<syn::Ident>()?);
                     input.parse::<syn::Token![,]>()?;
@@ -51,13 +46,11 @@ impl Parse for SnapshotTestsInput {
 
         let dirs = dirs.expect("Missing `dir:` attribute");
         let test_endings = test_endings.expect("Missing `test_endings:` attribute");
-        let result_endings = result_endings.expect("Missing `result_endings:` attribute");
         let runner = runner.expect("Missing `runner:` attribute");
 
         Ok(SnapshotTestsInput {
             dirs,
             test_endings,
-            result_endings,
             runner
         })
     }
@@ -82,51 +75,55 @@ fn parse_vector(input: &ParseStream) -> syn::Result<Vec<String>> {
     Ok(lit_list.into_iter().map(|a| a.value()).collect())
 }
 
+fn find_files(path: &PathBuf) -> Vec<(String, String, String)> {
+    let mut paths = Vec::new();
+    let files = read_dir(path).unwrap();
+    for file in files {
+        let file = file.unwrap();
+        let file_type = file.file_type().unwrap();
+        if file_type.is_file() {
+            let path = file.path().into_os_string().into_string().unwrap();
+            let extension = file.path().extension().unwrap().to_os_string().into_string().unwrap();
+            paths.push((path, file.file_name().into_string().unwrap(), extension))
+        }
+
+        if file_type.is_dir() {
+            let mut nested_files = find_files(&file.path());
+            paths.append(&mut nested_files);
+        }
+    }
+
+    paths
+}
+
 #[proc_macro]
 pub fn snapshot_tests(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as SnapshotTestsInput);
 
-    let project_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    let mut loader = TestSuite::loader(&input.test_endings, &input.result_endings);
-    for dir in &input.dirs {
-        let mut path = project_root.clone();
-        path.pop();
-        path.push(dir);
-        loader.load_dir(path);
-    }
+    let mut project_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
 
-    let suite = loader.build();
+    // Up one level to the root crate.
+    project_root.pop();
 
-    let case: Vec<TokenSteam2> = suite.test_cases.iter().map(|case| {
-        let test_file = &case.test_file;
-        let result_files: Vec<TokenSteam2> = case.result_files.iter().map(|(key, value)| {
-            quote! {
-            result_files.insert(#key, #value);
-        }
-        }).collect();
+    project_root.push(&input.dirs[0]);
 
-        let runner = &input.runner;
-        let test_name = create_identifier(&case.name);
+    let files = find_files(&project_root);
+    let runner = input.runner;
 
+    let tokens: Vec<TokenStream2> = files.iter().map(|(path, name, extension)| {
+        let identifier = create_identifier(name);
         quote! {
-            #[test]
-            fn #test_name() {
-                let test_file = #test_file;
-                let mut result_files = HashMap::new();
-                #(#result_files)*
-
-                #runner(test_file, result_files);
-            }
+            #runner!(#path, #identifier, #extension);
         }
     }).collect();
 
     TokenStream::from(quote! {
-        #(#case)*
+        #(#tokens)*
     })
 }
 
 fn create_identifier(name: &str) -> syn::Ident {
-    let mut name = name.to_owned().replace('-', "_");
+    let mut name = name.to_owned().replace('-', "_").replace('.', "_");
     name.retain(|c| ('a'..'z').contains(&c) || ('A'..'Z').contains(&c) || ('0'..'9').contains(&c) || c == '_');
     format_ident!("{}", name)
 }

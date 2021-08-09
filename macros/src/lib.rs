@@ -3,6 +3,7 @@ extern crate quote;
 extern crate syn;
 
 mod enum_from_string;
+mod for_each_file;
 
 use proc_macro::TokenStream;
 use syn::{parse_macro_input, Data, DeriveInput};
@@ -70,4 +71,9 @@ pub fn enum_from_string_derive(input: TokenStream) -> TokenStream {
     };
 
     TokenStream::from(tokens)
+}
+
+#[proc_macro]
+pub fn for_each_file(input: TokenStream) -> TokenStream {
+    for_each_file::for_each_file(input)
 }
