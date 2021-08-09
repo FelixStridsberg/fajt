@@ -87,18 +87,8 @@ dependencies = [
  "fajt_common",
  "fajt_lexer",
  "fajt_macros",
- "fajt_testing",
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "fajt_testing"
-version = "0.1.0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]

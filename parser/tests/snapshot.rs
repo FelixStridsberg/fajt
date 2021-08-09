@@ -1,8 +1,6 @@
-use std::path::Path;
-use std::collections::HashMap;
-
 extern crate fajt_macros;
-use fajt_testing::snapshot_tests;
+
+use std::path::Path;
 use fajt_lexer::Lexer;
 use fajt_common::io::PeekReader;
 use fajt_macros::for_each_file;
