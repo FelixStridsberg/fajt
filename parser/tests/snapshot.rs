@@ -6,21 +6,23 @@ use fajt_macros::for_each_file;
 use fajt_parser::Parser;
 use fajt_parser::ast::Expr;
 
+// TODO handle and assert errors
+// TODO expr vs stmt vs program (different folders?)
+fn parse_js_string(data: &str) -> Expr {
+    let lexer = Lexer::new(&data).unwrap();
+    let mut reader = PeekReader::new(lexer).unwrap();
+    let mut parser = Parser::new(&mut reader).unwrap();
+    parser.parse_expression().unwrap()
+}
+
 fn snapshot_runner(test_file: &str) {
     println!("Parsing {}", test_file);
 
     let markdown = md::Markdown::from_file(test_file.as_ref());
+    let result = parse_js_string(&markdown.js_block);
 
-    let js_data = &markdown.js_block;
-    let json_data = &markdown.json_block;
-
-    let lexer = Lexer::new(&js_data).unwrap();
-    let mut reader = PeekReader::new(lexer).unwrap();
-    let mut parser = Parser::new(&mut reader).unwrap();
-    let result = parser.parse_expression().unwrap();
-
-    if let Some(data) = json_data {
-        let expected_expr: Expr = serde_json::from_str(&data).unwrap();
+    if let Some(expected_data) = &markdown.json_block {
+        let expected_expr: Expr = serde_json::from_str(&expected_data).unwrap();
         assert_eq!(result, expected_expr)
     } else {
         let json = serde_json::to_string_pretty(&result).unwrap();
