@@ -1,3 +1,8 @@
+```js
+new new a;
+```
+
+```json
 {
   "New": {
     "span": "0:9",
@@ -18,3 +23,4 @@
     "arguments": []
   }
 }
+```
