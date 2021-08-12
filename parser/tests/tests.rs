@@ -3,7 +3,6 @@ mod r#macro;
 
 mod expr {
     mod async_expr;
-    mod binary;
     mod call;
     mod class;
     mod expr;
