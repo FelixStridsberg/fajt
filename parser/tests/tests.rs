@@ -5,7 +5,6 @@ mod expr {
     mod async_expr;
     mod class;
     mod member_access;
-    mod unary;
     mod update;
     mod yield_expr;
 }
