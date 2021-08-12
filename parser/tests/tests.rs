@@ -3,7 +3,6 @@ mod r#macro;
 
 mod expr {
     mod async_expr;
-    mod call;
     mod class;
     mod expr;
     mod flow_control;
