@@ -1,11 +1,11 @@
 use proc_macro::TokenStream;
+use proc_macro2::TokenStream as TokenStream2;
 use std::path::PathBuf;
 use quote::quote;
 use quote::format_ident;
 use syn::parse::{Parse, ParseStream};
 use std::fs;
 use std::fs::DirEntry;
-use syn::__private::TokenStream2;
 
 const INPUT_ERROR: &str = "Unexpected input, expected: for_each_file!(\"string/path\", macro_identifier);";
 
