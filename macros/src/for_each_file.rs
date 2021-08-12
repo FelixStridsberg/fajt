@@ -45,7 +45,7 @@ pub fn for_each_file(input: TokenStream) -> TokenStream {
         .map(|file| {
             let path = &file.path;
             let extension = &file.extension;
-            let identifier = create_identifier(&file.relative_path);
+            let identifier = create_identifier(&file.relative_path, &extension);
             quote! {
                 #macro_ident!(#extension, #path, #identifier);
             }
@@ -102,8 +102,8 @@ fn to_file(entry: &DirEntry, relative_path: &str) -> File {
     }
 }
 
-fn create_identifier(name: &str) -> syn::Ident {
-    let mut name = name
+fn create_identifier(name: &str, extension: &str) -> syn::Ident {
+    let mut name = name[0..name.len() - (extension.len() + 1)]
         .to_owned()
         .replace('-', "_")
         .replace('.', "_")
