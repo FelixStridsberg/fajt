@@ -32,6 +32,7 @@ use fajt_macros::for_each_file;
 use fajt_parser::ast::Expr;
 use fajt_parser::Parser;
 
+// TODO possibility to regenerate all asts.
 // TODO handle and assert errors
 // TODO expr vs stmt vs program (different folders?)
 fn parse_js_string(data: &str) -> Expr {
