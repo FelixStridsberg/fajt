@@ -13,7 +13,6 @@ mod expr {
     mod function;
     mod literal;
     mod member_access;
-    mod new;
     mod unary;
     mod update;
     mod yield_expr;
