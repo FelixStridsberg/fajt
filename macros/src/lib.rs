@@ -3,6 +3,7 @@ extern crate quote;
 extern crate syn;
 
 mod enum_from_string;
+mod for_each_file;
 
 use proc_macro::TokenStream;
 use syn::{parse_macro_input, Data, DeriveInput};
@@ -70,4 +71,27 @@ pub fn enum_from_string_derive(input: TokenStream) -> TokenStream {
     };
 
     TokenStream::from(tokens)
+}
+
+/// This macro recursively iterates through a directory and calls a macro for each file.
+///
+/// Example, generating test cases from files:
+/// ```compile_fail
+/// macro_rules! generate_test_case {
+///     ("md", $file_path:literal, $ident:ident) => {
+///         #[test]
+///         fn $ident() {
+///             snapshot_runner($file_path)
+///         }
+///     };
+///     ($extension:literal, $file_path:literal, $ident:ident) => {
+///         // Unknown file extensions, ignore...
+///     };
+/// }
+///
+/// for_each_file!("parser/tests/snapshots", generate_test_case);
+/// ```
+#[proc_macro]
+pub fn for_each_file(input: TokenStream) -> TokenStream {
+    for_each_file::for_each_file(input)
 }

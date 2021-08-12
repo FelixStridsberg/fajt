@@ -2,21 +2,9 @@
 mod r#macro;
 
 mod expr {
-    mod arrow_function;
-    mod assignment;
     mod async_expr;
-    mod binary;
-    mod call;
     mod class;
-    mod expr;
-    mod flow_control;
-    mod function;
-    mod literal;
     mod member_access;
-    mod new;
-    mod unary;
-    mod update;
-    mod yield_expr;
 }
 
 mod stmt {
