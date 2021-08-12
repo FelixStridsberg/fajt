@@ -4,8 +4,6 @@ mod r#macro;
 mod expr {
     mod async_expr;
     mod class;
-    mod expr;
-    mod flow_control;
     mod function;
     mod literal;
     mod member_access;
