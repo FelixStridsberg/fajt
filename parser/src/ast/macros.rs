@@ -1,4 +1,5 @@
-/// Adds common implementations for enum that builds up the ast.
+/// The AST contains enums that maps to structs, these must be wrapped in this macro to add common
+/// implementation that can be used to any node in the tree.
 macro_rules! ast_mapping {
     (
         $(#[$enum_attr:meta])*
@@ -25,11 +26,11 @@ macro_rules! ast_mapping {
             }
         }
 
-        $( ast_enum_struct_impl!($name, $variant, $member); )*
+        $( ast_mapping_impl!($name, $variant, $member); )*
     };
 }
 
-macro_rules! ast_enum_struct_impl {
+macro_rules! ast_mapping_impl {
     ($enum_name:ident, $variant:ident, $member:ident) => {
         impl From<$member> for $enum_name {
             fn from(f: $member) -> Self {
@@ -45,6 +46,9 @@ macro_rules! ast_enum_struct_impl {
     };
 }
 
+/// Implements common attributes for structures that are part of the AST.
+/// This is mainly to handle traits that must be applied to the whole tree, for example Debug,
+/// Display, PartialEq.
 macro_rules! ast_struct {
     (
         $(#[$meta:meta])*
