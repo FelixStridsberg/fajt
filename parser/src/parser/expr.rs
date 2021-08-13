@@ -117,7 +117,7 @@ where
 
     /// Parses the part of `AssignmentExpression` that starts with the `async` keyword.
     /// Note that most of the complexity comes because of the ambiguity between:
-    /// 1. `async => {}` // Non async arrow function without the name async.
+    /// 1. `async => {}` // Non async arrow function with the name async.
     /// 2. `async a => {}` // Async arrow function without parameter parentheses.
     /// 3. `async(a) => {}` // Async arrow function with parentheses.
     /// 4. `async(a)` // Function call where `async` is an identifier and not a keyword.
