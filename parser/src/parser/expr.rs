@@ -60,7 +60,7 @@ where
             {
                 let span_start = self.position();
                 let parameters = self.parse_arrow_identifier_argument()?;
-                self.parse_arrow_function_expr(span_start, true, false, parameters)
+                self.parse_arrow_function_expr(span_start, true, parameters)
             }
             _ => {
                 let expr = self.parse_conditional_expr()?;
@@ -109,7 +109,7 @@ where
 
         if self.current_matches(punct!("=>")) && !self.reader.current().unwrap().first_on_line {
             let parameters = parenthesized_or_arrow_parameters.into_arrow_parameters()?;
-            self.parse_arrow_function_expr(span_start, false, false, parameters)
+            self.parse_arrow_function_expr(span_start, false, parameters)
         } else {
             parenthesized_or_arrow_parameters.into_expr()
         }
@@ -125,7 +125,7 @@ where
             let span_start = self.position();
             self.reader.consume()?;
             let parameters = self.parse_arrow_identifier_argument()?;
-            return self.parse_arrow_function_expr(span_start, true, true, parameters);
+            return self.parse_async_arrow_function_expr(span_start, true, parameters);
         }
 
         if self.peek_matches(punct!("(")) {
@@ -133,7 +133,7 @@ where
             let call_or_arrow_parameters = self.parse_cover_call_and_async_arrow_head()?;
             if self.current_matches(punct!("=>")) {
                 let parameters = call_or_arrow_parameters.into_arrow_parameters()?;
-                self.parse_arrow_function_expr(span_start, false, true, parameters)
+                self.parse_async_arrow_function_expr(span_start, false, parameters)
             } else {
                 call_or_arrow_parameters.into_call()
             }

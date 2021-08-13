@@ -2,7 +2,6 @@
 mod r#macro;
 
 mod expr {
-    mod async_expr;
     mod class;
     mod member_access;
 }

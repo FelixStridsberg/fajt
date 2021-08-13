@@ -21,7 +21,6 @@ where
         &mut self,
         span_start: usize,
         binding_parameter: bool,
-        asynchronous: bool,
         parameters: FormalParameters,
     ) -> Result<Expr> {
         self.consume_assert(punct!("=>"))?;
@@ -35,7 +34,38 @@ where
         let span = self.span_from(span_start);
         Ok(ExprArrowFunction {
             span,
-            asynchronous,
+            asynchronous: false,
+            binding_parameter,
+            parameters,
+            body,
+        }
+        .into())
+    }
+
+    /// Parses the async version of `ArrowFunction` goal symbol, but expects the parameters as input
+    /// since that may be a non terminal before we know if it is an arrow function or parenthesized
+    /// expression.
+    pub(super) fn parse_async_arrow_function_expr(
+        &mut self,
+        span_start: usize,
+        binding_parameter: bool,
+        parameters: FormalParameters,
+    ) -> Result<Expr> {
+        self.consume_assert(punct!("=>"))?;
+
+        let body = if self.current_matches(punct!("{")) {
+            ArrowFunctionBody::Block(
+                self.with_context(ContextModify::new().set_await(true))
+                    .parse_function_body()?,
+            )
+        } else {
+            ArrowFunctionBody::Expr(self.parse_assignment_expr()?.into())
+        };
+
+        let span = self.span_from(span_start);
+        Ok(ExprArrowFunction {
+            span,
+            asynchronous: true,
             binding_parameter,
             parameters,
             body,
