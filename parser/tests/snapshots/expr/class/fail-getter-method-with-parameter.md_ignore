@@ -1,0 +1,12 @@
+```js
+class { set getter(a) {} }
+```
+
+```json
+{
+  "SyntaxError": [
+    "Getter must not have any formal parameters.",
+    "18:21"
+  ]
+}
+```

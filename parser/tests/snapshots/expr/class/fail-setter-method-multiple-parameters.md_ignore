@@ -1,0 +1,12 @@
+```js
+class { set setter(a, b) {} }
+```
+
+```json
+{
+  "SyntaxError": [
+    "Setter must have exactly one formal parameter.",
+    "18:24"
+  ]
+}
+```
