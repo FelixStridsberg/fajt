@@ -1,10 +1,11 @@
 use crate::token::{Keyword, Span};
+use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
 use std::{error, fmt};
 
 use fajt_common::io::Error as CommonError;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Error {
     kind: ErrorKind,
 }
@@ -19,7 +20,7 @@ impl Error {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[non_exhaustive]
 pub enum ErrorKind {
     InvalidOrUnexpectedToken(Span),

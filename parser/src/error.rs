@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
 use std::{error, fmt};
 
@@ -68,7 +69,7 @@ impl Error {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[non_exhaustive]
 pub enum ErrorKind {
     EndOfStream,

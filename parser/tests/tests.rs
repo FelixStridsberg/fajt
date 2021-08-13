@@ -3,7 +3,6 @@ mod r#macro;
 
 mod expr {
     mod class;
-    mod member_access;
 }
 
 mod stmt {

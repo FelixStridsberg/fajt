@@ -30,16 +30,17 @@ use fajt_common::io::PeekReader;
 use fajt_lexer::Lexer;
 use fajt_macros::for_each_file;
 use fajt_parser::ast::Expr;
+use fajt_parser::error::{ErrorKind, Result};
 use fajt_parser::Parser;
 
 // TODO possibility to regenerate all asts.
 // TODO handle and assert errors
 // TODO expr vs stmt vs program (different folders?)
-fn parse_js_string(data: &str) -> Expr {
+fn parse_js_string(data: &str) -> Result<Expr> {
     let lexer = Lexer::new(&data).unwrap();
     let mut reader = PeekReader::new(lexer).unwrap();
     let mut parser = Parser::new(&mut reader).unwrap();
-    parser.parse_expression().unwrap()
+    parser.parse_expression()
 }
 
 fn snapshot_runner(test_file: &str) {
@@ -49,12 +50,23 @@ fn snapshot_runner(test_file: &str) {
     let result = parse_js_string(&markdown.js_block);
 
     if let Some(expected_data) = &markdown.json_block {
-        let expected_expr: Expr = serde_json::from_str(&expected_data).unwrap();
-        assert_eq!(result, expected_expr)
+        if let Ok(result) = result {
+            let expected_expr: Expr = serde_json::from_str(&expected_data).unwrap();
+            assert_eq!(result, expected_expr)
+        } else {
+            let expected_error: ErrorKind = serde_json::from_str(&expected_data).unwrap();
+            assert_eq!(result.unwrap_err().kind(), &expected_error)
+        }
     } else {
-        let json = serde_json::to_string_pretty(&result).unwrap();
-        markdown.append_json_block(&json);
-        panic!("No ast found in this test. Json generated, verify and rerun.");
+        if let Ok(result) = result {
+            let json = serde_json::to_string_pretty(&result).unwrap();
+            markdown.append_json_block(&json);
+            panic!("No ast found in this test. Json generated, verify and rerun.");
+        } else {
+            let error = serde_json::to_string_pretty(&result.unwrap_err().kind()).unwrap();
+            markdown.append_json_block(&error);
+            panic!("No ast found in this test. Json error generated, verify and rerun.");
+        }
     }
 }
 
