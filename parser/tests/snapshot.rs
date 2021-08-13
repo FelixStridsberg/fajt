@@ -77,6 +77,13 @@ macro_rules! generate_test_case {
             snapshot_runner($file_path)
         }
     };
+    ("md_ignore", $file_path:literal, $ident:ident) => {
+        #[ignore]
+        #[test]
+        fn $ident() {
+            snapshot_runner($file_path)
+        }
+    };
     ($extension:literal, $file_path:literal, $ident:ident) => {
         // Unknown file extensions, ignore...
     };
