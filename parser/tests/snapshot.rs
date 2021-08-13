@@ -30,7 +30,6 @@ use fajt_parser::error::{ErrorKind, Result};
 use fajt_parser::Parser;
 
 // TODO possibility to regenerate all asts.
-// TODO handle and assert errors
 // TODO expr vs stmt vs program (different folders?)
 fn parse_js_string(data: &str) -> Result<Expr> {
     let lexer = Lexer::new(&data).unwrap();
