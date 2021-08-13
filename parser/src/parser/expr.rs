@@ -117,28 +117,34 @@ where
 
     /// Parses the part of `AssignmentExpression` that starts with the `async` keyword.
     /// Note that most of the complexity comes because of the ambiguity between:
-    /// 1. `async a => {}` // Async arrow function without parameter parentheses.
-    /// 2. `async(a) => {}` // Async arrow function with parentheses.
-    /// 3. `async(a)` // Function call where `async` is an identifier and not a keyword.
+    /// 1. `async => {}` // Non async arrow function without the name async.
+    /// 2. `async a => {}` // Async arrow function without parameter parentheses.
+    /// 3. `async(a) => {}` // Async arrow function with parentheses.
+    /// 4. `async(a)` // Function call where `async` is an identifier and not a keyword.
     fn parse_assignment_expr_async(&mut self) -> Result<Expr> {
-        if self.peek_is_identifier() {
-            let span_start = self.position();
-            self.reader.consume()?;
-            let parameters = self.parse_arrow_identifier_argument()?;
-            return self.parse_async_arrow_function_expr(span_start, true, parameters);
-        }
-
-        if self.peek_matches(punct!("(")) {
-            let span_start = self.position();
-            let call_or_arrow_parameters = self.parse_cover_call_and_async_arrow_head()?;
-            if self.current_matches(punct!("=>")) {
-                let parameters = call_or_arrow_parameters.into_arrow_parameters()?;
-                self.parse_async_arrow_function_expr(span_start, false, parameters)
-            } else {
-                call_or_arrow_parameters.into_call()
+        match self.reader.peek() {
+            token_matches!(opt: punct!("=>")) => {
+                let span_start = self.position();
+                let parameters = self.parse_arrow_identifier_argument()?;
+                return self.parse_arrow_function_expr(span_start, true, parameters);
             }
-        } else {
-            self.parse_conditional_expr()
+            token_matches!(opt: punct!("(")) => {
+                let span_start = self.position();
+                let call_or_arrow_parameters = self.parse_cover_call_and_async_arrow_head()?;
+                if self.current_matches(punct!("=>")) {
+                    let parameters = call_or_arrow_parameters.into_arrow_parameters()?;
+                    self.parse_async_arrow_function_expr(span_start, false, parameters)
+                } else {
+                    call_or_arrow_parameters.into_call()
+                }
+            }
+            _ if self.peek_is_identifier() => {
+                let span_start = self.position();
+                self.reader.consume()?;
+                let parameters = self.parse_arrow_identifier_argument()?;
+                return self.parse_async_arrow_function_expr(span_start, true, parameters);
+            }
+            _ => self.parse_conditional_expr(),
         }
     }
 

@@ -59,7 +59,11 @@ where
                     .parse_function_body()?,
             )
         } else {
-            ArrowFunctionBody::Expr(self.parse_assignment_expr()?.into())
+            ArrowFunctionBody::Expr(
+                self.with_context(ContextModify::new().set_await(true))
+                    .parse_assignment_expr()?
+                    .into(),
+            )
         };
 
         let span = self.span_from(span_start);
