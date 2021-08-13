@@ -126,7 +126,7 @@ where
             token_matches!(opt: punct!("=>")) => {
                 let span_start = self.position();
                 let parameters = self.parse_arrow_identifier_argument()?;
-                return self.parse_arrow_function_expr(span_start, true, parameters);
+                self.parse_arrow_function_expr(span_start, true, parameters)
             }
             token_matches!(opt: punct!("(")) => {
                 let span_start = self.position();
@@ -142,7 +142,7 @@ where
                 let span_start = self.position();
                 self.reader.consume()?;
                 let parameters = self.parse_arrow_identifier_argument()?;
-                return self.parse_async_arrow_function_expr(span_start, true, parameters);
+                self.parse_async_arrow_function_expr(span_start, true, parameters)
             }
             _ => self.parse_conditional_expr(),
         }

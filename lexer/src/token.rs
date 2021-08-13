@@ -397,7 +397,7 @@ impl<'de> Deserialize<'de> for Span {
             where
                 E: serde::de::Error,
             {
-                let mut parts = v.split(":");
+                let mut parts = v.split(':');
                 if let (Some(start), Some(end)) = (parts.next(), parts.next()) {
                     Ok(Span {
                         start: start.parse().unwrap(),

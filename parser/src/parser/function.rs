@@ -123,7 +123,7 @@ where
         self.consume_assert(keyword!("async"))?;
 
         let function_token = self.consume_assert(keyword!("function"))?;
-        debug_assert_eq!(function_token.first_on_line, false);
+        debug_assert!(!function_token.first_on_line);
 
         let generator = self.maybe_consume(punct!("*"))?;
         let identifier = self.parse_optional_identifier()?;
@@ -160,7 +160,7 @@ where
         self.consume_assert(keyword!("async"))?;
 
         let function_token = self.consume_assert(keyword!("function"))?;
-        debug_assert_eq!(function_token.first_on_line, false);
+        debug_assert!(!function_token.first_on_line);
 
         let generator = self.maybe_consume(punct!("*"))?;
         let ident = self.parse_identifier()?;

@@ -203,9 +203,7 @@ impl<'a> Lexer<'a> {
     }
 
     fn read_identifier_or_keyword(&mut self) -> Result<TokenValue> {
-        let word = self
-            .reader
-            .read_until(|c| char::is_part_of_identifier(&c))?;
+        let word = self.reader.read_until(|c| char::is_part_of_identifier(c))?;
         let value = if let Ok(keyword) = word.parse() {
             TokenValue::Keyword(keyword)
         } else {
@@ -243,7 +241,7 @@ impl<'a> Lexer<'a> {
                 (Hex, self.read_number(16, char::is_ascii_hexdigit)?)
             }
             Some(&'o' | &'O') if current == &'0' => {
-                (Octal, self.read_number(8, |c| ('0'..='7').contains(&c))?)
+                (Octal, self.read_number(8, |c| ('0'..='7').contains(c))?)
             }
             Some(&'b' | &'B') if current == &'0' => {
                 (Binary, self.read_number(2, |c| c == &'0' || c == &'1')?)

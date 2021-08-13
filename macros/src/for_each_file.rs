@@ -4,7 +4,7 @@ use quote::format_ident;
 use quote::quote;
 use std::fs;
 use std::fs::DirEntry;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use syn::parse::{Parse, ParseStream};
 
 const INPUT_ERROR: &str =
@@ -45,7 +45,7 @@ pub fn for_each_file(input: TokenStream) -> TokenStream {
         .map(|file| {
             let path = &file.path;
             let extension = &file.extension;
-            let identifier = create_identifier(&file.relative_path, &extension);
+            let identifier = create_identifier(&file.relative_path, extension);
             quote! {
                 #macro_ident!(#extension, #path, #identifier);
             }
@@ -57,7 +57,7 @@ pub fn for_each_file(input: TokenStream) -> TokenStream {
     })
 }
 
-fn find_files(path: &PathBuf, directory_path: &str) -> Vec<File> {
+fn find_files(path: &Path, directory_path: &str) -> Vec<File> {
     let mut files = Vec::new();
 
     for entry in fs::read_dir(path).unwrap() {
@@ -70,7 +70,7 @@ fn find_files(path: &PathBuf, directory_path: &str) -> Vec<File> {
         if file_type.is_dir() {
             let mut relative_path = entry.file_name().into_string().unwrap();
             relative_path.push('/');
-            let dir_prefix = if directory_path.len() == 0 {
+            let dir_prefix = if directory_path.is_empty() {
                 relative_path
             } else {
                 format!("{}{}", directory_path, relative_path)
