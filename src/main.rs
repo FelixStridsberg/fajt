@@ -1,6 +1,6 @@
 use clap::{App, Arg};
-use std::fs::read_to_string;
 use fajt_parser::Parser;
+use std::fs::read_to_string;
 
 struct Arguments {
     file_name: String,
