@@ -6,5 +6,4 @@ mod stmt {
     mod exception;
     mod iteration;
     mod stmt;
-    mod variable;
 }
