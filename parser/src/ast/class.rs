@@ -1,4 +1,4 @@
-use crate::ast::{Body, Expr, FormalParameters, Ident, PropertyName, Stmt};
+use crate::ast::{Body, Expr, FormalParameters, Ident, PropertyName};
 use fajt_lexer::token::Span;
 
 ast_struct! {
