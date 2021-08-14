@@ -40,7 +40,7 @@ where
         let mut class_body = Vec::new();
 
         loop {
-            let element: ClassElement = match self.reader.current()? {
+            let element: ClassElement = match self.current()? {
                 token_matches!(punct!("}")) => {
                     self.reader.consume()?;
                     break;

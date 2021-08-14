@@ -16,7 +16,7 @@ where
 {
     /// Parses the `BindingPattern` goal symbol.
     pub(super) fn parse_binding_pattern(&mut self) -> Result<BindingPattern> {
-        Ok(match self.reader.current()? {
+        Ok(match self.current()? {
             token_matches!(punct!("{")) => self.parse_object_binding_pattern()?,
             token_matches!(punct!("[")) => self.parse_array_binding_pattern()?,
             _ if self.is_identifier() => BindingPattern::Ident(self.parse_identifier()?),
@@ -33,7 +33,7 @@ where
 
         let mut rest = None;
         loop {
-            match self.reader.current()? {
+            match self.current()? {
                 token_matches!(punct!("}")) => {
                     self.reader.consume()?;
                     break;
@@ -78,7 +78,7 @@ where
 
         let mut rest = None;
         loop {
-            match self.reader.current()? {
+            match self.current()? {
                 token_matches!(punct!("]")) => {
                     self.reader.consume()?;
                     break;
@@ -110,7 +110,7 @@ where
     }
 
     pub(super) fn is_binding_element(&self) -> Result<bool> {
-        match self.reader.current()? {
+        match self.current()? {
             token_matches!(punct!("{") | punct!("[")) => Ok(true),
             _ if self.is_identifier() => Ok(true),
             _ => Ok(false),

@@ -45,7 +45,7 @@ where
 
         let mut elements = Vec::new();
         loop {
-            match self.reader.current()? {
+            match self.current()? {
                 token_matches!(punct!("]")) => {
                     self.reader.consume()?;
                     break;
@@ -84,7 +84,7 @@ where
 
         let mut props = Vec::new();
         loop {
-            match self.reader.current()? {
+            match self.current()? {
                 token_matches!(punct!("}")) => {
                     self.reader.consume()?;
                     break;

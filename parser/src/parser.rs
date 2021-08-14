@@ -170,9 +170,13 @@ where
         T::parse(&mut parser)
     }
 
+    // TODO this should not be Result<>
+    fn current(&self) -> Result<&Token> {
+        Ok(self.reader.current()?)
+    }
+
     fn position(&self) -> usize {
-        self.reader
-            .current()
+        self.current()
             .map(|t| t.span.start)
             .unwrap_or_else(|_| self.reader.position())
     }
@@ -189,7 +193,7 @@ where
     }
 
     fn current_matches(&self, value: TokenValue) -> bool {
-        if let Ok(token) = self.reader.current() {
+        if let Ok(token) = self.current() {
             token.value == value
         } else {
             false
@@ -230,7 +234,7 @@ where
     }
 
     fn is_identifier(&self) -> bool {
-        is_identifier(self.reader.current().ok(), self.context.keyword_context())
+        is_identifier(self.current().ok(), self.context.keyword_context())
     }
 
     fn parse_identifier(&mut self) -> Result<Ident> {
@@ -258,7 +262,7 @@ where
 
     /// Parses the `PropertyName` goal symbol.
     fn parse_property_name(&mut self) -> Result<PropertyName> {
-        match self.reader.current()? {
+        match self.current()? {
             token_matches!(@literal) => todo!(),
             token_matches!(punct!("[")) => todo!(),
             _ if self.is_identifier() => Ok(PropertyName::Ident(self.parse_identifier()?)),

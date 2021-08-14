@@ -50,7 +50,7 @@ where
     /// Parses the `AssignmentExpression` goal symbol.
     pub(super) fn parse_assignment_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        match self.reader.current() {
+        match self.current() {
             token_matches!(ok: keyword!("yield")) => self.parse_yield_expr(),
             token_matches!(ok: keyword!("async")) => self.parse_assignment_expr_async(),
             token_matches!(ok: punct!("(")) => self.parse_assignment_expr_open_parentheses(),
@@ -66,7 +66,7 @@ where
                 let expr = self.parse_conditional_expr()?;
 
                 // TODO assignment left side must be LeftHandSideExpression
-                let assignment_operator = match self.reader.current() {
+                let assignment_operator = match self.current() {
                     token_matches!(ok: punct!("=")) => Some(assignment_op!("=")),
                     token_matches!(ok: punct!("*=")) => Some(assignment_op!("*=")),
                     token_matches!(ok: punct!("/=")) => Some(assignment_op!("/=")),
@@ -107,7 +107,7 @@ where
         let parenthesized_or_arrow_parameters =
             self.parse_cover_parenthesized_and_arrow_parameters()?;
 
-        if self.current_matches(punct!("=>")) && !self.reader.current().unwrap().first_on_line {
+        if self.current_matches(punct!("=>")) && !self.current().unwrap().first_on_line {
             let parameters = parenthesized_or_arrow_parameters.into_arrow_parameters()?;
             self.parse_arrow_function_expr(span_start, false, parameters)
         } else {
@@ -163,7 +163,7 @@ where
             .into());
         }
 
-        let next_token = self.reader.current()?;
+        let next_token = self.current()?;
         let has_argument = !next_token.first_on_line;
         let delegate = has_argument && token_matches!(next_token, punct!("*"));
         if delegate {
@@ -207,7 +207,7 @@ where
 
     /// Parses the `UnaryExpression` goal symbol.
     pub(super) fn parse_unary_expr(&mut self) -> Result<Expr> {
-        let operator = match self.reader.current()? {
+        let operator = match self.current()? {
             token_matches!(punct!("+")) => Some(unary_op!("+")),
             token_matches!(punct!("-")) => Some(unary_op!("-")),
             token_matches!(punct!("~")) => Some(unary_op!("~")),
@@ -243,7 +243,7 @@ where
 
     /// Parses the `UpdateExpression` goal symbol.
     fn parse_update_expr(&mut self) -> Result<Expr> {
-        let prefix_operator = match self.reader.current()? {
+        let prefix_operator = match self.current()? {
             token_matches!(punct!("++")) => Some(update_op!("++")),
             token_matches!(punct!("--")) => Some(update_op!("--")),
             _ => None,
@@ -265,14 +265,14 @@ where
 
         let span_start = self.position();
         let argument = self.parse_left_hand_side_expr()?;
-        let suffix_operator = match self.reader.current() {
+        let suffix_operator = match self.current() {
             token_matches!(ok: punct!("++")) => Some(update_op!("++")),
             token_matches!(ok: punct!("--")) => Some(update_op!("--")),
             _ => None,
         };
 
         if let Some(operator) = suffix_operator {
-            if self.reader.current()?.first_on_line {
+            if self.current()?.first_on_line {
                 return Ok(argument);
             }
 
@@ -293,7 +293,7 @@ where
     /// Parses the `LeftHandSideExpression` goal symbol.
     pub(super) fn parse_left_hand_side_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        let expr = match self.reader.current() {
+        let expr = match self.current() {
             token_matches!(ok: keyword!("new")) if !self.peek_matches(punct!(".")) => {
                 self.parse_new_expr()
             }
@@ -308,7 +308,7 @@ where
                 let mut expr = self.parse_member_expr()?;
 
                 loop {
-                    match self.reader.current() {
+                    match self.current() {
                         token_matches!(ok: punct!("(")) => {
                             let (arguments_span, arguments) = self.parse_arguments()?;
                             let span = self.span_from(span_start);
@@ -341,7 +341,7 @@ where
             if expr.is_nested_new() {
                 return err!(SyntaxError(
                     "Invalid optional chain from new expression".to_owned(),
-                    self.reader.current().unwrap().span.clone()
+                    self.current().unwrap().span.clone()
                 ));
             }
 
@@ -430,7 +430,7 @@ where
         let mut arguments = Vec::new();
 
         loop {
-            match self.reader.current() {
+            match self.current() {
                 token_matches!(ok: punct!(")")) => {
                     self.reader.consume()?;
                     break;
@@ -458,7 +458,7 @@ where
         let mut expr = self.parse_member_expr_non_recursive()?;
 
         loop {
-            if token_matches!(self.reader.current(), ok: punct!(".") | punct!("[")) {
+            if token_matches!(self.current(), ok: punct!(".") | punct!("[")) {
                 expr =
                     self.parse_member_expr_right_side(span_start, MemberObject::Expr(expr.into()))?;
             } else {
@@ -473,12 +473,12 @@ where
 
     /// Parses the non recursive parts of `MemberExpressions`.
     fn parse_member_expr_non_recursive(&mut self) -> Result<Expr> {
-        match self.reader.current()? {
+        match self.current()? {
             token_matches!(keyword!("super")) => {
                 let span_start = self.position();
                 let super_token = self.reader.consume()?;
 
-                if !token_matches!(self.reader.current(), ok: punct!(".") | punct!("[")) {
+                if !token_matches!(self.current(), ok: punct!(".") | punct!("[")) {
                     todo!("Error, unexpected super")
                 }
 
@@ -531,7 +531,7 @@ where
 
     /// Parses the `PrimaryExpression` goal symbol.
     fn parse_primary_expr(&mut self) -> Result<Expr> {
-        Ok(match self.reader.current()? {
+        Ok(match self.current()? {
             token_matches!(keyword!("this")) => self.parse_this_expr()?,
             token_matches!(keyword!("null")) => self.consume_literal(Literal::Null)?,
             token_matches!(keyword!("true")) => self.consume_literal(Literal::Boolean(true))?,

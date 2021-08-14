@@ -69,7 +69,7 @@ where
         self.consume_assert(punct!("("))?;
 
         let init = self.parse_for_first_argument()?;
-        match self.reader.current() {
+        match self.current() {
             token_matches!(ok: punct!(";")) => self.parse_plain_for(span_start, init),
             token_matches!(ok: keyword!("of")) if init.is_some() => {
                 self.parse_for_of(span_start, init.unwrap(), false)
@@ -160,7 +160,7 @@ where
 
     pub(super) fn parse_for_first_argument(&mut self) -> Result<Option<ForInit>> {
         let span_start = self.position();
-        let variable_kind = match self.reader.current()? {
+        let variable_kind = match self.current()? {
             token_matches!(keyword!("var")) => Some(VariableKind::Var),
             token_matches!(keyword!("let")) => Some(VariableKind::Let),
             token_matches!(keyword!("const")) => Some(VariableKind::Const),
@@ -181,7 +181,7 @@ where
             })));
         }
 
-        Ok(match self.reader.current()? {
+        Ok(match self.current()? {
             _ if self.current_matches(punct!(";")) => None,
             _ => Some(ForInit::Expr(
                 self.with_context(ContextModify::new().set_in(false))

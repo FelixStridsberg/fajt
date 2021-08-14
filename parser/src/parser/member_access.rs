@@ -33,7 +33,7 @@ where
         let mut object = left;
 
         loop {
-            match self.reader.current() {
+            match self.current() {
                 token_matches!(ok: punct!("?.")) => {
                     if self.peek_matches(punct!("(")) {
                         object = self.parse_optional_call_expr(span_start, object)?;
@@ -84,7 +84,7 @@ where
     }
 
     fn parse_optional_member_property(&mut self) -> Result<MemberProperty> {
-        match self.reader.current() {
+        match self.current() {
             token_matches!(ok: punct!("?.")) if self.peek_matches(punct!("[")) => {
                 self.reader.consume()?;
                 let property = self.parse_computed_property()?;
@@ -104,7 +104,7 @@ where
     }
 
     fn parse_member_property(&mut self) -> Result<MemberProperty> {
-        match self.reader.current() {
+        match self.current() {
             token_matches!(ok: punct!(".")) => {
                 self.reader.consume()?;
                 let identifier = self.parse_identifier()?;

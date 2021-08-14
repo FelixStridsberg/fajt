@@ -16,7 +16,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
     pub(super) fn parse_stmt(&mut self) -> Result<Stmt> {
-        Ok(match self.reader.current()? {
+        Ok(match self.current()? {
             token_matches!(punct!(";")) => self.parse_empty_stmt()?,
             token_matches!(punct!("{")) => self.parse_block_stmt()?,
             token_matches!(keyword!("var")) => self.parse_variable_stmt(VariableKind::Var)?,
@@ -53,7 +53,7 @@ where
     /// `ExpressionStatement` goal symbol.
     fn is_expr_stmt(&self) -> Result<bool> {
         if matches!(
-            self.reader.current()?.value,
+            self.current()?.value,
             punct!("{") | keyword!("function") | keyword!("class")
         ) {
             return Ok(false);
@@ -157,7 +157,7 @@ where
 
     /// True if the current token is not preceded by a line feed or is a semi colon.
     fn stmt_not_ended(&self) -> bool {
-        match self.reader.current() {
+        match self.current() {
             token_matches!(ok: punct!(";")) | Err(_) => false,
             Ok(token) if token.first_on_line => false,
             _ => true,
@@ -321,7 +321,7 @@ where
 
         loop {
             if token_matches!(
-                self.reader.current(),
+                self.current(),
                 ok: punct!("}") | keyword!("case") | keyword!("default")
             ) {
                 break;

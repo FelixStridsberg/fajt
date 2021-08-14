@@ -210,7 +210,7 @@ where
         let mut parameters = Vec::new();
         let mut rest = None;
         loop {
-            match self.reader.current()? {
+            match self.current()? {
                 token_matches!(punct!(")")) => {
                     self.reader.consume()?;
                     break;
