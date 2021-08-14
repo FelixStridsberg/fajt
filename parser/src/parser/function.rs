@@ -1,6 +1,6 @@
 use crate::ast::{
     ArrowFunctionBody, BindingElement, Body, DeclFunction, Expr, ExprArrowFunction, ExprFunction,
-    FormalParameters, Ident, Stmt,
+    ExprLiteral, FormalParameters, Ident, Literal, Stmt, StmtExpr,
 };
 use crate::error::Result;
 use crate::parser::ContextModify;
@@ -10,6 +10,7 @@ use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
+use std::mem;
 
 impl<I> Parser<'_, I>
 where
@@ -239,20 +240,47 @@ where
         let span_start = self.position();
         self.consume_assert(punct!("{"))?;
 
+        let mut directives = Vec::new();
         let mut statements = Vec::new();
         loop {
             if self.maybe_consume(punct!("}"))? {
                 break;
             }
 
-            statements.push(self.parse_stmt()?);
+            let mut stmt = self.parse_stmt()?;
+            if !statements.is_empty() {
+                statements.push(stmt);
+                continue;
+            }
+
+            if let Some(string) = match_string_literal(&mut stmt) {
+                directives.push(string);
+            } else {
+                statements.push(stmt);
+            }
         }
 
         let span = self.span_from(span_start);
         Ok(Body {
             span,
-            directives: vec![],
+            directives,
             statements,
         })
+    }
+}
+
+fn match_string_literal(stmt: &mut Stmt) -> Option<String> {
+    if let Stmt::Expr(StmtExpr {
+        expr:
+            Expr::Literal(ExprLiteral {
+                literal: Literal::String(string, _),
+                ..
+            }),
+        ..
+    }) = stmt
+    {
+        Some(mem::take(string))
+    } else {
+        None
     }
 }

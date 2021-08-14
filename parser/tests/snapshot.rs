@@ -124,6 +124,7 @@ where
     }
 }
 
+#[allow(unused)]
 fn regenerate_asts<'a, 'b: 'a, T>(result: Result<T>, markdown: &'b md::Markdown)
 where
     T: Deserialize<'a> + Serialize + PartialEq + Debug,
