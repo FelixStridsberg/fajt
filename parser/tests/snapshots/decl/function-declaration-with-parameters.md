@@ -43,7 +43,11 @@ function fn(a, b = c) { }
       ],
       "rest": null
     },
-    "body": []
+    "body": {
+      "span": "22:25",
+      "directives": [],
+      "statements": []
+    }
   }
 }
 ```

@@ -1,4 +1,4 @@
-use crate::ast::{Expr, FormalParameters, Ident, PropertyName, Stmt};
+use crate::ast::{Body, Expr, FormalParameters, Ident, PropertyName, Stmt};
 use fajt_lexer::token::Span;
 
 ast_struct! {
@@ -28,7 +28,7 @@ ast_struct! {
         pub name: PropertyName,
         pub kind: ClassMethodKind,
         pub parameters: FormalParameters,
-        pub body: Vec<Stmt>,
+        pub body: Body,
         pub generator: bool,
         pub asynchronous: bool,
     }

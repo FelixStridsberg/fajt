@@ -17,38 +17,42 @@ function fn() { var a = 1 }
       "bindings": [],
       "rest": null
     },
-    "body": [
-      {
-        "Variable": {
-          "span": "16:25",
-          "kind": "Var",
-          "declarations": [
-            {
-              "span": "20:25",
-              "pattern": {
-                "Ident": {
-                  "span": "20:21",
-                  "name": "a"
-                }
-              },
-              "initializer": {
-                "Literal": {
-                  "span": "24:25",
-                  "literal": {
-                    "Number": {
-                      "Integer": [
-                        1,
-                        "Decimal"
-                      ]
+    "body": {
+      "span": "14:27",
+      "directives": [],
+      "statements": [
+        {
+          "Variable": {
+            "span": "16:25",
+            "kind": "Var",
+            "declarations": [
+              {
+                "span": "20:25",
+                "pattern": {
+                  "Ident": {
+                    "span": "20:21",
+                    "name": "a"
+                  }
+                },
+                "initializer": {
+                  "Literal": {
+                    "span": "24:25",
+                    "literal": {
+                      "Number": {
+                        "Integer": [
+                          1,
+                          "Decimal"
+                        ]
+                      }
                     }
                   }
                 }
               }
-            }
-          ]
+            ]
+          }
         }
-      }
-    ]
+      ]
+    }
   }
 }
 ```

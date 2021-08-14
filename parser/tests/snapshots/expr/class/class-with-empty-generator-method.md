@@ -24,7 +24,11 @@ class { *method1() {} }
             "bindings": [],
             "rest": null
           },
-          "body": [],
+          "body": {
+            "span": "19:21",
+            "directives": [],
+            "statements": []
+          },
           "generator": true,
           "asynchronous": false
         }

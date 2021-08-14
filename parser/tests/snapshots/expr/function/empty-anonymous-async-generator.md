@@ -14,7 +14,11 @@ async function *() {}
       "bindings": [],
       "rest": null
     },
-    "body": []
+    "body": {
+      "span": "19:21",
+      "directives": [],
+      "statements": []
+    }
   }
 }
 ```

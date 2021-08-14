@@ -84,10 +84,13 @@ generate_test_module!(
 generate_test_module!(
     mod_name: stmt,
     ast_type: Stmt,
-    folders: [
-        "parser/tests/snapshots/stmt",
-        "parser/tests/snapshots/decl"
-    ],
+    folders: ["parser/tests/snapshots/stmt"],
+);
+
+generate_test_module!(
+    mod_name: decl,
+    ast_type: Stmt,
+    folders: ["parser/tests/snapshots/decl"],
 );
 
 generate_test_module!(
@@ -121,6 +124,19 @@ where
     }
 }
 
+fn regenerate_asts<'a, 'b: 'a, T>(result: Result<T>, markdown: &'b md::Markdown)
+where
+    T: Deserialize<'a> + Serialize + PartialEq + Debug,
+{
+    if let Ok(result) = result {
+        let json = serde_json::to_string_pretty(&result).unwrap();
+        markdown.replace_json_block(&json)
+    } else {
+        let json = serde_json::to_string_pretty(&result.unwrap_err().kind()).unwrap();
+        markdown.replace_json_block(&json)
+    }
+}
+
 fn parse_input<T>(input: &str) -> Result<T>
 where
     T: Parse,
@@ -130,6 +146,7 @@ where
     Parser::parse::<T>(&mut reader)
 }
 
+// TODO clean up this module
 mod md {
     use std::fs::{File, OpenOptions};
     use std::io::{Read, Seek, SeekFrom, Write};
@@ -165,11 +182,30 @@ mod md {
             file.write_all("\n\n".as_bytes()).unwrap();
             file.write_all(block.as_bytes()).unwrap();
         }
+
+        pub fn replace_json_block(&self, contents: &str) {
+            let data = read_string(&self.path);
+
+            if let Some((start, end)) = get_code_block_pos(&data, "json") {
+                let mut new_data = String::new();
+                new_data.push_str(&data[..start]);
+                new_data.push_str(contents);
+                new_data.push_str(&data[end - 1..]);
+
+                let mut file = OpenOptions::new().write(true).open(&self.path).unwrap();
+                file.write_all(new_data.as_bytes()).unwrap();
+            }
+        }
     }
 
     const BLOCK_DELIMITER: &str = "```";
 
     fn get_code_block<'a>(source: &'a str, annotation: &str) -> Option<&'a str> {
+        let pos = get_code_block_pos(source, annotation);
+        pos.map(|(start, end)| &source[start..end])
+    }
+
+    fn get_code_block_pos(source: &str, annotation: &str) -> Option<(usize, usize)> {
         let block_start = format!("{}{}\n", BLOCK_DELIMITER, annotation);
         if let Some(start) = source.find(&block_start) {
             // Block start without preceding new line is only valid if block starts at first line.
@@ -181,7 +217,7 @@ mod md {
             let start = start + block_start.len();
             (&source[start..]).find(BLOCK_DELIMITER).map(|end| {
                 // \n``` without a new line after is only valid if file ends
-                &source[start..end + start]
+                (start, end + start)
             })
         } else {
             None

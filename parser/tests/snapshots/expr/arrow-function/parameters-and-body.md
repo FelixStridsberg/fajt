@@ -25,13 +25,17 @@
       "rest": null
     },
     "body": {
-      "Block": [
-        {
-          "Empty": {
-            "span": "9:10"
+      "Body": {
+        "span": "7:12",
+        "directives": [],
+        "statements": [
+          {
+            "Empty": {
+              "span": "9:10"
+            }
           }
-        }
-      ]
+        ]
+      }
     }
   }
 }

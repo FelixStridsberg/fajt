@@ -1,5 +1,5 @@
 use crate::ast::{
-    ArrowFunctionBody, BindingElement, DeclFunction, Expr, ExprArrowFunction, ExprFunction,
+    ArrowFunctionBody, BindingElement, Body, DeclFunction, Expr, ExprArrowFunction, ExprFunction,
     FormalParameters, Ident, Stmt,
 };
 use crate::error::Result;
@@ -26,7 +26,7 @@ where
         self.consume_assert(punct!("=>"))?;
 
         let body = if self.current_matches(punct!("{")) {
-            ArrowFunctionBody::Block(self.parse_function_body()?)
+            ArrowFunctionBody::Body(self.parse_function_body()?)
         } else {
             ArrowFunctionBody::Expr(self.parse_assignment_expr()?.into())
         };
@@ -54,7 +54,7 @@ where
         self.consume_assert(punct!("=>"))?;
 
         let body = if self.current_matches(punct!("{")) {
-            ArrowFunctionBody::Block(
+            ArrowFunctionBody::Body(
                 self.with_context(ContextModify::new().set_await(true))
                     .parse_function_body()?,
             )
@@ -235,17 +235,24 @@ where
     }
 
     /// Parses the `FunctionBody` or `AsyncFunctionBody` goal symbol.
-    pub(super) fn parse_function_body(&mut self) -> Result<Vec<Stmt>> {
+    pub(super) fn parse_function_body(&mut self) -> Result<Body> {
+        let span_start = self.position();
         self.consume_assert(punct!("{"))?;
 
-        let mut body = Vec::new();
+        let mut statements = Vec::new();
         loop {
             if self.maybe_consume(punct!("}"))? {
                 break;
             }
 
-            body.push(self.parse_stmt()?);
+            statements.push(self.parse_stmt()?);
         }
-        Ok(body)
+
+        let span = self.span_from(span_start);
+        Ok(Body {
+            span,
+            directives: vec![],
+            statements,
+        })
     }
 }

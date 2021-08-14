@@ -14,7 +14,11 @@ function () {}
       "bindings": [],
       "rest": null
     },
-    "body": []
+    "body": {
+      "span": "12:14",
+      "directives": [],
+      "statements": []
+    }
   }
 }
 ```

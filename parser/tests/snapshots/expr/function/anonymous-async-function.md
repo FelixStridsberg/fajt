@@ -25,13 +25,17 @@ async function (param) { ; }
       ],
       "rest": null
     },
-    "body": [
-      {
-        "Empty": {
-          "span": "25:26"
+    "body": {
+      "span": "23:28",
+      "directives": [],
+      "statements": [
+        {
+          "Empty": {
+            "span": "25:26"
+          }
         }
-      }
-    ]
+      ]
+    }
   }
 }
 ```

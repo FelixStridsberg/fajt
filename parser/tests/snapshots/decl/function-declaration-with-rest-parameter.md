@@ -22,7 +22,11 @@ function fn(...a) { }
         }
       }
     },
-    "body": []
+    "body": {
+      "span": "18:21",
+      "directives": [],
+      "statements": []
+    }
   }
 }
 ```

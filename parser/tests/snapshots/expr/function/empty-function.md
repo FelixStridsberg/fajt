@@ -17,7 +17,11 @@ function fn() {}
       "bindings": [],
       "rest": null
     },
-    "body": []
+    "body": {
+      "span": "14:16",
+      "directives": [],
+      "statements": []
+    }
   }
 }
 ```

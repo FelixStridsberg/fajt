@@ -20,22 +20,22 @@ mod literal;
 mod stmt;
 
 #[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
-pub struct Body<T> {
+pub struct StatementList<T> {
     span: Span,
     body: Vec<T>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
 pub enum Program {
-    Script(Body<Stmt>),
-    Module(Body<ModuleItem>),
+    Script(StatementList<Stmt>),
+    Module(StatementList<ModuleItem>),
 }
 
 impl Program {
     pub fn from_body(body: Vec<Stmt>) -> Self {
         let span_start = body.first().map(|s| s.span().start).unwrap_or(0);
         let span_end = body.last().map(|s| s.span().end).unwrap_or(0);
-        Program::Script(Body {
+        Program::Script(StatementList {
             span: Span::new(span_start, span_end),
             body,
         })

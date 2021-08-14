@@ -24,7 +24,11 @@ class { async method1() {} }
             "bindings": [],
             "rest": null
           },
-          "body": [],
+          "body": {
+            "span": "24:26",
+            "directives": [],
+            "statements": []
+          },
           "generator": false,
           "asynchronous": true
         }

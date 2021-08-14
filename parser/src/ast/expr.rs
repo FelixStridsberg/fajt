@@ -1,6 +1,6 @@
 use crate::ast::class::ExprClass;
 use crate::ast::literal::*;
-use crate::ast::{FormalParameters, Ident, Stmt};
+use crate::ast::{Body, FormalParameters, Ident, Stmt};
 use fajt_lexer::token::Span;
 use fajt_macros::FromString;
 
@@ -252,7 +252,7 @@ ast_struct! {
         pub generator: bool,
         pub identifier: Option<Ident>,
         pub parameters: FormalParameters,
-        pub body: Vec<Stmt>,
+        pub body: Body,
     }
 }
 
@@ -269,7 +269,7 @@ ast_struct! {
 ast_struct! {
     pub enum ArrowFunctionBody {
         Expr(Box<Expr>),
-        Block(Vec<Stmt>),
+        Body(Body),
     }
 }
 

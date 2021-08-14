@@ -24,7 +24,11 @@ class { get getter() {} }
             "bindings": [],
             "rest": null
           },
-          "body": [],
+          "body": {
+            "span": "21:23",
+            "directives": [],
+            "statements": []
+          },
           "generator": false,
           "asynchronous": false
         }

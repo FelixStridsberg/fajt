@@ -28,13 +28,17 @@ function fn(param) { ; }
       ],
       "rest": null
     },
-    "body": [
-      {
-        "Empty": {
-          "span": "21:22"
+    "body": {
+      "span": "19:24",
+      "directives": [],
+      "statements": [
+        {
+          "Empty": {
+            "span": "21:22"
+          }
         }
-      }
-    ]
+      ]
+    }
   }
 }
 ```

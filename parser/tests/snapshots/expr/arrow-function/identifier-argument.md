@@ -25,7 +25,11 @@ a => {}
       "rest": null
     },
     "body": {
-      "Block": []
+      "Body": {
+        "span": "5:7",
+        "directives": [],
+        "statements": []
+      }
     }
   }
 }

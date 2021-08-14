@@ -40,13 +40,17 @@
       }
     },
     "body": {
-      "Block": [
-        {
-          "Empty": {
-            "span": "21:22"
+      "Body": {
+        "span": "19:24",
+        "directives": [],
+        "statements": [
+          {
+            "Empty": {
+              "span": "21:22"
+            }
           }
-        }
-      ]
+        ]
+      }
     }
   }
 }

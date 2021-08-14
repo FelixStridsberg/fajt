@@ -17,7 +17,11 @@ async function fn() {}
       "bindings": [],
       "rest": null
     },
-    "body": []
+    "body": {
+      "span": "20:22",
+      "directives": [],
+      "statements": []
+    }
   }
 }
 ```

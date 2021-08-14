@@ -25,13 +25,17 @@ function (param) { ; }
       ],
       "rest": null
     },
-    "body": [
-      {
-        "Empty": {
-          "span": "19:20"
+    "body": {
+      "span": "17:22",
+      "directives": [],
+      "statements": [
+        {
+          "Empty": {
+            "span": "19:20"
+          }
         }
-      }
-    ]
+      ]
+    }
   }
 }
 ```

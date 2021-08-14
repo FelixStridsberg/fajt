@@ -16,19 +16,23 @@
       "rest": null
     },
     "body": {
-      "Block": [
-        {
-          "Expr": {
-            "span": "10:16",
-            "expr": {
-              "IdentRef": {
-                "span": "10:15",
-                "name": "await"
+      "Body": {
+        "span": "6:18",
+        "directives": [],
+        "statements": [
+          {
+            "Expr": {
+              "span": "10:16",
+              "expr": {
+                "IdentRef": {
+                  "span": "10:15",
+                  "name": "await"
+                }
               }
             }
           }
-        }
-      ]
+        ]
+      }
     }
   }
 }

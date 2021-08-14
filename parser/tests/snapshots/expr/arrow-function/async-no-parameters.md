@@ -14,7 +14,11 @@ async () => {}
       "rest": null
     },
     "body": {
-      "Block": []
+      "Body": {
+        "span": "12:14",
+        "directives": [],
+        "statements": []
+      }
     }
   }
 }

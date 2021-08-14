@@ -51,7 +51,16 @@ ast_struct! {
         pub generator: bool,
         pub identifier: Ident,
         pub parameters: FormalParameters,
-        pub body: Vec<Stmt>,
+        pub body: Body,
+    }
+}
+
+ast_struct! {
+    /// FunctionBody, ScriptBody or ModuleBody.
+    pub struct Body {
+        pub span: Span,
+        pub directives: Vec<String>,
+        pub statements: Vec<Stmt>,
     }
 }
 

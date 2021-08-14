@@ -40,13 +40,17 @@ async (a, b, ...rest) => { ; }
       }
     },
     "body": {
-      "Block": [
-        {
-          "Empty": {
-            "span": "27:28"
+      "Body": {
+        "span": "25:30",
+        "directives": [],
+        "statements": [
+          {
+            "Empty": {
+              "span": "27:28"
+            }
           }
-        }
-      ]
+        ]
+      }
     }
   }
 }

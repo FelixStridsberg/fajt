@@ -14,7 +14,11 @@
       "rest": null
     },
     "body": {
-      "Block": []
+      "Body": {
+        "span": "6:8",
+        "directives": [],
+        "statements": []
+      }
     }
   }
 }

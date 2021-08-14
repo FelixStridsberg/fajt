@@ -35,7 +35,11 @@ class { set setter(a) {} }
             ],
             "rest": null
           },
-          "body": [],
+          "body": {
+            "span": "22:24",
+            "directives": [],
+            "statements": []
+          },
           "generator": false,
           "asynchronous": false
         }

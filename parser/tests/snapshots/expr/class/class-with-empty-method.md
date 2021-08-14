@@ -24,7 +24,11 @@ class { method1() {} }
             "bindings": [],
             "rest": null
           },
-          "body": [],
+          "body": {
+            "span": "18:20",
+            "directives": [],
+            "statements": []
+          },
           "generator": false,
           "asynchronous": false
         }

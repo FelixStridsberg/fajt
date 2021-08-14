@@ -17,38 +17,42 @@ async function fn() { var a = 1 }
       "bindings": [],
       "rest": null
     },
-    "body": [
-      {
-        "Variable": {
-          "span": "22:31",
-          "kind": "Var",
-          "declarations": [
-            {
-              "span": "26:31",
-              "pattern": {
-                "Ident": {
-                  "span": "26:27",
-                  "name": "a"
-                }
-              },
-              "initializer": {
-                "Literal": {
-                  "span": "30:31",
-                  "literal": {
-                    "Number": {
-                      "Integer": [
-                        1,
-                        "Decimal"
-                      ]
+    "body": {
+      "span": "20:33",
+      "directives": [],
+      "statements": [
+        {
+          "Variable": {
+            "span": "22:31",
+            "kind": "Var",
+            "declarations": [
+              {
+                "span": "26:31",
+                "pattern": {
+                  "Ident": {
+                    "span": "26:27",
+                    "name": "a"
+                  }
+                },
+                "initializer": {
+                  "Literal": {
+                    "span": "30:31",
+                    "literal": {
+                      "Number": {
+                        "Integer": [
+                          1,
+                          "Decimal"
+                        ]
+                      }
                     }
                   }
                 }
               }
-            }
-          ]
+            ]
+          }
         }
-      }
-    ]
+      ]
+    }
   }
 }
 ```
