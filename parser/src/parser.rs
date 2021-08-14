@@ -179,6 +179,10 @@ where
         self.reader.peek()
     }
 
+    fn is_end(&self) -> bool {
+        self.reader.is_end()
+    }
+
     fn position(&self) -> usize {
         self.current()
             .map(|t| t.span.start)

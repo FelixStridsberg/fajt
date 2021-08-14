@@ -153,7 +153,7 @@ where
         let span_start = self.position();
         self.consume_assert(keyword!("yield"))?;
 
-        if self.reader.is_end() {
+        if self.is_end() {
             let span = self.span_from(span_start);
             return Ok(ExprYield {
                 span,

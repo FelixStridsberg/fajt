@@ -335,7 +335,7 @@ where
 
     /// Check if it is valid to insert semicolon before the current token.
     fn valid_auto_semicolon(&self) -> Result<bool> {
-        Ok(self.reader.is_end()
+        Ok(self.is_end()
             || self.current_matches(punct!("}"))
             || self
                 .reader
