@@ -49,16 +49,17 @@ macro_rules! generate_test_case {
 mod expr {
 
     use super::md;
+    use super::parse;
     use fajt_macros::for_each_file;
     use fajt_parser::ast::Expr;
-    use fajt_parser::error::ErrorKind;
+    use fajt_parser::error::{ErrorKind, Result};
 
     // TODO make this (and the parser) generic to reduce duplicate code
     fn snapshot_runner(test_file: &str) {
         println!("Running: {}", test_file);
 
         let markdown = md::Markdown::from_file(test_file.as_ref());
-        let result = parse!(expr: markdown.js_block);
+        let result: Result<Expr> = parse!(expr: &markdown.js_block);
 
         if let Some(expected_data) = &markdown.json_block {
             if let Ok(result) = result {
@@ -87,17 +88,17 @@ mod expr {
 /// Everything inside snapshots/stmt is parsed as expressions.
 mod stmt {
 
-    use super::md;
+    use super::{md, parse};
     use fajt_macros::for_each_file;
     use fajt_parser::ast::Stmt;
-    use fajt_parser::error::ErrorKind;
+    use fajt_parser::error::{ErrorKind, Result};
 
     // TODO make this (and the parser) generic to reduce duplicate code
     fn snapshot_runner(test_file: &str) {
         println!("Running: {}", test_file);
 
         let markdown = md::Markdown::from_file(test_file.as_ref());
-        let result = parse!(stmt: markdown.js_block);
+        let result: Result<Stmt> = parse!(stmt: &markdown.js_block);
 
         if let Some(expected_data) = &markdown.json_block {
             if let Ok(result) = result {
@@ -127,17 +128,17 @@ mod stmt {
 /// Everything inside snapshots/semicolon is parsed as expressions.
 mod semicolon {
 
-    use super::md;
+    use super::{md, parse};
     use fajt_macros::for_each_file;
     use fajt_parser::ast::Program;
-    use fajt_parser::error::ErrorKind;
+    use fajt_parser::error::{ErrorKind, Result};
 
     // TODO make this (and the parser) generic to reduce duplicate code
     fn snapshot_runner(test_file: &str) {
         println!("Running: {}", test_file);
 
         let markdown = md::Markdown::from_file(test_file.as_ref());
-        let result = parse!(program: markdown.js_block);
+        let result: Result<Program> = parse!(program: &markdown.js_block);
 
         if let Some(expected_data) = &markdown.json_block {
             if let Ok(result) = result {

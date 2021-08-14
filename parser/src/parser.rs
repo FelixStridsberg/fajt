@@ -131,15 +131,13 @@ where
         Ok(Program::from_body(body))
     }
 
-    // TODO make generic (parse::<Stmt>(..))
-    pub fn parse_statement(&mut self) -> Result<Stmt> {
-        self.parse_stmt()
-    }
-
-    // TODO make generic (parse::<Expr>(..))
     pub fn parse_expression(&mut self) -> Result<Expr> {
         self.with_context(ContextModify::new().set_in(true))
             .parse_expr()
+    }
+
+    pub fn parse_statement(&mut self) -> Result<Stmt> {
+        self.parse_stmt()
     }
 
     fn position(&self) -> usize {
