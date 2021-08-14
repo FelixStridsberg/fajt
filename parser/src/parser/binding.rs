@@ -43,7 +43,7 @@ where
                     rest = self.parse_rest_binding_ident(BracketClose)?;
                     break;
                 }
-                _ if token_matches!(self.reader.peek(), opt: punct!(":")) => {
+                _ if self.peek_matches(punct!(":")) => {
                     let property_name = self.parse_property_name()?;
                     self.consume_assert(punct!(":"))?;
 

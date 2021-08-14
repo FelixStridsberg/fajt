@@ -122,7 +122,7 @@ where
     /// 3. `async(a) => {}` // Async arrow function with parentheses.
     /// 4. `async(a)` // Function call where `async` is an identifier and not a keyword.
     fn parse_assignment_expr_async(&mut self) -> Result<Expr> {
-        match self.reader.peek() {
+        match self.peek() {
             token_matches!(opt: punct!("=>")) => {
                 let span_start = self.position();
                 let parameters = self.parse_arrow_identifier_argument()?;

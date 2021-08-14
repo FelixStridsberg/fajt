@@ -175,6 +175,10 @@ where
         Ok(self.reader.current()?)
     }
 
+    fn peek(&self) -> Option<&Token> {
+        self.reader.peek()
+    }
+
     fn position(&self) -> usize {
         self.current()
             .map(|t| t.span.start)
@@ -201,7 +205,7 @@ where
     }
 
     fn peek_matches(&self, value: TokenValue) -> bool {
-        if let Some(token) = self.reader.peek() {
+        if let Some(token) = self.peek() {
             token.value == value
         } else {
             false
@@ -226,11 +230,11 @@ where
     }
 
     fn followed_by_new_lined(&self) -> bool {
-        self.reader.peek().map_or(false, |t| t.first_on_line)
+        self.peek().map_or(false, |t| t.first_on_line)
     }
 
     fn peek_is_identifier(&self) -> bool {
-        is_identifier(self.reader.peek(), self.context.keyword_context())
+        is_identifier(self.peek(), self.context.keyword_context())
     }
 
     fn is_identifier(&self) -> bool {
