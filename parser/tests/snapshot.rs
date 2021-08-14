@@ -121,6 +121,7 @@ mod stmt {
     }
 
     for_each_file!("parser/tests/snapshots/stmt", generate_test_case);
+    for_each_file!("parser/tests/snapshots/decl", generate_test_case);
 }
 
 mod md {
