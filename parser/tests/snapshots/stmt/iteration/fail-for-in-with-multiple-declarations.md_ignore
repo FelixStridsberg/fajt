@@ -1,0 +1,9 @@
+```js
+for (var a, b in c) ;
+```
+
+TODO
+SyntaxError(
+    "Invalid left-hand side in for-in loop: Must have a single binding.".to_owned(),
+    Span::new(5, 13)
+)
