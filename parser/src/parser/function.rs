@@ -212,7 +212,7 @@ where
         loop {
             match self.current()? {
                 token_matches!(punct!(")")) => {
-                    self.reader.consume()?;
+                    self.consume()?;
                     break;
                 }
                 token_matches!(punct!("...")) => {

@@ -42,7 +42,7 @@ where
         loop {
             let element: ClassElement = match self.current()? {
                 token_matches!(punct!("}")) => {
-                    self.reader.consume()?;
+                    self.consume()?;
                     break;
                 }
                 token_matches!(punct!("*")) => self.parse_class_generator_method()?.into(),
@@ -68,19 +68,19 @@ where
 
     fn parse_class_get_set(&mut self, kind: ClassMethodKind) -> Result<ClassMethod> {
         let span_start = self.position();
-        self.reader.consume()?;
+        self.consume()?;
         self.parse_class_method(span_start, kind, false, false)
     }
 
     fn parse_class_generator_method(&mut self) -> Result<ClassMethod> {
         let span_start = self.position();
-        self.reader.consume()?;
+        self.consume()?;
         self.parse_class_method(span_start, ClassMethodKind::Method, true, false)
     }
 
     fn parse_class_async_method(&mut self) -> Result<ClassMethod> {
         let span_start = self.position();
-        self.reader.consume()?;
+        self.consume()?;
 
         let generator = self.maybe_consume(punct!("*"))?;
         self.parse_class_method(span_start, ClassMethodKind::Method, generator, true)

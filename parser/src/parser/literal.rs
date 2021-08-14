@@ -13,7 +13,7 @@ where
 {
     /// Consumes a know literal token from the reader and returns an expression of it.
     pub(super) fn consume_literal(&mut self, literal: Literal) -> Result<Expr> {
-        let token = self.reader.consume()?;
+        let token = self.consume()?;
         Ok(ExprLiteral {
             span: token.span,
             literal,
@@ -23,7 +23,7 @@ where
 
     /// Parses the `Literal` goal symbol.
     pub(super) fn parse_literal(&mut self) -> Result<Expr> {
-        let token = self.reader.consume()?;
+        let token = self.consume()?;
         debug_assert!(token_matches!(token, @literal));
 
         if let TokenValue::Literal(literal) = token.value {
@@ -40,22 +40,22 @@ where
     /// Parses the `ArrayLiteral` goal symbol.
     pub(super) fn parse_array_literal(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
+        let token = self.consume()?;
         debug_assert!(token_matches!(token, punct!("[")));
 
         let mut elements = Vec::new();
         loop {
             match self.current()? {
                 token_matches!(punct!("]")) => {
-                    self.reader.consume()?;
+                    self.consume()?;
                     break;
                 }
                 token_matches!(punct!(",")) => {
-                    self.reader.consume()?;
+                    self.consume()?;
                     elements.push(ArrayElement::None);
                 }
                 token_matches!(punct!("...")) => {
-                    self.reader.consume()?;
+                    self.consume()?;
                     let expr = self.parse_assignment_expr()?;
                     elements.push(ArrayElement::Spread(expr));
                     self.consume_array_delimiter()?;
@@ -79,18 +79,18 @@ where
     /// Parses the `ObjectLiteral` goal symbol.
     pub(super) fn parse_object_literal(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        let token = self.reader.consume()?;
+        let token = self.consume()?;
         debug_assert!(token_matches!(token, punct!("{")));
 
         let mut props = Vec::new();
         loop {
             match self.current()? {
                 token_matches!(punct!("}")) => {
-                    self.reader.consume()?;
+                    self.consume()?;
                     break;
                 }
                 token_matches!(punct!("...")) => {
-                    self.reader.consume()?;
+                    self.consume()?;
                     let expr = self.parse_assignment_expr()?;
                     props.push(PropertyDefinition::Spread(expr));
                     self.consume_object_delimiter()?;
@@ -100,7 +100,7 @@ where
                     props.push(PropertyDefinition::IdentRef(ident));
                     self.consume_object_delimiter()?;
                 }
-                _ => return err!(UnexpectedToken(self.reader.consume()?)),
+                _ => return err!(UnexpectedToken(self.consume()?)),
             }
         }
 

@@ -77,7 +77,7 @@ where
             token_matches!(ok: keyword!("in")) if init.is_some() => {
                 self.parse_for_in(span_start, init.unwrap())
             }
-            _ => return err!(UnexpectedToken(self.reader.consume()?)),
+            _ => return err!(UnexpectedToken(self.consume()?)),
         }
     }
 
@@ -124,12 +124,12 @@ where
     }
 
     fn parse_for_await_of(&mut self, span_start: usize) -> Result<Stmt> {
-        self.reader.consume()?;
+        self.consume()?;
         self.consume_assert(punct!("("))?;
 
         let init = self.parse_for_first_argument()?;
         if init.is_none() {
-            return err!(UnexpectedToken(self.reader.consume()?));
+            return err!(UnexpectedToken(self.consume()?));
         }
 
         self.parse_for_of(span_start, init.unwrap(), true)
@@ -168,7 +168,7 @@ where
         };
 
         if let Some(kind) = variable_kind {
-            self.reader.consume()?; // var, let, const
+            self.consume()?; // var, let, const
             let declarations = self
                 .with_context(ContextModify::new().set_in(false))
                 .parse_variable_declarations()?;

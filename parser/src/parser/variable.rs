@@ -11,7 +11,7 @@ where
 {
     /// Parses the `VariableStatement` or `LexicalDeclaration` goal symbol.
     pub(super) fn parse_variable_stmt(&mut self, kind: VariableKind) -> Result<Stmt> {
-        let token = self.reader.consume()?;
+        let token = self.consume()?;
         let span_start = token.span.start;
 
         let declarations = self.parse_variable_declarations()?;

@@ -20,7 +20,7 @@ where
             token_matches!(punct!("{")) => self.parse_object_binding_pattern()?,
             token_matches!(punct!("[")) => self.parse_array_binding_pattern()?,
             _ if self.is_identifier() => BindingPattern::Ident(self.parse_identifier()?),
-            _ => return err!(UnexpectedToken(self.reader.consume()?)),
+            _ => return err!(UnexpectedToken(self.consume()?)),
         })
     }
 
@@ -35,11 +35,11 @@ where
         loop {
             match self.current()? {
                 token_matches!(punct!("}")) => {
-                    self.reader.consume()?;
+                    self.consume()?;
                     break;
                 }
                 token_matches!(punct!("...")) => {
-                    self.reader.consume()?;
+                    self.consume()?;
                     rest = self.parse_rest_binding_ident(BracketClose)?;
                     break;
                 }
@@ -61,7 +61,7 @@ where
 
                     self.consume_object_delimiter()?;
                 }
-                _ => return err!(UnexpectedToken(self.reader.consume()?)),
+                _ => return err!(UnexpectedToken(self.consume()?)),
             }
         }
 
@@ -80,15 +80,15 @@ where
         loop {
             match self.current()? {
                 token_matches!(punct!("]")) => {
-                    self.reader.consume()?;
+                    self.consume()?;
                     break;
                 }
                 token_matches!(punct!(",")) => {
-                    self.reader.consume()?;
+                    self.consume()?;
                     elements.push(None);
                 }
                 token_matches!(punct!("...")) => {
-                    self.reader.consume()?;
+                    self.consume()?;
                     rest = self.parse_rest_binding_ident(BraceClose)?;
                     break;
                 }
@@ -96,7 +96,7 @@ where
                     elements.push(Some(self.parse_binding_element()?));
                     self.consume_array_delimiter()?;
                 }
-                _ => return err!(UnexpectedToken(self.reader.consume()?)),
+                _ => return err!(UnexpectedToken(self.consume()?)),
             }
         }
 
@@ -143,7 +143,7 @@ where
     /// This also consumes the expected end punctuator.
     fn parse_rest_binding_ident(&mut self, expected_end: Punct) -> Result<Option<Ident>> {
         let ident = self.parse_identifier()?;
-        let end_token = self.reader.consume()?;
+        let end_token = self.consume()?;
 
         if let TokenValue::Punct(p) = end_token.value {
             if p == expected_end {

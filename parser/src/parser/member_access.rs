@@ -86,7 +86,7 @@ where
     fn parse_optional_member_property(&mut self) -> Result<MemberProperty> {
         match self.current() {
             token_matches!(ok: punct!("?.")) if self.peek_matches(punct!("[")) => {
-                self.reader.consume()?;
+                self.consume()?;
                 let property = self.parse_computed_property()?;
                 Ok(MemberProperty::Expr(property.into()))
             }
@@ -95,7 +95,7 @@ where
                 Ok(MemberProperty::Expr(property.into()))
             }
             token_matches!(ok: punct!("?.") | punct!(".")) => {
-                self.reader.consume()?;
+                self.consume()?;
                 let identifier = self.parse_identifier()?;
                 Ok(MemberProperty::Ident(identifier))
             }
@@ -106,7 +106,7 @@ where
     fn parse_member_property(&mut self) -> Result<MemberProperty> {
         match self.current() {
             token_matches!(ok: punct!(".")) => {
-                self.reader.consume()?;
+                self.consume()?;
                 let identifier = self.parse_identifier()?;
                 Ok(MemberProperty::Ident(identifier))
             }

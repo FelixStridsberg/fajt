@@ -206,7 +206,7 @@ where
             let operator = self.current().map(|t| map_operator(t));
 
             if let Ok(Some(operator)) = operator {
-                self.reader.consume()?;
+                self.consume()?;
                 let right = next(self)?;
                 let span = self.span_from(span_start);
 

@@ -175,6 +175,10 @@ where
         Ok(self.reader.current()?)
     }
 
+    fn consume(&mut self) -> Result<Token> {
+        Ok(self.reader.consume()?)
+    }
+
     fn peek(&self) -> Option<&Token> {
         self.reader.peek()
     }
@@ -217,7 +221,7 @@ where
     }
 
     fn consume_assert(&mut self, value: TokenValue) -> Result<Token> {
-        let token = self.reader.consume()?;
+        let token = self.consume()?;
         if token.value != value {
             return err!(UnexpectedToken(token));
         }
@@ -226,7 +230,7 @@ where
 
     fn maybe_consume(&mut self, value: TokenValue) -> Result<bool> {
         if self.current_matches(value) {
-            self.reader.consume()?;
+            self.consume()?;
             Ok(true)
         } else {
             Ok(false)
@@ -246,7 +250,7 @@ where
     }
 
     fn parse_identifier(&mut self) -> Result<Ident> {
-        let token = self.reader.consume()?;
+        let token = self.consume()?;
         Ok(match token.value {
             TokenValue::Identifier(s) => Ident::new(s, token.span),
             TokenValue::Keyword(k) => {
@@ -274,7 +278,7 @@ where
             token_matches!(@literal) => todo!(),
             token_matches!(punct!("[")) => todo!(),
             _ if self.is_identifier() => Ok(PropertyName::Ident(self.parse_identifier()?)),
-            _ => return err!(UnexpectedToken(self.reader.consume()?)),
+            _ => return err!(UnexpectedToken(self.consume()?)),
         }
     }
 
@@ -292,7 +296,7 @@ where
 
     fn consume_list_delimiter(&mut self, list_end: TokenValue) -> Result<()> {
         if !self.maybe_consume(punct!(","))? && !self.current_matches(list_end) {
-            return err!(UnexpectedToken(self.reader.consume()?));
+            return err!(UnexpectedToken(self.consume()?));
         }
 
         Ok(())

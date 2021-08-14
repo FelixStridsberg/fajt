@@ -94,7 +94,7 @@ where
         let expr = self.parse_expr()?;
 
         if !self.maybe_consume(punct!(";"))? && !self.valid_auto_semicolon()? {
-            return err!(UnexpectedToken(self.reader.consume()?));
+            return err!(UnexpectedToken(self.consume()?));
         }
 
         let span = self.span_from(span_start);

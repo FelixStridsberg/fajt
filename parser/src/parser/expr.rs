@@ -36,7 +36,7 @@ where
 
         loop {
             if self.current_matches(punct!(",")) {
-                self.reader.consume()?;
+                self.consume()?;
                 expr.push(self.parse_assignment_expr()?);
             } else {
                 break;
@@ -84,7 +84,7 @@ where
                 };
 
                 if let Some(operator) = assignment_operator {
-                    self.reader.consume()?; // consume the operator
+                    self.consume()?; // consume the operator
                     let right = self.parse_assignment_expr()?;
                     let span = self.span_from(span_start);
                     Ok(ExprAssignment {
@@ -140,7 +140,7 @@ where
             }
             _ if self.peek_is_identifier() => {
                 let span_start = self.position();
-                self.reader.consume()?;
+                self.consume()?;
                 let parameters = self.parse_arrow_identifier_argument()?;
                 self.parse_async_arrow_function_expr(span_start, true, parameters)
             }
@@ -167,7 +167,7 @@ where
         let has_argument = !next_token.first_on_line;
         let delegate = has_argument && token_matches!(next_token, punct!("*"));
         if delegate {
-            self.reader.consume()?;
+            self.consume()?;
         }
 
         let argument = has_argument.then_try(|| Ok(Box::new(self.parse_assignment_expr()?)))?;
@@ -186,7 +186,7 @@ where
         let expr = self.parse_short_circuit_expr()?;
 
         if self.current_matches(punct!("?")) {
-            self.reader.consume()?;
+            self.consume()?;
             let consequent = self.parse_assignment_expr()?;
 
             self.consume_assert(punct!(":"))?;
@@ -217,7 +217,7 @@ where
             token_matches!(keyword!("typeof")) => Some(unary_op!("typeof")),
             token_matches!(keyword!("await")) if self.context.is_await => {
                 let span_start = self.position();
-                self.reader.consume()?;
+                self.consume()?;
                 let argument = self.parse_unary_expr()?.into();
                 let span = self.span_from(span_start);
                 return Ok(ExprAwait { span, argument }.into());
@@ -227,7 +227,7 @@ where
 
         if let Some(operator) = operator {
             let span_start = self.position();
-            self.reader.consume()?;
+            self.consume()?;
             let argument = self.parse_unary_expr()?.into();
             let span = self.span_from(span_start);
             Ok(ExprUnary {
@@ -251,7 +251,7 @@ where
 
         if let Some(operator) = prefix_operator {
             let span_start = self.position();
-            self.reader.consume()?;
+            self.consume()?;
             let argument = self.parse_unary_expr()?.into();
             let span = self.span_from(span_start);
             return Ok(ExprUpdate {
@@ -276,7 +276,7 @@ where
                 return Ok(argument);
             }
 
-            self.reader.consume()?;
+            self.consume()?;
             let span = self.span_from(span_start);
             Ok(ExprUpdate {
                 span,
@@ -354,7 +354,7 @@ where
     /// Parses the `SuperCall` goal symbol.
     fn parse_super_call_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        self.reader.consume()?;
+        self.consume()?;
         let (arguments_span, arguments) = self.parse_arguments()?;
         let span = self.span_from(span_start);
         Ok(ExprCall {
@@ -369,7 +369,7 @@ where
     /// Parses the `ImportCall` goal symbol.
     fn parse_import_call_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        self.reader.consume()?;
+        self.consume()?;
 
         let (arguments_span, arguments) = self.parse_import_argument()?;
 
@@ -398,7 +398,7 @@ where
     fn parse_new_expr(&mut self) -> Result<Expr> {
         if self.current_matches(keyword!("new")) && !self.current_matches(punct!(".")) {
             let span_start = self.position();
-            self.reader.consume()?;
+            self.consume()?;
 
             let callee = self.parse_new_expr()?.into();
 
@@ -432,11 +432,11 @@ where
         loop {
             match self.current() {
                 token_matches!(ok: punct!(")")) => {
-                    self.reader.consume()?;
+                    self.consume()?;
                     break;
                 }
                 token_matches!(ok: punct!("...")) => {
-                    self.reader.consume()?;
+                    self.consume()?;
                     arguments.push(Argument::Spread(self.parse_assignment_expr()?));
                     self.consume_parameter_delimiter()?;
                 }
@@ -476,7 +476,7 @@ where
         match self.current()? {
             token_matches!(keyword!("super")) => {
                 let span_start = self.position();
-                let super_token = self.reader.consume()?;
+                let super_token = self.consume()?;
 
                 if !token_matches!(self.current(), ok: punct!(".") | punct!("[")) {
                     todo!("Error, unexpected super")
@@ -491,8 +491,8 @@ where
             }
             token_matches!(keyword!("new")) if self.peek_matches(punct!(".")) => {
                 let span_start = self.position();
-                let new_token = self.reader.consume()?;
-                self.reader.consume()?; // .
+                let new_token = self.consume()?;
+                self.consume()?; // .
 
                 let property = self.parse_identifier()?;
                 if property.name != "target" {
@@ -509,8 +509,8 @@ where
             }
             token_matches!(keyword!("import")) if self.peek_matches(punct!(".")) => {
                 let span_start = self.position();
-                let import_token = self.reader.consume()?;
-                self.reader.consume()?; // .
+                let import_token = self.consume()?;
+                self.consume()?; // .
 
                 let property = self.parse_identifier()?;
                 if property.name != "meta" {
@@ -568,7 +568,7 @@ where
 
     /// Parses the `Initializer` goal symbol.
     pub(super) fn parse_initializer(&mut self) -> Result<Expr> {
-        self.reader.consume()?; // Skip =
+        self.consume()?; // Skip =
         self.parse_assignment_expr()
     }
 }

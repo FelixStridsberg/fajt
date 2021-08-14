@@ -44,7 +44,7 @@ where
 
         let mut depth = 1;
         loop {
-            let token = self.reader.consume()?;
+            let token = self.consume()?;
             match &token {
                 token_matches!(punct!("(")) => depth += 1,
                 token_matches!(punct!(")")) => depth -= 1,
