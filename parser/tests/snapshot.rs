@@ -22,13 +22,16 @@
 //! test assertions.
 extern crate fajt_macros;
 
-#[macro_use]
-mod r#macro;
+use fajt_lexer::Lexer;
+use fajt_parser::error::{ErrorKind, Result};
+use fajt_parser::parser::Parse;
+use fajt_parser::Parser;
+use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 
-// TODO clean up file once all tests are migrated.
 // TODO possibility to regenerate all asts.
 
-macro_rules! generate_test_case {
+macro_rules! generate_test_cases {
     ("md", $file_path:literal, $ident:ident) => {
         #[test]
         fn $ident() {
@@ -45,123 +48,86 @@ macro_rules! generate_test_case {
     ($extension:literal, $file_path:literal, $ident:ident) => {};
 }
 
-/// Everything inside snapshots/expr is parsed as expressions.
-mod expr {
+macro_rules! generate_test_module {
+    (
+        mod_name: $mod_name:ident,
+        ast_type: $ast_type:ident,
+        folders: [$( $folder:literal ),*],
+    ) => {
+        /// Everything inside snapshots/expr is parsed as expressions.
+        mod $mod_name {
+            use super::{md, parse_input, evaluate_result};
+            use fajt_macros::for_each_file;
+            use fajt_parser::ast::$ast_type;
 
-    use super::md;
-    use super::parse;
-    use fajt_macros::for_each_file;
-    use fajt_parser::ast::Expr;
-    use fajt_parser::error::{ErrorKind, Result};
+            fn snapshot_runner(test_file: &str) {
+                println!("Running: {}", test_file);
 
-    // TODO make this (and the parser) generic to reduce duplicate code
-    fn snapshot_runner(test_file: &str) {
-        println!("Running: {}", test_file);
-
-        let markdown = md::Markdown::from_file(test_file.as_ref());
-        let result: Result<Expr> = parse!(expr: &markdown.js_block);
-
-        if let Some(expected_data) = &markdown.json_block {
-            if let Ok(result) = result {
-                let expected_expr: Expr = serde_json::from_str(&expected_data).unwrap();
-                assert_eq!(result, expected_expr)
-            } else {
-                let expected_error: ErrorKind = serde_json::from_str(&expected_data).unwrap();
-                assert_eq!(result.unwrap_err().kind(), &expected_error)
+                let markdown = md::Markdown::from_file(test_file.as_ref());
+                let result = parse_input::<$ast_type>(&markdown.js_block);
+                evaluate_result(result, &markdown);
             }
-        } else {
-            if let Ok(result) = result {
-                let json = serde_json::to_string_pretty(&result).unwrap();
-                markdown.append_json_block(&json);
-                panic!("No ast found in this test. Json generated, verify and rerun.");
-            } else {
-                let error = serde_json::to_string_pretty(&result.unwrap_err().kind()).unwrap();
-                markdown.append_json_block(&error);
-                panic!("No ast found in this test. Json error generated, verify and rerun.");
-            }
+
+            $(
+                for_each_file!($folder, generate_test_cases);
+            )*
         }
     }
-
-    for_each_file!("parser/tests/snapshots/expr", generate_test_case);
 }
 
-/// Everything inside snapshots/stmt is parsed as expressions.
-mod stmt {
+generate_test_module!(
+    mod_name: expr,
+    ast_type: Expr,
+    folders: ["parser/tests/snapshots/expr"],
+);
 
-    use super::{md, parse};
-    use fajt_macros::for_each_file;
-    use fajt_parser::ast::Stmt;
-    use fajt_parser::error::{ErrorKind, Result};
+generate_test_module!(
+    mod_name: stmt,
+    ast_type: Stmt,
+    folders: [
+        "parser/tests/snapshots/stmt",
+        "parser/tests/snapshots/decl"
+    ],
+);
 
-    // TODO make this (and the parser) generic to reduce duplicate code
-    fn snapshot_runner(test_file: &str) {
-        println!("Running: {}", test_file);
+generate_test_module!(
+    mod_name: semicolon,
+    ast_type: Program,
+    folders: ["parser/tests/snapshots/semicolon"],
+);
 
-        let markdown = md::Markdown::from_file(test_file.as_ref());
-        let result: Result<Stmt> = parse!(stmt: &markdown.js_block);
-
-        if let Some(expected_data) = &markdown.json_block {
-            if let Ok(result) = result {
-                let expected_expr: Stmt = serde_json::from_str(&expected_data).unwrap();
-                assert_eq!(result, expected_expr)
-            } else {
-                let expected_error: ErrorKind = serde_json::from_str(&expected_data).unwrap();
-                assert_eq!(result.unwrap_err().kind(), &expected_error)
-            }
+fn evaluate_result<'a, 'b: 'a, T>(result: Result<T>, markdown: &'b md::Markdown)
+where
+    T: Deserialize<'a> + Serialize + PartialEq + Debug,
+{
+    if let Some(expected_data) = &markdown.json_block {
+        if let Ok(result) = result {
+            let expected_expr: T = serde_json::from_str(&expected_data).unwrap();
+            assert_eq!(result, expected_expr)
         } else {
-            if let Ok(result) = result {
-                let json = serde_json::to_string_pretty(&result).unwrap();
-                markdown.append_json_block(&json);
-                panic!("No ast found in this test. Json generated, verify and rerun.");
-            } else {
-                let error = serde_json::to_string_pretty(&result.unwrap_err().kind()).unwrap();
-                markdown.append_json_block(&error);
-                panic!("No ast found in this test. Json error generated, verify and rerun.");
-            }
+            let expected_error: ErrorKind = serde_json::from_str(&expected_data).unwrap();
+            assert_eq!(result.unwrap_err().kind(), &expected_error)
+        }
+    } else {
+        if let Ok(result) = result {
+            let json = serde_json::to_string_pretty(&result).unwrap();
+            markdown.append_json_block(&json);
+            panic!("No ast found in this test. Json generated, verify and rerun.");
+        } else {
+            let error = serde_json::to_string_pretty(&result.unwrap_err().kind()).unwrap();
+            markdown.append_json_block(&error);
+            panic!("No ast found in this test. Json error generated, verify and rerun.");
         }
     }
-
-    for_each_file!("parser/tests/snapshots/stmt", generate_test_case);
-    for_each_file!("parser/tests/snapshots/decl", generate_test_case);
 }
 
-/// Everything inside snapshots/semicolon is parsed as expressions.
-mod semicolon {
-
-    use super::{md, parse};
-    use fajt_macros::for_each_file;
-    use fajt_parser::ast::Program;
-    use fajt_parser::error::{ErrorKind, Result};
-
-    // TODO make this (and the parser) generic to reduce duplicate code
-    fn snapshot_runner(test_file: &str) {
-        println!("Running: {}", test_file);
-
-        let markdown = md::Markdown::from_file(test_file.as_ref());
-        let result: Result<Program> = parse!(program: &markdown.js_block);
-
-        if let Some(expected_data) = &markdown.json_block {
-            if let Ok(result) = result {
-                let expected_expr: Program = serde_json::from_str(&expected_data).unwrap();
-                assert_eq!(result, expected_expr)
-            } else {
-                let expected_error: ErrorKind = serde_json::from_str(&expected_data).unwrap();
-                assert_eq!(result.unwrap_err().kind(), &expected_error)
-            }
-        } else {
-            if let Ok(result) = result {
-                let json = serde_json::to_string_pretty(&result).unwrap();
-                markdown.append_json_block(&json);
-                panic!("No ast found in this test. Json generated, verify and rerun.");
-            } else {
-                let error = serde_json::to_string_pretty(&result.unwrap_err().kind()).unwrap();
-                markdown.append_json_block(&error);
-                panic!("No ast found in this test. Json error generated, verify and rerun.");
-            }
-        }
-    }
-
-    for_each_file!("parser/tests/snapshots/semicolon", generate_test_case);
+fn parse_input<T>(input: &str) -> Result<T>
+where
+    T: Parse,
+{
+    let lexer = Lexer::new(input).unwrap();
+    let mut reader = fajt_common::io::PeekReader::new(lexer).unwrap();
+    Parser::parse::<T>(&mut reader)
 }
 
 mod md {

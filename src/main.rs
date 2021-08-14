@@ -13,7 +13,7 @@ fn main() {
     let mut reader = fajt_common::io::PeekReader::new(lexer).unwrap();
     let mut parser = fajt_parser::Parser::new(&mut reader).unwrap();
 
-    let program = parser.parse();
+    let program = parser.parse_program();
     println!("{:#?}", program);
 }
 
