@@ -1,5 +1,6 @@
 use clap::{App, Arg};
 use std::fs::read_to_string;
+use fajt_parser::Parser;
 
 struct Arguments {
     file_name: String,
@@ -11,9 +12,7 @@ fn main() {
 
     let lexer = fajt_lexer::Lexer::new(&source).unwrap();
     let mut reader = fajt_common::io::PeekReader::new(lexer).unwrap();
-    let mut parser = fajt_parser::Parser::new(&mut reader).unwrap();
-
-    let program = parser.parse_program();
+    let program: fajt_parser::error::Result<fajt_parser::ast::Program> = Parser::parse(&mut reader);
     println!("{:#?}", program);
 }
 
