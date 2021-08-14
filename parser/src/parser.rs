@@ -170,7 +170,6 @@ where
         T::parse(&mut parser)
     }
 
-    // TODO this should not be Result<>
     fn current(&self) -> Result<&Token> {
         Ok(self.reader.current()?)
     }
