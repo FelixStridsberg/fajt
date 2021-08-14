@@ -6,6 +6,7 @@ pub use literal::*;
 pub use stmt::*;
 
 use fajt_lexer::token::Span;
+use serde::{Deserialize, Serialize};
 
 #[macro_use]
 mod macros;
@@ -18,13 +19,13 @@ mod cover;
 mod literal;
 mod stmt;
 
-#[derive(Debug, PartialOrd, PartialEq)]
+#[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
 pub struct Body<T> {
     span: Span,
     body: Vec<T>,
 }
 
-#[derive(Debug, PartialOrd, PartialEq)]
+#[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
 pub enum Program {
     Script(Body<Stmt>),
     Module(Body<ModuleItem>),

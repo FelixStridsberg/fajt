@@ -124,6 +124,45 @@ mod stmt {
     for_each_file!("parser/tests/snapshots/decl", generate_test_case);
 }
 
+/// Everything inside snapshots/semicolon is parsed as expressions.
+mod semicolon {
+
+    use super::md;
+    use fajt_macros::for_each_file;
+    use fajt_parser::ast::Program;
+    use fajt_parser::error::ErrorKind;
+
+    // TODO make this (and the parser) generic to reduce duplicate code
+    fn snapshot_runner(test_file: &str) {
+        println!("Running: {}", test_file);
+
+        let markdown = md::Markdown::from_file(test_file.as_ref());
+        let result = parse!(program: markdown.js_block);
+
+        if let Some(expected_data) = &markdown.json_block {
+            if let Ok(result) = result {
+                let expected_expr: Program = serde_json::from_str(&expected_data).unwrap();
+                assert_eq!(result, expected_expr)
+            } else {
+                let expected_error: ErrorKind = serde_json::from_str(&expected_data).unwrap();
+                assert_eq!(result.unwrap_err().kind(), &expected_error)
+            }
+        } else {
+            if let Ok(result) = result {
+                let json = serde_json::to_string_pretty(&result).unwrap();
+                markdown.append_json_block(&json);
+                panic!("No ast found in this test. Json generated, verify and rerun.");
+            } else {
+                let error = serde_json::to_string_pretty(&result.unwrap_err().kind()).unwrap();
+                markdown.append_json_block(&error);
+                panic!("No ast found in this test. Json error generated, verify and rerun.");
+            }
+        }
+    }
+
+    for_each_file!("parser/tests/snapshots/semicolon", generate_test_case);
+}
+
 mod md {
     use std::fs::{File, OpenOptions};
     use std::io::{Read, Seek, SeekFrom, Write};
