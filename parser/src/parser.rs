@@ -100,6 +100,49 @@ impl Default for Context {
     }
 }
 
+pub trait Parse: Sized {
+    fn parse<I>(parser: &mut Parser<I>) -> Result<Self>
+    where
+        I: PeekRead<Token, Error = fajt_lexer::error::Error>;
+}
+
+impl Parse for Expr {
+    fn parse<I>(parser: &mut Parser<I>) -> Result<Self>
+    where
+        I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+    {
+        parser
+            .with_context(ContextModify::new().set_in(true))
+            .parse_expr()
+    }
+}
+
+impl Parse for Stmt {
+    fn parse<I>(parser: &mut Parser<I>) -> Result<Self>
+    where
+        I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+    {
+        parser.parse_stmt()
+    }
+}
+
+impl Parse for Program {
+    fn parse<I>(parser: &mut Parser<I>) -> Result<Self>
+    where
+        I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+    {
+        let mut body = Vec::new();
+        loop {
+            if parser.reader.is_end() {
+                break;
+            }
+
+            body.push(parser.parse_stmt()?);
+        }
+        Ok(Program::from_body(body))
+    }
+}
+
 pub struct Parser<'a, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
@@ -119,25 +162,12 @@ where
         })
     }
 
-    pub fn parse(&mut self) -> Result<Program> {
-        let mut body = Vec::new();
-        loop {
-            if self.reader.is_end() {
-                break;
-            }
-
-            body.push(self.parse_stmt()?);
-        }
-        Ok(Program::from_body(body))
-    }
-
-    pub fn parse_expression(&mut self) -> Result<Expr> {
-        self.with_context(ContextModify::new().set_in(true))
-            .parse_expr()
-    }
-
-    pub fn parse_statement(&mut self) -> Result<Stmt> {
-        self.parse_stmt()
+    pub fn parse<T>(reader: &'a mut PeekReader<Token, I>) -> Result<T>
+    where
+        T: Parse,
+    {
+        let mut parser = Parser::new(reader)?;
+        T::parse(&mut parser)
     }
 
     fn position(&self) -> usize {
