@@ -15,19 +15,21 @@ where
         let span_start = self.position();
         self.consume_assert(keyword!("import"))?;
 
-        let (named_imports, namespace_binding, source) = if self.current_matches_string_literal() {
-            (None, None, self.parse_module_specifier()?)
+        let (default_binding, named_imports, namespace_binding, source) = if self
+            .current_matches_string_literal()
+        {
+            (None, None, None, self.parse_module_specifier()?)
         } else {
-            let (named_imports, namespace_binding) = self.parse_import_clause()?;
+            let (default_binding, named_imports, namespace_binding) = self.parse_import_clause()?;
             self.consume_assert(keyword!("from"))?;
             let source = self.parse_module_specifier()?;
-            (named_imports, namespace_binding, source)
+            (default_binding, named_imports, namespace_binding, source)
         };
 
         let span = self.span_from(span_start);
         Ok(DeclImport {
             span,
-            default_binding: None,
+            default_binding,
             namespace_binding,
             named_imports,
             source,
@@ -45,7 +47,10 @@ where
         Ok(module_name)
     }
 
-    fn parse_import_clause(&mut self) -> Result<(Option<Vec<NamedImport>>, Option<Ident>)> {
+    fn parse_import_clause(
+        &mut self,
+    ) -> Result<(Option<Ident>, Option<Vec<NamedImport>>, Option<Ident>)> {
+        let default_binding = self.is_identifier().then_try(|| self.parse_identifier())?;
         let namespace_binding = self
             .current_matches(punct!("*"))
             .then_try(|| self.parse_namespace_import())?;
@@ -55,7 +60,7 @@ where
             .map(Option::Some)
             .unwrap_or(None);
 
-        Ok((named_imports, namespace_binding))
+        Ok((default_binding, named_imports, namespace_binding))
     }
 
     /// Parses the `NameSpaceImport` goal symbol.
