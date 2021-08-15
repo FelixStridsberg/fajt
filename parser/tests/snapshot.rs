@@ -101,7 +101,7 @@ generate_test_module!(
 generate_test_module!(
     mod_name: semicolon,
     ast_type: Program,
-    source_type: Script,
+    source_type: Unknown,
     folders: ["parser/tests/snapshots/semicolon"],
 );
 

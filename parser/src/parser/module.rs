@@ -20,6 +20,7 @@ where
         // `import "./module.js"`;
         if self.current_matches_string_literal() {
             let source = self.parse_module_specifier()?;
+            self.consume_optional_semicolon()?;
             let span = self.span_from(span_start);
             return Ok(DeclImport {
                 span,
@@ -32,20 +33,21 @@ where
         }
 
         let default_binding = self.is_identifier().then_try(|| self.parse_identifier())?;
-        let (named_imports, namespace_binding) = if default_binding.is_none()
-            || self.maybe_consume(punct!(","))?
-        {
-            match self.current() {
-                token_matches!(ok: punct!("*")) => (None, Some(self.parse_namespace_import()?)),
-                token_matches!(ok: punct!("{")) => (Some(self.parse_named_imports()?), None),
-                _ => return err!(UnexpectedToken(self.consume()?)),
-            }
-        } else {
-            (None, None)
-        };
+        let (named_imports, namespace_binding) =
+            if default_binding.is_none() || self.maybe_consume(punct!(","))? {
+                match self.current() {
+                    token_matches!(ok: punct!("*")) => (None, Some(self.parse_namespace_import()?)),
+                    token_matches!(ok: punct!("{")) => (Some(self.parse_named_imports()?), None),
+                    _ => return err!(UnexpectedToken(self.consume()?)),
+                }
+            } else {
+                (None, None)
+            };
 
         self.consume_assert(keyword!("from"))?;
         let source = self.parse_module_specifier()?;
+
+        self.consume_optional_semicolon()?;
 
         let span = self.span_from(span_start);
         Ok(DeclImport {

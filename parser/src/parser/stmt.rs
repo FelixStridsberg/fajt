@@ -111,9 +111,7 @@ where
         let span_start = self.position();
         let expr = self.parse_expr()?;
 
-        if !self.maybe_consume(punct!(";"))? && !self.valid_auto_semicolon()? {
-            return err!(UnexpectedToken(self.consume()?));
-        }
+        self.consume_optional_semicolon()?;
 
         let span = self.span_from(span_start);
         Ok(StmtExpr { span, expr }.into())
@@ -364,6 +362,16 @@ where
         }
 
         Ok(statements)
+    }
+
+    /// Consumes semicolon if exists, returns error if no semicolon exists and no semicolon can be
+    /// auto inserted.
+    pub(super) fn consume_optional_semicolon(&mut self) -> Result<()> {
+        if !self.maybe_consume(punct!(";"))? && !self.valid_auto_semicolon()? {
+            err!(UnexpectedToken(self.consume()?))
+        } else {
+            Ok(())
+        }
     }
 
     /// Check if it is valid to insert semicolon before the current token.
