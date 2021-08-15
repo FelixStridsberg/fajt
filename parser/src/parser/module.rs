@@ -1,4 +1,4 @@
-use crate::ast::{DeclImport, Ident, NamedImport, Stmt};
+use crate::ast::{DeclExport, DeclImport, ExportNamed, Ident, NamedExport, NamedImport, Stmt};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenTry};
 use crate::Parser;
@@ -12,6 +12,28 @@ impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
+    /// Parses the `ExportDeclaration` goal symbol.
+    pub(super) fn parse_export_declaration(&mut self) -> Result<Stmt> {
+        let span_start = self.position();
+        self.consume_assert(keyword!("export"))?;
+
+        if self.current_matches(punct!("{")) {
+            self.parse_named_export(span_start)
+        } else {
+            todo!("Export type not implemented yet")
+        }
+    }
+
+    fn parse_named_export(&mut self, span_start: usize) -> Result<Stmt> {
+        let named_exports = self.parse_named_exports()?;
+        let span = self.span_from(span_start);
+        Ok(DeclExport::Named(ExportNamed {
+            span,
+            named_exports,
+        })
+        .into())
+    }
+
     /// Parses the `ImportDeclaration` goal symbol.
     pub(super) fn parse_import_declaration(&mut self) -> Result<Stmt> {
         let span_start = self.position();
@@ -104,5 +126,37 @@ where
             .then_try(|| self.parse_identifier())?;
         let span = self.span_from(span_start);
         Ok(NamedImport { span, name, alias })
+    }
+
+    /// Parses the `NamedExports` goal symbol.
+    fn parse_named_exports(&mut self) -> Result<Vec<NamedExport>> {
+        self.consume_assert(punct!("{"))?;
+
+        let mut named_exports = Vec::new();
+        loop {
+            if self.current_matches(punct!("}")) {
+                self.consume()?;
+                break;
+            }
+
+            named_exports.push(self.parse_export_specifier()?);
+            self.consume_object_delimiter()?;
+        }
+
+        Ok(named_exports)
+    }
+
+    /// Parses the `ExportSpecifier` goal symbol.
+    fn parse_export_specifier(&mut self) -> Result<NamedExport> {
+        let span_start = self.position();
+        let name = self.parse_identifier()?;
+        let alias_of = None;
+
+        let span = self.span_from(span_start);
+        Ok(NamedExport {
+            span,
+            name,
+            alias_of,
+        })
     }
 }

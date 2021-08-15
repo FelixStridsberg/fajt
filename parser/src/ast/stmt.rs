@@ -320,11 +320,20 @@ ast_struct! {
 ast_struct! {
     pub struct ExportNamed {
         pub span: Span,
+        pub named_exports: Vec<NamedExport>,
     }
 }
 
 ast_struct! {
     pub struct ExportNamespace {
         pub span: Span,
+    }
+}
+
+ast_struct! {
+    pub struct NamedExport {
+        pub span: Span,
+        pub name: Ident,
+        pub alias_of: Option<Ident>,
     }
 }
