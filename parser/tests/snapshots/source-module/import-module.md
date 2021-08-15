@@ -4,7 +4,7 @@ import 'module'
 
 ```json
 {
-  "Script": {
+  "Module": {
     "span": "0:15",
     "body": [
       {

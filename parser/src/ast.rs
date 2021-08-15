@@ -5,6 +5,7 @@ pub use expr::*;
 pub use literal::*;
 pub use stmt::*;
 
+use crate::parser::SourceType;
 use fajt_lexer::token::Span;
 use serde::{Deserialize, Serialize};
 
@@ -32,13 +33,16 @@ pub enum Program {
 }
 
 impl Program {
-    pub fn from_body(body: Vec<Stmt>) -> Self {
+    pub fn from_body(source_type: SourceType, body: Vec<Stmt>) -> Self {
         let span_start = body.first().map(|s| s.span().start).unwrap_or(0);
         let span_end = body.last().map(|s| s.span().end).unwrap_or(0);
-        Program::Script(StatementList {
-            span: Span::new(span_start, span_end),
-            body,
-        })
+        let span = Span::new(span_start, span_end);
+
+        if source_type == SourceType::Module {
+            Program::Module(StatementList { span, body })
+        } else {
+            Program::Script(StatementList { span, body })
+        }
     }
 
     pub fn span(&self) -> &Span {

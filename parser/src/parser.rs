@@ -6,6 +6,7 @@ use fajt_lexer::token_matches;
 use crate::ast::{Expr, Ident, Program, PropertyName, Stmt};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
+use std::cell::RefCell;
 use std::rc::Rc;
 
 mod binary_expr;
@@ -158,11 +159,11 @@ impl Parse for Program {
 
             body.push(parser.parse_stmt()?);
         }
-        Ok(Program::from_body(body))
+        Ok(Program::from_body(*parser.source_type.borrow(), body))
     }
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Copy, Clone)]
 pub enum SourceType {
     Module,
     Script,
@@ -175,7 +176,7 @@ where
 {
     context: Context,
     reader: &'a mut PeekReader<Token, I>,
-    source_type: Rc<SourceType>,
+    source_type: Rc<RefCell<SourceType>>,
 }
 
 impl<'a, I> Parser<'a, I>
@@ -186,7 +187,7 @@ where
         Ok(Parser {
             context: Context::default(),
             reader,
-            source_type: Rc::new(source_type),
+            source_type: Rc::new(RefCell::new(source_type)),
         })
     }
 
@@ -196,6 +197,14 @@ where
     {
         let mut parser = Parser::new(reader, source_type)?;
         T::parse(&mut parser)
+    }
+
+    fn source_type(&self) -> SourceType {
+        *(*self.source_type).borrow()
+    }
+
+    fn set_source_type(&mut self, source_type: SourceType) {
+        self.source_type.replace(source_type);
     }
 
     fn current(&self) -> Result<&Token> {

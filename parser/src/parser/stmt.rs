@@ -46,14 +46,14 @@ where
                 .with_context(ContextModify::new().set_strict(true))
                 .parse_class_decl()?,
             token_matches!(keyword!("import")) => {
-                if self.source_type.as_ref() == &SourceType::Script {
+                if self.source_type() == SourceType::Script {
                     return err!(SyntaxError(
                         "'import' cannot appear in a 'script' source.".to_owned(),
                         self.current()?.span.clone()
                     ));
                 }
 
-                // TODO if SourceType == Unknown, make this into a module parser.
+                self.set_source_type(SourceType::Module);
                 self.parse_import_declaration()?
             }
             _ if self.is_identifier() && self.peek_matches(punct!(":")) => {
