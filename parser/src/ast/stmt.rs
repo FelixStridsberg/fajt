@@ -27,7 +27,7 @@ ast_mapping! {
         While(StmtWhile),
         With(StmtWith),
         ImportDeclaration(DeclImport), // Only applicable for Module
-        // ExportDeclaration(/* TODO */), // Only applicable for Module
+        ExportDeclaration(DeclExport), // Only applicable for Module
     }
 }
 
@@ -126,7 +126,7 @@ ast_struct! {
     }
 }
 
-ast_struct! {
+ast_node! {
     pub enum VariableKind {
         Const,
         Let,
@@ -263,7 +263,7 @@ ast_struct! {
     }
 }
 
-ast_struct! {
+ast_node! {
     pub enum ForInit {
         Expr(Expr),
         Declaration(StmtVariable),
@@ -293,5 +293,38 @@ ast_struct! {
         pub span: Span,
         pub name: Ident,
         pub alias: Option<Ident>,
+    }
+}
+
+ast_mapping! {
+    pub enum DeclExport {
+        Decl(ExportDecl),
+        DefaultExpr(ExportDefaultExpr),
+        Named(ExportNamed),
+        Namespace(ExportNamespace),
+    }
+}
+
+ast_struct! {
+    pub struct ExportDecl {
+        pub span: Span,
+    }
+}
+
+ast_struct! {
+    pub struct ExportDefaultExpr {
+        pub span: Span,
+    }
+}
+
+ast_struct! {
+    pub struct ExportNamed {
+        pub span: Span,
+    }
+}
+
+ast_struct! {
+    pub struct ExportNamespace {
+        pub span: Span,
     }
 }

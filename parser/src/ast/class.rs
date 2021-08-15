@@ -19,15 +19,9 @@ ast_struct! {
     }
 }
 
-ast_struct! {
+ast_mapping! {
     pub enum ClassElement {
         Method(ClassMethod),
-    }
-}
-
-impl From<ClassMethod> for ClassElement {
-    fn from(method: ClassMethod) -> Self {
-        Self::Method(method)
     }
 }
 
@@ -43,7 +37,7 @@ ast_struct! {
     }
 }
 
-ast_struct! {
+ast_node! {
     pub enum ClassMethodKind {
         Method,
         Get,

@@ -20,6 +20,10 @@ mod cover;
 mod literal;
 mod stmt;
 
+pub trait Spanned {
+    fn span(&self) -> &Span;
+}
+
 #[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
 pub struct StatementList<T> {
     span: Span,

@@ -88,7 +88,7 @@ ast_struct! {
     }
 }
 
-ast_struct! {
+ast_node! {
     #[derive(FromString)]
     #[from_string_macro("binary_op")]
     #[from_string_macro_rules(
@@ -153,7 +153,7 @@ ast_struct! {
     }
 }
 
-ast_struct! {
+ast_node! {
     #[derive(FromString)]
     #[from_string_macro("logical_op")]
     #[from_string_macro_rules(
@@ -179,7 +179,7 @@ ast_struct! {
     }
 }
 
-ast_struct! {
+ast_node! {
     #[derive(FromString)]
     #[from_string_macro("unary_op")]
     #[from_string_macro_rules(
@@ -214,7 +214,7 @@ ast_struct! {
     }
 }
 
-ast_struct! {
+ast_node! {
     #[derive(FromString)]
     #[from_string_macro("update_op")]
     #[from_string_macro_rules(
@@ -282,7 +282,7 @@ ast_struct! {
     }
 }
 
-ast_struct! {
+ast_node! {
     pub enum ArrowFunctionBody {
         Expr(Box<Expr>),
         Body(Body),
@@ -313,7 +313,7 @@ ast_struct! {
     }
 }
 
-ast_struct! {
+ast_node! {
     pub enum MemberObject {
         Expr(Box<Expr>),
         Super(Super),
@@ -326,7 +326,7 @@ ast_struct! {
     }
 }
 
-ast_struct! {
+ast_node! {
     pub enum MemberProperty {
         Ident(Ident),
         Expr(Box<Expr>),
@@ -350,7 +350,7 @@ ast_struct! {
     }
 }
 
-ast_struct! {
+ast_node! {
     pub enum Argument {
         Expr(Expr),
         Spread(Expr),
@@ -366,7 +366,7 @@ ast_struct! {
     }
 }
 
-ast_struct! {
+ast_node! {
     #[derive(FromString)]
     #[from_string_macro("assignment_op")]
     #[from_string_macro_rules(
@@ -423,7 +423,7 @@ ast_struct! {
     }
 }
 
-ast_struct! {
+ast_node! {
     pub enum Callee {
         Super,
         Import,

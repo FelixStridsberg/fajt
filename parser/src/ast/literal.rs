@@ -4,7 +4,7 @@ use fajt_lexer::token::Base as LexerBase;
 use fajt_lexer::token::Literal as LexerLiteral;
 use fajt_lexer::token::Number as LexerNumber;
 
-ast_struct! {
+ast_node! {
     pub enum Literal {
         Null,
         Boolean(bool),
@@ -25,13 +25,13 @@ impl Literal {
     }
 }
 
-ast_struct! {
+ast_node! {
     pub struct Array {
         pub elements: Vec<ArrayElement>,
     }
 }
 
-ast_struct! {
+ast_node! {
     pub enum ArrayElement {
         None,
         Expr(Expr),
@@ -39,20 +39,20 @@ ast_struct! {
     }
 }
 
-ast_struct! {
+ast_node! {
     pub struct Object {
         pub props: Vec<PropertyDefinition>,
     }
 }
 
-ast_struct! {
+ast_node! {
     pub enum PropertyDefinition {
         IdentRef(Ident),
         Spread(Expr),
     }
 }
 
-ast_struct! {
+ast_node! {
     pub enum Base {
         Binary,
         Decimal,
@@ -72,7 +72,7 @@ impl From<LexerBase> for Base {
     }
 }
 
-ast_struct! {
+ast_node! {
     pub enum Number {
         Integer(i64, Base),
         Decimal(f64),

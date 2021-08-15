@@ -56,6 +56,17 @@ where
                 self.set_source_type(SourceType::Module);
                 self.parse_import_declaration()?
             }
+            token_matches!(keyword!("export")) => {
+                if self.source_type() == SourceType::Script {
+                    return err!(SyntaxError(
+                        "'export' cannot appear in a 'script' source.".to_owned(),
+                        self.current()?.span.clone()
+                    ));
+                }
+
+                self.set_source_type(SourceType::Module);
+                self.parse_export_declaration()?
+            }
             _ if self.is_identifier() && self.peek_matches(punct!(":")) => {
                 self.parse_labeled_stmt()?
             }

@@ -25,7 +25,7 @@ ast_struct! {
     }
 }
 
-ast_struct! {
+ast_node! {
     pub enum ObjectBindingProp {
         Single(Ident, Option<Expr>),
         KeyValue(PropertyName, BindingElement),
@@ -38,7 +38,7 @@ impl From<Ident> for ObjectBindingProp {
     }
 }
 
-ast_struct! {
+ast_node! {
     pub enum PropertyName {
         Ident(Ident),
         String(String, char),

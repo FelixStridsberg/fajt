@@ -9,19 +9,18 @@ macro_rules! ast_mapping {
             )*
         }
     ) => {
-        ast_struct! {
+
+        ast_node! {
             $(#[$enum_attr])*
             $pub $enum $name {
                 $( $variant($member), )*
             }
         }
 
-        impl $name {
-            pub fn span(&self) -> &Span {
+        impl $crate::ast::Spanned for $name {
+            fn span(&self) -> &Span {
                 match self {
-                    $(
-                        Self::$variant(v) => &v.span,
-                    )*
+                    $( Self::$variant(v) => $crate::ast::Spanned::span(v), )*
                 }
             }
         }
@@ -46,10 +45,32 @@ macro_rules! ast_mapping_impl {
     };
 }
 
-/// Implements common attributes for structures that are part of the AST.
+/// All AST structures that contains a span attribute should be an ast_struct! to get all common
+/// implementations.
+macro_rules! ast_struct {
+    (
+        $(#[$meta:meta])*
+        pub $( ($visibility:ident) )? $struct_or_enum:ident $name:ident $($rest:tt)*
+    ) => {
+        ast_node! {
+            $(#[$meta])*
+            pub $( ($visibility) )? $struct_or_enum $name $($rest)*
+        }
+
+        impl $crate::ast::Spanned for $name {
+            fn span(&self) -> &fajt_lexer::token::Span {
+                &self.span
+            }
+        }
+    }
+}
+
+/// Implements common attributes for all different types in the ast tree.
+/// This is called implicitly for ast_struct! and ast_mapping!.
+///
 /// This is mainly to handle traits that must be applied to the whole tree, for example Debug,
 /// Display, PartialEq.
-macro_rules! ast_struct {
+macro_rules! ast_node {
     (
         $(#[$meta:meta])*
         pub $( ($visibility:ident) )? $struct_or_enum:ident $name:ident $($rest:tt)*
