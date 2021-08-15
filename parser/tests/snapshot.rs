@@ -99,6 +99,12 @@ generate_test_module!(
     folders: ["parser/tests/snapshots/semicolon"],
 );
 
+generate_test_module!(
+    mod_name: strict_mode,
+    ast_type: Program,
+    folders: ["parser/tests/snapshots/strict-mode"],
+);
+
 fn evaluate_result<'a, 'b: 'a, T>(result: Result<T>, markdown: &'b md::Markdown)
 where
     T: Deserialize<'a> + Serialize + PartialEq + Debug,

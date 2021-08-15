@@ -24,6 +24,7 @@ pub struct ContextModify {
     is_await: Option<bool>,
     is_yield: Option<bool>,
     is_in: Option<bool>,
+    is_strict: Option<bool>,
 }
 
 impl ContextModify {
@@ -32,6 +33,7 @@ impl ContextModify {
             is_await: None,
             is_yield: None,
             is_in: None,
+            is_strict: None,
         }
     }
 
@@ -49,6 +51,11 @@ impl ContextModify {
         self.is_in = Some(value);
         self
     }
+
+    pub fn set_strict(&mut self, value: bool) -> &mut Self {
+        self.is_strict = Some(value);
+        self
+    }
 }
 
 #[derive(Clone)]
@@ -56,6 +63,7 @@ pub struct Context {
     is_await: bool,
     is_yield: bool,
     is_in: bool,
+    is_strict: bool,
 }
 
 impl Context {
@@ -73,6 +81,10 @@ impl Context {
             context.is_in = is_in;
         }
 
+        if let Some(is_strict) = modify.is_strict {
+            context.is_strict = is_strict;
+        }
+
         context
     }
 
@@ -86,6 +98,10 @@ impl Context {
             keyword_context |= KeywordContext::YIELD;
         }
 
+        if self.is_strict {
+            keyword_context |= KeywordContext::STRICT;
+        }
+
         keyword_context
     }
 }
@@ -96,6 +112,7 @@ impl Default for Context {
             is_await: false,
             is_yield: false,
             is_in: false,
+            is_strict: false,
         }
     }
 }

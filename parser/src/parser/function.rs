@@ -240,6 +240,23 @@ where
         self.consume_assert(punct!("{"))?;
 
         let directives = self.parse_directive_prologue()?;
+        let statements = if self.context.is_strict || directives.iter().any(|s| &s == &"use strict")
+        {
+            self.with_context(ContextModify::default().set_strict(true))
+                .parse_function_body_stmt_list()?
+        } else {
+            self.parse_function_body_stmt_list()?
+        };
+
+        let span = self.span_from(span_start);
+        Ok(Body {
+            span,
+            directives,
+            statements,
+        })
+    }
+
+    fn parse_function_body_stmt_list(&mut self) -> Result<Vec<Stmt>> {
         let mut statements = Vec::new();
         loop {
             if self.maybe_consume(punct!("}"))? {
@@ -248,12 +265,6 @@ where
 
             statements.push(self.parse_stmt()?);
         }
-
-        let span = self.span_from(span_start);
-        Ok(Body {
-            span,
-            directives,
-            statements,
-        })
+        Ok(statements)
     }
 }
