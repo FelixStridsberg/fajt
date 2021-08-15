@@ -28,7 +28,7 @@ pub struct StatementList<T> {
 #[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
 pub enum Program {
     Script(StatementList<Stmt>),
-    Module(StatementList<ModuleItem>),
+    Module(StatementList<Stmt>),
 }
 
 impl Program {
@@ -46,14 +46,6 @@ impl Program {
             Program::Script(body) => &body.span,
             Program::Module(body) => &body.span,
         }
-    }
-}
-
-ast_struct! {
-    pub enum ModuleItem {
-        ImportDeclaration(/* TODO */),
-        ExportDeclaration(/* TODO */),
-        Statement(Stmt),
     }
 }
 

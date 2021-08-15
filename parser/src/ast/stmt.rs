@@ -26,6 +26,8 @@ ast_mapping! {
         Variable(StmtVariable),
         While(StmtWhile),
         With(StmtWith),
+        // ImportDeclaration(/* TODO */), // Only applicable for Module
+        // ExportDeclaration(/* TODO */), // Only applicable for Module
     }
 }
 
