@@ -1,10 +1,12 @@
 use crate::ast::{DeclImport, Ident, NamedImport, Stmt};
+use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenTry};
 use crate::Parser;
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
+use fajt_lexer::token_matches;
 
 impl<I> Parser<'_, I>
 where
@@ -51,14 +53,17 @@ where
         &mut self,
     ) -> Result<(Option<Ident>, Option<Vec<NamedImport>>, Option<Ident>)> {
         let default_binding = self.is_identifier().then_try(|| self.parse_identifier())?;
-        let namespace_binding = self
-            .current_matches(punct!("*"))
-            .then_try(|| self.parse_namespace_import())?;
-        let named_imports = self
-            .current_matches(punct!("{"))
-            .then_try(|| self.parse_named_imports())?
-            .map(Option::Some)
-            .unwrap_or(None);
+
+        let (named_imports, namespace_binding) =
+            if default_binding.is_none() || self.maybe_consume(punct!(","))? {
+                match self.current() {
+                    token_matches!(ok: punct!("*")) => (None, Some(self.parse_namespace_import()?)),
+                    token_matches!(ok: punct!("{")) => (Some(self.parse_named_imports()?), None),
+                    _ => return err!(UnexpectedToken(self.consume()?)),
+                }
+            } else {
+                (None, None)
+            };
 
         Ok((default_binding, named_imports, namespace_binding))
     }

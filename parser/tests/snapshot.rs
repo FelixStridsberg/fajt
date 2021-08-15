@@ -135,8 +135,11 @@ where
             let expected_expr: T = serde_json::from_str(&expected_data).unwrap();
             assert_eq!(result, expected_expr)
         } else {
+            let error = result.unwrap_err();
+            println!("Error: {:?}", error);
+
             let expected_error: ErrorKind = serde_json::from_str(&expected_data).unwrap();
-            assert_eq!(result.unwrap_err().kind(), &expected_error)
+            assert_eq!(error.kind(), &expected_error)
         }
     } else {
         if let Ok(result) = result {
