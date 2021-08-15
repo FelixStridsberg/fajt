@@ -281,12 +281,17 @@ ast_struct! {
 ast_struct! {
     pub struct DeclImport {
         pub span: Span,
-        pub import: Import,
+        pub default_binding: Option<Ident>,
+        pub namespace_binding: Option<Ident>,
+        pub named_imports: Option<Vec<NamedImport>>,
+        pub source: String,
     }
 }
 
 ast_struct! {
-    pub enum Import {
-        Module(String),
+    pub struct NamedImport {
+        pub span: Span,
+        pub name: Ident,
+        pub alias: Option<Ident>,
     }
 }
