@@ -1,4 +1,8 @@
-use crate::ast::{CatchClause, Stmt, StmtBlock, StmtBreak, StmtContinue, StmtDebugger, StmtEmpty, StmtExpr, StmtIf, StmtReturn, StmtSwitch, StmtThrow, StmtTry, StmtWith, SwitchCase, VariableKind, Expr, StmtLabeled};
+use crate::ast::{
+    CatchClause, Stmt, StmtBlock, StmtBreak, StmtContinue, StmtDebugger, StmtEmpty, StmtExpr,
+    StmtIf, StmtLabeled, StmtReturn, StmtSwitch, StmtThrow, StmtTry, StmtWith, SwitchCase,
+    VariableKind,
+};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenTry};
 use crate::{ContextModify, Parser};
@@ -40,10 +44,12 @@ where
             token_matches!(keyword!("class")) => self
                 .with_context(ContextModify::new().set_strict(true))
                 .parse_class_decl()?,
-
+            _ if self.is_identifier() && self.peek_matches(punct!(":")) => {
+                self.parse_labeled_stmt()?
+            }
             _ if self.is_expr_stmt()? => self
                 .with_context(ContextModify::new().set_in(true))
-                .parse_expr_or_labeled_stmt()?,
+                .parse_expr_stmt()?,
             t => unimplemented!("Invalid statement error handling {:?}", t),
         })
     }
@@ -88,20 +94,10 @@ where
         Ok(StmtBlock { span, statements }.into())
     }
 
-    fn parse_expr_or_labeled_stmt(&mut self) -> Result<Stmt> {
+    /// Parses the `ExpressionStatement` gaol symbol.
+    fn parse_expr_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         let expr = self.parse_expr()?;
-
-        // `Identifier :` is the start of a label statement.
-        if matches!(expr, Expr::IdentRef(_)) && self.maybe_consume(punct!(":"))? {
-            let body = self.parse_stmt()?;
-            let span = self.span_from(span_start);
-            return Ok(StmtLabeled {
-                span,
-                label: expr.unwrap_ident_ref(),
-                body: Box::new(body),
-            }.into())
-        }
 
         if !self.maybe_consume(punct!(";"))? && !self.valid_auto_semicolon()? {
             return err!(UnexpectedToken(self.consume()?));
@@ -109,6 +105,21 @@ where
 
         let span = self.span_from(span_start);
         Ok(StmtExpr { span, expr }.into())
+    }
+
+    /// Parses the `LabeledStatement` goal symbol.
+    fn parse_labeled_stmt(&mut self) -> Result<Stmt> {
+        let span_start = self.position();
+        let label = self.parse_identifier()?;
+        self.consume_assert(punct!(":"))?;
+        let body = self.parse_stmt()?;
+        let span = self.span_from(span_start);
+        return Ok(StmtLabeled {
+            span,
+            label,
+            body: Box::new(body),
+        }
+        .into());
     }
 
     /// Parses the `EmptyStatement` goal symbol.
