@@ -1,6 +1,6 @@
 use fajt_common::io::{PeekRead, PeekReader};
 use fajt_lexer::punct;
-use fajt_lexer::token::{KeywordContext, Span, Token, TokenValue};
+use fajt_lexer::token::{KeywordContext, Literal, Span, Token, TokenValue};
 use fajt_lexer::token_matches;
 
 use crate::ast::{Expr, Ident, Program, PropertyName, Stmt};
@@ -279,6 +279,33 @@ where
             _ if self.is_identifier() => Ok(PropertyName::Ident(self.parse_identifier()?)),
             _ => return err!(UnexpectedToken(self.consume()?)),
         }
+    }
+
+    fn parse_directive_prologue(&mut self) -> Result<Vec<String>> {
+        let mut directives = Vec::new();
+
+        loop {
+            if matches!(
+                self.current(),
+                Ok(Token {
+                    value: TokenValue::Literal(Literal::String(_, _)),
+                    ..
+                })
+            ) {
+                let stmt = self.parse_stmt()?;
+                let (string, _) = stmt
+                    .unwrap_expr_stmt()
+                    .expr
+                    .unwrap_literal()
+                    .literal
+                    .unwrap_string();
+                directives.push(string);
+            } else {
+                break;
+            }
+        }
+
+        Ok(directives)
     }
 
     fn consume_array_delimiter(&mut self) -> Result<()> {

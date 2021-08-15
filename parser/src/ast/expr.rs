@@ -39,6 +39,14 @@ impl Expr {
             false
         }
     }
+
+    pub fn unwrap_literal(self) -> ExprLiteral {
+        if let Expr::Literal(literal) = self {
+            literal
+        } else {
+            panic!("Tried to unwrap {:?} as a literal expression", self);
+        }
+    }
 }
 
 ast_struct! {

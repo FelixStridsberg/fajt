@@ -15,6 +15,16 @@ ast_struct! {
     }
 }
 
+impl Literal {
+    pub fn unwrap_string(self) -> (String, char) {
+        if let Literal::String(string, delimiter) = self {
+            (string, delimiter)
+        } else {
+            panic!("Tried to unwrap {:?} as a string literal", self);
+        }
+    }
+}
+
 ast_struct! {
     pub struct Array {
         pub elements: Vec<ArrayElement>,

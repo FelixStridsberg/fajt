@@ -35,6 +35,14 @@ impl Stmt {
             panic!("Tried to unwrap {:?} as a block statement", self);
         }
     }
+
+    pub fn unwrap_expr_stmt(self) -> StmtExpr {
+        if let Stmt::Expr(expr) = self {
+            expr
+        } else {
+            panic!("Tried to unwrap {:?} as an expression statement", self);
+        }
+    }
 }
 
 ast_struct! {
