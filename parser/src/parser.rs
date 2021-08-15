@@ -17,6 +17,7 @@ mod function;
 mod iteration;
 mod literal;
 mod member_access;
+mod module;
 mod stmt;
 mod variable;
 
@@ -161,6 +162,7 @@ impl Parse for Program {
     }
 }
 
+#[derive(PartialEq, Debug)]
 pub enum SourceType {
     Module,
     Script,
@@ -238,6 +240,16 @@ where
         }
     }
 
+    fn current_matches_string_literal(&self) -> bool {
+        matches!(
+            self.current(),
+            Ok(Token {
+                value: TokenValue::Literal(Literal::String(_, _)),
+                ..
+            })
+        )
+    }
+
     fn peek_matches(&self, value: TokenValue) -> bool {
         if let Some(token) = self.peek() {
             token.value == value
@@ -312,13 +324,7 @@ where
         let mut directives = Vec::new();
 
         loop {
-            if matches!(
-                self.current(),
-                Ok(Token {
-                    value: TokenValue::Literal(Literal::String(_, _)),
-                    ..
-                })
-            ) {
+            if self.current_matches_string_literal() {
                 let stmt = self.parse_stmt()?;
                 let (string, _) = stmt
                     .unwrap_expr_stmt()

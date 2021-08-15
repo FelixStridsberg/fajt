@@ -26,7 +26,7 @@ ast_mapping! {
         Variable(StmtVariable),
         While(StmtWhile),
         With(StmtWith),
-        // ImportDeclaration(/* TODO */), // Only applicable for Module
+        ImportDeclaration(DeclImport), // Only applicable for Module
         // ExportDeclaration(/* TODO */), // Only applicable for Module
     }
 }
@@ -275,5 +275,18 @@ ast_struct! {
         pub span: Span,
         pub label: Ident,
         pub body: Box<Stmt>,
+    }
+}
+
+ast_struct! {
+    pub struct DeclImport {
+        pub span: Span,
+        pub import: Import,
+    }
+}
+
+ast_struct! {
+    pub enum Import {
+        Module(String),
     }
 }

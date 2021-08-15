@@ -52,6 +52,7 @@ macro_rules! generate_test_module {
     (
         mod_name: $mod_name:ident,
         ast_type: $ast_type:ident,
+        source_type: $source_type:ident,
         folders: [$( $folder:literal ),*],
     ) => {
         /// Everything inside snapshots/expr is parsed as expressions.
@@ -59,12 +60,13 @@ macro_rules! generate_test_module {
             use super::{md, parse_input, evaluate_result};
             use fajt_macros::for_each_file;
             use fajt_parser::ast::$ast_type;
+            use fajt_parser::parser::SourceType::$source_type;
 
             fn snapshot_runner(test_file: &str) {
                 println!("Running: {}", test_file);
 
                 let markdown = md::Markdown::from_file(test_file.as_ref());
-                let result = parse_input::<$ast_type>(&markdown.js_block);
+                let result = parse_input::<$ast_type>(&markdown.js_block, $source_type);
                 evaluate_result(result, &markdown);
             }
 
@@ -78,31 +80,50 @@ macro_rules! generate_test_module {
 generate_test_module!(
     mod_name: expr,
     ast_type: Expr,
+    source_type: Script,
     folders: ["parser/tests/snapshots/expr"],
 );
 
 generate_test_module!(
     mod_name: stmt,
     ast_type: Stmt,
+    source_type: Script,
     folders: ["parser/tests/snapshots/stmt"],
 );
 
 generate_test_module!(
     mod_name: decl,
     ast_type: Stmt,
+    source_type: Script,
     folders: ["parser/tests/snapshots/decl"],
 );
 
 generate_test_module!(
     mod_name: semicolon,
     ast_type: Program,
+    source_type: Script,
     folders: ["parser/tests/snapshots/semicolon"],
 );
 
 generate_test_module!(
     mod_name: strict_mode,
     ast_type: Program,
+    source_type: Script,
     folders: ["parser/tests/snapshots/strict-mode"],
+);
+
+generate_test_module!(
+    mod_name: source_module,
+    ast_type: Program,
+    source_type: Module,
+    folders: ["parser/tests/snapshots/source-module"],
+);
+
+generate_test_module!(
+    mod_name: source_script,
+    ast_type: Program,
+    source_type: Script,
+    folders: ["parser/tests/snapshots/source-script"],
 );
 
 fn evaluate_result<'a, 'b: 'a, T>(result: Result<T>, markdown: &'b md::Markdown)
@@ -144,13 +165,13 @@ where
     }
 }
 
-fn parse_input<T>(input: &str) -> Result<T>
+fn parse_input<T>(input: &str, source_type: SourceType) -> Result<T>
 where
     T: Parse,
 {
     let lexer = Lexer::new(input).unwrap();
     let mut reader = fajt_common::io::PeekReader::new(lexer).unwrap();
-    Parser::parse::<T>(&mut reader, SourceType::Unknown)
+    Parser::parse::<T>(&mut reader, source_type)
 }
 
 // TODO clean up this module
