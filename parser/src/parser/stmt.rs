@@ -16,6 +16,8 @@ impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
+    // Parses statements, we handle declarations as statements as well since they appear in the same
+    // contexts.
     pub(super) fn parse_stmt(&mut self) -> Result<Stmt> {
         Ok(match self.current()? {
             token_matches!(punct!(";")) => self.parse_empty_stmt()?,
@@ -35,8 +37,6 @@ where
             token_matches!(keyword!("while")) => self.parse_while_stmt()?,
             token_matches!(keyword!("for")) => self.parse_for_stmt()?,
             token_matches!(keyword!("switch")) => self.parse_switch_stmt()?,
-
-            // Declarations are handles as statements
             token_matches!(keyword!("function")) => self.parse_function_declaration()?,
             token_matches!(keyword!("async")) if self.peek_matches(keyword!("function")) => {
                 self.parse_async_function_declaration()?
