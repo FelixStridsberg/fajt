@@ -27,7 +27,6 @@ where
             token_matches!(keyword!("throw")) => self.parse_throw_stmt()?,
             token_matches!(keyword!("try")) => self.parse_try_stmt()?,
             token_matches!(keyword!("debugger")) => self.parse_debugger_stmt()?,
-            // TODO IterationStatement
             token_matches!(keyword!("do")) => self.parse_do_while_stmt()?,
             token_matches!(keyword!("while")) => self.parse_while_stmt()?,
             token_matches!(keyword!("for")) => self.parse_for_stmt()?,
