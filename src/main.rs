@@ -1,4 +1,5 @@
 use clap::{App, Arg};
+use fajt_parser::parser::SourceType;
 use fajt_parser::Parser;
 use std::fs::read_to_string;
 
@@ -12,7 +13,8 @@ fn main() {
 
     let lexer = fajt_lexer::Lexer::new(&source).unwrap();
     let mut reader = fajt_common::io::PeekReader::new(lexer).unwrap();
-    let program: fajt_parser::error::Result<fajt_parser::ast::Program> = Parser::parse(&mut reader);
+    let program: fajt_parser::error::Result<fajt_parser::ast::Program> =
+        Parser::parse(&mut reader, SourceType::Unknown);
     println!("{:#?}", program);
 }
 

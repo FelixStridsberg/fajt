@@ -24,7 +24,7 @@ extern crate fajt_macros;
 
 use fajt_lexer::Lexer;
 use fajt_parser::error::{ErrorKind, Result};
-use fajt_parser::parser::Parse;
+use fajt_parser::parser::{Parse, SourceType};
 use fajt_parser::Parser;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
@@ -150,7 +150,7 @@ where
 {
     let lexer = Lexer::new(input).unwrap();
     let mut reader = fajt_common::io::PeekReader::new(lexer).unwrap();
-    Parser::parse::<T>(&mut reader)
+    Parser::parse::<T>(&mut reader, SourceType::Unknown)
 }
 
 // TODO clean up this module

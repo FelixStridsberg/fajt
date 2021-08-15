@@ -6,6 +6,7 @@ use fajt_lexer::token_matches;
 use crate::ast::{Expr, Ident, Program, PropertyName, Stmt};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
+use std::rc::Rc;
 
 mod binary_expr;
 mod binding;
@@ -160,30 +161,38 @@ impl Parse for Program {
     }
 }
 
+pub enum SourceType {
+    Module,
+    Script,
+    Unknown,
+}
+
 pub struct Parser<'a, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
     context: Context,
     reader: &'a mut PeekReader<Token, I>,
+    source_type: Rc<SourceType>,
 }
 
 impl<'a, I> Parser<'a, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
-    pub fn new(reader: &'a mut PeekReader<Token, I>) -> Result<Self> {
+    pub fn new(reader: &'a mut PeekReader<Token, I>, source_type: SourceType) -> Result<Self> {
         Ok(Parser {
             context: Context::default(),
             reader,
+            source_type: Rc::new(source_type),
         })
     }
 
-    pub fn parse<T>(reader: &'a mut PeekReader<Token, I>) -> Result<T>
+    pub fn parse<T>(reader: &'a mut PeekReader<Token, I>, source_type: SourceType) -> Result<T>
     where
         T: Parse,
     {
-        let mut parser = Parser::new(reader)?;
+        let mut parser = Parser::new(reader, source_type)?;
         T::parse(&mut parser)
     }
 
@@ -217,6 +226,7 @@ where
         Parser {
             context: self.context.modify(modify),
             reader: &mut self.reader,
+            source_type: self.source_type.clone(),
         }
     }
 

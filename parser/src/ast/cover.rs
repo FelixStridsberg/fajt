@@ -3,6 +3,7 @@
 //!
 //! These will never appear in the final AST.
 use crate::ast::{Expr, ExprParenthesized, FormalParameters};
+use crate::parser::SourceType;
 use crate::Parser;
 use fajt_common::io::PeekReader;
 use fajt_lexer::token::{Span, Token};
@@ -19,7 +20,7 @@ impl CoverParenthesizedAndArrowParameters {
     pub fn into_arrow_parameters(self) -> crate::error::Result<FormalParameters> {
         let tokens = self.tokens.into_iter();
         let mut reader = PeekReader::new(tokens).unwrap();
-        let mut parser = Parser::new(&mut reader).unwrap();
+        let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
         parser.parse_formal_parameters()
     }
 
@@ -29,7 +30,7 @@ impl CoverParenthesizedAndArrowParameters {
 
         let tokens = self.tokens.into_iter();
         let mut reader = PeekReader::new(tokens).unwrap();
-        let mut parser = Parser::new(&mut reader).unwrap();
+        let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
 
         let expr = parser.parse_expr().unwrap();
 
@@ -55,7 +56,7 @@ impl CoverCallExprAndAsyncArrowHead {
 
         let tokens = self.tokens.into_iter();
         let mut reader = PeekReader::new(tokens).unwrap();
-        let mut parser = Parser::new(&mut reader).unwrap();
+        let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
         parser.parse_formal_parameters()
     }
 
