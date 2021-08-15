@@ -1,7 +1,4 @@
-use crate::ast::{
-    CatchClause, Stmt, StmtBlock, StmtBreak, StmtContinue, StmtDebugger, StmtEmpty, StmtExpr,
-    StmtIf, StmtReturn, StmtSwitch, StmtThrow, StmtTry, StmtWith, SwitchCase, VariableKind,
-};
+use crate::ast::{CatchClause, Stmt, StmtBlock, StmtBreak, StmtContinue, StmtDebugger, StmtEmpty, StmtExpr, StmtIf, StmtReturn, StmtSwitch, StmtThrow, StmtTry, StmtWith, SwitchCase, VariableKind, Expr, StmtLabeled};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenTry};
 use crate::{ContextModify, Parser};
@@ -30,7 +27,6 @@ where
             token_matches!(keyword!("throw")) => self.parse_throw_stmt()?,
             token_matches!(keyword!("try")) => self.parse_try_stmt()?,
             token_matches!(keyword!("debugger")) => self.parse_debugger_stmt()?,
-            // TODO LabelledStatement
             // TODO IterationStatement
             token_matches!(keyword!("do")) => self.parse_do_while_stmt()?,
             token_matches!(keyword!("while")) => self.parse_while_stmt()?,
@@ -48,7 +44,7 @@ where
 
             _ if self.is_expr_stmt()? => self
                 .with_context(ContextModify::new().set_in(true))
-                .parse_expr_stmt()?,
+                .parse_expr_or_labeled_stmt()?,
             t => unimplemented!("Invalid statement error handling {:?}", t),
         })
     }
@@ -93,9 +89,20 @@ where
         Ok(StmtBlock { span, statements }.into())
     }
 
-    fn parse_expr_stmt(&mut self) -> Result<Stmt> {
+    fn parse_expr_or_labeled_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         let expr = self.parse_expr()?;
+
+        // `Identifier :` is the start of a label statement.
+        if matches!(expr, Expr::IdentRef(_)) && self.maybe_consume(punct!(":"))? {
+            let body = self.parse_stmt()?;
+            let span = self.span_from(span_start);
+            return Ok(StmtLabeled {
+                span,
+                label: expr.unwrap_ident_ref(),
+                body: Box::new(body),
+            }.into())
+        }
 
         if !self.maybe_consume(punct!(";"))? && !self.valid_auto_semicolon()? {
             return err!(UnexpectedToken(self.consume()?));

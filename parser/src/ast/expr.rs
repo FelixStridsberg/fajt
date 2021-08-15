@@ -40,6 +40,14 @@ impl Expr {
         }
     }
 
+    pub fn unwrap_ident_ref(self) -> Ident {
+        if let Expr::IdentRef(ident) = self {
+            ident
+        } else {
+            panic!("Tried to unwrap {:?} as a ident ref", self);
+        }
+    }
+
     pub fn unwrap_literal(self) -> ExprLiteral {
         if let Expr::Literal(literal) = self {
             literal

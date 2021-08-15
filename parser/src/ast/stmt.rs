@@ -18,6 +18,7 @@ ast_mapping! {
         ForIn(StmtForIn),
         ForOf(StmtForOf),
         If(StmtIf),
+        Labeled(StmtLabeled),
         Return(StmtReturn),
         Switch(StmtSwitch),
         Throw(StmtThrow),
@@ -264,5 +265,13 @@ ast_struct! {
     pub enum ForInit {
         Expr(Expr),
         Declaration(StmtVariable),
+    }
+}
+
+ast_struct! {
+    pub struct StmtLabeled {
+        pub span: Span,
+        pub label: Ident,
+        pub body: Box<Stmt>,
     }
 }
