@@ -289,6 +289,12 @@ ast_struct! {
 }
 
 ast_struct! {
+    /// The `name` is the name of the imported field, `alias` is the name of that import within the
+    /// module.
+    ///
+    /// The reason for this is so that there always is a straight mapping between `NamedImport.name`
+    /// and `NamedExport.name` no matter if aliases are used, the `alias` and `alias_of` are only
+    /// used for mapping within each module.
     pub struct NamedImport {
         pub span: Span,
         pub name: Ident,
@@ -331,6 +337,12 @@ ast_struct! {
 }
 
 ast_struct! {
+    /// The `name` is the name of the export, `alias_of` is the local name inside the module the
+    /// export statement resides if there is an alias (i.e `alias_of as name`).
+    ///
+    /// The reason for this is so that there always is a straight mapping between `NamedImport.name`
+    /// and `NamedExport.name` no matter if aliases are used, the `alias` and `alias_of` are only
+    /// used for mapping within each module.
     pub struct NamedExport {
         pub span: Span,
         pub name: Ident,

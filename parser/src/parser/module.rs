@@ -149,8 +149,14 @@ where
     /// Parses the `ExportSpecifier` goal symbol.
     fn parse_export_specifier(&mut self) -> Result<NamedExport> {
         let span_start = self.position();
-        let name = self.parse_identifier()?;
-        let alias_of = None;
+        let mut name = self.parse_identifier()?;
+
+        // If there is an alias, we swap the name and alias identifiers, since the name should be
+        // the name of the export, and the alias the local name.
+        let alias_of = self
+            .maybe_consume(keyword!("as"))?
+            .then_try(|| self.parse_identifier())?
+            .map(|alias| std::mem::replace(&mut name, alias));
 
         let span = self.span_from(span_start);
         Ok(NamedExport {
