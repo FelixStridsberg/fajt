@@ -1,4 +1,4 @@
-use crate::ast::{DeclImport, NamedImport, Stmt};
+use crate::ast::{DeclImport, Ident, NamedImport, Stmt};
 use crate::error::{Result, ThenTry};
 use crate::Parser;
 use fajt_common::io::PeekRead;
@@ -15,20 +15,20 @@ where
         let span_start = self.position();
         self.consume_assert(keyword!("import"))?;
 
-        let (named_imports, source) = if self.current_matches_string_literal() {
-            (None, self.parse_module_specifier()?)
+        let (named_imports, namespace_binding, source) = if self.current_matches_string_literal() {
+            (None, None, self.parse_module_specifier()?)
         } else {
-            let (named_imports) = self.parse_import_clause()?;
+            let (named_imports, namespace_binding) = self.parse_import_clause()?;
             self.consume_assert(keyword!("from"))?;
             let source = self.parse_module_specifier()?;
-            (named_imports, source)
+            (named_imports, namespace_binding, source)
         };
 
         let span = self.span_from(span_start);
         Ok(DeclImport {
             span,
             default_binding: None,
-            namespace_binding: None,
+            namespace_binding,
             named_imports,
             source,
         }
@@ -45,12 +45,24 @@ where
         Ok(module_name)
     }
 
-    fn parse_import_clause(&mut self) -> Result<(Option<Vec<NamedImport>>)> {
+    fn parse_import_clause(&mut self) -> Result<(Option<Vec<NamedImport>>, Option<Ident>)> {
+        let namespace_binding = self
+            .current_matches(punct!("*"))
+            .then_try(|| self.parse_namespace_import())?;
         let named_imports = self
             .current_matches(punct!("{"))
             .then_try(|| self.parse_named_imports())?
-            .unwrap_or(Vec::new());
-        Ok((Some(named_imports)))
+            .map(Option::Some)
+            .unwrap_or(None);
+
+        Ok((named_imports, namespace_binding))
+    }
+
+    /// Parses the `NameSpaceImport` goal symbol.
+    fn parse_namespace_import(&mut self) -> Result<Ident> {
+        self.consume_assert(punct!("*"))?;
+        self.consume_assert(keyword!("as"))?;
+        self.parse_identifier()
     }
 
     fn parse_named_imports(&mut self) -> Result<Vec<NamedImport>> {
