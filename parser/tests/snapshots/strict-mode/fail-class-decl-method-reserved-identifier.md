@@ -14,7 +14,7 @@ class cls {
       "Keyword": "Implements"
     },
     "first_on_line": false,
-    "span": "52:62"
+    "span": "34:44"
   }
 }
 ```

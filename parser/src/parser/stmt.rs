@@ -36,15 +36,19 @@ where
             token_matches!(keyword!("while")) => self.parse_while_stmt()?,
             token_matches!(keyword!("for")) => self.parse_for_stmt()?,
             token_matches!(keyword!("switch")) => self.parse_switch_stmt()?,
-            _ if self.is_expr_stmt()? => self
-                .with_context(ContextModify::new().set_in(true))
-                .parse_expr_stmt()?,
 
             // Declarations are handles as statements
             token_matches!(keyword!("function")) => self.parse_function_declaration()?,
             token_matches!(keyword!("async")) if self.peek_matches(keyword!("function")) => {
                 self.parse_async_function_declaration()?
             }
+            token_matches!(keyword!("class")) => self
+                .with_context(ContextModify::new().set_strict(true))
+                .parse_class_decl()?,
+
+            _ if self.is_expr_stmt()? => self
+                .with_context(ContextModify::new().set_in(true))
+                .parse_expr_stmt()?,
             t => unimplemented!("Invalid statement error handling {:?}", t),
         })
     }

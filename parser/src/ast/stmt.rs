@@ -1,5 +1,5 @@
 use super::Ident;
-use crate::ast::{BindingElement, BindingPattern, Expr};
+use crate::ast::{BindingElement, BindingPattern, DeclClass, Expr};
 use fajt_lexer::token::Span;
 
 ast_mapping! {
@@ -8,6 +8,7 @@ ast_mapping! {
         FunctionDecl(DeclFunction),
         Block(StmtBlock),
         Break(StmtBreak),
+        Class(DeclClass),
         Continue(StmtContinue),
         Debugger(StmtDebugger),
         DoWhile(StmtDoWhile),

@@ -5,7 +5,7 @@ use crate::ast::{
 };
 use crate::error::ErrorKind::SyntaxError;
 use crate::error::{Result, ThenTry};
-use crate::Parser;
+use crate::{ContextModify, Parser};
 
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
@@ -540,7 +540,9 @@ where
             token_matches!(punct!("[")) => self.parse_array_literal()?,
             token_matches!(punct!("{")) => self.parse_object_literal()?,
             token_matches!(keyword!("function")) => self.parse_function_expr()?,
-            token_matches!(keyword!("class")) => self.parse_class_expr()?,
+            token_matches!(keyword!("class")) => self
+                .with_context(ContextModify::new().set_strict(true))
+                .parse_class_expr()?,
             token_matches!(keyword!("async")) if !self.followed_by_new_lined() => {
                 self.parse_async_function_expr()?
             }
