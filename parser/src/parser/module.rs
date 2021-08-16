@@ -36,16 +36,6 @@ where
         }
     }
 
-    fn parse_declaration_export(&mut self, span_start: usize) -> Result<Stmt> {
-        let decl = self.parse_stmt()?;
-        let span = self.span_from(span_start);
-        Ok(DeclExport::Decl(ExportDecl {
-            span,
-            decl: Box::new(decl),
-        })
-        .into())
-    }
-
     fn parse_default_export(&mut self) -> Result<Stmt> {
         self.consume_assert(keyword!("default"))?;
         match self.current()? {
@@ -58,6 +48,17 @@ where
             }
             _ => todo!("Default assignment expression"),
         }
+    }
+
+    /// Parses any `export` followed by a declaration.
+    fn parse_declaration_export(&mut self, span_start: usize) -> Result<Stmt> {
+        let decl = self.parse_stmt()?;
+        let span = self.span_from(span_start);
+        Ok(DeclExport::Decl(ExportDecl {
+            span,
+            decl: Box::new(decl),
+        })
+            .into())
     }
 
     /// Parses `export * from 'module'` and `export * as alias from 'module'`.
