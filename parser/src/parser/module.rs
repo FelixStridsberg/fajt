@@ -23,15 +23,9 @@ where
         match self.current() {
             token_matches!(ok: punct!("{")) => self.parse_named_export(span_start),
             token_matches!(ok: punct!("*")) => self.parse_namespace_export(span_start),
-            token_matches!(ok: keyword!("var")) => {
-                self.parse_var_decl_export(span_start, VariableKind::Var)
-            }
-            token_matches!(ok: keyword!("let")) => {
-                self.parse_var_decl_export(span_start, VariableKind::Let)
-            }
-            token_matches!(ok: keyword!("const")) => {
-                self.parse_var_decl_export(span_start, VariableKind::Const)
-            }
+            token_matches!(ok: keyword!("var"))
+            | token_matches!(ok: keyword!("let"))
+            | token_matches!(ok: keyword!("const")) => self.parse_declaration_export(span_start),
             token_matches!(ok: keyword!("class")) | token_matches!(ok: keyword!("function")) => {
                 todo!("Hoistable/class declaration")
             }
@@ -43,12 +37,8 @@ where
         }
     }
 
-    fn parse_var_decl_export(
-        &mut self,
-        span_start: usize,
-        variable_kind: VariableKind,
-    ) -> Result<Stmt> {
-        let decl = self.parse_variable_stmt(variable_kind)?;
+    fn parse_declaration_export(&mut self, span_start: usize) -> Result<Stmt> {
+        let decl = self.parse_stmt()?;
         let span = self.span_from(span_start);
         Ok(DeclExport::Decl(ExportDecl {
             span,
