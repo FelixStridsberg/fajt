@@ -29,7 +29,7 @@ where
             | token_matches!(ok: keyword!("function"))
             | token_matches!(ok: keyword!("class")) => self.parse_declaration_export(span_start),
             token_matches!(ok: keyword!("async")) if self.peek_matches(keyword!("function")) => {
-                todo!("Hoistable/class declaration")
+                self.parse_declaration_export(span_start)
             }
             token_matches!(ok: keyword!("default")) => self.parse_default_export(),
             _ => err!(UnexpectedToken(self.consume()?)),
@@ -58,7 +58,7 @@ where
             span,
             decl: Box::new(decl),
         })
-            .into())
+        .into())
     }
 
     /// Parses `export * from 'module'` and `export * as alias from 'module'`.
