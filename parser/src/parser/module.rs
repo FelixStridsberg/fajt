@@ -1,6 +1,6 @@
 use crate::ast::{
     DeclExport, DeclImport, ExportDecl, ExportNamed, ExportNamespace, Ident, NamedExport,
-    NamedImport, Stmt, VariableKind,
+    NamedImport, Stmt,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenTry};
@@ -25,10 +25,9 @@ where
             token_matches!(ok: punct!("*")) => self.parse_namespace_export(span_start),
             token_matches!(ok: keyword!("var"))
             | token_matches!(ok: keyword!("let"))
-            | token_matches!(ok: keyword!("const")) => self.parse_declaration_export(span_start),
-            token_matches!(ok: keyword!("class")) | token_matches!(ok: keyword!("function")) => {
-                todo!("Hoistable/class declaration")
-            }
+            | token_matches!(ok: keyword!("const"))
+            | token_matches!(ok: keyword!("function"))
+            | token_matches!(ok: keyword!("class")) => self.parse_declaration_export(span_start),
             token_matches!(ok: keyword!("async")) if self.peek_matches(keyword!("function")) => {
                 todo!("Hoistable/class declaration")
             }
