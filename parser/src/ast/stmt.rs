@@ -314,6 +314,7 @@ ast_mapping! {
 ast_struct! {
     pub struct ExportDecl {
         pub span: Span,
+        pub decl: Box<Stmt>,
     }
 }
 

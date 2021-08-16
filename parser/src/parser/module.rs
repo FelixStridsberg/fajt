@@ -1,5 +1,6 @@
 use crate::ast::{
-    DeclExport, DeclImport, ExportNamed, ExportNamespace, Ident, NamedExport, NamedImport, Stmt,
+    DeclExport, DeclImport, ExportDecl, ExportNamed, ExportNamespace, Ident, NamedExport,
+    NamedImport, Stmt, VariableKind,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenTry};
@@ -22,9 +23,12 @@ where
         match self.current() {
             token_matches!(ok: punct!("{")) => self.parse_named_export(span_start),
             token_matches!(ok: punct!("*")) => self.parse_namespace_export(span_start),
-            token_matches!(ok: keyword!("var"))
-            | token_matches!(ok: keyword!("let"))
-            | token_matches!(ok: keyword!("const")) => todo!("Variable/LexicalDeclaration"),
+            token_matches!(ok: keyword!("var")) => {
+                self.parse_var_decl_export(span_start, VariableKind::Var)
+            }
+            token_matches!(ok: keyword!("let")) | token_matches!(ok: keyword!("const")) => {
+                todo!("Variable/LexicalDeclaration")
+            }
             token_matches!(ok: keyword!("class")) | token_matches!(ok: keyword!("function")) => {
                 todo!("Hoistable/class declaration")
             }
@@ -34,6 +38,20 @@ where
             token_matches!(ok: keyword!("default")) => self.parse_default_export(),
             _ => err!(UnexpectedToken(self.consume()?)),
         }
+    }
+
+    fn parse_var_decl_export(
+        &mut self,
+        span_start: usize,
+        variable_kind: VariableKind,
+    ) -> Result<Stmt> {
+        let decl = self.parse_variable_stmt(variable_kind)?;
+        let span = self.span_from(span_start);
+        Ok(DeclExport::Decl(ExportDecl {
+            span,
+            decl: Box::new(decl),
+        })
+        .into())
     }
 
     fn parse_default_export(&mut self) -> Result<Stmt> {
@@ -188,7 +206,6 @@ where
 
         Ok(named_exports)
     }
-
     /// Parses the `ExportSpecifier` goal symbol.
     fn parse_export_specifier(&mut self) -> Result<NamedExport> {
         let span_start = self.position();
