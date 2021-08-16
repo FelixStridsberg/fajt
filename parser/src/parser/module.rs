@@ -26,8 +26,11 @@ where
             token_matches!(ok: keyword!("var")) => {
                 self.parse_var_decl_export(span_start, VariableKind::Var)
             }
-            token_matches!(ok: keyword!("let")) | token_matches!(ok: keyword!("const")) => {
-                todo!("Variable/LexicalDeclaration")
+            token_matches!(ok: keyword!("let")) => {
+                self.parse_var_decl_export(span_start, VariableKind::Let)
+            }
+            token_matches!(ok: keyword!("const")) => {
+                self.parse_var_decl_export(span_start, VariableKind::Const)
             }
             token_matches!(ok: keyword!("class")) | token_matches!(ok: keyword!("function")) => {
                 todo!("Hoistable/class declaration")
