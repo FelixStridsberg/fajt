@@ -13,7 +13,7 @@ import 'module'
           "default_binding": null,
           "namespace_binding": null,
           "named_imports": null,
-          "source": "module"
+          "from": "module"
         }
       }
     ]

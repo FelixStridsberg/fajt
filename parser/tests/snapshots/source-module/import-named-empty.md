@@ -13,7 +13,7 @@ import {} from 'module'
           "default_binding": null,
           "namespace_binding": null,
           "named_imports": [],
-          "source": "module"
+          "from": "module"
         }
       }
     ]

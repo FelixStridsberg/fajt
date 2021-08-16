@@ -17,7 +17,7 @@ import def, {} from 'module';
           "default_binding": null,
           "namespace_binding": null,
           "named_imports": null,
-          "source": "module"
+          "from": "module"
         }
       },
       {
@@ -29,7 +29,7 @@ import def, {} from 'module';
           },
           "namespace_binding": null,
           "named_imports": null,
-          "source": "module"
+          "from": "module"
         }
       },
       {
@@ -41,7 +41,7 @@ import def, {} from 'module';
             "name": "ns"
           },
           "named_imports": null,
-          "source": "module"
+          "from": "module"
         }
       },
       {
@@ -50,7 +50,7 @@ import def, {} from 'module';
           "default_binding": null,
           "namespace_binding": null,
           "named_imports": [],
-          "source": "module"
+          "from": "module"
         }
       },
       {
@@ -62,7 +62,7 @@ import def, {} from 'module';
           },
           "namespace_binding": null,
           "named_imports": [],
-          "source": "module"
+          "from": "module"
         }
       }
     ]

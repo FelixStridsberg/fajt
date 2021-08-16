@@ -284,7 +284,7 @@ ast_struct! {
         pub default_binding: Option<Ident>,
         pub namespace_binding: Option<Ident>,
         pub named_imports: Option<Vec<NamedImport>>,
-        pub source: String,
+        pub from: String,
     }
 }
 

@@ -16,7 +16,7 @@ import abc from 'module'
           },
           "namespace_binding": null,
           "named_imports": null,
-          "source": "module"
+          "from": "module"
         }
       }
     ]

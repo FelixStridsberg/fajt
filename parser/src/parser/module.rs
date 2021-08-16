@@ -45,7 +45,7 @@ where
 
         // `import "./module.js"`;
         if self.current_matches_string_literal() {
-            let source = self.parse_module_specifier()?;
+            let from = self.parse_module_specifier()?;
             self.consume_optional_semicolon()?;
             let span = self.span_from(span_start);
             return Ok(DeclImport {
@@ -53,7 +53,7 @@ where
                 default_binding: None,
                 namespace_binding: None,
                 named_imports: None,
-                source,
+                from,
             }
             .into());
         }
@@ -71,7 +71,7 @@ where
             };
 
         self.consume_assert(keyword!("from"))?;
-        let source = self.parse_module_specifier()?;
+        let from = self.parse_module_specifier()?;
 
         self.consume_optional_semicolon()?;
 
@@ -81,7 +81,7 @@ where
             default_binding,
             namespace_binding,
             named_imports,
-            source,
+            from,
         }
         .into())
     }

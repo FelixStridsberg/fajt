@@ -33,7 +33,7 @@ import def, {a, b} from 'module'
               "alias": null
             }
           ],
-          "source": "module"
+          "from": "module"
         }
       }
     ]

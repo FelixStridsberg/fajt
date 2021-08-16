@@ -16,7 +16,7 @@ import * as ns from 'module'
             "name": "ns"
           },
           "named_imports": null,
-          "source": "module"
+          "from": "module"
         }
       }
     ]

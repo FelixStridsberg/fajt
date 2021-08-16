@@ -19,7 +19,7 @@ import def, * as a from 'module'
             "name": "a"
           },
           "named_imports": null,
-          "source": "module"
+          "from": "module"
         }
       }
     ]

@@ -33,7 +33,7 @@ import { a, b as c } from 'module'
               }
             }
           ],
-          "source": "module"
+          "from": "module"
         }
       }
     ]
