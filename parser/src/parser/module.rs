@@ -26,10 +26,14 @@ where
 
     fn parse_named_export(&mut self, span_start: usize) -> Result<Stmt> {
         let named_exports = self.parse_named_exports()?;
+        let from = self
+            .maybe_consume(keyword!("from"))?
+            .then_try(|| self.parse_module_specifier())?;
         let span = self.span_from(span_start);
         Ok(DeclExport::Named(ExportNamed {
             span,
             named_exports,
+            from,
         })
         .into())
     }

@@ -327,6 +327,7 @@ ast_struct! {
     pub struct ExportNamed {
         pub span: Span,
         pub named_exports: Vec<NamedExport>,
+        pub from: Option<String>,
     }
 }
 
