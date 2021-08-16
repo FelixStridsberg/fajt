@@ -1,4 +1,6 @@
-use crate::ast::{DeclExport, DeclImport, ExportNamed, Ident, NamedExport, NamedImport, Stmt};
+use crate::ast::{
+    DeclExport, DeclImport, ExportNamed, ExportNamespace, Ident, NamedExport, NamedImport, Stmt,
+};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenTry};
 use crate::Parser;
@@ -19,7 +21,7 @@ where
 
         match self.current() {
             token_matches!(ok: punct!("{")) => self.parse_named_export(span_start),
-            token_matches!(ok: punct!("*")) => todo!("Namespace export"),
+            token_matches!(ok: punct!("*")) => self.parse_namespace_export(span_start),
             token_matches!(ok: keyword!("var"))
             | token_matches!(ok: keyword!("let"))
             | token_matches!(ok: keyword!("const")) => todo!("Variable/LexicalDeclaration"),
@@ -48,6 +50,19 @@ where
         }
     }
 
+    /// Parses `export * from 'module'` and `export * as alias from 'module'`.
+    fn parse_namespace_export(&mut self, span_start: usize) -> Result<Stmt> {
+        self.consume_assert(punct!("*"))?;
+        let alias = self
+            .maybe_consume(keyword!("as"))?
+            .then_try(|| self.parse_identifier())?;
+        self.consume_assert(keyword!("from"))?;
+        let from = self.parse_module_specifier()?;
+        let span = self.span_from(span_start);
+        Ok(DeclExport::Namespace(ExportNamespace { span, alias, from }).into())
+    }
+
+    /// Parses `export { name }` and `export { name as name2 } from 'other'`.
     fn parse_named_export(&mut self, span_start: usize) -> Result<Stmt> {
         let named_exports = self.parse_named_exports()?;
         let from = self

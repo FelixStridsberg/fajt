@@ -334,6 +334,8 @@ ast_struct! {
 ast_struct! {
     pub struct ExportNamespace {
         pub span: Span,
+        pub alias: Option<Ident>,
+        pub from: String,
     }
 }
 
