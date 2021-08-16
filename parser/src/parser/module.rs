@@ -17,10 +17,34 @@ where
         let span_start = self.position();
         self.consume_assert(keyword!("export"))?;
 
-        if self.current_matches(punct!("{")) {
-            self.parse_named_export(span_start)
-        } else {
-            todo!("Export type not implemented yet")
+        match self.current() {
+            token_matches!(ok: punct!("{")) => self.parse_named_export(span_start),
+            token_matches!(ok: punct!("*")) => todo!("Namespace export"),
+            token_matches!(ok: keyword!("var"))
+            | token_matches!(ok: keyword!("let"))
+            | token_matches!(ok: keyword!("const")) => todo!("Variable/LexicalDeclaration"),
+            token_matches!(ok: keyword!("class")) | token_matches!(ok: keyword!("function")) => {
+                todo!("Hoistable/class declaration")
+            }
+            token_matches!(ok: keyword!("async")) if self.peek_matches(keyword!("function")) => {
+                todo!("Hoistable/class declaration")
+            }
+            token_matches!(ok: keyword!("default")) => self.parse_default_export(),
+            _ => err!(UnexpectedToken(self.consume()?)),
+        }
+    }
+
+    fn parse_default_export(&mut self) -> Result<Stmt> {
+        self.consume_assert(keyword!("default"))?;
+        match self.current()? {
+            token_matches!(keyword!("class"))
+            | token_matches!(keyword!("function"))
+            | token_matches!(keyword!("async"))
+                if self.peek_matches(keyword!("function")) =>
+            {
+                todo!("Default hoistable/class declaration")
+            }
+            _ => todo!("Default assignment expression"),
         }
     }
 
