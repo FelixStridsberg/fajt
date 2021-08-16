@@ -306,6 +306,7 @@ ast_mapping! {
     pub enum DeclExport {
         Decl(ExportDecl),
         DefaultExpr(ExportDefaultExpr),
+        DefaultDecl(ExportDefaultDecl),
         Named(ExportNamed),
         Namespace(ExportNamespace),
     }
@@ -313,6 +314,13 @@ ast_mapping! {
 
 ast_struct! {
     pub struct ExportDecl {
+        pub span: Span,
+        pub decl: Box<Stmt>,
+    }
+}
+
+ast_struct! {
+    pub struct ExportDefaultDecl {
         pub span: Span,
         pub decl: Box<Stmt>,
     }

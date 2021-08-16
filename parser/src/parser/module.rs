@@ -1,6 +1,6 @@
 use crate::ast::{
-    DeclExport, DeclImport, ExportDecl, ExportNamed, ExportNamespace, Ident, NamedExport,
-    NamedImport, Stmt,
+    DeclExport, DeclImport, ExportDecl, ExportDefaultDecl, ExportNamed, ExportNamespace, Ident,
+    NamedExport, NamedImport, Stmt,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenTry};
@@ -31,20 +31,19 @@ where
             token_matches!(ok: keyword!("async")) if self.peek_matches(keyword!("function")) => {
                 self.parse_declaration_export(span_start)
             }
-            token_matches!(ok: keyword!("default")) => self.parse_default_export(),
+            token_matches!(ok: keyword!("default")) => self.parse_default_export(span_start),
             _ => err!(UnexpectedToken(self.consume()?)),
         }
     }
 
-    fn parse_default_export(&mut self) -> Result<Stmt> {
+    fn parse_default_export(&mut self, span_start: usize) -> Result<Stmt> {
         self.consume_assert(keyword!("default"))?;
         match self.current()? {
-            token_matches!(keyword!("class"))
-            | token_matches!(keyword!("function"))
-            | token_matches!(keyword!("async"))
-                if self.peek_matches(keyword!("function")) =>
-            {
-                todo!("Default hoistable/class declaration")
+            token_matches!(keyword!("class")) | token_matches!(keyword!("function")) => {
+                self.parse_declaration_default_export(span_start)
+            }
+            token_matches!(keyword!("async")) if self.peek_matches(keyword!("function")) => {
+                self.parse_declaration_default_export(span_start)
             }
             _ => todo!("Default assignment expression"),
         }
@@ -55,6 +54,17 @@ where
         let decl = self.parse_stmt()?;
         let span = self.span_from(span_start);
         Ok(DeclExport::Decl(ExportDecl {
+            span,
+            decl: Box::new(decl),
+        })
+        .into())
+    }
+
+    /// Parses any `export default` followed by a declaration.
+    fn parse_declaration_default_export(&mut self, span_start: usize) -> Result<Stmt> {
+        let decl = self.parse_stmt()?;
+        let span = self.span_from(span_start);
+        Ok(DeclExport::DefaultDecl(ExportDefaultDecl {
             span,
             decl: Box::new(decl),
         })
