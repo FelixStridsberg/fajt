@@ -101,20 +101,8 @@ where
         self.consume_assert(keyword!("function"))?;
 
         let generator = self.maybe_consume(punct!("*"))?;
-        let identifier = self.parse_optional_identifier()?;
-        let parameters = self.parse_formal_parameters()?;
-        let body = self.parse_function_body()?;
-
-        let span = self.span_from(span_start);
-        Ok(ExprFunction {
-            span,
-            asynchronous: false,
-            generator,
-            identifier,
-            parameters,
-            body,
-        }
-        .into())
+        self.with_context(ContextModify::new().set_yield(generator).set_await(false))
+            .parse_function_expr_content(span_start)
     }
 
     /// Parses the `AsyncFunctionExpression` goal symbol.
@@ -126,6 +114,13 @@ where
         debug_assert!(!function_token.first_on_line);
 
         let generator = self.maybe_consume(punct!("*"))?;
+        self.with_context(ContextModify::new().set_yield(generator).set_await(true))
+            .parse_function_expr_content(span_start)
+    }
+
+    /// Parses the parts from the optional identifier and forward for async/non-async
+    /// function/generator expressions, assumes context is set correctly.
+    fn parse_function_expr_content(&mut self, span_start: usize) -> Result<Expr> {
         let identifier = self.parse_optional_identifier()?;
         let parameters = self.parse_formal_parameters()?;
         let body = self.parse_function_body()?;
@@ -133,8 +128,8 @@ where
         let span = self.span_from(span_start);
         Ok(ExprFunction {
             span,
-            asynchronous: true,
-            generator,
+            asynchronous: self.context.is_await,
+            generator: self.context.is_yield,
             identifier,
             parameters,
             body,
@@ -150,8 +145,8 @@ where
         let generator = self.maybe_consume(punct!("*"))?;
         let ident = self.parse_function_identifier()?;
 
-        self.with_context(ContextModify::new().set_yield(false).set_await(false))
-            .parse_function_implementation(span_start, ident, generator, false)
+        self.with_context(ContextModify::new().set_yield(generator).set_await(false))
+            .parse_function_decl_content(span_start, ident)
     }
 
     /// Parses the `AsyncFunctionDeclaration` goal symbol.
@@ -165,8 +160,30 @@ where
         let generator = self.maybe_consume(punct!("*"))?;
         let ident = self.parse_function_identifier()?;
 
-        self.with_context(ContextModify::new().set_yield(false).set_await(true))
-            .parse_function_implementation(span_start, ident, generator, true)
+        self.with_context(ContextModify::new().set_yield(generator).set_await(true))
+            .parse_function_decl_content(span_start, ident)
+    }
+
+    /// Parses the parts after the identifier and forward async/non-async function/generator
+    /// declarations, assumes context is set correctly.
+    pub(super) fn parse_function_decl_content(
+        &mut self,
+        span_start: usize,
+        identifier: Ident,
+    ) -> Result<Stmt> {
+        let parameters = self.parse_formal_parameters()?;
+        let body = self.parse_function_body()?;
+
+        let span = self.span_from(span_start);
+        Ok(DeclFunction {
+            span,
+            asynchronous: self.context.is_await,
+            generator: self.context.is_yield,
+            identifier,
+            parameters,
+            body,
+        }
+        .into())
     }
 
     /// Parses the name of a function, if in `default` (export default) context, the ident may be
@@ -182,38 +199,6 @@ where
         } else {
             self.parse_identifier()
         }
-    }
-
-    /// Parses the part after the identifier of a function declaration.
-    ///
-    /// Example:
-    /// ```no_rust
-    /// function fn( a, ...args ) { return 1 };
-    ///            ^~~~~~~~~~~~~~~~~~~~~~~~~~~^
-    ///
-    /// async function fn( a, ...args ) { return 1 };
-    ///                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~^
-    /// ```
-    pub(super) fn parse_function_implementation(
-        &mut self,
-        span_start: usize,
-        ident: Ident,
-        generator: bool,
-        asynchronous: bool,
-    ) -> Result<Stmt> {
-        let parameters = self.parse_formal_parameters()?;
-        let body = self.parse_function_body()?;
-
-        let span = self.span_from(span_start);
-        Ok(DeclFunction {
-            span,
-            asynchronous,
-            generator,
-            identifier: ident,
-            parameters,
-            body,
-        }
-        .into())
     }
 
     /// Parses the `FormalParameters` goal symbol.

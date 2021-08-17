@@ -3,7 +3,7 @@ use crate::ast::{
     ExprNew, ExprSequence, ExprThis, ExprUnary, ExprUpdate, ExprYield, Ident, Literal,
     MemberObject, Super,
 };
-use crate::error::ErrorKind::SyntaxError;
+use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::{Result, ThenTry};
 use crate::{ContextModify, Parser};
 
@@ -51,7 +51,9 @@ where
     pub(super) fn parse_assignment_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         match self.current() {
-            token_matches!(ok: keyword!("yield")) => self.parse_yield_expr(),
+            token_matches!(ok: keyword!("yield")) if self.context.is_yield => {
+                self.parse_yield_expr()
+            }
             token_matches!(ok: keyword!("async")) => self.parse_assignment_expr_async(),
             token_matches!(ok: punct!("(")) => self.parse_assignment_expr_open_parentheses(),
             _ if self.is_identifier()
@@ -552,7 +554,7 @@ where
                 .parse_cover_parenthesized_and_arrow_parameters()?
                 .into_expr()?,
             _ if self.is_identifier() => self.parse_identifier_reference()?,
-            r => unimplemented!("TOKEN: {:?}", r),
+            _ => return err!(UnexpectedToken(self.consume()?)),
         })
     }
 

@@ -120,7 +120,9 @@ where
     /// Parses the `ExpressionStatement` gaol symbol.
     fn parse_expr_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        let expr = self.parse_expr()?;
+        let expr = self
+            .with_context(ContextModify::new().set_in(true))
+            .parse_expr()?;
 
         self.consume_optional_semicolon()?;
 
