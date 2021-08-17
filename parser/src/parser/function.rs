@@ -148,14 +148,7 @@ where
         self.consume_assert(keyword!("function"))?;
 
         let generator = self.maybe_consume(punct!("*"))?;
-
-        // In `default` context the identifier is optional.
-        let ident = if self.context.is_default && self.current_matches(punct!("(")) {
-            let current = self.current().unwrap();
-            Ident::new("", Span::new(current.span.start, current.span.start))
-        } else {
-            self.parse_identifier()?
-        };
+        let ident = self.parse_function_identifier()?;
 
         self.with_context(ContextModify::new().set_yield(false).set_await(false))
             .parse_function_implementation(span_start, ident, generator, false)
@@ -170,10 +163,22 @@ where
         debug_assert!(!function_token.first_on_line);
 
         let generator = self.maybe_consume(punct!("*"))?;
-        let ident = self.parse_identifier()?;
+        let ident = self.parse_function_identifier()?;
 
         self.with_context(ContextModify::new().set_yield(false).set_await(true))
             .parse_function_implementation(span_start, ident, generator, true)
+    }
+
+    /// Parses the name of a function, if in `default` (export default) context, the ident may be
+    /// empty/non existent.
+    fn parse_function_identifier(&mut self) -> Result<Ident> {
+        // In `default` context the identifier is optional.
+        if self.context.is_default && self.current_matches(punct!("(")) {
+            let current = self.current().unwrap();
+            Ok(Ident::new("", Span::new(current.span.start, current.span.start)))
+        } else {
+            self.parse_identifier()
+        }
     }
 
     /// Parses the part after the identifier of a function declaration.

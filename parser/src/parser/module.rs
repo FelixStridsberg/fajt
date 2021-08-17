@@ -42,9 +42,9 @@ where
             token_matches!(keyword!("class")) | token_matches!(keyword!("function")) => self
                 .with_context(ContextModify::new().set_default(true))
                 .parse_declaration_default_export(span_start),
-            token_matches!(keyword!("async")) if self.peek_matches(keyword!("function")) => {
-                self.parse_declaration_default_export(span_start)
-            }
+            token_matches!(keyword!("async")) if self.peek_matches(keyword!("function")) => self
+                .with_context(ContextModify::new().set_default(true))
+                .parse_declaration_default_export(span_start),
             _ => todo!("Default assignment expression"),
         }
     }
