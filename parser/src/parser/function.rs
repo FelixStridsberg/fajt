@@ -8,7 +8,7 @@ use crate::Parser;
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
-use fajt_lexer::token::Token;
+use fajt_lexer::token::{Span, Token};
 use fajt_lexer::token_matches;
 
 impl<I> Parser<'_, I>
@@ -148,7 +148,14 @@ where
         self.consume_assert(keyword!("function"))?;
 
         let generator = self.maybe_consume(punct!("*"))?;
-        let ident = self.parse_identifier()?;
+
+        // In `default` context the identifier is optional.
+        let ident = if self.context.is_default && self.current_matches(punct!("(")) {
+            let current = self.current().unwrap();
+            Ident::new("", Span::new(current.span.start, current.span.start))
+        } else {
+            self.parse_identifier()?
+        };
 
         self.with_context(ContextModify::new().set_yield(false).set_await(false))
             .parse_function_implementation(span_start, ident, generator, false)

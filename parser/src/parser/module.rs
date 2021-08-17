@@ -4,7 +4,7 @@ use crate::ast::{
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenTry};
-use crate::Parser;
+use crate::{ContextModify, Parser};
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
@@ -39,9 +39,9 @@ where
     fn parse_default_export(&mut self, span_start: usize) -> Result<Stmt> {
         self.consume_assert(keyword!("default"))?;
         match self.current()? {
-            token_matches!(keyword!("class")) | token_matches!(keyword!("function")) => {
-                self.parse_declaration_default_export(span_start)
-            }
+            token_matches!(keyword!("class")) | token_matches!(keyword!("function")) => self
+                .with_context(ContextModify::new().set_default(true))
+                .parse_declaration_default_export(span_start),
             token_matches!(keyword!("async")) if self.peek_matches(keyword!("function")) => {
                 self.parse_declaration_default_export(span_start)
             }

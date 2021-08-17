@@ -28,6 +28,7 @@ pub struct ContextModify {
     is_yield: Option<bool>,
     is_in: Option<bool>,
     is_strict: Option<bool>,
+    is_default: Option<bool>,
 }
 
 impl ContextModify {
@@ -37,6 +38,7 @@ impl ContextModify {
             is_yield: None,
             is_in: None,
             is_strict: None,
+            is_default: None,
         }
     }
 
@@ -59,6 +61,11 @@ impl ContextModify {
         self.is_strict = Some(value);
         self
     }
+
+    pub fn set_default(&mut self, value: bool) -> &mut Self {
+        self.is_default = Some(value);
+        self
+    }
 }
 
 #[derive(Clone)]
@@ -67,6 +74,7 @@ pub struct Context {
     is_yield: bool,
     is_in: bool,
     is_strict: bool,
+    is_default: bool,
 }
 
 impl Context {
@@ -86,6 +94,10 @@ impl Context {
 
         if let Some(is_strict) = modify.is_strict {
             context.is_strict = is_strict;
+        }
+
+        if let Some(is_default) = modify.is_default {
+            context.is_default = is_default;
         }
 
         context
@@ -116,6 +128,7 @@ impl Default for Context {
             is_yield: false,
             is_in: false,
             is_strict: false,
+            is_default: false,
         }
     }
 }
