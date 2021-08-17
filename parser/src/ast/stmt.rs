@@ -329,6 +329,7 @@ ast_struct! {
 ast_struct! {
     pub struct ExportDefaultExpr {
         pub span: Span,
+        pub expr: Box<Expr>,
     }
 }
 

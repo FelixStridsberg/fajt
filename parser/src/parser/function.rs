@@ -175,7 +175,10 @@ where
         // In `default` context the identifier is optional.
         if self.context.is_default && self.current_matches(punct!("(")) {
             let current = self.current().unwrap();
-            Ok(Ident::new("", Span::new(current.span.start, current.span.start)))
+            Ok(Ident::new(
+                "",
+                Span::new(current.span.start, current.span.start),
+            ))
         } else {
             self.parse_identifier()
         }

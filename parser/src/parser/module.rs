@@ -1,6 +1,6 @@
 use crate::ast::{
-    DeclExport, DeclImport, ExportDecl, ExportDefaultDecl, ExportNamed, ExportNamespace, Ident,
-    NamedExport, NamedImport, Stmt,
+    DeclExport, DeclImport, ExportDecl, ExportDefaultDecl, ExportDefaultExpr, ExportNamed,
+    ExportNamespace, Ident, NamedExport, NamedImport, Stmt,
 };
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenTry};
@@ -45,7 +45,15 @@ where
             token_matches!(keyword!("async")) if self.peek_matches(keyword!("function")) => self
                 .with_context(ContextModify::new().set_default(true))
                 .parse_declaration_default_export(span_start),
-            _ => todo!("Default assignment expression"),
+            _ => {
+                let expr = self.parse_assignment_expr()?;
+                let span = self.span_from(span_start);
+                Ok(DeclExport::DefaultExpr(ExportDefaultExpr {
+                    span,
+                    expr: Box::new(expr),
+                })
+                .into())
+            }
         }
     }
 
