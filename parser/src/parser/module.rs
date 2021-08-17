@@ -47,6 +47,7 @@ where
                 .parse_declaration_default_export(span_start),
             _ => {
                 let expr = self.parse_assignment_expr()?;
+                self.consume_optional_semicolon()?;
                 let span = self.span_from(span_start);
                 Ok(DeclExport::DefaultExpr(ExportDefaultExpr {
                     span,
