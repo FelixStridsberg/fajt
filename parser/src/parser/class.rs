@@ -1,10 +1,12 @@
-use crate::ast::{ClassElement, ClassMethod, ClassMethodKind, DeclClass, Expr, ExprClass, Stmt};
+use crate::ast::{
+    ClassElement, ClassMethod, ClassMethodKind, DeclClass, Expr, ExprClass, Ident, Stmt,
+};
 use crate::error::{Result, ThenTry};
 use crate::Parser;
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
-use fajt_lexer::token::Token;
+use fajt_lexer::token::{Span, Token};
 use fajt_lexer::token_matches;
 
 impl<I> Parser<'_, I>
@@ -16,7 +18,13 @@ where
         let span_start = self.position();
         self.consume_assert(keyword!("class"))?;
 
-        let identifier = self.parse_identifier()?;
+        let identifier = if self.context.is_default && self.current_matches(punct!("{")) {
+            let current = self.current().unwrap();
+            Ident::new("", Span::new(current.span.start, current.span.start))
+        } else {
+            self.parse_identifier()?
+        };
+
         let (super_class, body) = self.parse_class_tail()?;
 
         let span = self.span_from(span_start);
