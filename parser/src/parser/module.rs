@@ -87,6 +87,7 @@ where
             .then_try(|| self.parse_identifier())?;
         self.consume_assert(keyword!("from"))?;
         let from = self.parse_module_specifier()?;
+        self.consume_optional_semicolon()?;
         let span = self.span_from(span_start);
         Ok(DeclExport::Namespace(ExportNamespace { span, alias, from }).into())
     }
@@ -97,6 +98,7 @@ where
         let from = self
             .maybe_consume(keyword!("from"))?
             .then_try(|| self.parse_module_specifier())?;
+        self.consume_optional_semicolon()?;
         let span = self.span_from(span_start);
         Ok(DeclExport::Named(ExportNamed {
             span,
