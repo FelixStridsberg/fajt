@@ -259,7 +259,7 @@ ast_struct! {
         pub left: ForInit,
         pub right: Expr,
         pub body: Box<Stmt>,
-        pub wait: bool,
+        pub asynchronous: bool,
     }
 }
 

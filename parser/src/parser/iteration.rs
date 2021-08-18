@@ -135,7 +135,12 @@ where
         self.parse_for_of(span_start, init.unwrap(), true)
     }
 
-    fn parse_for_of(&mut self, span_start: usize, left: ForInit, wait: bool) -> Result<Stmt> {
+    fn parse_for_of(
+        &mut self,
+        span_start: usize,
+        left: ForInit,
+        asynchronous: bool,
+    ) -> Result<Stmt> {
         // TODO verify that `left` is a valid LeftHandSideExpression if not declaration.
 
         self.consume_assert(keyword!("of"))?;
@@ -153,7 +158,7 @@ where
             left,
             right,
             body: body.into(),
-            wait,
+            asynchronous,
         }
         .into())
     }

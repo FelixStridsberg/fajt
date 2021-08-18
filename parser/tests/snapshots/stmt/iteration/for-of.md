@@ -25,7 +25,7 @@ for (a of b) ;
         "span": "13:14"
       }
     },
-    "wait": false
+    "asynchronous": false
   }
 }
 ```

@@ -35,7 +35,7 @@ for (var a of b) ;
         "span": "17:18"
       }
     },
-    "wait": false
+    "asynchronous": false
   }
 }
 ```
