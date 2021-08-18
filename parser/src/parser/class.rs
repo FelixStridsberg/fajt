@@ -1,8 +1,9 @@
 use crate::ast::{
-    ClassElement, ClassMethod, ClassMethodKind, DeclClass, Expr, ExprClass, Ident, Stmt,
+    ClassElement, ClassMethod, ClassMethodKind, DeclClass, Expr, ExprClass, Ident, PropertyName,
+    Stmt,
 };
 use crate::error::{Result, ThenTry};
-use crate::Parser;
+use crate::{ContextModify, Parser};
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
@@ -87,9 +88,12 @@ where
                 token_matches!(keyword!("set")) => {
                     self.parse_class_get_set(ClassMethodKind::Set)?.into()
                 }
-                _ => self
-                    .parse_class_method(self.position(), ClassMethodKind::Method, false, false)?
-                    .into(),
+                _ => {
+                    let span_start = self.position();
+                    let name = self.parse_property_name()?;
+                    self.parse_class_method(span_start, name, ClassMethodKind::Method)?
+                        .into()
+                }
             };
 
             class_body.push(element);
@@ -101,13 +105,16 @@ where
     fn parse_class_get_set(&mut self, kind: ClassMethodKind) -> Result<ClassMethod> {
         let span_start = self.position();
         self.consume()?;
-        self.parse_class_method(span_start, kind, false, false)
+        let name = self.parse_property_name()?;
+        self.parse_class_method(span_start, name, kind)
     }
 
     fn parse_class_generator_method(&mut self) -> Result<ClassMethod> {
         let span_start = self.position();
         self.consume()?;
-        self.parse_class_method(span_start, ClassMethodKind::Method, true, false)
+        let name = self.parse_property_name()?;
+        self.with_context(ContextModify::new().set_yield(true).set_await(false))
+            .parse_class_method(span_start, name, ClassMethodKind::Method)
     }
 
     fn parse_class_async_method(&mut self) -> Result<ClassMethod> {
@@ -115,17 +122,17 @@ where
         self.consume()?;
 
         let generator = self.maybe_consume(punct!("*"))?;
-        self.parse_class_method(span_start, ClassMethodKind::Method, generator, true)
+        let name = self.parse_property_name()?;
+        self.with_context(ContextModify::new().set_yield(generator).set_await(true))
+            .parse_class_method(span_start, name, ClassMethodKind::Method)
     }
 
     fn parse_class_method(
         &mut self,
         span_start: usize,
+        name: PropertyName,
         kind: ClassMethodKind,
-        generator: bool,
-        asynchronous: bool,
     ) -> Result<ClassMethod> {
-        let name = self.parse_property_name()?;
         // TODO this should be `UniqueFormalParameters` or `PropertySetParameterList` depending on kind.
         let parameters = self.parse_formal_parameters()?;
         let body = self.parse_function_body()?;
@@ -137,8 +144,8 @@ where
             kind,
             parameters,
             body,
-            generator,
-            asynchronous,
+            generator: self.context.is_yield,
+            asynchronous: self.context.is_await,
         })
     }
 }

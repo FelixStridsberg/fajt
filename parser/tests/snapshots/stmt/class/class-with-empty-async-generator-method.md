@@ -1,11 +1,15 @@
 ```js
-class cls { async *method1() {} }
+class cls {
+  async *method1() {
+    yield
+  }
+}
 ```
 
 ```json
 {
   "Class": {
-    "span": "0:33",
+    "span": "0:48",
     "identifier": {
       "span": "6:9",
       "name": "cls"
@@ -14,23 +18,36 @@ class cls { async *method1() {} }
     "body": [
       {
         "Method": {
-          "span": "12:31",
+          "span": "14:46",
           "name": {
             "Ident": {
-              "span": "19:26",
+              "span": "21:28",
               "name": "method1"
             }
           },
           "kind": "Method",
           "parameters": {
-            "span": "26:28",
+            "span": "28:30",
             "bindings": [],
             "rest": null
           },
           "body": {
-            "span": "29:31",
+            "span": "31:46",
             "directives": [],
-            "statements": []
+            "statements": [
+              {
+                "Expr": {
+                  "span": "37:42",
+                  "expr": {
+                    "Yield": {
+                      "span": "37:42",
+                      "argument": null,
+                      "delegate": false
+                    }
+                  }
+                }
+              }
+            ]
           },
           "generator": true,
           "asynchronous": true

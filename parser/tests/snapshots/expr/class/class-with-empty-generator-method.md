@@ -1,33 +1,50 @@
 ```js
-class { *method1() {} }
+class {
+  *method1() {
+    yield
+  }
+}
 ```
 
 ```json
 {
   "Class": {
-    "span": "0:23",
+    "span": "0:38",
     "identifier": null,
     "super_class": null,
     "body": [
       {
         "Method": {
-          "span": "8:21",
+          "span": "10:36",
           "name": {
             "Ident": {
-              "span": "9:16",
+              "span": "11:18",
               "name": "method1"
             }
           },
           "kind": "Method",
           "parameters": {
-            "span": "16:18",
+            "span": "18:20",
             "bindings": [],
             "rest": null
           },
           "body": {
-            "span": "19:21",
+            "span": "21:36",
             "directives": [],
-            "statements": []
+            "statements": [
+              {
+                "Expr": {
+                  "span": "27:32",
+                  "expr": {
+                    "Yield": {
+                      "span": "27:32",
+                      "argument": null,
+                      "delegate": false
+                    }
+                  }
+                }
+              }
+            ]
           },
           "generator": true,
           "asynchronous": false
