@@ -147,7 +147,7 @@ impl Keyword {
             | Self::Set
             | Self::Target => true,
             Self::Await if !ctx.contains(KeywordContext::AWAIT) => true,
-            Self::Yield if !ctx.contains(KeywordContext::YIELD) => true,
+            Self::Yield if !ctx.intersects(KeywordContext::YIELD | KeywordContext::STRICT) => true,
             Self::Implements
             | Self::Interface
             | Self::Let
