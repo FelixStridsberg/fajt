@@ -1,9 +1,9 @@
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
-use fajt_ast::{Expr, Ident, Program, PropertyName, SourceType, Stmt};
+use fajt_ast::{Expr, Ident, Literal, Program, PropertyName, SourceType, Span, Stmt};
 use fajt_common::io::{PeekRead, PeekReader};
 use fajt_lexer::punct;
-use fajt_lexer::token::{KeywordContext, Literal, Span, Token, TokenValue};
+use fajt_lexer::token::{KeywordContext, Token, TokenValue};
 use fajt_lexer::token_matches;
 use std::cell::RefCell;
 use std::rc::Rc;

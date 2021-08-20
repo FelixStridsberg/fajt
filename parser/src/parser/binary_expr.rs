@@ -2,11 +2,11 @@ use crate::error::Result;
 use crate::Parser;
 use fajt_ast::binary_op;
 use fajt_ast::logical_op;
-use fajt_ast::{BinaryOperator, Expr, ExprBinary, ExprLogical, LogicalOperator};
+use fajt_ast::{BinaryOperator, Expr, ExprBinary, ExprLogical, LogicalOperator, Span};
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
-use fajt_lexer::token::{Span, Token};
+use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
 
 impl<'a, I> Parser<'a, I>

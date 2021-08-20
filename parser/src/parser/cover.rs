@@ -1,10 +1,10 @@
 use crate::error::Result;
 use crate::Parser;
-use fajt_ast::{Expr, ExprParenthesized, FormalParameters, SourceType};
+use fajt_ast::{Expr, ExprParenthesized, FormalParameters, SourceType, Span};
 use fajt_common::io::{PeekRead, PeekReader};
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
-use fajt_lexer::token::{Span, Token};
+use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
 use serde::{Deserialize, Serialize};
 

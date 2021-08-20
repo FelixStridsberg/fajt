@@ -18,7 +18,7 @@ macro_rules! ast_mapping {
         }
 
         impl $crate::Spanned for $name {
-            fn span(&self) -> &Span {
+            fn span(&self) -> &$crate::Span {
                 match self {
                     $( Self::$variant(v) => $crate::Spanned::span(v), )*
                 }
@@ -58,7 +58,7 @@ macro_rules! ast_struct {
         }
 
         impl $crate::Spanned for $name {
-            fn span(&self) -> &fajt_lexer::token::Span {
+            fn span(&self) -> &$crate::Span {
                 &self.span
             }
         }

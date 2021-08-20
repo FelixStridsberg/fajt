@@ -1,7 +1,6 @@
 use crate::class::ExprClass;
 use crate::literal::*;
-use crate::{Body, FormalParameters, Ident};
-use fajt_lexer::token::Span;
+use crate::{Body, FormalParameters, Ident, Span};
 use fajt_macros::FromString;
 
 ast_mapping! {

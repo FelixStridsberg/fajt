@@ -1,5 +1,4 @@
-use crate::{BindingElement, BindingPattern, DeclClass, Expr, Ident};
-use fajt_lexer::token::Span;
+use crate::{BindingElement, BindingPattern, DeclClass, Expr, Ident, Span};
 
 ast_mapping! {
     /// Note: Declarations are handles as statements since they can appear in the same contexts.

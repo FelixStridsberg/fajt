@@ -59,7 +59,6 @@ name = "fajt_ast"
 version = "0.1.0"
 dependencies = [
  "fajt_common",
- "fajt_lexer",
  "fajt_macros",
  "serde",
 ]
@@ -77,6 +76,7 @@ name = "fajt_lexer"
 version = "0.1.0"
 dependencies = [
  "bitflags",
+ "fajt_ast",
  "fajt_common",
  "fajt_macros",
  "serde",

@@ -29,7 +29,7 @@ where
         if let TokenValue::Literal(literal) = token.value {
             Ok(ExprLiteral {
                 span: token.span,
-                literal: literal.into(),
+                literal,
             }
             .into())
         } else {

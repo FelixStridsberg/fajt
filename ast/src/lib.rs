@@ -1,6 +1,7 @@
 #[macro_use]
 mod macros;
 pub mod binding;
+pub mod span;
 #[macro_use]
 pub mod expr;
 pub mod class;
@@ -13,10 +14,8 @@ pub use crate::binding::*;
 pub use crate::class::*;
 pub use crate::expr::*;
 pub use crate::literal::*;
+pub use crate::span::*;
 pub use crate::stmt::*;
-
-// TODO move to ast
-use fajt_lexer::token::Span;
 
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub enum SourceType {
