@@ -552,9 +552,9 @@ where
             }
             token_matches!(punct!("/")) => todo!("RegularExpressionLiteral"),
             // token_matches!(punct!("`")) => todo!("TemplateLiteral"), TODO missing from lexer
-            token_matches!(punct!("(")) => todo!(), /*self
-            .parse_cover_parenthesized_and_arrow_parameters()?
-            .into_expr()?,*/
+            token_matches!(punct!("(")) => self
+                .parse_cover_parenthesized_and_arrow_parameters()?
+                .into_expr()?,
             _ if self.is_identifier() => self.parse_identifier_reference()?,
             _ => return err!(UnexpectedToken(self.consume()?)),
         })
