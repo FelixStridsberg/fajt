@@ -2,9 +2,9 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
 use std::{error, fmt};
 
+use fajt_ast::Span;
 use fajt_common::io::Error as CommonError;
 use fajt_lexer::error::Error as LexerError;
-use fajt_lexer::token::Span;
 
 // TODO this macro should expand without debug info for optimized build.
 #[macro_export]

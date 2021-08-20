@@ -1,14 +1,14 @@
-use crate::ast::{
-    ArrowFunctionBody, BindingElement, Body, DeclFunction, Expr, ExprArrowFunction, ExprFunction,
-    FormalParameters, Ident, Stmt,
-};
 use crate::error::Result;
 use crate::parser::ContextModify;
 use crate::Parser;
+use fajt_ast::{
+    ArrowFunctionBody, BindingElement, Body, DeclFunction, Expr, ExprArrowFunction, ExprFunction,
+    FormalParameters, Ident, Span, Stmt,
+};
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
-use fajt_lexer::token::{Span, Token};
+use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
 
 impl<I> Parser<'_, I>
@@ -240,8 +240,7 @@ where
         self.consume_assert(punct!("{"))?;
 
         let directives = self.parse_directive_prologue()?;
-        let statements = if self.context.is_strict || directives.iter().any(|s| &s == &"use strict")
-        {
+        let statements = if self.context.is_strict || directives.iter().any(|s| s == "use strict") {
             self.with_context(ContextModify::default().set_strict(true))
                 .parse_function_body_stmt_list()?
         } else {

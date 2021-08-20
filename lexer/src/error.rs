@@ -1,9 +1,9 @@
-use crate::token::{Keyword, Span};
+use crate::token::Keyword;
+use fajt_ast::Span;
+use fajt_common::io::Error as CommonError;
 use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
 use std::{error, fmt};
-
-use fajt_common::io::Error as CommonError;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Error {

@@ -1,12 +1,12 @@
-use crate::ast::{
-    CatchClause, Stmt, StmtBlock, StmtBreak, StmtContinue, StmtDebugger, StmtEmpty, StmtExpr,
-    StmtIf, StmtLabeled, StmtReturn, StmtSwitch, StmtThrow, StmtTry, StmtWith, SwitchCase,
-    VariableKind,
-};
 use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::{Result, ThenTry};
 use crate::parser::SourceType;
 use crate::{ContextModify, Parser};
+use fajt_ast::{
+    CatchClause, Stmt, StmtBlock, StmtBreak, StmtContinue, StmtDebugger, StmtEmpty, StmtExpr,
+    StmtIf, StmtLabeled, StmtReturn, StmtSwitch, StmtThrow, StmtTry, StmtWith, SwitchCase,
+    VariableKind,
+};
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
@@ -137,12 +137,12 @@ where
         self.consume_assert(punct!(":"))?;
         let body = self.parse_stmt()?;
         let span = self.span_from(span_start);
-        return Ok(StmtLabeled {
+        Ok(StmtLabeled {
             span,
             label,
             body: Box::new(body),
         }
-        .into());
+        .into())
     }
 
     /// Parses the `EmptyStatement` goal symbol.

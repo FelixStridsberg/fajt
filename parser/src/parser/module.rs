@@ -1,10 +1,10 @@
-use crate::ast::{
-    DeclExport, DeclImport, ExportDecl, ExportDefaultDecl, ExportDefaultExpr, ExportNamed,
-    ExportNamespace, Ident, NamedExport, NamedImport, Stmt,
-};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenTry};
 use crate::{ContextModify, Parser};
+use fajt_ast::{
+    DeclExport, DeclImport, ExportDecl, ExportDefaultDecl, ExportDefaultExpr, ExportNamed,
+    ExportNamespace, Ident, NamedExport, NamedImport, Stmt,
+};
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;

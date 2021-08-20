@@ -1,5 +1,4 @@
-use crate::ast::{Expr, Ident, Number};
-use fajt_lexer::token::Span;
+use crate::{Expr, Ident, Number, Span};
 
 ast_mapping! {
     pub enum BindingPattern {

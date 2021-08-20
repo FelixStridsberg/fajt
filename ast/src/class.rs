@@ -1,5 +1,4 @@
-use crate::ast::{Body, Expr, FormalParameters, Ident, PropertyName};
-use fajt_lexer::token::Span;
+use crate::{Body, Expr, FormalParameters, Ident, PropertyName, Span};
 
 ast_struct! {
     pub struct DeclClass {

@@ -1,7 +1,6 @@
-use crate::ast::class::ExprClass;
-use crate::ast::literal::*;
-use crate::ast::{Body, FormalParameters, Ident};
-use fajt_lexer::token::Span;
+use crate::class::ExprClass;
+use crate::literal::*;
+use crate::{Body, FormalParameters, Ident, Span};
 use fajt_macros::FromString;
 
 ast_mapping! {
@@ -93,7 +92,7 @@ ast_node! {
     #[from_string_macro("binary_op")]
     #[from_string_macro_rules(
         ($variant:ident) => {
-            $crate::ast::BinaryOperator::$variant
+            $crate::BinaryOperator::$variant
         };
     )]
     pub enum BinaryOperator {
@@ -158,7 +157,7 @@ ast_node! {
     #[from_string_macro("logical_op")]
     #[from_string_macro_rules(
         ($variant:ident) => {
-            $crate::ast::LogicalOperator::$variant
+            $crate::LogicalOperator::$variant
         };
     )]
     pub enum LogicalOperator {
@@ -184,7 +183,7 @@ ast_node! {
     #[from_string_macro("unary_op")]
     #[from_string_macro_rules(
         ($variant:ident) => {
-            $crate::ast::UnaryOperator::$variant
+            $crate::UnaryOperator::$variant
         };
     )]
     pub enum UnaryOperator {
@@ -219,7 +218,7 @@ ast_node! {
     #[from_string_macro("update_op")]
     #[from_string_macro_rules(
         ($variant:ident) => {
-            $crate::ast::UpdateOperator::$variant
+            $crate::UpdateOperator::$variant
         };
     )]
     pub enum UpdateOperator {
@@ -371,7 +370,7 @@ ast_node! {
     #[from_string_macro("assignment_op")]
     #[from_string_macro_rules(
         ($variant:ident) => {
-            $crate::ast::AssignmentOperator::$variant
+            $crate::AssignmentOperator::$variant
         };
     )]
     pub enum AssignmentOperator {

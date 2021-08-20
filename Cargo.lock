@@ -48,9 +48,19 @@ name = "fajt"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "fajt_ast",
  "fajt_common",
  "fajt_lexer",
  "fajt_parser",
+]
+
+[[package]]
+name = "fajt_ast"
+version = "0.1.0"
+dependencies = [
+ "fajt_common",
+ "fajt_macros",
+ "serde",
 ]
 
 [[package]]
@@ -66,6 +76,7 @@ name = "fajt_lexer"
 version = "0.1.0"
 dependencies = [
  "bitflags",
+ "fajt_ast",
  "fajt_common",
  "fajt_macros",
  "serde",
@@ -84,6 +95,7 @@ dependencies = [
 name = "fajt_parser"
 version = "0.1.0"
 dependencies = [
+ "fajt_ast",
  "fajt_common",
  "fajt_lexer",
  "fajt_macros",

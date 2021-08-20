@@ -1,8 +1,8 @@
-use crate::ast::{
-    Expr, ExprMember, ExprOptionalCall, ExprOptionalMember, MemberObject, MemberProperty,
-};
 use crate::error::Result;
 use crate::Parser;
+use fajt_ast::{
+    Expr, ExprMember, ExprOptionalCall, ExprOptionalMember, MemberObject, MemberProperty,
+};
 use fajt_common::io::PeekRead;
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;

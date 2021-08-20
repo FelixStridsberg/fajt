@@ -1,24 +1,28 @@
-pub use binding::*;
-pub use class::*;
-pub(crate) use cover::*;
-pub use expr::*;
-pub use literal::*;
-pub use stmt::*;
-
-use crate::parser::SourceType;
-use fajt_lexer::token::Span;
-use serde::{Deserialize, Serialize};
-
 #[macro_use]
 mod macros;
-
-mod binding;
+pub mod binding;
+pub mod span;
 #[macro_use]
-mod expr;
-mod class;
-mod cover;
-mod literal;
-mod stmt;
+pub mod expr;
+pub mod class;
+pub mod literal;
+pub mod stmt;
+
+use serde::{Deserialize, Serialize};
+
+pub use crate::binding::*;
+pub use crate::class::*;
+pub use crate::expr::*;
+pub use crate::literal::*;
+pub use crate::span::*;
+pub use crate::stmt::*;
+
+#[derive(PartialEq, Debug, Copy, Clone)]
+pub enum SourceType {
+    Module,
+    Script,
+    Unknown,
+}
 
 pub trait Spanned {
     fn span(&self) -> &Span;

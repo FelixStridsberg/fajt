@@ -1,9 +1,9 @@
-use crate::ast::{
-    ArrayBinding, BindingElement, BindingPattern, Ident, ObjectBinding, ObjectBindingProp,
-};
 use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::{Result, ThenTry};
 use crate::Parser;
+use fajt_ast::{
+    ArrayBinding, BindingElement, BindingPattern, Ident, ObjectBinding, ObjectBindingProp,
+};
 use fajt_common::io::PeekRead;
 use fajt_lexer::punct;
 use fajt_lexer::token::Punct::{BraceClose, BracketClose};

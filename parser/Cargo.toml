@@ -5,6 +5,7 @@ authors = ["Felix Stridsberg <felixstridsberg@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+fajt_ast = { path = "../ast" }
 fajt_common = { path = "../common" }
 fajt_lexer = { path = "../lexer" }
 fajt_macros = { path = "../macros" }

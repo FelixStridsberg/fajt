@@ -1,16 +1,18 @@
-use crate::ast::{
-    Argument, Callee, Expr, ExprAssignment, ExprAwait, ExprCall, ExprConditional, ExprMetaProperty,
-    ExprNew, ExprSequence, ExprThis, ExprUnary, ExprUpdate, ExprYield, Ident, Literal,
-    MemberObject, Super,
-};
 use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::{Result, ThenTry};
 use crate::{ContextModify, Parser};
-
+use fajt_ast::assignment_op;
+use fajt_ast::unary_op;
+use fajt_ast::update_op;
+use fajt_ast::{
+    Argument, Callee, Expr, ExprAssignment, ExprAwait, ExprCall, ExprConditional, ExprMetaProperty,
+    ExprNew, ExprSequence, ExprThis, ExprUnary, ExprUpdate, ExprYield, Ident, Literal,
+    MemberObject, Span, Super,
+};
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
-use fajt_lexer::token::{Span, Token};
+use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
 
 impl<I> Parser<'_, I>
