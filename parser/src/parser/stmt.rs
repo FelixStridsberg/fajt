@@ -137,12 +137,12 @@ where
         self.consume_assert(punct!(":"))?;
         let body = self.parse_stmt()?;
         let span = self.span_from(span_start);
-        return Ok(StmtLabeled {
+        Ok(StmtLabeled {
             span,
             label,
             body: Box::new(body),
         }
-        .into());
+        .into())
     }
 
     /// Parses the `EmptyStatement` goal symbol.

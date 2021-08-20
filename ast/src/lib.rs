@@ -4,7 +4,6 @@ pub mod binding;
 #[macro_use]
 pub mod expr;
 pub mod class;
-pub mod cover;
 pub mod literal;
 pub mod stmt;
 
