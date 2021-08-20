@@ -108,8 +108,6 @@ where
     /// Parses the part of `AssignmentExpression` that start with the `(` punctuator.
     fn parse_assignment_expr_open_parentheses(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        todo!()
-        /*
         let parenthesized_or_arrow_parameters =
             self.parse_cover_parenthesized_and_arrow_parameters()?;
 
@@ -118,7 +116,7 @@ where
             self.parse_arrow_function_expr(span_start, false, parameters)
         } else {
             parenthesized_or_arrow_parameters.into_expr()
-        }*/
+        }
     }
 
     /// Parses the part of `AssignmentExpression` that starts with the `async` keyword.
@@ -136,15 +134,13 @@ where
             }
             token_matches!(opt: punct!("(")) => {
                 let span_start = self.position();
-                todo!()
-                /*
                 let call_or_arrow_parameters = self.parse_cover_call_and_async_arrow_head()?;
                 if self.current_matches(punct!("=>")) {
                     let parameters = call_or_arrow_parameters.into_arrow_parameters()?;
                     self.parse_async_arrow_function_expr(span_start, false, parameters)
                 } else {
                     call_or_arrow_parameters.into_call()
-                }*/
+                }
             }
             _ if self.peek_is_identifier() => {
                 let span_start = self.position();

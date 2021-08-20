@@ -1,11 +1,68 @@
 use crate::error::Result;
 use crate::Parser;
-use fajt_ast::cover::{CoverCallExprAndAsyncArrowHead, CoverParenthesizedAndArrowParameters};
-use fajt_common::io::PeekRead;
+use fajt_ast::{Expr, ExprParenthesized, FormalParameters, SourceType};
+use fajt_common::io::{PeekRead, PeekReader};
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
-use fajt_lexer::token::Token;
+use fajt_lexer::token::{Span, Token};
 use fajt_lexer::token_matches;
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
+pub struct CoverParenthesizedAndArrowParameters {
+    pub span: Span,
+    #[serde(skip)]
+    pub tokens: Vec<Token>,
+}
+
+impl CoverParenthesizedAndArrowParameters {
+    pub fn into_arrow_parameters(self) -> Result<FormalParameters> {
+        let tokens = self.tokens.into_iter();
+        let mut reader = PeekReader::new(tokens).unwrap();
+        let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
+        parser.parse_formal_parameters()
+    }
+
+    pub fn into_expr(mut self) -> Result<Expr> {
+        self.tokens.drain(0..1);
+        self.tokens.pop();
+
+        let tokens = self.tokens.into_iter();
+        let mut reader = PeekReader::new(tokens).unwrap();
+        let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
+
+        let expr = parser.parse_expr().unwrap();
+
+        Ok(ExprParenthesized {
+            span: self.span,
+            expression: expr.into(),
+        }
+        .into())
+    }
+}
+
+#[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
+pub struct CoverCallExprAndAsyncArrowHead {
+    pub span: Span,
+    #[serde(skip)]
+    pub tokens: Vec<Token>,
+}
+
+impl CoverCallExprAndAsyncArrowHead {
+    pub fn into_arrow_parameters(mut self) -> Result<FormalParameters> {
+        self.tokens.drain(0..1); // Skip 'async' of 'async (...)'
+
+        let tokens = self.tokens.into_iter();
+        let mut reader = PeekReader::new(tokens).unwrap();
+        let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
+        parser.parse_formal_parameters()
+    }
+
+    pub fn into_call(self) -> Result<Expr> {
+        // This is call expressions like: async(), async(parameters) since async is not reserved.
+        todo!("CoverCallExpressionAndAsyncArrowHead to call expression")
+    }
+}
 
 impl<I> Parser<'_, I>
 where
