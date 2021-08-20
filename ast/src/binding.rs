@@ -1,4 +1,4 @@
-use crate::ast::{Expr, Ident, Number};
+use crate::{Expr, Ident, Number};
 use fajt_lexer::token::Span;
 
 ast_mapping! {

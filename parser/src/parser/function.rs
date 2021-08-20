@@ -1,10 +1,10 @@
-use crate::ast::{
-    ArrowFunctionBody, BindingElement, Body, DeclFunction, Expr, ExprArrowFunction, ExprFunction,
-    FormalParameters, Ident, Stmt,
-};
 use crate::error::Result;
 use crate::parser::ContextModify;
 use crate::Parser;
+use fajt_ast::{
+    ArrowFunctionBody, BindingElement, Body, DeclFunction, Expr, ExprArrowFunction, ExprFunction,
+    FormalParameters, Ident, Stmt,
+};
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;

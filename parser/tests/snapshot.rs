@@ -22,9 +22,10 @@
 //! test assertions.
 extern crate fajt_macros;
 
+use fajt_ast::SourceType;
 use fajt_lexer::Lexer;
 use fajt_parser::error::{ErrorKind, Result};
-use fajt_parser::parser::{Parse, SourceType};
+use fajt_parser::parser::Parse;
 use fajt_parser::Parser;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
@@ -59,8 +60,8 @@ macro_rules! generate_test_module {
         mod $mod_name {
             use super::{md, parse_input, evaluate_result};
             use fajt_macros::for_each_file;
-            use fajt_parser::ast::$ast_type;
-            use fajt_parser::parser::SourceType::$source_type;
+            use fajt_ast::$ast_type;
+            use fajt_ast::SourceType::$source_type;
 
             fn snapshot_runner(test_file: &str) {
                 println!("Running: {}", test_file);

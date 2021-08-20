@@ -1,10 +1,10 @@
-use crate::ast::{
-    ForInit, Stmt, StmtDoWhile, StmtFor, StmtForIn, StmtForOf, StmtVariable, StmtWhile,
-    VariableKind,
-};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::{Result, ThenTry};
 use crate::{ContextModify, Parser};
+use fajt_ast::{
+    ForInit, Stmt, StmtDoWhile, StmtFor, StmtForIn, StmtForOf, StmtVariable, StmtWhile,
+    VariableKind,
+};
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;

@@ -1,11 +1,10 @@
+use crate::error::ErrorKind::UnexpectedToken;
+use crate::error::Result;
+use fajt_ast::{Expr, Ident, Program, PropertyName, SourceType, Stmt};
 use fajt_common::io::{PeekRead, PeekReader};
 use fajt_lexer::punct;
 use fajt_lexer::token::{KeywordContext, Literal, Span, Token, TokenValue};
 use fajt_lexer::token_matches;
-
-use crate::ast::{Expr, Ident, Program, PropertyName, Stmt};
-use crate::error::ErrorKind::UnexpectedToken;
-use crate::error::Result;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -174,13 +173,6 @@ impl Parse for Program {
         }
         Ok(Program::from_body(*parser.source_type.borrow(), body))
     }
-}
-
-#[derive(PartialEq, Debug, Copy, Clone)]
-pub enum SourceType {
-    Module,
-    Script,
-    Unknown,
 }
 
 pub struct Parser<'a, I>

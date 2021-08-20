@@ -1,7 +1,7 @@
-use crate::ast::{Array, ArrayElement, Expr, ExprLiteral, Literal, Object, PropertyDefinition};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 use crate::Parser;
+use fajt_ast::{Array, ArrayElement, Expr, ExprLiteral, Literal, Object, PropertyDefinition};
 use fajt_common::io::PeekRead;
 use fajt_lexer::punct;
 use fajt_lexer::token::{Token, TokenValue};

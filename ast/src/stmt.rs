@@ -1,5 +1,4 @@
-use super::Ident;
-use crate::ast::{BindingElement, BindingPattern, DeclClass, Expr};
+use crate::{BindingElement, BindingPattern, DeclClass, Expr, Ident};
 use fajt_lexer::token::Span;
 
 ast_mapping! {

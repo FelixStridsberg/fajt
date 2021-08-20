@@ -1,9 +1,9 @@
-use crate::ast::{
+use crate::error::{Result, ThenTry};
+use crate::{ContextModify, Parser};
+use fajt_ast::{
     ClassElement, ClassMethod, ClassMethodKind, DeclClass, Expr, ExprClass, Ident, PropertyName,
     Stmt,
 };
-use crate::error::{Result, ThenTry};
-use crate::{ContextModify, Parser};
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;

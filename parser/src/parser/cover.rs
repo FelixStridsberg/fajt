@@ -1,6 +1,6 @@
-use crate::ast::{CoverCallExprAndAsyncArrowHead, CoverParenthesizedAndArrowParameters};
 use crate::error::Result;
 use crate::Parser;
+use fajt_ast::cover::{CoverCallExprAndAsyncArrowHead, CoverParenthesizedAndArrowParameters};
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;

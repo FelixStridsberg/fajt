@@ -1,7 +1,8 @@
-use crate::ast::{BinaryOperator, Expr, ExprBinary, ExprLogical, LogicalOperator};
 use crate::error::Result;
 use crate::Parser;
-
+use fajt_ast::binary_op;
+use fajt_ast::logical_op;
+use fajt_ast::{BinaryOperator, Expr, ExprBinary, ExprLogical, LogicalOperator};
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
 use fajt_lexer::punct;

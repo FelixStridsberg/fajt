@@ -1,0 +1,11 @@
+[package]
+name = "fajt_ast"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+serde = {version = "1.0", features = ["derive"]}
+
+fajt_common = {path = "../common"}
+fajt_macros = {path = "../macros"}
+fajt_lexer = {path = "../lexer"}

@@ -1,4 +1,4 @@
-use crate::ast::{Expr, Ident};
+use crate::{Expr, Ident};
 
 use fajt_lexer::token::Base as LexerBase;
 use fajt_lexer::token::Literal as LexerLiteral;

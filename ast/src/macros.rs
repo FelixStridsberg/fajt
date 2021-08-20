@@ -17,10 +17,10 @@ macro_rules! ast_mapping {
             }
         }
 
-        impl $crate::ast::Spanned for $name {
+        impl $crate::Spanned for $name {
             fn span(&self) -> &Span {
                 match self {
-                    $( Self::$variant(v) => $crate::ast::Spanned::span(v), )*
+                    $( Self::$variant(v) => $crate::Spanned::span(v), )*
                 }
             }
         }
@@ -57,7 +57,7 @@ macro_rules! ast_struct {
             pub $( ($visibility) )? $struct_or_enum $name $($rest)*
         }
 
-        impl $crate::ast::Spanned for $name {
+        impl $crate::Spanned for $name {
             fn span(&self) -> &fajt_lexer::token::Span {
                 &self.span
             }

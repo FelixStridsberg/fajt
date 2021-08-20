@@ -1,6 +1,6 @@
-use crate::ast::{Stmt, StmtVariable, VariableDeclaration, VariableKind};
 use crate::error::{Result, ThenTry};
 use crate::Parser;
+use fajt_ast::{Stmt, StmtVariable, VariableDeclaration, VariableKind};
 use fajt_common::io::PeekRead;
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
