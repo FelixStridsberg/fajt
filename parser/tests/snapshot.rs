@@ -25,8 +25,7 @@ extern crate fajt_macros;
 use fajt_ast::SourceType;
 use fajt_lexer::Lexer;
 use fajt_parser::error::{ErrorKind, Result};
-use fajt_parser::parser::Parse;
-use fajt_parser::Parser;
+use fajt_parser::{Parse, Parser};
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 

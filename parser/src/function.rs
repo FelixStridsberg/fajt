@@ -1,6 +1,5 @@
 use crate::error::Result;
-use crate::parser::ContextModify;
-use crate::Parser;
+use crate::{ContextModify, Parser};
 use fajt_ast::{
     ArrowFunctionBody, BindingElement, Body, DeclFunction, Expr, ExprArrowFunction, ExprFunction,
     FormalParameters, Ident, Span, Stmt,
@@ -80,7 +79,7 @@ where
     /// Parses the `ArrowParameters` goal symbol.
     /// Returns true in second tuple element if the parameters are a binding identifier without
     /// parentheses.
-    pub(crate) fn parse_arrow_identifier_argument(&mut self) -> Result<FormalParameters> {
+    pub(super) fn parse_arrow_identifier_argument(&mut self) -> Result<FormalParameters> {
         let span_start = self.position();
         let identifier = self.parse_identifier()?;
         let span = self.span_from(span_start);
@@ -202,7 +201,7 @@ where
     }
 
     /// Parses the `FormalParameters` goal symbol.
-    pub(crate) fn parse_formal_parameters(&mut self) -> Result<FormalParameters> {
+    pub(super) fn parse_formal_parameters(&mut self) -> Result<FormalParameters> {
         let span_start = self.position();
 
         self.consume_assert(punct!("("))?;

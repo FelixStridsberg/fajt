@@ -20,7 +20,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `Expression` goal symbol.
-    pub(crate) fn parse_expr(&mut self) -> Result<Expr> {
+    pub(super) fn parse_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let expr = self.parse_assignment_expr()?;
 

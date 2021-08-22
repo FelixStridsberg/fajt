@@ -13,7 +13,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `MemberExpression` goal symbol when you already know the left side.
-    pub(crate) fn parse_member_expr_right_side(
+    pub(super) fn parse_member_expr_right_side(
         &mut self,
         span_start: usize,
         left: MemberObject,
@@ -29,7 +29,7 @@ where
     }
 
     /// Parses the `OptionalExpression` goal symbol. Left side must be known.
-    pub(crate) fn parse_optional_expr(&mut self, span_start: usize, left: Expr) -> Result<Expr> {
+    pub(super) fn parse_optional_expr(&mut self, span_start: usize, left: Expr) -> Result<Expr> {
         let mut object = left;
 
         loop {
