@@ -9,7 +9,9 @@ trait Fold {
 
 
 trait Visitor {
-    fn visit_ident(&mut self, ident: Ident) -> Ident;
+    fn visit_ident(&mut self, ident: Ident) -> Ident {
+        ident
+    }
 }
 
 struct IdentModifier {}
@@ -19,6 +21,18 @@ impl Visitor for IdentModifier {
         println!("VISITED: {:?}", ident);
         ident.name = "Other name".to_string();
         ident
+    }
+}
+
+impl<F: Fold> Fold for Vec<F> {
+    fn fold(self, visitor: &mut dyn Visitor) -> Self {
+        self.into_iter().map(|item| item.fold(visitor)).collect()
+    }
+}
+
+impl<F: Fold> Fold for Box<F> {
+    fn fold(self, visitor: &mut dyn Visitor) -> Self {
+        Box::new((*self).fold(visitor))
     }
 }
 
@@ -40,115 +54,107 @@ impl Fold for FormalParameters {
     fn fold(self, visitor: &mut dyn Visitor) -> Self {
         // const modified = modify(self);
         FormalParameters {
-            span: self.span,
-            bindings: self.bindings.into_iter().map(|b| b.fold(visitor)).collect(),
-            rest: self.rest,
+            bindings: self.bindings.fold(visitor),
+            ..self
         }
     }
 }
 
-impl Fold for Body {
-    fn fold(self, visitor: &mut dyn Visitor) -> Self {
-        Body {
-            span: self.span,
-            directives: self.directives,
-            statements: self
-                .statements
-                .into_iter()
-                .map(|stmt| stmt.fold(visitor))
-                .collect(),
-        }
-    }
-}
-
-impl Fold for DeclFunction {
-    fn fold(self, visitor: &mut dyn Visitor) -> Self {
-        println!("Traverse: DeclFunction {}", self.identifier.name);
-
-        DeclFunction {
-            span: self.span,
-            asynchronous: self.asynchronous,
-            generator: self.generator,
-            identifier: self.identifier.fold(visitor),
-            parameters: self.parameters.fold(visitor),
-            body: self.body.fold(visitor),
-        }
-    }
-}
-
-impl Fold for StmtExpr {
-    fn fold(self, visitor: &mut dyn Visitor) -> Self {
-        StmtExpr {
-            span: self.span,
-            expr: self.expr.fold(visitor),
-        }
-    }
-}
-
-impl Fold for ExprBinary {
-    fn fold(self, visitor: &mut dyn Visitor) -> Self {
-        ExprBinary {
-            span: self.span,
-            operator: self.operator,
-            left: Box::new(self.left.fold(visitor)),
-            right: Box::new(self.right.fold(visitor)),
-        }
-    }
-}
-
-impl Fold for Expr {
-    fn fold(self, visitor: &mut dyn Visitor) -> Self {
-        return match self {
-            Expr::Binary(expr) => Expr::Binary(expr.fold(visitor)),
-            Expr::IdentRef(expr) => Expr::IdentRef(expr.fold(visitor)),
-            x => {
-                println!("Fold not implemented for expr: {:?}", x);
-                x
+macro_rules! generate_fold {
+    (
+        $(
+            $ident:ident $( <$param:ident> )? {
+                $(
+                    $field: ident
+                )*
             }
-        };
-    }
-}
-
-impl Fold for Stmt {
-    fn fold(self, visitor: &mut dyn Visitor) -> Self {
-        println!("Traverse: Stmt");
-        return match self {
-            Stmt::FunctionDecl(stmt) => Stmt::FunctionDecl(stmt.fold(visitor)),
-            Stmt::Expr(stmt) => Stmt::Expr(stmt.fold(visitor)),
-            x => {
-                println!("Fold not implemented for stmt: {:?}", x);
-                x
+        )*
+    ) => {
+        $(
+            impl Fold for $ident $( <$param> )? {
+                fn fold(self, visitor: &mut dyn Visitor) -> Self {
+                    println!("Visit: {}", stringify!($ident));
+                    $ident {
+                        $($field: self.$field.fold(visitor),)*
+                        ..self
+                    }
+                }
             }
-        };
+        )*
+    };
+
+    (
+        $(
+            enum $ident:ident {
+                $(
+                    $field: ident
+                )*
+            }
+        )*
+    ) => {
+        $(
+            impl Fold for $ident {
+                fn fold(self, visitor: &mut dyn Visitor) -> Self {
+                    match self {
+                        $( $ident::$field(v) => $ident::$field(v.fold(visitor)), )*
+                        _ => self
+                    }
+                }
+            }
+        )*
     }
 }
 
-impl Fold for StatementList<Stmt> {
-    fn fold(self, visitor: &mut dyn Visitor) -> Self {
-        println!("Traverse: StmtList");
-        StatementList {
-            span: self.span,
-            body: self.body.into_iter().map(|stmt| stmt.fold(visitor)).collect(),
-        }
+generate_fold! {
+    Body {
+        statements
+    }
+
+    DeclFunction {
+        identifier
+        parameters
+        body
+    }
+
+    StmtExpr {
+        expr
+    }
+
+    ExprBinary {
+        left
+        right
+    }
+
+    StatementList<Stmt> {
+        body
     }
 }
 
-impl Fold for Program {
-    fn fold(self, visitor: &mut dyn Visitor) -> Self {
-        match self {
-            Program::Script(stmts) | Program::Module(stmts) => Program::Script(stmts.fold(visitor)),
-        }
+generate_fold! {
+    enum Program {
+        Script
+        Module
+    }
+
+    enum Expr {
+        Binary
+        IdentRef
+    }
+
+    enum Stmt {
+        FunctionDecl
+        Expr
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::Fold;
+    use crate::IdentModifier;
     use fajt_ast::{
         BinaryOperator, BindingElement, Body, DeclFunction, ExprBinary, FormalParameters, Ident,
         Program, Span, StatementList, Stmt, StmtExpr,
     };
-    use crate::IdentModifier;
 
     #[test]
     fn it_works() {
@@ -189,7 +195,7 @@ mod tests {
         let mut visitor = IdentModifier {};
         let ast2 = ast.fold(&mut visitor);
 
-        println!("AST2 {:?}", ast2);
+        //println!("AST2 {:?}", ast2);
 
         assert_eq!(1, 2);
     }
