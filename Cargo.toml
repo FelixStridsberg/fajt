@@ -10,11 +10,9 @@ members = [
     "macros",
     "lexer",
     "parser",
+    "traverser",
 ]
 
 [dependencies]
 clap = "2.33"
-fajt_ast = { path = "./ast" }
 fajt_parser = { path = "./parser" }
-fajt_lexer = { path = "./lexer" }
-fajt_common = { path = "./common" }

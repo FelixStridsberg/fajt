@@ -30,8 +30,8 @@ pub trait Spanned {
 
 #[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
 pub struct StatementList<T> {
-    span: Span,
-    body: Vec<T>,
+    pub span: Span,
+    pub body: Vec<T>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]

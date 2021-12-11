@@ -22,10 +22,7 @@
 //! test assertions.
 extern crate fajt_macros;
 
-use fajt_ast::SourceType;
-use fajt_lexer::Lexer;
 use fajt_parser::error::{ErrorKind, Result};
-use fajt_parser::{Parse, Parser};
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
@@ -57,7 +54,8 @@ macro_rules! generate_test_module {
     ) => {
         /// Everything inside snapshots/expr is parsed as expressions.
         mod $mod_name {
-            use super::{md, parse_input, evaluate_result};
+            use super::{md, evaluate_result};
+            use fajt_parser::parse;
             use fajt_macros::for_each_file;
             use fajt_ast::$ast_type;
             use fajt_ast::SourceType::$source_type;
@@ -66,7 +64,7 @@ macro_rules! generate_test_module {
                 println!("Running: {}", test_file);
 
                 let markdown = md::Markdown::from_file(test_file.as_ref());
-                let result = parse_input::<$ast_type>(&markdown.js_block, $source_type);
+                let result = parse::<$ast_type>(&markdown.js_block, $source_type);
                 evaluate_result(result, &markdown);
             }
 
@@ -166,15 +164,6 @@ where
         let json = serde_json::to_string_pretty(&result.unwrap_err().kind()).unwrap();
         markdown.replace_json_block(&json)
     }
-}
-
-fn parse_input<T>(input: &str, source_type: SourceType) -> Result<T>
-where
-    T: Parse,
-{
-    let lexer = Lexer::new(input).unwrap();
-    let mut reader = fajt_common::io::PeekReader::new(lexer).unwrap();
-    Parser::parse::<T>(&mut reader, source_type)
 }
 
 // TODO clean up this module
