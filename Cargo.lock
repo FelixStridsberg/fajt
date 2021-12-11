@@ -44,6 +44,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "codegen"
+version = "0.1.0"
+dependencies = [
+ "fajt_ast",
+ "fajt_parser",
+]
+
+[[package]]
 name = "fajt"
 version = "0.1.0"
 dependencies = [

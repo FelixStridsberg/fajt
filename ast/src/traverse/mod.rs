@@ -38,6 +38,7 @@ generate_fold_and_visit! {
         Expr: (enter: enter_expr, exit: exit_expr) {
             Binary
             IdentRef
+            Literal
         }
 
         Stmt: (enter: enter_stmt, exit: exit_stmt) {
@@ -66,6 +67,8 @@ generate_fold_and_visit! {
             left
             right
         }
+
+        ExprLiteral: (enter: enter_literal_expr, exit: exit_literal_expr) { }
 
         StatementList<Stmt>: (enter: enter_stmt_list, exit: exit_stmt_list) {
             body

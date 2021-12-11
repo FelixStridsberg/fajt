@@ -80,6 +80,14 @@ macro_rules! generate_fold_and_visit {
             pub visits: Vec<&'static str>,
         }
 
+        impl TraceVisitor {
+            pub fn new() -> Self {
+                Self {
+                    visits: vec![],
+                }
+            }
+        }
+
         impl Visitor for TraceVisitor {
             $(
                 fn $enum_enter(&mut self, node: $enum)-> $enum {
