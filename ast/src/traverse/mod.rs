@@ -1,7 +1,54 @@
-#[macro_use]
-mod fold;
+macro_rules! generate_fold {
+    (
+        $(
+            $ident:ident $( <$param:ident> )? (enter: $enter:ident, exit: $exit:ident) {
+                $(
+                    $field: ident
+                )*
+            }
+        )*
+    ) => {
+        $(
+            impl Fold for $ident $( <$param> )? {
+                fn fold(self, visitor: &mut dyn Visitor) -> Self {
+                    let node = visitor.$enter(self);
+                    let folded = $ident {
+                        $($field: node.$field.fold(visitor),)*
+                        ..node
+                    };
 
-use fajt_ast::*;
+                    visitor.$exit(folded)
+                }
+            }
+        )*
+    };
+
+    (
+        $(
+            enum $ident:ident (enter: $enter:ident, exit: $exit: ident) {
+                $(
+                    $field: ident
+                )*
+            }
+        )*
+    ) => {
+        $(
+            impl Fold for $ident {
+                fn fold(self, visitor: &mut dyn Visitor) -> Self {
+                    let node = visitor.$enter(self);
+                    let folded = match node {
+                        $( $ident::$field(v) => $ident::$field(v.fold(visitor)), )*
+
+                        #[allow(unreachable_patterns)]
+                        _ => node
+                    };
+
+                    visitor.$exit(folded)
+                }
+            }
+        )*
+    }
+}
 
 macro_rules! generate_visit_trait {
     (
@@ -79,6 +126,8 @@ impl<F: Fold> Fold for Option<F> {
         self.map(|node| node.fold(visitor))
     }
 }
+
+use crate::*;
 
 generate_fold! {
     enum Program(enter: enter_program, exit: exit_program) {

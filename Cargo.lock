@@ -57,6 +57,7 @@ version = "0.1.0"
 dependencies = [
  "fajt_common",
  "fajt_macros",
+ "fajt_parser",
  "serde",
 ]
 
@@ -94,14 +95,6 @@ dependencies = [
  "fajt_macros",
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "fajt_traverser"
-version = "0.1.0"
-dependencies = [
- "fajt_ast",
- "fajt_parser",
 ]
 
 [[package]]

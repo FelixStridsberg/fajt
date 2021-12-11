@@ -7,8 +7,8 @@ macro_rules! assert_traverse_trace {
         ]
     ) => {
         use fajt_parser::{ parse_program };
-        use fajt_traverser::TraceVisitor;
-        use fajt_traverser::Fold;
+        use fajt_ast::traverse::TraceVisitor;
+        use fajt_ast::traverse::Fold;
 
         let ast = parse_program($source).unwrap();
 

@@ -1,3 +1,4 @@
+pub mod traverse;
 #[macro_use]
 mod macros;
 pub mod binding;
