@@ -10,8 +10,6 @@ members = [
     "macros",
     "lexer",
     "parser",
-    "codegen",
-    "traverser",
 ]
 
 [dependencies]

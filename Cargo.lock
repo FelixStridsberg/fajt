@@ -64,10 +64,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fajt_codegen"
-version = "0.1.0"
-
-[[package]]
 name = "fajt_common"
 version = "0.1.0"
 
@@ -102,10 +98,6 @@ dependencies = [
  "serde",
  "serde_json",
 ]
-
-[[package]]
-name = "fajt_traverser"
-version = "0.1.0"
 
 [[package]]
 name = "hermit-abi"
