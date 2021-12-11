@@ -104,6 +104,9 @@ name = "fajt_traverser"
 version = "0.1.0"
 dependencies = [
  "fajt_ast",
+ "fajt_common",
+ "fajt_lexer",
+ "fajt_parser",
 ]
 
 [[package]]

@@ -5,3 +5,8 @@ edition = "2018"
 
 [dependencies]
 fajt_ast = { path = "../ast" }
+
+[dev-dependencies]
+fajt_lexer = { path = "../lexer" }
+fajt_parser = { path = "../parser" }
+fajt_common = { path = "../common" }

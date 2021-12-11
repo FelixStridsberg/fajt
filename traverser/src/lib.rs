@@ -1,16 +1,13 @@
 #[macro_use]
 mod fold;
 
-use fajt_ast::{
-    BindingElement, Body, DeclFunction, Expr, ExprBinary, FormalParameters, Ident, Program,
-    StatementList, Stmt, StmtExpr,
-};
+use fajt_ast::*;
 
 macro_rules! generate_visit_trait {
     (
         $( $fn_name:ident: $node:ident $( <$param:ident> )?  )*
     ) => {
-        trait Visitor {
+        pub trait Visitor {
             $(
                 fn $fn_name(&mut self, node: $node$( <$param> )?) -> $node$( <$param> )? {
                     node
@@ -18,12 +15,10 @@ macro_rules! generate_visit_trait {
             )*
         }
 
-        #[cfg(test)]
-        struct TraceVisitor {
+        pub struct TraceVisitor {
             pub visits: Vec<&'static str>,
         }
 
-        #[cfg(test)]
         impl Visitor for TraceVisitor {
             $(
                 fn $fn_name(&mut self, node: $node$( <$param> )?) -> $node$( <$param> )? {
@@ -47,6 +42,7 @@ generate_visit_trait! {
     enter_program: Program
     enter_expr: Expr
     enter_stmt: Stmt
+    enter_return_stmt: StmtReturn
 
     exit_ident: Ident
     exit_body: Body
@@ -59,21 +55,28 @@ generate_visit_trait! {
     exit_program: Program
     exit_expr: Expr
     exit_stmt: Stmt
+    exit_return_stmt: StmtReturn
 }
 
-trait Fold {
+pub trait Fold {
     fn fold(self, visitor: &mut dyn Visitor) -> Self;
 }
 
 impl<F: Fold> Fold for Vec<F> {
     fn fold(self, visitor: &mut dyn Visitor) -> Self {
-        self.into_iter().map(|item| item.fold(visitor)).collect()
+        self.into_iter().map(|node| node.fold(visitor)).collect()
     }
 }
 
 impl<F: Fold> Fold for Box<F> {
     fn fold(self, visitor: &mut dyn Visitor) -> Self {
         Box::new((*self).fold(visitor))
+    }
+}
+
+impl<F: Fold> Fold for Option<F> {
+    fn fold(self, visitor: &mut dyn Visitor) -> Self {
+        self.map(|node| node.fold(visitor))
     }
 }
 
@@ -90,6 +93,7 @@ generate_fold! {
 
     enum Stmt(enter: enter_stmt, exit: exit_stmt) {
         FunctionDecl
+        Return
         Expr
     }
 }
@@ -125,58 +129,8 @@ generate_fold! {
     }
 
     Ident (enter: enter_ident, exit: exit_ident) {}
-}
 
-#[cfg(test)]
-mod tests {
-    use super::Fold;
-    use crate::{ TraceVisitor, Visitor };
-    use fajt_ast::{
-        BinaryOperator, BindingElement, Body, DeclFunction, ExprBinary, FormalParameters, Ident,
-        Program, Span, StatementList, Stmt, StmtExpr,
-    };
-
-    #[test]
-    fn it_works() {
-        let ast = Program::Module(StatementList {
-            span: Span::new(0, 0),
-            body: vec![DeclFunction {
-                span: Span::new(0, 0),
-                asynchronous: false,
-                generator: false,
-                identifier: Ident::new("square", (0, 0)),
-                parameters: FormalParameters {
-                    span: Span::new(0, 0),
-                    bindings: vec![BindingElement {
-                        span: Span::new(0, 0),
-                        pattern: Ident::new("n", (0, 0)).into(),
-                        initializer: None,
-                    }],
-                    rest: None,
-                },
-                body: Body {
-                    span: Span::new(0, 0),
-                    directives: vec![],
-                    statements: vec![Stmt::Expr(StmtExpr {
-                        span: Span::new(0, 0),
-                        expr: ExprBinary {
-                            span: Span::new(0, 0),
-                            operator: BinaryOperator::Multiplication,
-                            left: Box::new(Ident::new("n", (0, 0)).into()),
-                            right: Box::new(Ident::new("n", (0, 0)).into()),
-                        }
-                        .into(),
-                    })],
-                },
-            }
-            .into()],
-        });
-
-        let mut visitor = TraceVisitor { visits: Vec::new() };
-        ast.fold(&mut visitor);
-
-        println!("AST2 {:?}", visitor.visits);
-
-        assert_eq!(1, 2);
+    StmtReturn (enter: enter_return_stmt, exit: exit_return_stmt) {
+        argument
     }
 }
