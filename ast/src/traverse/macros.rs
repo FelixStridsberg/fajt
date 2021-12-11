@@ -1,103 +1,109 @@
-macro_rules! generate_visit_fold {
+macro_rules! generate_fold_and_visit {
     (
-        $(
-            $ident:ty:  (enter: $enter:ident, exit: $exit:ident) {
-                $(
-                    $field: ident
-                )*
-            }
-        )*
-    ) => {
-        $(
-            impl Fold for $ident {
-                fn fold(self, visitor: &mut dyn Visitor) -> Self {
-                    let node = visitor.$enter(self);
-                    let folded = Self {
-                        $($field: node.$field.fold(visitor),)*
-                        ..node
-                    };
-
-                    visitor.$exit(folded)
-                }
-            }
-        )*
-
-        pub trait StructVisitor {
+        enums: {
             $(
-                fn $enter(&mut self, node: $ident)-> $ident {
-                    node
-                }
-
-                fn $exit(&mut self, node: $ident)-> $ident {
-                    node
+                $enum:ident: (enter: $enum_enter:ident, exit: $enum_exit: ident) {
+                    $(
+                        $variant:ident
+                    )*
                 }
             )*
         }
 
-        impl StructVisitor for TraceVisitor {
+        structs: {
             $(
-                fn $enter(&mut self, node: $ident) -> $ident {
-                    self.visits.push(stringify!($enter));
-                    node
-                }
-
-                fn $exit(&mut self, node: $ident) -> $ident {
-                    self.visits.push(stringify!($exit));
-                    node
+                $struct:ty:  (enter: $struct_enter:ident, exit: $struct_exit:ident) {
+                    $(
+                        $field: ident
+                    )*
                 }
             )*
         }
-    };
-
-    (
-        $(
-            enum $ident:ident (enter: $enter:ident, exit: $exit: ident) {
-                $(
-                    $field: ident
-                )*
-            }
-        )*
     ) => {
+        // Fold implementation for the enums
         $(
-            impl Fold for $ident {
+            impl Fold for $enum {
                 fn fold(self, visitor: &mut dyn Visitor) -> Self {
-                    let node = visitor.$enter(self);
+                    let node = visitor.$enum_enter(self);
                     let folded = match node {
-                        $( $ident::$field(v) => $ident::$field(v.fold(visitor)), )*
+                        $( Self::$variant(v) => Self::$variant(v.fold(visitor)), )*
 
                         #[allow(unreachable_patterns)]
                         _ => node
                     };
 
-                    visitor.$exit(folded)
+                    visitor.$enum_exit(folded)
                 }
             }
         )*
 
-        impl EnumVisitor for TraceVisitor {
+        // Fold implementation for the structs
+        $(
+            impl Fold for $struct {
+                fn fold(self, visitor: &mut dyn Visitor) -> Self {
+                    let node = visitor.$struct_enter(self);
+                    let folded = Self {
+                        $($field: node.$field.fold(visitor),)*
+                        ..node
+                    };
+
+                    visitor.$struct_exit(folded)
+                }
+            }
+        )*
+
+        // Visitor trait with all methods defined for any struct or enum
+        pub trait Visitor {
             $(
-                fn $enter(&mut self, node: $ident) -> $ident {
-                    self.visits.push(stringify!($enter));
+                fn $enum_enter(&mut self, node: $enum)-> $enum {
                     node
                 }
 
-                fn $exit(&mut self, node: $ident) -> $ident {
-                    self.visits.push(stringify!($exit));
+                fn $enum_exit(&mut self, node: $enum)-> $enum {
+                    node
+                }
+            )*
+
+            $(
+                fn $struct_enter(&mut self, node: $struct)-> $struct {
+                    node
+                }
+
+                fn $struct_exit(&mut self, node: $struct)-> $struct {
                     node
                 }
             )*
         }
 
-        pub trait EnumVisitor {
+        // Trace visitor for easy debugging
+        pub struct TraceVisitor {
+            pub visits: Vec<&'static str>,
+        }
+
+        impl Visitor for TraceVisitor {
             $(
-                fn $enter(&mut self, node: $ident)-> $ident {
+                fn $enum_enter(&mut self, node: $enum)-> $enum {
+                    self.visits.push(stringify!($enum_enter));
                     node
                 }
 
-                fn $exit(&mut self, node: $ident)-> $ident {
+                fn $enum_exit(&mut self, node: $enum)-> $enum {
+                    self.visits.push(stringify!($enum_exit));
+                    node
+                }
+            )*
+
+            $(
+                fn $struct_enter(&mut self, node: $struct)-> $struct {
+                    self.visits.push(stringify!($struct_enter));
+                    node
+                }
+
+                fn $struct_exit(&mut self, node: $struct)-> $struct {
+                    self.visits.push(stringify!($struct_exit));
                     node
                 }
             )*
         }
-    };
+    }
 }
