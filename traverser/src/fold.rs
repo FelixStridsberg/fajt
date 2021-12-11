@@ -1,7 +1,7 @@
 macro_rules! generate_fold {
     (
         $(
-            $ident:ident $( <$param:ident> )? $( (visit: $visit:ident) )? {
+            $ident:ident $( <$param:ident> )? (enter: $enter:ident) {
                 $(
                     $field: ident
                 )*
@@ -13,13 +13,11 @@ macro_rules! generate_fold {
                 fn fold(self, _visitor: &mut dyn Visitor) -> Self {
                     println!("Traverse: {}", stringify!($ident));
 
-                    #[allow(unused_mut)]
-                    let mut visited = self;
-                    $( visited = _visitor.$visit(visited); )?
+                    let node = _visitor.$enter(self);
 
                     $ident {
-                        $($field: visited.$field.fold(_visitor),)*
-                        ..visited
+                        $($field: node.$field.fold(_visitor),)*
+                        ..node
                     }
                 }
             }
@@ -28,7 +26,7 @@ macro_rules! generate_fold {
 
     (
         $(
-            enum $ident:ident {
+            enum $ident:ident (enter: $enter:ident) {
                 $(
                     $field: ident
                 )*
@@ -38,11 +36,13 @@ macro_rules! generate_fold {
         $(
             impl Fold for $ident {
                 fn fold(self, visitor: &mut dyn Visitor) -> Self {
-                    match self {
+                    println!("Traverse: {}", stringify!($ident));
+                    let node = visitor.$enter(self);
+                    match node {
                         $( $ident::$field(v) => $ident::$field(v.fold(visitor)), )*
 
                         #[allow(unreachable_patterns)]
-                        _ => self
+                        _ => node
                     }
                 }
             }

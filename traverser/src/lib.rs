@@ -6,9 +6,31 @@ use fajt_ast::{
     StatementList, Stmt, StmtExpr,
 };
 
+macro_rules! generate_visit_fn {
+    (
+        $( $fn_name:ident: $node:ident $( <$param:ident> )?  )*
+    ) => {
+        $(
+            fn $fn_name(&mut self, node: $node$( <$param> )?) -> $node$( <$param> )? {
+                node
+            }
+        )*
+    }
+}
+
 trait Visitor {
-    fn visit_ident(&mut self, ident: Ident) -> Ident {
-        ident
+    generate_visit_fn! {
+        enter_ident: Ident
+        enter_body: Body
+        enter_function_decl: DeclFunction
+        enter_stmt_expr: StmtExpr
+        enter_binary_expr: ExprBinary
+        enter_stmt_list: StatementList<Stmt>
+        enter_binding_element: BindingElement
+        enter_format_parameters: FormalParameters
+        enter_program: Program
+        enter_expr: Expr
+        enter_stmt: Stmt
     }
 }
 
@@ -29,53 +51,53 @@ impl<F: Fold> Fold for Box<F> {
 }
 
 generate_fold! {
-    enum Program {
+    enum Program(enter: enter_program) {
         Script
         Module
     }
 
-    enum Expr {
+    enum Expr(enter: enter_expr) {
         Binary
         IdentRef
     }
 
-    enum Stmt {
+    enum Stmt(enter: enter_stmt) {
         FunctionDecl
         Expr
     }
 }
 
 generate_fold! {
-    Body {
+    Body(enter: enter_body) {
         statements
     }
 
-    DeclFunction {
+    DeclFunction(enter: enter_function_decl) {
         identifier
         parameters
         body
     }
 
-    StmtExpr {
+    StmtExpr(enter: enter_stmt_expr) {
         expr
     }
 
-    ExprBinary {
+    ExprBinary(enter: enter_binary_expr) {
         left
         right
     }
 
-    StatementList<Stmt> {
+    StatementList<Stmt>(enter: enter_stmt_list) {
         body
     }
 
-    BindingElement { }
+    BindingElement(enter: enter_binding_element) { }
 
-    FormalParameters {
+    FormalParameters(enter: enter_format_parameters) {
         bindings
     }
 
-    Ident (visit: visit_ident) {}
+    Ident (enter: enter_ident) {}
 }
 
 #[cfg(test)]
@@ -90,7 +112,7 @@ mod tests {
     struct IdentModifier {}
 
     impl Visitor for IdentModifier {
-        fn visit_ident(&mut self, mut ident: Ident) -> Ident {
+        fn enter_ident(&mut self, mut ident: Ident) -> Ident {
             println!("VISITED: {:?}", ident);
             ident.name = "Other name".to_string();
             ident
