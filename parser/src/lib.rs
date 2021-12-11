@@ -21,12 +21,25 @@ use std::rc::Rc;
 
 use fajt_ast::{Expr, Ident, Literal, Program, PropertyName, SourceType, Span, Stmt};
 use fajt_common::io::{PeekRead, PeekReader};
-use fajt_lexer::punct;
 use fajt_lexer::token::{KeywordContext, Token, TokenValue};
 use fajt_lexer::token_matches;
+use fajt_lexer::{punct, Lexer};
 
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
+
+pub fn parse_program(input: &str) -> Result<Program> {
+    parse::<Program>(input, SourceType::Unknown)
+}
+
+pub fn parse<T>(input: &str, source_type: SourceType) -> Result<T>
+where
+    T: Parse,
+{
+    let lexer = Lexer::new(input).unwrap();
+    let mut reader = fajt_common::io::PeekReader::new(lexer).unwrap();
+    Parser::parse::<T>(&mut reader, source_type)
+}
 
 #[derive(Default)]
 pub struct ContextModify {
