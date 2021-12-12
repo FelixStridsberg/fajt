@@ -2,13 +2,15 @@ use fajt_ast::*;
 use fajt_ast::traverse::{Traverse, Visitor};
 
 struct CodeGenerator {
+    indent: u32,
     data: String,
 }
 
 impl CodeGenerator {
     fn new() -> Self {
         Self {
-            data: String::new()
+            indent: 0,
+            data: String::new(),
         }
     }
 }
@@ -39,12 +41,16 @@ impl Visitor for CodeGenerator {
 
     fn enter_body(&mut self, node: &mut Body) -> bool {
         self.data.push_str("{\n");
+        self.indent += 1;
         node.statements.traverse(self);
+        self.indent -= 1;
         self.data.push_str("\n}");
         false
     }
 
     fn enter_return_stmt(&mut self, node: &mut StmtReturn) -> bool {
+        self.data.push_str(&" ".repeat((4 * self.indent) as usize));
+
         self.data.push_str("return ");
         node.argument.traverse(self);
         self.data.push(';');
@@ -75,6 +81,7 @@ mod tests {
     #[test]
     fn add_expr() {
         let mut ast = parse_program("a + a").unwrap();
+
         let mut codegen = CodeGenerator::new();
         ast.traverse(&mut codegen);
 
@@ -84,6 +91,7 @@ mod tests {
     #[test]
     fn parenthesized_expr() {
         let mut ast = parse_program("(a + a)").unwrap();
+
         let mut codegen = CodeGenerator::new();
         ast.traverse(&mut codegen);
 
@@ -92,8 +100,9 @@ mod tests {
 
     #[test]
     fn function() {
-        let input = "function plus(n) {\nreturn n + n;\n}";
+        let input = "function plus(n) {\n    return n + n;\n}";
         let mut ast = parse_program(input).unwrap();
+
         let mut codegen = CodeGenerator::new();
         ast.traverse(&mut codegen);
 
