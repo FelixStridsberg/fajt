@@ -54,6 +54,9 @@ macro_rules! generate_fold_and_visit {
 
         // Visitor trait with all methods defined for any struct or enum
         pub trait Visitor {
+            fn enter(&mut self) {}
+            fn exit(&mut self) {}
+
             $(
                 fn $enum_enter(&mut self, node: $enum)-> $enum {
                     node
