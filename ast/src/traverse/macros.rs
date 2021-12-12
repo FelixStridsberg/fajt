@@ -20,34 +20,37 @@ macro_rules! generate_fold_and_visit {
             )*
         }
     ) => {
-        // Fold implementation for the enums
+        // Traverse implementation for the enums
         $(
-            impl Fold for $enum {
-                fn fold(self, visitor: &mut dyn Visitor) -> Self {
-                    let node = visitor.$enum_enter(self);
-                    let folded = match node {
-                        $( Self::$variant(v) => Self::$variant(v.fold(visitor)), )*
+            impl Traverse for $enum {
+                fn traverse(&mut self, visitor: &mut dyn Visitor) {
+                    let traverse_children = visitor.$enum_enter(self);
 
-                        #[allow(unreachable_patterns)]
-                        _ => node
-                    };
+                    if traverse_children {
+                        match self {
+                            $( Self::$variant(v) => v.traverse(visitor), )*
 
-                    visitor.$enum_exit(folded)
+                            #[allow(unreachable_patterns)]
+                            _ => {}
+                        };
+                    }
+
+                    visitor.$enum_exit(self);
                 }
             }
         )*
 
-        // Fold implementation for the structs
+        // Traverse implementation for the structs
         $(
-            impl Fold for $struct {
-                fn fold(self, visitor: &mut dyn Visitor) -> Self {
-                    let node = visitor.$struct_enter(self);
-                    let folded = Self {
-                        $($field: node.$field.fold(visitor),)*
-                        ..node
-                    };
+            impl Traverse for $struct {
+                fn traverse(&mut self, visitor: &mut dyn Visitor) {
+                    let traverse_children = visitor.$struct_enter(self);
 
-                    visitor.$struct_exit(folded)
+                    if traverse_children {
+                        $( self.$field.traverse(visitor); )*
+                    }
+
+                    visitor.$struct_exit(self)
                 }
             }
         )*
@@ -58,23 +61,15 @@ macro_rules! generate_fold_and_visit {
             fn exit(&mut self) {}
 
             $(
-                fn $enum_enter(&mut self, node: $enum)-> $enum {
-                    node
-                }
+                fn $enum_enter(&mut self, _node: &mut $enum) -> bool { true }
 
-                fn $enum_exit(&mut self, node: $enum)-> $enum {
-                    node
-                }
+                fn $enum_exit(&mut self, _node: &mut $enum) { }
             )*
 
             $(
-                fn $struct_enter(&mut self, node: $struct)-> $struct {
-                    node
-                }
+                fn $struct_enter(&mut self, _node: &mut $struct) -> bool { true }
 
-                fn $struct_exit(&mut self, node: $struct)-> $struct {
-                    node
-                }
+                fn $struct_exit(&mut self, _node: &mut $struct) { }
             )*
         }
 
@@ -93,26 +88,24 @@ macro_rules! generate_fold_and_visit {
 
         impl Visitor for TraceVisitor {
             $(
-                fn $enum_enter(&mut self, node: $enum)-> $enum {
+                fn $enum_enter(&mut self, _node: &mut $enum) -> bool {
                     self.visits.push(stringify!($enum_enter));
-                    node
+                    true
                 }
 
-                fn $enum_exit(&mut self, node: $enum)-> $enum {
+                fn $enum_exit(&mut self, _node: &mut $enum) {
                     self.visits.push(stringify!($enum_exit));
-                    node
                 }
             )*
 
             $(
-                fn $struct_enter(&mut self, node: $struct)-> $struct {
+                fn $struct_enter(&mut self, _node: &mut $struct) -> bool {
                     self.visits.push(stringify!($struct_enter));
-                    node
+                    true
                 }
 
-                fn $struct_exit(&mut self, node: $struct)-> $struct {
+                fn $struct_exit(&mut self, _node: &mut $struct) {
                     self.visits.push(stringify!($struct_exit));
-                    node
                 }
             )*
         }

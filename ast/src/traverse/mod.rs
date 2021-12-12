@@ -3,29 +3,31 @@ mod macros;
 
 use super::*;
 
-pub trait Fold {
-    fn fold(self, visitor: &mut dyn Visitor) -> Self;
+pub trait Traverse {
+    fn traverse(&mut self, visitor: &mut dyn Visitor);
 }
 
-impl<F: Fold> Fold for Vec<F> {
-    fn fold(self, visitor: &mut dyn Visitor) -> Self {
-        self.into_iter().map(|node| node.fold(visitor)).collect()
+impl<F: Traverse> Traverse for Vec<F> {
+    fn traverse(&mut self, visitor: &mut dyn Visitor) {
+        self.into_iter().map(|node| node.traverse(visitor)).collect()
     }
 }
 
-impl<F: Fold> Fold for Box<F> {
-    fn fold(self, visitor: &mut dyn Visitor) -> Self {
-        Box::new((*self).fold(visitor))
+impl<F: Traverse> Traverse for Box<F> {
+    fn traverse(&mut self, visitor: &mut dyn Visitor) {
+        (*self).as_mut().traverse(visitor)
     }
 }
 
-impl<F: Fold> Fold for Option<F> {
-    fn fold(self, visitor: &mut dyn Visitor) -> Self {
-        self.map(|node| node.fold(visitor))
+impl<F: Traverse> Traverse for Option<F> {
+    fn traverse(&mut self, visitor: &mut dyn Visitor) {
+        for node in self {
+            node.traverse(visitor);
+        }
     }
 }
 
-// This macro generates all fold implementations and a Visitor trait with all methods required for
+// This macro generates all traverse implementations and a Visitor trait with all methods required for
 // visiting all types defined here. Only the types and fields defined here are traversed.
 // It also generates a TraceVisitor struct that can be used to trace the traversal of a tree.
 generate_fold_and_visit! {
