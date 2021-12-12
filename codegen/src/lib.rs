@@ -11,7 +11,6 @@ impl CodeGenerator {
             data: String::new()
         }
     }
-
 }
 
 impl Visitor for CodeGenerator {
@@ -22,11 +21,19 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_parenthesized_expr(&mut self, node: &mut ExprParenthesized) -> bool {
+        self.data.push('(');
+        node.expression.traverse(self);
+        self.data.push(')');
+        false
+    }
+
     fn enter_ident(&mut self, node: &mut Ident) -> bool {
         self.data.push_str(&node.name);
-        true
+        false
     }
 }
+
 #[cfg(test)]
 mod tests {
     use fajt_ast::traverse::Traverse;
@@ -34,11 +41,20 @@ mod tests {
     use crate::CodeGenerator;
 
     #[test]
-    fn test() {
+    fn add_expr() {
         let mut ast = parse_program("a + a").unwrap();
         let mut codegen = CodeGenerator::new();
         ast.traverse(&mut codegen);
 
         assert_eq!(codegen.data, "a + a");
+    }
+
+    #[test]
+    fn parenthesized_expr() {
+        let mut ast = parse_program("(a + a)").unwrap();
+        let mut codegen = CodeGenerator::new();
+        ast.traverse(&mut codegen);
+
+        assert_eq!(codegen.data, "(a + a)");
     }
 }

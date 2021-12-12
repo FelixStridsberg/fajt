@@ -41,6 +41,7 @@ generate_fold_and_visit! {
             Binary
             IdentRef
             Literal
+            Parenthesized
         }
 
         Stmt: (enter: enter_stmt, exit: exit_stmt) {
@@ -68,6 +69,10 @@ generate_fold_and_visit! {
         ExprBinary: (enter: enter_binary_expr, exit: exit_binary_expr) {
             left
             right
+        }
+
+        ExprParenthesized: (enter: enter_parenthesized_expr, exit: exit_parenthesized_expr) {
+            expression
         }
 
         ExprLiteral: (enter: enter_literal_expr, exit: exit_literal_expr) { }
