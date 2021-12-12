@@ -28,7 +28,9 @@ impl CodeGenerator {
 impl Visitor for CodeGenerator {
     fn enter_binary_expr(&mut self, node: &mut ExprBinary) -> bool {
         node.left.traverse(self);
-        self.data.push_str(" + ");
+        self.data.push(' ');
+        self.data.push_str(&node.operator.to_string());
+        self.data.push(' ');
         node.right.traverse(self);
         false
     }
