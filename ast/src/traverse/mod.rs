@@ -49,6 +49,10 @@ generate_fold_and_visit! {
             Return
             Expr
         }
+
+        BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
+            Ident
+        }
     }
 
     structs: {
@@ -81,7 +85,9 @@ generate_fold_and_visit! {
             body
         }
 
-        BindingElement: (enter: enter_binding_element, exit: exit_binding_element) { }
+        BindingElement: (enter: enter_binding_element, exit: exit_binding_element) {
+            pattern
+        }
 
         FormalParameters: (enter: enter_format_parameters, exit: exit_format_parameters) {
             bindings

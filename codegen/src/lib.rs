@@ -2,7 +2,7 @@ use fajt_ast::*;
 use fajt_ast::traverse::{Traverse, Visitor};
 
 struct CodeGenerator {
-    data: String
+    data: String,
 }
 
 impl CodeGenerator {
@@ -24,6 +24,38 @@ impl Visitor for CodeGenerator {
     fn enter_parenthesized_expr(&mut self, node: &mut ExprParenthesized) -> bool {
         self.data.push('(');
         node.expression.traverse(self);
+        self.data.push(')');
+        false
+    }
+
+    fn enter_function_decl(&mut self, node: &mut DeclFunction) -> bool {
+        self.data.push_str("function ");
+        node.identifier.traverse(self);
+        node.parameters.traverse(self);
+        self.data.push(' ');
+        node.body.traverse(self);
+        false
+    }
+
+    fn enter_body(&mut self, node: &mut Body) -> bool {
+        self.data.push_str("{\n");
+        node.statements.traverse(self);
+        self.data.push_str("\n}");
+        false
+    }
+
+    fn enter_return_stmt(&mut self, node: &mut StmtReturn) -> bool {
+        self.data.push_str("return ");
+        node.argument.traverse(self);
+        self.data.push(';');
+        false
+    }
+
+    fn enter_format_parameters(&mut self, node: &mut FormalParameters) -> bool {
+        self.data.push('(');
+        for bind in node.bindings.iter_mut() {
+            bind.traverse(self);
+        }
         self.data.push(')');
         false
     }
@@ -56,5 +88,15 @@ mod tests {
         ast.traverse(&mut codegen);
 
         assert_eq!(codegen.data, "(a + a)");
+    }
+
+    #[test]
+    fn function() {
+        let input = "function plus(n) {\nreturn n + n;\n}";
+        let mut ast = parse_program(input).unwrap();
+        let mut codegen = CodeGenerator::new();
+        ast.traverse(&mut codegen);
+
+        assert_eq!(codegen.data, input);
     }
 }
