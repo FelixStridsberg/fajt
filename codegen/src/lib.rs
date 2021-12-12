@@ -1,6 +1,12 @@
 use fajt_ast::*;
 use fajt_ast::traverse::{Traverse, Visitor};
 
+pub fn generate_code(mut program: Program) -> String {
+    let mut codegen = CodeGenerator::new();
+    program.traverse(&mut codegen);
+    codegen.to_string()
+}
+
 struct CodeGenerator {
     indent: u32,
     data: String,
@@ -12,6 +18,10 @@ impl CodeGenerator {
             indent: 0,
             data: String::new(),
         }
+    }
+
+    fn to_string(self) -> String {
+        self.data
     }
 }
 
@@ -76,26 +86,22 @@ impl Visitor for CodeGenerator {
 mod tests {
     use fajt_ast::traverse::Traverse;
     use fajt_parser::parse_program;
-    use crate::CodeGenerator;
+    use crate::{CodeGenerator, generate_code};
 
     #[test]
     fn add_expr() {
         let mut ast = parse_program("a + a").unwrap();
+        let code = generate_code(ast);
 
-        let mut codegen = CodeGenerator::new();
-        ast.traverse(&mut codegen);
-
-        assert_eq!(codegen.data, "a + a");
+        assert_eq!(code, "a + a");
     }
 
     #[test]
     fn parenthesized_expr() {
         let mut ast = parse_program("(a + a)").unwrap();
 
-        let mut codegen = CodeGenerator::new();
-        ast.traverse(&mut codegen);
-
-        assert_eq!(codegen.data, "(a + a)");
+        let code = generate_code(ast);
+        assert_eq!(code, "(a + a)");
     }
 
     #[test]
@@ -103,9 +109,7 @@ mod tests {
         let input = "function plus(n) {\n    return n + n;\n}";
         let mut ast = parse_program(input).unwrap();
 
-        let mut codegen = CodeGenerator::new();
-        ast.traverse(&mut codegen);
-
-        assert_eq!(codegen.data, input);
+        let code = generate_code(ast);
+        assert_eq!(code, input);
     }
 }
