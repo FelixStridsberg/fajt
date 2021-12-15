@@ -2,17 +2,15 @@ extern crate fajt_macros;
 
 mod markdown;
 
-use markdown::TestFile;
 use fajt_codegen::generate_code;
 use fajt_parser::parse_program;
+use markdown::TestFile;
 
-fn read_file(path: &str) -> String {
+fn run_test_file(path: &str) {
+    println!("Running: {}", path);
+
     let test_file = TestFile::from(&path);
-    test_file.source
-}
-
-fn run_test(file_path: &str) {
-    let input = read_file(file_path);
+    let input = test_file.source;
     let ast = parse_program(&input).unwrap();
     let output = generate_code(ast);
 
@@ -23,14 +21,14 @@ macro_rules! generate_test_cases {
     ("md", $file_path:literal, $ident:ident) => {
         #[test]
         fn $ident() {
-            $crate::run_test($file_path)
+            $crate::run_test_file($file_path)
         }
     };
     ("md_ignore", $file_path:literal, $ident:ident) => {
         #[ignore]
         #[test]
         fn $ident() {
-            $crate::run_test($file_path)
+            $crate::run_test_file($file_path)
         }
     };
     ($extension:literal, $file_path:literal, $ident:ident) => {};
@@ -52,7 +50,6 @@ macro_rules! generate_test_module {
         }
     }
 }
-
 
 generate_test_module!(
     mod_name: decl,

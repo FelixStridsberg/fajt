@@ -24,25 +24,92 @@ extern crate fajt_macros;
 
 mod markdown;
 
-use markdown::TestFile;
+use fajt_ast::SourceType;
 use fajt_parser::error::{ErrorKind, Result};
-use serde::{Deserialize, Serialize};
+use fajt_parser::{parse, Parse};
+use markdown::TestFile;
+use serde::Serialize;
+use serde::de::DeserializeOwned;
 use std::fmt::Debug;
 
 // TODO possibility to regenerate all asts.
+
+// This runs for each .md file in the ./cases folder.
+fn run_test_file<T>(path: &str, source_type: SourceType)
+where
+    T: Parse + Serialize + DeserializeOwned + PartialEq + Debug,
+{
+    println!("Running: {}", path);
+
+    let test_file = TestFile::from(&path);
+    let result = parse::<T>(&test_file.source, source_type);
+
+    if test_file.ast.is_none() {
+        // If the test file contain no output, we generate that from result of running the code.
+        // I.e. you can add a test file with just code to generate the result.
+        generate_expected_output(result, test_file);
+        panic!("No ast found in this test. Output generated, verify and rerun.");
+    }
+
+    let ast = test_file.ast.unwrap();
+    assert_result(result, ast);
+}
+
+fn assert_result<T>(result: Result<T>, ast_json: String)
+    where
+        T: Parse + Serialize + DeserializeOwned + PartialEq + Debug,
+{
+    if let Ok(result) = result {
+        let expected_expr: T = serde_json::from_str(&ast_json).unwrap();
+        assert_eq!(result, expected_expr)
+    } else {
+        let error = result.unwrap_err();
+        println!("Error: {:?}", error);
+
+        let expected_error: ErrorKind = serde_json::from_str(&ast_json).unwrap();
+        assert_eq!(error.kind(), &expected_error)
+    }
+}
+
+fn generate_expected_output<T>(result: Result<T>, test_file: TestFile)
+where
+    T: Parse + Serialize + Debug
+{
+    if let Ok(result) = result {
+        let json = serde_json::to_string_pretty(&result).unwrap();
+        test_file.append_json_block(&json);
+    } else {
+        let error = serde_json::to_string_pretty(&result.unwrap_err().kind()).unwrap();
+        test_file.append_json_block(&error);
+    }
+}
+
+#[allow(unused)]
+fn regenerate_asts<T>(result: Result<T>, test_file: TestFile)
+    where
+        T: DeserializeOwned + Serialize + PartialEq + Debug,
+{
+    if let Ok(result) = result {
+        let json = serde_json::to_string_pretty(&result).unwrap();
+        test_file.replace_json_block(&json)
+    } else {
+        let json = serde_json::to_string_pretty(&result.unwrap_err().kind()).unwrap();
+        test_file.replace_json_block(&json)
+    }
+}
 
 macro_rules! generate_test_cases {
     ("md", $file_path:literal, $ident:ident) => {
         #[test]
         fn $ident() {
-            snapshot_runner($file_path)
+            run_test($file_path)
         }
     };
     ("md_ignore", $file_path:literal, $ident:ident) => {
         #[ignore]
         #[test]
         fn $ident() {
-            snapshot_runner($file_path)
+            run_test($file_path)
         }
     };
     ($extension:literal, $file_path:literal, $ident:ident) => {};
@@ -55,21 +122,13 @@ macro_rules! generate_test_module {
         source_type: $source_type:ident,
         folders: [$( $folder:literal ),*],
     ) => {
-        /// Everything inside snapshots/expr is parsed as expressions.
         mod $mod_name {
-            use super::evaluate_result;
-            use super::markdown::TestFile;
-            use fajt_parser::parse;
             use fajt_macros::for_each_file;
             use fajt_ast::$ast_type;
             use fajt_ast::SourceType::$source_type;
 
-            fn snapshot_runner(test_file: &str) {
-                println!("Running: {}", test_file);
-
-                let markdown = TestFile::from(&test_file);
-                let result = parse::<$ast_type>(&markdown.source, $source_type);
-                evaluate_result(result, &markdown);
+            fn run_test(test_file: &str) {
+                $crate::run_test_file::<$ast_type>(&test_file, $source_type);
             }
 
             $(
@@ -127,48 +186,6 @@ generate_test_module!(
     source_type: Script,
     folders: ["tests/cases/source-script"],
 );
-
-fn evaluate_result<'a, 'b: 'a, T>(result: Result<T>, markdown: &'b TestFile)
-where
-    T: Deserialize<'a> + Serialize + PartialEq + Debug,
-{
-    if let Some(expected_data) = &markdown.ast {
-        if let Ok(result) = result {
-            let expected_expr: T = serde_json::from_str(&expected_data).unwrap();
-            assert_eq!(result, expected_expr)
-        } else {
-            let error = result.unwrap_err();
-            println!("Error: {:?}", error);
-
-            let expected_error: ErrorKind = serde_json::from_str(&expected_data).unwrap();
-            assert_eq!(error.kind(), &expected_error)
-        }
-    } else {
-        if let Ok(result) = result {
-            let json = serde_json::to_string_pretty(&result).unwrap();
-            markdown.append_json_block(&json);
-            panic!("No ast found in this test. Json generated, verify and rerun.");
-        } else {
-            let error = serde_json::to_string_pretty(&result.unwrap_err().kind()).unwrap();
-            markdown.append_json_block(&error);
-            panic!("No ast found in this test. Json error generated, verify and rerun.");
-        }
-    }
-}
-
-#[allow(unused)]
-fn regenerate_asts<'a, 'b: 'a, T>(result: Result<T>, markdown: &'b TestFile)
-where
-    T: Deserialize<'a> + Serialize + PartialEq + Debug,
-{
-    if let Ok(result) = result {
-        let json = serde_json::to_string_pretty(&result).unwrap();
-        markdown.replace_json_block(&json)
-    } else {
-        let json = serde_json::to_string_pretty(&result.unwrap_err().kind()).unwrap();
-        markdown.replace_json_block(&json)
-    }
-}
 
 #[test]
 fn dummy() {

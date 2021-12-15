@@ -102,7 +102,8 @@ impl CodeGenerator {
         if let Some(align) = self.align {
             self.data.push_str(&" ".repeat(align));
         } else {
-            self.data.push_str(&" ".repeat(self.indent * INDENTATION_SIZE));
+            self.data
+                .push_str(&" ".repeat(self.indent * INDENTATION_SIZE));
         }
     }
 
@@ -141,7 +142,7 @@ impl Visitor for CodeGenerator {
     fn enter_body(&mut self, node: &mut Body) -> bool {
         if node.statements.is_empty() {
             self.push_str("{}").new_line();
-            return false
+            return false;
         }
 
         self.block_start();
