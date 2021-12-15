@@ -50,6 +50,7 @@ generate_fold_and_visit! {
             FunctionDecl
             Return
             Expr
+            Variable
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
@@ -99,6 +100,15 @@ generate_fold_and_visit! {
 
         StmtReturn: (enter: enter_return_stmt, exit: exit_return_stmt) {
             argument
+        }
+
+        StmtVariable: (enter: enter_variable_stmt, exit: exit_variable_stmt) {
+            declarations
+        }
+
+        VariableDeclaration: (enter: enter_variable_declaration, exit: exit_variable_declaration) {
+            pattern
+            initializer
         }
     }
 }

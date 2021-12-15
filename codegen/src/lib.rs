@@ -8,7 +8,8 @@ pub fn generate_code(mut program: Program) -> String {
 }
 
 struct CodeGenerator {
-    indent: u32,
+    indent: usize,
+    align: Option<usize>,
     data: String,
     last_new_line: usize,
     last_block_start: usize,
@@ -18,6 +19,7 @@ impl CodeGenerator {
     fn new() -> Self {
         Self {
             indent: 0,
+            align: None,
             data: String::new(),
             last_new_line: 0,
             last_block_start: 0,
@@ -84,7 +86,8 @@ impl CodeGenerator {
 
     fn maybe_indent(&mut self) {
         if self.should_indent() {
-            self.data.push_str(&" ".repeat((4 * self.indent) as usize));
+            let indentation = 4 * self.indent + self.align.unwrap_or(0);
+            self.data.push_str(&" ".repeat(indentation));
         }
     }
 
@@ -122,7 +125,7 @@ impl Visitor for CodeGenerator {
 
     fn enter_body(&mut self, node: &mut Body) -> bool {
         if node.statements.is_empty() {
-            self.push_str("{ }").new_line();
+            self.push_str("{}").new_line();
             return false
         }
 
@@ -154,6 +157,42 @@ impl Visitor for CodeGenerator {
             }
         }
         self.push(')');
+        false
+    }
+
+    fn enter_variable_stmt(&mut self, node: &mut StmtVariable) -> bool {
+        let kind_str = node.kind.to_string();
+        self.push_str(&kind_str);
+        self.push(' ');
+
+        self.align = Some(kind_str.len() + 1);
+
+        let mut declarations = node.declarations.iter_mut().peekable();
+        while let Some(decl) = declarations.next() {
+            decl.traverse(self);
+
+            if let Some(_) = declarations.peek() {
+                self.push(',');
+            } else {
+                self.push(';');
+            }
+
+            self.new_line();
+        }
+
+        self.align = None;
+
+        false
+    }
+
+    fn enter_variable_declaration(&mut self, node: &mut VariableDeclaration) -> bool {
+        node.pattern.traverse(self);
+
+        if let Some(initializer) = node.initializer.as_mut() {
+            self.push_str(" = ");
+            initializer.traverse(self);
+        }
+
         false
     }
 

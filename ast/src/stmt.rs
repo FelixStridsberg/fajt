@@ -1,4 +1,5 @@
 use crate::{BindingElement, BindingPattern, DeclClass, Expr, Ident, Span};
+use fajt_macros::FromString;
 
 ast_mapping! {
     /// Note: Declarations are handles as statements since they can appear in the same contexts.
@@ -125,9 +126,13 @@ ast_struct! {
 }
 
 ast_node! {
+    #[derive(FromString)]
     pub enum VariableKind {
+        #[from_string("const")]
         Const,
+        #[from_string("let")]
         Let,
+        #[from_string("var")]
         Var,
     }
 }
