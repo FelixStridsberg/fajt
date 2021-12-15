@@ -91,7 +91,7 @@ generate_fold_and_visit! {
             pattern
         }
 
-        FormalParameters: (enter: enter_format_parameters, exit: exit_format_parameters) {
+        FormalParameters: (enter: enter_formal_parameters, exit: exit_formal_parameters) {
             bindings
         }
 

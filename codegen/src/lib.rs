@@ -11,6 +11,7 @@ struct CodeGenerator {
     indent: u32,
     data: String,
     last_new_line: usize,
+    last_block_start: usize,
 }
 
 impl CodeGenerator {
@@ -19,6 +20,7 @@ impl CodeGenerator {
             indent: 0,
             data: String::new(),
             last_new_line: 0,
+            last_block_start: 0,
         }
     }
 
@@ -43,6 +45,17 @@ impl CodeGenerator {
         self
     }
 
+    fn block_start(&mut self) -> &mut Self {
+        self.push('{').new_line();
+        self.last_block_start = self.data.len();
+        self
+    }
+
+    fn block_end(&mut self) -> &mut Self {
+        self.push('}').new_line();
+        self
+    }
+
     fn push(&mut self, ch: char) -> &mut Self {
         self.maybe_indent();
         self.data.push(ch);
@@ -52,6 +65,14 @@ impl CodeGenerator {
     fn push_str(&mut self, str: &str) -> &mut Self {
         self.maybe_indent();
         self.data.push_str(str);
+        self
+    }
+
+    // Separation between logical sections, only adds a new line if not first in block or file.
+    fn separation(&mut self) -> &mut Self {
+        if self.data.len() != self.last_block_start {
+            self.new_line();
+        }
         self
     }
 
@@ -90,6 +111,7 @@ impl Visitor for CodeGenerator {
     }
 
     fn enter_function_decl(&mut self, node: &mut DeclFunction) -> bool {
+        self.separation();
         self.push_str("function ");
         node.identifier.traverse(self);
         node.parameters.traverse(self);
@@ -99,12 +121,16 @@ impl Visitor for CodeGenerator {
     }
 
     fn enter_body(&mut self, node: &mut Body) -> bool {
-        self.push('{').new_line();
+        if node.statements.is_empty() {
+            self.push_str("{ }").new_line();
+            return false
+        }
+
+        self.block_start();
         self.indent();
         node.statements.traverse(self);
         self.dedent();
-        self.push('}');
-        self.new_line();
+        self.block_end();
         false
     }
 
@@ -116,10 +142,16 @@ impl Visitor for CodeGenerator {
         false
     }
 
-    fn enter_format_parameters(&mut self, node: &mut FormalParameters) -> bool {
+    fn enter_formal_parameters(&mut self, node: &mut FormalParameters) -> bool {
         self.push('(');
-        for bind in node.bindings.iter_mut() {
+
+        let mut bindings = node.bindings.iter_mut().peekable();
+        while let Some(bind) = bindings.next() {
             bind.traverse(self);
+            if let Some(_) = bindings.peek() {
+                self.push(',');
+                self.space();
+            }
         }
         self.push(')');
         false
