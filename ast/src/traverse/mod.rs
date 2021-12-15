@@ -9,7 +9,9 @@ pub trait Traverse {
 
 impl<F: Traverse> Traverse for Vec<F> {
     fn traverse(&mut self, visitor: &mut dyn Visitor) {
-        self.into_iter().map(|node| node.traverse(visitor)).collect()
+        self.into_iter()
+            .map(|node| node.traverse(visitor))
+            .collect()
     }
 }
 

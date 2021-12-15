@@ -1,10 +1,10 @@
 extern crate fajt_macros;
 
-use std::fs::File;
-use std::io::Read;
 use fajt_codegen::generate_code;
 use fajt_macros::for_each_file;
 use fajt_parser::parse_program;
+use std::fs::File;
+use std::io::Read;
 
 fn read_file(path: &str) -> String {
     let mut file = File::open(path).expect("Failed to open file.");
@@ -28,7 +28,7 @@ macro_rules! generate_test_cases {
         fn $ident() {
             run_test($file_path);
         }
-    }
+    };
 }
 
 for_each_file!("tests/js", generate_test_cases);
