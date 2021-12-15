@@ -1,4 +1,4 @@
-function empty() { }
+function empty() {}
 
 function square(n) {
     return n * n;
