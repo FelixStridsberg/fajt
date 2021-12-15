@@ -79,49 +79,49 @@ generate_test_module!(
     mod_name: expr,
     ast_type: Expr,
     source_type: Script,
-    folders: ["parser/tests/snapshots/expr"],
+    folders: ["tests/cases/expr"],
 );
 
 generate_test_module!(
     mod_name: stmt,
     ast_type: Stmt,
     source_type: Script,
-    folders: ["parser/tests/snapshots/stmt"],
+    folders: ["tests/cases/stmt"],
 );
 
 generate_test_module!(
     mod_name: decl,
     ast_type: Stmt,
     source_type: Script,
-    folders: ["parser/tests/snapshots/decl"],
+    folders: ["tests/cases/decl"],
 );
 
 generate_test_module!(
     mod_name: semicolon,
     ast_type: Program,
     source_type: Unknown,
-    folders: ["parser/tests/snapshots/semicolon"],
+    folders: ["tests/cases/semicolon"],
 );
 
 generate_test_module!(
     mod_name: strict_mode,
     ast_type: Program,
     source_type: Script,
-    folders: ["parser/tests/snapshots/strict-mode"],
+    folders: ["tests/cases/strict-mode"],
 );
 
 generate_test_module!(
     mod_name: source_module,
     ast_type: Program,
     source_type: Module,
-    folders: ["parser/tests/snapshots/source-module"],
+    folders: ["tests/cases/source-module"],
 );
 
 generate_test_module!(
     mod_name: source_script,
     ast_type: Program,
     source_type: Script,
-    folders: ["parser/tests/snapshots/source-script"],
+    folders: ["tests/cases/source-script"],
 );
 
 fn evaluate_result<'a, 'b: 'a, T>(result: Result<T>, markdown: &'b md::Markdown)
@@ -259,3 +259,6 @@ mod md {
         data
     }
 }
+
+#[test]
+fn dummy() { }

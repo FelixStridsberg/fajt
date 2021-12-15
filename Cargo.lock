@@ -48,9 +48,12 @@ name = "fajt"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "fajt_ast",
  "fajt_codegen",
  "fajt_macros",
  "fajt_parser",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
