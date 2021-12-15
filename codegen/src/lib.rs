@@ -1,6 +1,8 @@
 use fajt_ast::traverse::{Traverse, Visitor};
 use fajt_ast::*;
 
+const INDENTATION_SIZE: usize = 4;
+
 pub fn generate_code(mut program: Program) -> String {
     let mut codegen = CodeGenerator::new();
     program.traverse(&mut codegen);
@@ -70,6 +72,14 @@ impl CodeGenerator {
         self
     }
 
+    fn start_align(&mut self) {
+        self.align = Some(self.data.len() - self.last_new_line);
+    }
+
+    fn stop_align(&mut self) {
+        self.align = None;
+    }
+
     // Separation between logical sections, only adds a new line if not first in block or file.
     fn separation(&mut self) -> &mut Self {
         if self.data.len() != self.last_block_start {
@@ -85,9 +95,14 @@ impl CodeGenerator {
     }
 
     fn maybe_indent(&mut self) {
-        if self.should_indent() {
-            let indentation = 4 * self.indent + self.align.unwrap_or(0);
-            self.data.push_str(&" ".repeat(indentation));
+        if !self.should_indent() {
+            return;
+        }
+
+        if let Some(align) = self.align {
+            self.data.push_str(&" ".repeat(align));
+        } else {
+            self.data.push_str(&" ".repeat(self.indent * INDENTATION_SIZE));
         }
     }
 
@@ -165,7 +180,7 @@ impl Visitor for CodeGenerator {
         self.push_str(&kind_str);
         self.push(' ');
 
-        self.align = Some(kind_str.len() + 1);
+        self.start_align();
 
         let mut declarations = node.declarations.iter_mut().peekable();
         while let Some(decl) = declarations.next() {
@@ -180,7 +195,7 @@ impl Visitor for CodeGenerator {
             self.new_line();
         }
 
-        self.align = None;
+        self.stop_align();
 
         false
     }
