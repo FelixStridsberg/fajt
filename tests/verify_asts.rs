@@ -261,4 +261,6 @@ mod md {
 }
 
 #[test]
-fn dummy() { }
+fn dummy() {
+    // This is just so IDE recognize this is a runnable file.
+}
