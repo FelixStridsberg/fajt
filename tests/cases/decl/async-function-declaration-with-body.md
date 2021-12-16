@@ -1,11 +1,13 @@
 ```js
-async function fn() { var a = 1 }
+async function fn() {
+    var a = 1;
+}
 ```
 
 ```json
 {
   "FunctionDecl": {
-    "span": "0:33",
+    "span": "0:38",
     "asynchronous": true,
     "generator": false,
     "identifier": {
@@ -18,25 +20,25 @@ async function fn() { var a = 1 }
       "rest": null
     },
     "body": {
-      "span": "20:33",
+      "span": "20:38",
       "directives": [],
       "statements": [
         {
           "Variable": {
-            "span": "22:31",
+            "span": "26:36",
             "kind": "Var",
             "declarations": [
               {
-                "span": "26:31",
+                "span": "30:35",
                 "pattern": {
                   "Ident": {
-                    "span": "26:27",
+                    "span": "30:31",
                     "name": "a"
                   }
                 },
                 "initializer": {
                   "Literal": {
-                    "span": "30:31",
+                    "span": "34:35",
                     "literal": {
                       "Number": {
                         "Integer": [
