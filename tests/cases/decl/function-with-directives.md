@@ -1,15 +1,15 @@
 ```js
 function fn() {
-  "use strict"
-  'custom1';
-  "custom2"
+    "use strict";
+    'custom1';
+    "custom2";
 }
 ```
 
 ```json
 {
   "FunctionDecl": {
-    "span": "0:57",
+    "span": "0:65",
     "asynchronous": false,
     "generator": false,
     "identifier": {
@@ -22,11 +22,20 @@ function fn() {
       "rest": null
     },
     "body": {
-      "span": "14:57",
+      "span": "14:65",
       "directives": [
-        "use strict",
-        "custom1",
-        "custom2"
+        {
+          "value": "use strict",
+          "delimiter": "\""
+        },
+        {
+          "value": "custom1",
+          "delimiter": "'"
+        },
+        {
+          "value": "custom2",
+          "delimiter": "\""
+        }
       ],
       "statements": []
     }

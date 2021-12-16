@@ -1,4 +1,4 @@
-use crate::{BindingElement, BindingPattern, DeclClass, Expr, Ident, Span};
+use crate::{BindingElement, BindingPattern, DeclClass, Expr, Ident, LitString, Span};
 use fajt_macros::FromString;
 
 ast_mapping! {
@@ -70,7 +70,7 @@ ast_struct! {
     /// FunctionBody, ScriptBody or ModuleBody.
     pub struct Body {
         pub span: Span,
-        pub directives: Vec<String>,
+        pub directives: Vec<LitString>,
         pub statements: Vec<Stmt>,
     }
 }

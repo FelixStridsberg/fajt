@@ -19,7 +19,7 @@ mod variable;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use fajt_ast::{Expr, Ident, Literal, Program, PropertyName, SourceType, Span, Stmt};
+use fajt_ast::{Expr, Ident, Literal, LitString, Program, PropertyName, SourceType, Span, Stmt};
 use fajt_common::io::{PeekRead, PeekReader};
 use fajt_lexer::token::{KeywordContext, Token, TokenValue};
 use fajt_lexer::token_matches;
@@ -354,7 +354,7 @@ where
         }
     }
 
-    fn parse_directive_prologue(&mut self) -> Result<Vec<String>> {
+    fn parse_directive_prologue(&mut self) -> Result<Vec<LitString>> {
         let mut directives = Vec::new();
 
         loop {
@@ -365,8 +365,7 @@ where
                     .expr
                     .unwrap_literal()
                     .literal
-                    .unwrap_string()
-                    .value;
+                    .unwrap_string();
                 directives.push(string);
             } else {
                 break;
