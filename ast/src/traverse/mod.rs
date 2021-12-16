@@ -56,6 +56,12 @@ generate_fold_and_visit! {
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
             Ident
         }
+
+        Literal: (enter: enter_literal, exit: exit_literal) {
+            Number
+        }
+
+        Number: (enter: enter_number, exit: exit_number) {}
     }
 
     structs: {
@@ -82,7 +88,9 @@ generate_fold_and_visit! {
             expression
         }
 
-        ExprLiteral: (enter: enter_literal_expr, exit: exit_literal_expr) { }
+        ExprLiteral: (enter: enter_literal_expr, exit: exit_literal_expr) {
+            literal
+        }
 
         StatementList<Stmt>: (enter: enter_stmt_list, exit: exit_stmt_list) {
             body

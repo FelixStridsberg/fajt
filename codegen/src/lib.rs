@@ -212,6 +212,17 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_number(&mut self, node: &mut Number) -> bool {
+        match node {
+            Number::Integer(n, _) => {
+                self.push_str(&n.to_string());
+            }
+            Number::Decimal(_) => {}
+        }
+
+        false
+    }
+
     fn enter_ident(&mut self, node: &mut Ident) -> bool {
         self.push_str(&node.name);
         false

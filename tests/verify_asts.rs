@@ -28,8 +28,8 @@ use fajt_ast::SourceType;
 use fajt_parser::error::{ErrorKind, Result};
 use fajt_parser::{parse, Parse};
 use markdown::TestFile;
-use serde::Serialize;
 use serde::de::DeserializeOwned;
+use serde::Serialize;
 use std::fmt::Debug;
 
 // TODO possibility to regenerate all asts.
@@ -56,8 +56,8 @@ where
 }
 
 fn assert_result<T>(result: Result<T>, ast_json: String)
-    where
-        T: Parse + Serialize + DeserializeOwned + PartialEq + Debug,
+where
+    T: Parse + Serialize + DeserializeOwned + PartialEq + Debug,
 {
     if let Ok(result) = result {
         let expected_expr: T = serde_json::from_str(&ast_json).unwrap();
@@ -73,7 +73,7 @@ fn assert_result<T>(result: Result<T>, ast_json: String)
 
 fn generate_expected_output<T>(result: Result<T>, test_file: TestFile)
 where
-    T: Parse + Serialize + Debug
+    T: Parse + Serialize + Debug,
 {
     if let Ok(result) = result {
         let json = serde_json::to_string_pretty(&result).unwrap();
@@ -86,8 +86,8 @@ where
 
 #[allow(unused)]
 fn regenerate_asts<T>(result: Result<T>, test_file: TestFile)
-    where
-        T: DeserializeOwned + Serialize + PartialEq + Debug,
+where
+    T: DeserializeOwned + Serialize + PartialEq + Debug,
 {
     if let Ok(result) = result {
         let json = serde_json::to_string_pretty(&result).unwrap();
