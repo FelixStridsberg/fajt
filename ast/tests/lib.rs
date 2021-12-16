@@ -8,12 +8,11 @@ macro_rules! assert_traverse_trace {
     ) => {
         use fajt_parser::{ parse_program };
         use fajt_ast::traverse::TraceVisitor;
-        use fajt_ast::traverse::Fold;
+        use fajt_ast::traverse::Traverse;
 
-        let ast = parse_program($source).unwrap();
-
+        let mut ast = parse_program($source).unwrap();
         let mut visitor = TraceVisitor { visits: vec![] };
-        ast.fold(&mut visitor);
+        ast.traverse(&mut visitor);
 
         let expected_visits: Vec<&str> = vec![ $( $fn_name, )* ];
         assert_eq!(visitor.visits, expected_visits);
