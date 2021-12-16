@@ -137,6 +137,11 @@ impl Visitor for CodeGenerator {
         }
 
         self.push_str("function ");
+
+        if node.generator {
+            self.push('*');
+        }
+
         node.identifier.traverse(self);
         node.parameters.traverse(self);
         self.space();
