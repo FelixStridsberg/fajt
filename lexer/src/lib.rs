@@ -15,7 +15,7 @@ use crate::error::ErrorKind::EndOfFile;
 use crate::token::Token;
 use crate::token::TokenValue;
 use fajt_ast::Base::{Binary, Hex, Octal};
-use fajt_ast::Literal;
+use fajt_ast::{LitString, Literal};
 use fajt_common::io::{PeekRead, PeekReader};
 use std::str::CharIndices;
 
@@ -217,7 +217,7 @@ impl<'a> Lexer<'a> {
         let delimiter = self.reader.consume()?;
         debug_assert!(delimiter == '"' || delimiter == '\'');
 
-        let mut result = String::new();
+        let mut value = String::new();
         let mut escape = false;
         loop {
             let c = self.reader.consume()?;
@@ -227,11 +227,14 @@ impl<'a> Lexer<'a> {
 
             escape = c == '\\' && !escape;
             if !escape {
-                result.push(c);
+                value.push(c);
             }
         }
 
-        Ok(TokenValue::Literal(Literal::String(result, delimiter)))
+        Ok(TokenValue::Literal(Literal::String(LitString {
+            value,
+            delimiter,
+        })))
     }
 
     fn read_number_literal(&mut self) -> Result<TokenValue> {

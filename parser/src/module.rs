@@ -159,11 +159,12 @@ where
 
     /// Parses the `ModuleSpecifier` goal symbol.
     fn parse_module_specifier(&mut self) -> Result<String> {
-        let (module_name, _) = self
+        let module_name = self
             .parse_literal()?
             .unwrap_literal()
             .literal
-            .unwrap_string();
+            .unwrap_string()
+            .value;
         Ok(module_name)
     }
 

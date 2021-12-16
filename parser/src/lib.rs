@@ -278,7 +278,7 @@ where
         matches!(
             self.current(),
             Ok(Token {
-                value: TokenValue::Literal(Literal::String(_, _)),
+                value: TokenValue::Literal(Literal::String(_)),
                 ..
             })
         )
@@ -360,12 +360,13 @@ where
         loop {
             if self.current_matches_string_literal() {
                 let stmt = self.parse_stmt()?;
-                let (string, _) = stmt
+                let string = stmt
                     .unwrap_expr_stmt()
                     .expr
                     .unwrap_literal()
                     .literal
-                    .unwrap_string();
+                    .unwrap_string()
+                    .value;
                 directives.push(string);
             } else {
                 break;

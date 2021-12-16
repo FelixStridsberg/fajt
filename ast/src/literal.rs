@@ -4,20 +4,27 @@ ast_node! {
     pub enum Literal {
         Null,
         Boolean(bool),
-        String(String, char),
-        Number(Number),
-        Array(Array),
-        Object(Object),
+        String(LitString),
+        Number(Number), // TODO LitNumber
+        Array(Array), // TODO LitArray
+        Object(Object), // TODO  LitObject
     }
 }
 
 impl Literal {
-    pub fn unwrap_string(self) -> (String, char) {
-        if let Literal::String(string, delimiter) = self {
-            (string, delimiter)
+    pub fn unwrap_string(self) -> LitString {
+        if let Literal::String(string) = self {
+            string
         } else {
             panic!("Tried to unwrap {:?} as a string literal", self);
         }
+    }
+}
+
+ast_node! {
+    pub struct LitString {
+        pub value: String,
+        pub delimiter: char,
     }
 }
 

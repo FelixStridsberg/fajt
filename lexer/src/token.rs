@@ -329,7 +329,10 @@ macro_rules! literal(
     (string, $type:expr, $value:expr) => {
          $crate::token::TokenValue::Literal(
             fajt_ast::Literal::String(
-                $value.to_owned(), $type
+                fajt_ast::LitString {
+                    value: $value.to_owned(),
+                    delimiter: $type,
+                }
             )
         )
     }
