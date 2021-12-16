@@ -150,13 +150,20 @@ impl Visitor for CodeGenerator {
     }
 
     fn enter_body(&mut self, node: &mut Body) -> bool {
-        if node.statements.is_empty() {
+        if node.statements.is_empty() && node.directives.is_empty() {
             self.push_str("{}").new_line();
             return false;
         }
 
         self.block_start();
         self.indent();
+
+        for x in &mut node.directives {
+            x.traverse(self);
+            self.push(';');
+            self.new_line();
+        }
+
         node.statements.traverse(self);
         self.dedent();
         self.block_end();
