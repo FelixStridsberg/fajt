@@ -52,7 +52,6 @@ macro_rules! generate_test_cases {
 macro_rules! generate_test_module {
     (
         mod_name: $mod_name:ident,
-        ast_type: $ast_type:ident,
         source_type: $source_type:ident,
         folders: [$( $folder:literal ),*],
     ) => {
@@ -68,9 +67,14 @@ macro_rules! generate_test_module {
 
 generate_test_module!(
     mod_name: decl,
-    ast_type: Stmt,
     source_type: Script,
     folders: ["tests/cases/decl"],
+);
+
+generate_test_module!(
+    mod_name: stmt,
+    source_type: Script,
+    folders: ["tests/cases/stmt"],
 );
 
 #[test]
