@@ -5,11 +5,26 @@ mod markdown;
 use fajt_codegen::generate_code;
 use fajt_parser::parse_program;
 use markdown::TestFile;
+use std::path::Path;
 
-fn run_test_file(path: &str) {
-    println!("Running: {}", path);
+fn run_test_file(filename: &str) {
+    let path = Path::new(filename);
+    if path
+        .file_name()
+        .unwrap()
+        .to_string_lossy()
+        .starts_with("fail-")
+    {
+        println!(
+            "Skipping {}, cannot generate code from failing source.",
+            filename
+        );
+        return;
+    }
 
-    let test_file = TestFile::from(&path);
+    println!("Running: {}", filename);
+
+    let test_file = TestFile::from(&filename);
     let input = test_file.source;
     let ast = parse_program(&input).unwrap();
     let output = generate_code(ast);
