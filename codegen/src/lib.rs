@@ -6,7 +6,7 @@ const INDENTATION_SIZE: usize = 4;
 pub fn generate_code(mut program: Program) -> String {
     let mut codegen = CodeGenerator::new();
     program.traverse(&mut codegen);
-    codegen.to_string()
+    codegen.into_string()
 }
 
 struct CodeGenerator {
@@ -28,7 +28,7 @@ impl CodeGenerator {
         }
     }
 
-    fn to_string(self) -> String {
+    fn into_string(self) -> String {
         self.data
     }
 }
@@ -108,7 +108,7 @@ impl CodeGenerator {
     }
 
     fn should_indent(&self) -> bool {
-        self.data.len() != 0 && self.data.len() == self.last_new_line
+        !self.data.is_empty() && self.data.len() == self.last_new_line
     }
 }
 
@@ -184,7 +184,7 @@ impl Visitor for CodeGenerator {
         let mut bindings = node.bindings.iter_mut().peekable();
         while let Some(bind) = bindings.next() {
             bind.traverse(self);
-            if let Some(_) = bindings.peek() {
+            if bindings.peek().is_some() {
                 self.push(',');
                 self.space();
             }
@@ -226,7 +226,7 @@ impl Visitor for CodeGenerator {
         while let Some(decl) = declarations.next() {
             decl.traverse(self);
 
-            if let Some(_) = declarations.peek() {
+            if declarations.peek().is_some() {
                 self.push(',');
             } else {
                 self.push(';');
@@ -279,37 +279,5 @@ impl Visitor for CodeGenerator {
     fn enter_ident(&mut self, node: &mut Ident) -> bool {
         self.push_str(&node.name);
         false
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::{generate_code, CodeGenerator};
-    use fajt_ast::traverse::Traverse;
-    use fajt_parser::parse_program;
-
-    #[test]
-    fn add_expr() {
-        let mut ast = parse_program("a + a").unwrap();
-        let code = generate_code(ast);
-
-        assert_eq!(code, "a + a");
-    }
-
-    #[test]
-    fn parenthesized_expr() {
-        let mut ast = parse_program("(a + a)").unwrap();
-
-        let code = generate_code(ast);
-        assert_eq!(code, "(a + a)");
-    }
-
-    #[test]
-    fn function() {
-        let input = "function plus(n) {\n    return n + n;\n}";
-        let mut ast = parse_program(input).unwrap();
-
-        let code = generate_code(ast);
-        assert_eq!(code, input);
     }
 }

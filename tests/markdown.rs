@@ -26,7 +26,7 @@ impl TestFile {
     }
 
     pub fn append_json_block(&self, data: &str) {
-        let block = generate_code_block(&data, "json");
+        let block = generate_code_block(data, "json");
 
         let mut file = OpenOptions::new().write(true).open(&self.path).unwrap();
 

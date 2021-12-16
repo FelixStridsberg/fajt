@@ -261,7 +261,7 @@ where
     pub fn with_context(&mut self, modify: &ContextModify) -> Parser<'_, I> {
         Parser {
             context: self.context.modify(modify),
-            reader: &mut self.reader,
+            reader: self.reader,
             source_type: self.source_type.clone(),
         }
     }
