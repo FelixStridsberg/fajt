@@ -186,6 +186,16 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_binding_element(&mut self, node: &mut BindingElement) -> bool {
+        node.pattern.traverse(self);
+
+        if let Some(initializer) = node.initializer.as_mut() {
+            self.push_str(" = ");
+            initializer.traverse(self);
+        }
+        false
+    }
+
     fn enter_variable_stmt(&mut self, node: &mut StmtVariable) -> bool {
         let kind_str = node.kind.to_string();
         self.push_str(&kind_str);
