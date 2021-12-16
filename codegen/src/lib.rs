@@ -131,6 +131,11 @@ impl Visitor for CodeGenerator {
 
     fn enter_function_decl(&mut self, node: &mut DeclFunction) -> bool {
         self.separation();
+
+        if node.asynchronous {
+            self.push_str("async ");
+        }
+
         self.push_str("function ");
         node.identifier.traverse(self);
         node.parameters.traverse(self);
