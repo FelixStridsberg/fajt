@@ -19,7 +19,7 @@ mod variable;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use fajt_ast::{Expr, Ident, Literal, LitString, Program, PropertyName, SourceType, Span, Stmt};
+use fajt_ast::{Expr, Ident, LitString, Literal, Program, PropertyName, SourceType, Span, Stmt};
 use fajt_common::io::{PeekRead, PeekReader};
 use fajt_lexer::token::{KeywordContext, Token, TokenValue};
 use fajt_lexer::token_matches;
