@@ -1,11 +1,11 @@
 ```js
-function fn(...a) { }
+function fn(...a) {}
 ```
 
 ```json
 {
   "FunctionDecl": {
-    "span": "0:21",
+    "span": "0:20",
     "asynchronous": false,
     "generator": false,
     "identifier": {
@@ -23,7 +23,7 @@ function fn(...a) { }
       }
     },
     "body": {
-      "span": "18:21",
+      "span": "18:20",
       "directives": [],
       "statements": []
     }

@@ -182,6 +182,12 @@ impl Visitor for CodeGenerator {
                 self.space();
             }
         }
+
+        if let Some(rest) = node.rest.as_mut() {
+            self.push_str("...");
+            rest.traverse(self);
+        }
+
         self.push(')');
         false
     }
