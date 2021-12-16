@@ -51,6 +51,7 @@ generate_fold_and_visit! {
             Return
             Expr
             Variable
+            Empty
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
@@ -59,6 +60,7 @@ generate_fold_and_visit! {
 
         Literal: (enter: enter_literal, exit: exit_literal) {
             Number
+            String
         }
 
         Number: (enter: enter_number, exit: exit_number) {}
@@ -118,5 +120,9 @@ generate_fold_and_visit! {
             pattern
             initializer
         }
+
+        StmtEmpty: (enter: enter_empty_statement, exit: exit_empty_statement) {}
+
+        LitString: (enter: enter_string_literal, exit: exit_string_literal) {}
     }
 }

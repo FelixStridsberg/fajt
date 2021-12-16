@@ -192,6 +192,12 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_empty_statement(&mut self, _node: &mut StmtEmpty) -> bool {
+        self.push(';');
+        self.new_line();
+        false
+    }
+
     fn enter_binding_element(&mut self, node: &mut BindingElement) -> bool {
         node.pattern.traverse(self);
 
@@ -235,6 +241,20 @@ impl Visitor for CodeGenerator {
             initializer.traverse(self);
         }
 
+        false
+    }
+
+    fn enter_string_literal(&mut self, node: &mut LitString) -> bool {
+        self.push(node.delimiter);
+        self.push_str(&node.value);
+        self.push(node.delimiter);
+        false
+    }
+
+    fn enter_stmt_expr(&mut self, node: &mut StmtExpr) -> bool {
+        node.expr.traverse(self);
+        self.push(';');
+        self.new_line();
         false
     }
 

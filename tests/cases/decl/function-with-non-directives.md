@@ -1,14 +1,14 @@
 ```js
 function fn() {
-  ;
-  "use strict"
+    ;
+    "use strict";
 }
 ```
 
 ```json
 {
   "FunctionDecl": {
-    "span": "0:36",
+    "span": "0:41",
     "asynchronous": false,
     "generator": false,
     "identifier": {
@@ -21,20 +21,20 @@ function fn() {
       "rest": null
     },
     "body": {
-      "span": "14:36",
+      "span": "14:41",
       "directives": [],
       "statements": [
         {
           "Empty": {
-            "span": "18:19"
+            "span": "20:21"
           }
         },
         {
           "Expr": {
-            "span": "22:34",
+            "span": "26:39",
             "expr": {
               "Literal": {
-                "span": "22:34",
+                "span": "26:38",
                 "literal": {
                   "String": [
                     "use strict",
