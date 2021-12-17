@@ -250,6 +250,17 @@ impl Visitor for CodeGenerator {
             return false;
         }
 
+        self.push('[');
+        self.space();
+
+        let mut elements = node.elements.iter_mut().peekable();
+        while let Some(element) = elements.next() {
+            element.traverse(self);
+        }
+
+        self.space();
+        self.push(']');
+
         false
     }
 
