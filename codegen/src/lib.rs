@@ -228,11 +228,15 @@ impl Visitor for CodeGenerator {
 
             if declarations.peek().is_some() {
                 self.push(',');
+                if decl.initializer.is_some() {
+                    self.new_line();
+                } else {
+                    self.push(' ');
+                }
             } else {
                 self.push(';');
+                self.new_line();
             }
-
-            self.new_line();
         }
 
         self.stop_align();

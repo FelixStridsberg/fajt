@@ -1,11 +1,12 @@
 ```js
-var a = b, c;
+var a = b,
+    c;
 ```
 
 ```json
 {
   "Variable": {
-    "span": "0:13",
+    "span": "0:17",
     "kind": "Var",
     "declarations": [
       {
@@ -24,10 +25,10 @@ var a = b, c;
         }
       },
       {
-        "span": "11:12",
+        "span": "15:16",
         "pattern": {
           "Ident": {
-            "span": "11:12",
+            "span": "15:16",
             "name": "c"
           }
         },
