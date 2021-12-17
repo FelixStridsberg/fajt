@@ -256,6 +256,11 @@ impl Visitor for CodeGenerator {
         let mut elements = node.elements.iter_mut().peekable();
         while let Some(element) = elements.next() {
             element.traverse(self);
+
+            if elements.peek().is_some() {
+                self.push(',');
+                self.space();
+            }
         }
 
         self.space();
