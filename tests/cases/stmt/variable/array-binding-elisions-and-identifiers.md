@@ -1,18 +1,18 @@
 ```js
-var [ , a,,b ] = c;
+var [ , a, , b ] = c;
 ```
 
 ```json
 {
   "Variable": {
-    "span": "0:19",
+    "span": "0:21",
     "kind": "Var",
     "declarations": [
       {
-        "span": "4:18",
+        "span": "4:20",
         "pattern": {
           "Array": {
-            "span": "4:14",
+            "span": "4:16",
             "elements": [
               null,
               {
@@ -27,10 +27,10 @@ var [ , a,,b ] = c;
               },
               null,
               {
-                "span": "11:12",
+                "span": "13:14",
                 "pattern": {
                   "Ident": {
-                    "span": "11:12",
+                    "span": "13:14",
                     "name": "b"
                   }
                 },
@@ -42,7 +42,7 @@ var [ , a,,b ] = c;
         },
         "initializer": {
           "IdentRef": {
-            "span": "17:18",
+            "span": "19:20",
             "name": "c"
           }
         }
