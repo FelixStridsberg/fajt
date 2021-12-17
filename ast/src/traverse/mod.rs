@@ -54,6 +54,7 @@ generate_fold_and_visit! {
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
             Ident
+            Array
         }
 
         Literal: (enter: enter_literal, exit: exit_literal) {
@@ -122,5 +123,7 @@ generate_fold_and_visit! {
         StmtEmpty: (enter: enter_empty_statement, exit: exit_empty_statement) {}
 
         LitString: (enter: enter_string_literal, exit: exit_string_literal) {}
+
+        ArrayBinding: (enter: enter_array_binding, exit: exit_array_binding) {}
     }
 }

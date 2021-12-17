@@ -244,6 +244,15 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_array_binding(&mut self, node: &mut ArrayBinding) -> bool {
+        if node.rest.is_none() && node.elements.is_empty() {
+            self.push_str("[]");
+            return false;
+        }
+
+        false
+    }
+
     fn enter_variable_declaration(&mut self, node: &mut VariableDeclaration) -> bool {
         node.pattern.traverse(self);
 
