@@ -40,7 +40,7 @@ impl From<Ident> for ObjectBindingProp {
 ast_node! {
     pub enum PropertyName {
         Ident(Ident),
-        String(String, char),
+        String(String, char), // TODO LitString?
         Number(Number),
         Computed(Expr),
     }

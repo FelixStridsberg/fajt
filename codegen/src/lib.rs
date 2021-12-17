@@ -330,7 +330,10 @@ impl Visitor for CodeGenerator {
                 }
             }
             ObjectBindingProp::KeyValue(name, prop) => {
-                todo!()
+                name.traverse(self);
+                self.push(':');
+                self.space();
+                prop.traverse(self);
             }
         }
         false

@@ -66,6 +66,10 @@ generate_fold_and_visit! {
         Number: (enter: enter_number, exit: exit_number) {}
 
         ObjectBindingProp: (enter: enter_object_binding_prop, exit: exit_object_binding_prop) {}
+
+        PropertyName: (enter: enter_property_name, exit: exit_property_name) {
+            Ident
+        }
     }
 
     structs: {
