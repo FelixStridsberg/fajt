@@ -302,6 +302,16 @@ impl Visitor for CodeGenerator {
             }
         }
 
+        if let Some(rest) = node.rest.as_mut() {
+            if !node.props.is_empty() {
+                self.push(',');
+                self.space();
+            }
+
+            self.push_str("...");
+            rest.traverse(self);
+        }
+
         self.space();
         self.push('}');
         false
