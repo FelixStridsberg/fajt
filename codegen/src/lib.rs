@@ -114,6 +114,22 @@ impl CodeGenerator {
 }
 
 impl Visitor for CodeGenerator {
+    fn enter_block_stmt(&mut self, node: &mut StmtBlock) -> bool {
+        if node.statements.is_empty() {
+            self.push_str("{}").new_line();
+            return false;
+        }
+
+        self.block_start();
+        self.indent();
+
+        node.statements.traverse(self);
+
+        self.dedent();
+        self.block_end();
+        false
+    }
+
     fn enter_binary_expr(&mut self, node: &mut ExprBinary) -> bool {
         node.left.traverse(self);
         self.space();

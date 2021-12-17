@@ -1,20 +1,23 @@
 ```js
-{ ;; }
+{
+    ;
+    ;
+}
 ```
 
 ```json
 {
   "Block": {
-    "span": "0:6",
+    "span": "0:15",
     "statements": [
       {
         "Empty": {
-          "span": "2:3"
+          "span": "6:7"
         }
       },
       {
         "Empty": {
-          "span": "3:4"
+          "span": "12:13"
         }
       }
     ]

@@ -50,6 +50,7 @@ generate_fold_and_visit! {
             Expr
             Variable
             Empty
+            Block
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
@@ -86,6 +87,8 @@ generate_fold_and_visit! {
         StmtExpr: (enter: enter_stmt_expr, exit: exit_stmt_expr) {
             expr
         }
+
+        StmtBlock: (enter: enter_block_stmt, exit: exit_block_stmt) { }
 
         ExprBinary: (enter: enter_binary_expr, exit: exit_binary_expr) {
             left
