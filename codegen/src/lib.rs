@@ -321,6 +321,13 @@ impl Visitor for CodeGenerator {
         match node {
             ObjectBindingProp::Single(ident, initializer) => {
                 ident.traverse(self);
+
+                if let Some(initializer) = initializer {
+                    self.space();
+                    self.push('=');
+                    self.space();
+                    initializer.traverse(self);
+                }
             }
             ObjectBindingProp::KeyValue(name, prop) => {
                 todo!()
