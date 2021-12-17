@@ -1,5 +1,6 @@
 use fajt_ast::traverse::{Traverse, Visitor};
 use fajt_ast::*;
+use std::process::id;
 
 const INDENTATION_SIZE: usize = 4;
 
@@ -257,8 +258,11 @@ impl Visitor for CodeGenerator {
         while let Some(element) = elements.next() {
             element.traverse(self);
 
-            if elements.peek().is_some() {
+            if elements.peek().is_some() || element.is_none() {
                 self.push(',');
+            }
+
+            if elements.peek().is_some() {
                 self.space();
             }
         }
@@ -276,6 +280,42 @@ impl Visitor for CodeGenerator {
         self.space();
         self.push(']');
 
+        false
+    }
+
+    fn enter_object_binding(&mut self, node: &mut ObjectBinding) -> bool {
+        if node.rest.is_none() && node.props.is_empty() {
+            self.push_str("{}");
+            return false;
+        }
+
+        self.push('{');
+        self.space();
+
+        let mut props = node.props.iter_mut().peekable();
+        while let Some(element) = props.next() {
+            element.traverse(self);
+
+            if props.peek().is_some() {
+                self.push(',');
+                self.space();
+            }
+        }
+
+        self.space();
+        self.push('}');
+        false
+    }
+
+    fn enter_object_binding_prop(&mut self, node: &mut ObjectBindingProp) -> bool {
+        match node {
+            ObjectBindingProp::Single(ident, initializer) => {
+                ident.traverse(self);
+            }
+            ObjectBindingProp::KeyValue(name, prop) => {
+                todo!()
+            }
+        }
         false
     }
 

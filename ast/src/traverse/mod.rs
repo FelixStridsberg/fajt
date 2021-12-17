@@ -55,6 +55,7 @@ generate_fold_and_visit! {
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
             Ident
             Array
+            Object
         }
 
         Literal: (enter: enter_literal, exit: exit_literal) {
@@ -63,6 +64,8 @@ generate_fold_and_visit! {
         }
 
         Number: (enter: enter_number, exit: exit_number) {}
+
+        ObjectBindingProp: (enter: enter_object_binding_prop, exit: exit_object_binding_prop) {}
     }
 
     structs: {
@@ -125,5 +128,7 @@ generate_fold_and_visit! {
         LitString: (enter: enter_string_literal, exit: exit_string_literal) {}
 
         ArrayBinding: (enter: enter_array_binding, exit: exit_array_binding) {}
+
+        ObjectBinding: (enter: enter_object_binding, exit: exit_object_binding) {}
     }
 }

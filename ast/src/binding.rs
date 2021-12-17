@@ -26,8 +26,8 @@ ast_struct! {
 
 ast_node! {
     pub enum ObjectBindingProp {
-        Single(Ident, Option<Expr>),
-        KeyValue(PropertyName, BindingElement),
+        Single(Ident, Option<Expr>), // TODO make struct
+        KeyValue(PropertyName, BindingElement), // TODO make struct
     }
 }
 
