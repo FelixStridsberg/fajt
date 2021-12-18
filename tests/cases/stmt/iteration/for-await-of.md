@@ -1,13 +1,13 @@
 ```js
 async function fn() {
-  for await (a of b) ;
+    for await (a of b) ;
 }
 ```
 
 ```json
 {
   "FunctionDecl": {
-    "span": "0:46",
+    "span": "0:48",
     "asynchronous": true,
     "generator": false,
     "identifier": {
@@ -20,29 +20,29 @@ async function fn() {
       "rest": null
     },
     "body": {
-      "span": "20:46",
+      "span": "20:48",
       "directives": [],
       "statements": [
         {
           "ForOf": {
-            "span": "24:44",
+            "span": "26:46",
             "left": {
               "Expr": {
                 "IdentRef": {
-                  "span": "35:36",
+                  "span": "37:38",
                   "name": "a"
                 }
               }
             },
             "right": {
               "IdentRef": {
-                "span": "40:41",
+                "span": "42:43",
                 "name": "b"
               }
             },
             "body": {
               "Empty": {
-                "span": "43:44"
+                "span": "45:46"
               }
             },
             "asynchronous": true

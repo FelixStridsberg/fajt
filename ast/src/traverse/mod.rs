@@ -63,6 +63,7 @@ generate_fold_and_visit! {
             Switch
             If
             For
+            ForOf
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
@@ -215,5 +216,7 @@ generate_fold_and_visit! {
         }
 
         StmtFor: (enter: enter_for_stmt, exit: exit_for_stmt) {}
+
+        StmtForOf: (enter: enter_for_of_stmt, exit: exit_for_of_stmt) {}
     }
 }

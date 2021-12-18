@@ -254,6 +254,25 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_for_of_stmt(&mut self, node: &mut StmtForOf) -> bool {
+        self.push_str("for");
+
+        if node.asynchronous {
+            self.push_str(" await");
+        }
+
+        self.space();
+        self.push('(');
+        node.left.traverse(self);
+        self.push_str(" of ");
+        node.right.traverse(self);
+        self.push(')');
+
+        self.space();
+        node.body.traverse(self);
+        false
+    }
+
     fn enter_switch_case(&mut self, node: &mut SwitchCase) -> bool {
         if node.test.is_some() {
             self.push_str("case ");
