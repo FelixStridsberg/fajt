@@ -1,11 +1,13 @@
 ```js
-class cls { async method1() {} }
+class cls {
+    async method1() {}
+}
 ```
 
 ```json
 {
   "Class": {
-    "span": "0:32",
+    "span": "0:36",
     "identifier": {
       "span": "6:9",
       "name": "cls"
@@ -14,21 +16,21 @@ class cls { async method1() {} }
     "body": [
       {
         "Method": {
-          "span": "12:30",
+          "span": "16:34",
           "name": {
             "Ident": {
-              "span": "18:25",
+              "span": "22:29",
               "name": "method1"
             }
           },
           "kind": "Method",
           "parameters": {
-            "span": "25:27",
+            "span": "29:31",
             "bindings": [],
             "rest": null
           },
           "body": {
-            "span": "28:30",
+            "span": "32:34",
             "directives": [],
             "statements": []
           },

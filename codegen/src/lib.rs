@@ -196,6 +196,9 @@ impl Visitor for CodeGenerator {
     }
 
     fn enter_class_method(&mut self, node: &mut ClassMethod) -> bool {
+        if node.asynchronous {
+            self.push_str("async ");
+        }
         node.name.traverse(self);
         node.parameters.traverse(self);
         self.space();
