@@ -1,15 +1,15 @@
 ```js
 class cls {
-  *method1() {
-    yield
-  }
+    *method1() {
+        yield;
+    }
 }
 ```
 
 ```json
 {
   "Class": {
-    "span": "0:42",
+    "span": "0:51",
     "identifier": {
       "span": "6:9",
       "name": "cls"
@@ -18,29 +18,29 @@ class cls {
     "body": [
       {
         "Method": {
-          "span": "14:40",
+          "span": "16:49",
           "name": {
             "Ident": {
-              "span": "15:22",
+              "span": "17:24",
               "name": "method1"
             }
           },
           "kind": "Method",
           "parameters": {
-            "span": "22:24",
+            "span": "24:26",
             "bindings": [],
             "rest": null
           },
           "body": {
-            "span": "25:40",
+            "span": "27:49",
             "directives": [],
             "statements": [
               {
                 "Expr": {
-                  "span": "31:36",
+                  "span": "37:43",
                   "expr": {
                     "Yield": {
-                      "span": "31:36",
+                      "span": "37:42",
                       "argument": null,
                       "delegate": false
                     }

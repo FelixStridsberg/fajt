@@ -199,8 +199,14 @@ impl Visitor for CodeGenerator {
         if node.asynchronous {
             self.push_str("async ");
         }
+
+        if node.generator {
+            self.push('*');
+        }
+
         node.name.traverse(self);
         node.parameters.traverse(self);
+
         self.space();
         node.body.traverse(self);
         false
