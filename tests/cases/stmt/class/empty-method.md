@@ -1,11 +1,13 @@
 ```js
-class cls { method1() {} }
+class cls {
+    method1() {}
+}
 ```
 
 ```json
 {
   "Class": {
-    "span": "0:26",
+    "span": "0:30",
     "identifier": {
       "span": "6:9",
       "name": "cls"
@@ -14,21 +16,21 @@ class cls { method1() {} }
     "body": [
       {
         "Method": {
-          "span": "12:24",
+          "span": "16:28",
           "name": {
             "Ident": {
-              "span": "12:19",
+              "span": "16:23",
               "name": "method1"
             }
           },
           "kind": "Method",
           "parameters": {
-            "span": "19:21",
+            "span": "23:25",
             "bindings": [],
             "rest": null
           },
           "body": {
-            "span": "22:24",
+            "span": "26:28",
             "directives": [],
             "statements": []
           },

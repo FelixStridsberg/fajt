@@ -186,7 +186,20 @@ impl Visitor for CodeGenerator {
         }
 
         self.block_start();
+        self.indent();
+
+        node.body.traverse(self);
+
+        self.dedent();
         self.block_end();
+        false
+    }
+
+    fn enter_class_method(&mut self, node: &mut ClassMethod) -> bool {
+        node.name.traverse(self);
+        node.parameters.traverse(self);
+        self.space();
+        node.body.traverse(self);
         false
     }
 
