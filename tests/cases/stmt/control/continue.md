@@ -1,11 +1,11 @@
 ```js
-continue
+continue;
 ```
 
 ```json
 {
   "Continue": {
-    "span": "0:8",
+    "span": "0:9",
     "label": null
   }
 }

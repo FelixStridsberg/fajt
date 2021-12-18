@@ -58,6 +58,7 @@ generate_fold_and_visit! {
             Throw
             Labeled
             With
+            Continue
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
@@ -189,5 +190,7 @@ generate_fold_and_visit! {
         }
 
         StmtWith: (enter: enter_with_stmt, exit: exit_with_stmt) {}
+
+        StmtContinue: (enter: enter_continue_stmt, exit: exit_continue_stmt) {}
     }
 }

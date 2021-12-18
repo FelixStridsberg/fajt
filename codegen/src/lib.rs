@@ -503,6 +503,19 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_continue_stmt(&mut self, node: &mut StmtContinue) -> bool {
+        self.push_str("continue");
+
+        if node.label.is_some() {
+            self.push(' ');
+            node.label.traverse(self);
+        }
+
+        self.push(';');
+
+        false
+    }
+
     fn exit_stmt(&mut self, _node: &mut Stmt) {
         if self.last_new_line != self.data.len() {
             self.new_line();
