@@ -167,6 +167,23 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_class_decl(&mut self, node: &mut DeclClass) -> bool {
+        self.push_str("class ");
+
+        node.identifier.traverse(self);
+        self.space();
+
+        if node.body.is_empty() {
+            self.push_str("{}");
+            self.new_line();
+            return false;
+        }
+
+        self.block_start();
+        self.block_end();
+        false
+    }
+
     fn enter_body(&mut self, node: &mut Body) -> bool {
         if node.statements.is_empty() && node.directives.is_empty() {
             self.push_str("{}").new_line();

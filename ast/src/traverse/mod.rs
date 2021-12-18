@@ -52,6 +52,7 @@ generate_fold_and_visit! {
             Variable
             Empty
             Block
+            Class
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
@@ -71,6 +72,10 @@ generate_fold_and_visit! {
 
         PropertyName: (enter: enter_property_name, exit: exit_property_name) {
             Ident
+        }
+
+        ClassElement: (enter: enter_class_element, exit: exit_class_element) {
+            Method
         }
     }
 
@@ -141,6 +146,18 @@ generate_fold_and_visit! {
 
         ExprYield: (enter: enter_yield_expr, exit: exit_yield_expr) {
             argument
+        }
+
+        DeclClass: (enter: enter_class_decl, exit: exit_class_decl) {
+            super_class
+            identifier
+            body
+        }
+
+        ClassMethod: (enter: enter_class_method, exit: exit_class_method) {
+            name
+            parameters
+            body
         }
     }
 }
