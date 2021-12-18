@@ -1,11 +1,13 @@
 ```js
-class cls { get getter() {} }
+class cls {
+    get getter() {}
+}
 ```
 
 ```json
 {
   "Class": {
-    "span": "0:29",
+    "span": "0:33",
     "identifier": {
       "span": "6:9",
       "name": "cls"
@@ -14,21 +16,21 @@ class cls { get getter() {} }
     "body": [
       {
         "Method": {
-          "span": "12:27",
+          "span": "16:31",
           "name": {
             "Ident": {
-              "span": "16:22",
+              "span": "20:26",
               "name": "getter"
             }
           },
           "kind": "Get",
           "parameters": {
-            "span": "22:24",
+            "span": "26:28",
             "bindings": [],
             "rest": null
           },
           "body": {
-            "span": "25:27",
+            "span": "29:31",
             "directives": [],
             "statements": []
           },

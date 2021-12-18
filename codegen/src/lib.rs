@@ -204,6 +204,16 @@ impl Visitor for CodeGenerator {
             self.push('*');
         }
 
+        match node.kind {
+            ClassMethodKind::Method => {}
+            ClassMethodKind::Get => {
+                self.push_str("get ");
+            }
+            ClassMethodKind::Set => {
+                self.push_str("set ");
+            }
+        }
+
         node.name.traverse(self);
         node.parameters.traverse(self);
 

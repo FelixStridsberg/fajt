@@ -1,11 +1,13 @@
 ```js
-class cls { set setter(a) {} }
+class cls {
+    set setter(a) {}
+}
 ```
 
 ```json
 {
   "Class": {
-    "span": "0:30",
+    "span": "0:34",
     "identifier": {
       "span": "6:9",
       "name": "cls"
@@ -14,22 +16,22 @@ class cls { set setter(a) {} }
     "body": [
       {
         "Method": {
-          "span": "12:28",
+          "span": "16:32",
           "name": {
             "Ident": {
-              "span": "16:22",
+              "span": "20:26",
               "name": "setter"
             }
           },
           "kind": "Set",
           "parameters": {
-            "span": "22:25",
+            "span": "26:29",
             "bindings": [
               {
-                "span": "23:24",
+                "span": "27:28",
                 "pattern": {
                   "Ident": {
-                    "span": "23:24",
+                    "span": "27:28",
                     "name": "a"
                   }
                 },
@@ -39,7 +41,7 @@ class cls { set setter(a) {} }
             "rest": null
           },
           "body": {
-            "span": "26:28",
+            "span": "30:32",
             "directives": [],
             "statements": []
           },
