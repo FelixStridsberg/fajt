@@ -168,7 +168,7 @@ where
         }
 
         let next_token = self.current()?;
-        let has_argument = !next_token.first_on_line;
+        let has_argument = !next_token.first_on_line && !token_matches!(next_token, punct!(";"));
         let delegate = has_argument && token_matches!(next_token, punct!("*"));
         if delegate {
             self.consume()?;
