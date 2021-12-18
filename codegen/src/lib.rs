@@ -297,8 +297,13 @@ impl Visitor for CodeGenerator {
     }
 
     fn enter_return_stmt(&mut self, node: &mut StmtReturn) -> bool {
-        self.push_str("return ");
-        node.argument.traverse(self);
+        self.push_str("return");
+
+        if node.argument.is_some() {
+            self.push(' ');
+            node.argument.traverse(self);
+        }
+
         self.push(';');
         false
     }

@@ -1,11 +1,11 @@
 ```js
-return
+return;
 ```
 
 ```json
 {
   "Return": {
-    "span": "0:6",
+    "span": "0:7",
     "argument": null
   }
 }
