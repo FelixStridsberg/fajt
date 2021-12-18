@@ -480,4 +480,9 @@ impl Visitor for CodeGenerator {
         self.push_str(&node.name);
         false
     }
+
+    fn enter_debugger_stmt(&mut self, _node: &mut StmtDebugger) -> bool {
+        self.push_str("debugger");
+        false
+    }
 }

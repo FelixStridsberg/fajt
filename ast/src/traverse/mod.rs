@@ -54,6 +54,7 @@ generate_fold_and_visit! {
             Block
             Class
             Try
+            Debugger
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
@@ -165,5 +166,8 @@ generate_fold_and_visit! {
         StmtTry: (enter: enter_try_stmt, exit: exit_try_stmt) {
             block
         }
+
+
+        StmtDebugger: (enter: enter_debugger_stmt, exit: exit_debugger_stmt) {}
     }
 }
