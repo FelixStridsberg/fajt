@@ -171,6 +171,12 @@ impl Visitor for CodeGenerator {
         self.push_str("class ");
 
         node.identifier.traverse(self);
+
+        if let Some(super_class) = node.super_class.as_mut() {
+            self.push_str(" extends ");
+            super_class.traverse(self);
+        }
+
         self.space();
 
         if node.body.is_empty() {
