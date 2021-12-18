@@ -1,11 +1,11 @@
 ```js
-for (a;;);
+for (a;;) ;
 ```
 
 ```json
 {
   "For": {
-    "span": "0:10",
+    "span": "0:11",
     "init": {
       "Expr": {
         "IdentRef": {
@@ -18,7 +18,7 @@ for (a;;);
     "update": null,
     "body": {
       "Empty": {
-        "span": "9:10"
+        "span": "10:11"
       }
     }
   }

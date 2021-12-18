@@ -249,7 +249,8 @@ impl Visitor for CodeGenerator {
         node.update.traverse(self);
         self.push(')');
 
-        self.push(';');
+        self.space();
+        node.body.traverse(self);
         false
     }
 
