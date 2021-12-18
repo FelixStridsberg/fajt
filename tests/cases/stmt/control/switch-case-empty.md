@@ -1,11 +1,13 @@
 ```js
-switch (a) { case b: }
+switch (a) {
+    case b:
+}
 ```
 
 ```json
 {
   "Switch": {
-    "span": "0:22",
+    "span": "0:26",
     "discriminant": {
       "IdentRef": {
         "span": "8:9",
@@ -14,10 +16,10 @@ switch (a) { case b: }
     },
     "cases": [
       {
-        "span": "13:20",
+        "span": "17:24",
         "test": {
           "IdentRef": {
-            "span": "18:19",
+            "span": "22:23",
             "name": "b"
           }
         },

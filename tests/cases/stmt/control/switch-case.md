@@ -1,11 +1,15 @@
 ```js
-switch (a) { case b: c; d }
+switch (a) {
+    case b:
+        c;
+        d;
+}
 ```
 
 ```json
 {
   "Switch": {
-    "span": "0:27",
+    "span": "0:48",
     "discriminant": {
       "IdentRef": {
         "span": "8:9",
@@ -14,20 +18,20 @@ switch (a) { case b: c; d }
     },
     "cases": [
       {
-        "span": "13:25",
+        "span": "17:46",
         "test": {
           "IdentRef": {
-            "span": "18:19",
+            "span": "22:23",
             "name": "b"
           }
         },
         "consequent": [
           {
             "Expr": {
-              "span": "21:23",
+              "span": "33:35",
               "expr": {
                 "IdentRef": {
-                  "span": "21:22",
+                  "span": "33:34",
                   "name": "c"
                 }
               }
@@ -35,10 +39,10 @@ switch (a) { case b: c; d }
           },
           {
             "Expr": {
-              "span": "24:25",
+              "span": "44:46",
               "expr": {
                 "IdentRef": {
-                  "span": "24:25",
+                  "span": "44:45",
                   "name": "d"
                 }
               }

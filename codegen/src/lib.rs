@@ -196,6 +196,31 @@ impl Visitor for CodeGenerator {
             self.push_str("{}");
         }
 
+        self.block_start();
+        self.indent();
+
+        node.cases.traverse(self);
+
+        self.dedent();
+        self.block_end();
+
+        false
+    }
+
+    fn enter_switch_case(&mut self, node: &mut SwitchCase) -> bool {
+        if node.test.is_some() {
+            self.push_str("case ");
+            node.test.traverse(self);
+        } else {
+            self.push_str("default");
+        }
+
+        self.push(':');
+        self.new_line();
+
+        self.indent();
+        node.consequent.traverse(self);
+        self.dedent();
         false
     }
 

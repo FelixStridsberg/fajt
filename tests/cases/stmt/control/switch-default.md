@@ -1,11 +1,14 @@
 ```js
-switch (a) { default: b }
+switch (a) {
+    default:
+        b;
+}
 ```
 
 ```json
 {
   "Switch": {
-    "span": "0:25",
+    "span": "0:38",
     "discriminant": {
       "IdentRef": {
         "span": "8:9",
@@ -14,15 +17,15 @@ switch (a) { default: b }
     },
     "cases": [
       {
-        "span": "13:23",
+        "span": "17:36",
         "test": null,
         "consequent": [
           {
             "Expr": {
-              "span": "22:23",
+              "span": "34:36",
               "expr": {
                 "IdentRef": {
-                  "span": "22:23",
+                  "span": "34:35",
                   "name": "b"
                 }
               }

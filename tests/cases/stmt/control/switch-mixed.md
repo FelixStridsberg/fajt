@@ -1,11 +1,16 @@
 ```js
-switch (a) { case b: case c: d; default: }
+switch (a) {
+    case b:
+    case c:
+        d;
+    default:
+}
 ```
 
 ```json
 {
   "Switch": {
-    "span": "0:42",
+    "span": "0:62",
     "discriminant": {
       "IdentRef": {
         "span": "8:9",
@@ -14,30 +19,30 @@ switch (a) { case b: case c: d; default: }
     },
     "cases": [
       {
-        "span": "13:20",
+        "span": "17:24",
         "test": {
           "IdentRef": {
-            "span": "18:19",
+            "span": "22:23",
             "name": "b"
           }
         },
         "consequent": []
       },
       {
-        "span": "21:31",
+        "span": "29:47",
         "test": {
           "IdentRef": {
-            "span": "26:27",
+            "span": "34:35",
             "name": "c"
           }
         },
         "consequent": [
           {
             "Expr": {
-              "span": "29:31",
+              "span": "45:47",
               "expr": {
                 "IdentRef": {
-                  "span": "29:30",
+                  "span": "45:46",
                   "name": "d"
                 }
               }
@@ -46,7 +51,7 @@ switch (a) { case b: case c: d; default: }
         ]
       },
       {
-        "span": "32:40",
+        "span": "52:60",
         "test": null,
         "consequent": []
       }

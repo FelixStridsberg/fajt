@@ -198,5 +198,7 @@ generate_fold_and_visit! {
         StmtBreak: (enter: enter_break_stmt, exit: exit_break_stmt) {}
 
         StmtSwitch: (enter: enter_switch_stmt, exit: exit_switch_stmt) {}
+
+        SwitchCase: (enter: enter_switch_case, exit: exit_switch_case) {}
     }
 }
