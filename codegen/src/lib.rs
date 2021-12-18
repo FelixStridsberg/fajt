@@ -233,6 +233,18 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_for_stmt(&mut self, node: &mut StmtFor) -> bool {
+        self.push_str("for");
+        self.space();
+        self.push('(');
+        self.push(';');
+        self.push(';');
+        self.push(')');
+
+        self.push(';');
+        false
+    }
+
     fn enter_switch_case(&mut self, node: &mut SwitchCase) -> bool {
         if node.test.is_some() {
             self.push_str("case ");

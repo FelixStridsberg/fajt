@@ -62,6 +62,7 @@ generate_fold_and_visit! {
             Break
             Switch
             If
+            For
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
@@ -207,5 +208,7 @@ generate_fold_and_visit! {
             consequent
             alternate
         }
+
+        StmtFor: (enter: enter_for_stmt, exit: exit_for_stmt) {}
     }
 }
