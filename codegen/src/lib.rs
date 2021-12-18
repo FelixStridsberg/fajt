@@ -244,8 +244,9 @@ impl Visitor for CodeGenerator {
         }
 
         node.test.traverse(self);
-
         self.push(';');
+
+        node.update.traverse(self);
         self.push(')');
 
         self.push(';');
