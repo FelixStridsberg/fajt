@@ -239,7 +239,7 @@ impl Visitor for CodeGenerator {
         self.push('(');
 
         node.init.traverse(self);
-        if node.init.is_none() {
+        if node.init.is_none() || matches!(node.init, Some(ForInit::Expr(_))) {
             self.push(';');
         }
 
