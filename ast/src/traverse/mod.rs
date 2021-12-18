@@ -53,6 +53,7 @@ generate_fold_and_visit! {
             Empty
             Block
             Class
+            Try
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
@@ -158,6 +159,11 @@ generate_fold_and_visit! {
             name
             parameters
             body
+        }
+
+
+        StmtTry: (enter: enter_try_stmt, exit: exit_try_stmt) {
+            block
         }
     }
 }

@@ -129,6 +129,20 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_try_stmt(&mut self, node: &mut StmtTry) -> bool {
+        self.push_str("try");
+        self.space();
+        node.block.traverse(self);
+
+        if let Some(finalizer) = node.finalizer.as_mut() {
+            self.push_str("finally");
+            self.space();
+            finalizer.traverse(self);
+        }
+
+        false
+    }
+
     fn enter_binary_expr(&mut self, node: &mut ExprBinary) -> bool {
         node.left.traverse(self);
         self.space();
