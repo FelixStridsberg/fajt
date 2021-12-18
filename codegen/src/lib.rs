@@ -163,6 +163,14 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_labeled_stmt(&mut self, node: &mut StmtLabeled) -> bool {
+        node.label.traverse(self);
+        self.push(':');
+        self.space();
+        node.body.traverse(self);
+        false
+    }
+
     fn enter_throw_stmt(&mut self, node: &mut StmtThrow) -> bool {
         self.push_str("throw");
 
@@ -487,7 +495,9 @@ impl Visitor for CodeGenerator {
     }
 
     fn exit_stmt(&mut self, _node: &mut Stmt) {
-        self.new_line();
+        if self.last_new_line != self.data.len() {
+            self.new_line();
+        }
     }
 
     fn enter_stmt_expr(&mut self, node: &mut StmtExpr) -> bool {
