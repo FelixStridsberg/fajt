@@ -57,6 +57,7 @@ generate_fold_and_visit! {
             Debugger
             Throw
             Labeled
+            With
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
@@ -68,6 +69,7 @@ generate_fold_and_visit! {
         Literal: (enter: enter_literal, exit: exit_literal) {
             Number
             String
+            Object
         }
 
         Number: (enter: enter_number, exit: exit_number) {}
@@ -144,6 +146,8 @@ generate_fold_and_visit! {
 
         LitString: (enter: enter_string_literal, exit: exit_string_literal) {}
 
+        Object: (enter: enter_object_literal, exit: exit_object_literal) {}
+
         ArrayBinding: (enter: enter_array_binding, exit: exit_array_binding) {}
 
         ObjectBinding: (enter: enter_object_binding, exit: exit_object_binding) {}
@@ -183,5 +187,7 @@ generate_fold_and_visit! {
             label
             body
         }
+
+        StmtWith: (enter: enter_with_stmt, exit: exit_with_stmt) {}
     }
 }

@@ -1,14 +1,14 @@
 ```js
-with ({}) {}
+with({}) {}
 ```
 
 ```json
 {
   "With": {
-    "span": "0:12",
+    "span": "0:11",
     "object": {
       "Literal": {
-        "span": "6:8",
+        "span": "5:7",
         "literal": {
           "Object": {
             "props": []
@@ -18,7 +18,7 @@ with ({}) {}
     },
     "body": {
       "Block": {
-        "span": "10:12",
+        "span": "9:11",
         "statements": []
       }
     }

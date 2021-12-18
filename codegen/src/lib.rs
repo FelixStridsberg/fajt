@@ -494,6 +494,15 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_object_literal(&mut self, node: &mut Object) -> bool {
+        if node.props.is_empty() {
+            self.push_str("{}");
+        } else {
+            todo!()
+        }
+        false
+    }
+
     fn exit_stmt(&mut self, _node: &mut Stmt) {
         if self.last_new_line != self.data.len() {
             self.new_line();
@@ -503,6 +512,15 @@ impl Visitor for CodeGenerator {
     fn enter_stmt_expr(&mut self, node: &mut StmtExpr) -> bool {
         node.expr.traverse(self);
         self.push(';');
+        false
+    }
+
+    fn enter_with_stmt(&mut self, node: &mut StmtWith) -> bool {
+        self.push_str("with(");
+        node.object.traverse(self);
+        self.push(')');
+        self.space();
+        node.body.traverse(self);
         false
     }
 
