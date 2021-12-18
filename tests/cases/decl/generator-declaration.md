@@ -1,5 +1,5 @@
 ```js
-function *fn() {}
+function* fn() {}
 ```
 
 ```json

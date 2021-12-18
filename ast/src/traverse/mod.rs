@@ -42,6 +42,7 @@ generate_fold_and_visit! {
             IdentRef
             Literal
             Parenthesized
+            Yield
         }
 
         Stmt: (enter: enter_stmt, exit: exit_stmt) {
@@ -137,5 +138,9 @@ generate_fold_and_visit! {
         ArrayBinding: (enter: enter_array_binding, exit: exit_array_binding) {}
 
         ObjectBinding: (enter: enter_object_binding, exit: exit_object_binding) {}
+
+        ExprYield: (enter: enter_yield_expr, exit: exit_yield_expr) {
+            argument
+        }
     }
 }

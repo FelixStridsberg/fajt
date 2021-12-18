@@ -1,5 +1,5 @@
 ```js
-async function *fn() {}
+async function* fn() {}
 ```
 
 ```json

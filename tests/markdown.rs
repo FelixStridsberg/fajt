@@ -31,7 +31,7 @@ impl TestFile {
         let mut file = OpenOptions::new().write(true).open(&self.path).unwrap();
 
         file.seek(SeekFrom::End(0)).unwrap();
-        file.write_all("\n\n".as_bytes()).unwrap();
+        file.write_all("\n".as_bytes()).unwrap();
         file.write_all(block.as_bytes()).unwrap();
     }
 

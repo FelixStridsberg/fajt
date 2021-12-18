@@ -1,6 +1,5 @@
 use fajt_ast::traverse::{Traverse, Visitor};
 use fajt_ast::*;
-use std::process::id;
 
 const INDENTATION_SIZE: usize = 4;
 
@@ -153,11 +152,13 @@ impl Visitor for CodeGenerator {
             self.push_str("async ");
         }
 
-        self.push_str("function ");
+        self.push_str("function");
 
         if node.generator {
             self.push('*');
         }
+
+        self.push(' ');
 
         node.identifier.traverse(self);
         node.parameters.traverse(self);
@@ -229,6 +230,21 @@ impl Visitor for CodeGenerator {
             self.push_str(" = ");
             initializer.traverse(self);
         }
+        false
+    }
+
+    fn enter_yield_expr(&mut self, node: &mut ExprYield) -> bool {
+        self.push_str("yield");
+
+        if node.delegate {
+            self.push('*');
+        }
+
+        if node.argument.is_some() {
+            self.push(' ');
+            node.argument.traverse(self);
+        }
+
         false
     }
 

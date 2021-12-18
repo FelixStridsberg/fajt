@@ -1,13 +1,13 @@
 ```js
 async function* fn() {
-  yield a
+    yield a;
 }
 ```
 
 ```json
 {
   "FunctionDecl": {
-    "span": "0:34",
+    "span": "0:37",
     "asynchronous": true,
     "generator": true,
     "identifier": {
@@ -20,18 +20,18 @@ async function* fn() {
       "rest": null
     },
     "body": {
-      "span": "21:34",
+      "span": "21:37",
       "directives": [],
       "statements": [
         {
           "Expr": {
-            "span": "25:32",
+            "span": "27:35",
             "expr": {
               "Yield": {
-                "span": "25:32",
+                "span": "27:34",
                 "argument": {
                   "IdentRef": {
-                    "span": "31:32",
+                    "span": "33:34",
                     "name": "a"
                   }
                 },
