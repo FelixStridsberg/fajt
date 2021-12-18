@@ -143,6 +143,17 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_throw_stmt(&mut self, node: &mut StmtThrow) -> bool {
+        self.push_str("throw");
+
+        if node.argument.is_some() {
+            self.push(' ');
+            node.argument.traverse(self);
+        }
+
+        false
+    }
+
     fn enter_binary_expr(&mut self, node: &mut ExprBinary) -> bool {
         node.left.traverse(self);
         self.space();

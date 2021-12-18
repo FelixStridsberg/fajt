@@ -55,6 +55,7 @@ generate_fold_and_visit! {
             Class
             Try
             Debugger
+            Throw
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
@@ -169,5 +170,7 @@ generate_fold_and_visit! {
 
 
         StmtDebugger: (enter: enter_debugger_stmt, exit: exit_debugger_stmt) {}
+
+        StmtThrow: (enter: enter_throw_stmt, exit: exit_throw_stmt) {}
     }
 }
