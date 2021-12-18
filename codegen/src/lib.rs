@@ -194,6 +194,7 @@ impl Visitor for CodeGenerator {
 
         if node.cases.is_empty() {
             self.push_str("{}");
+            return false;
         }
 
         self.block_start();
