@@ -208,6 +208,31 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_if_stmt(&mut self, node: &mut StmtIf) -> bool {
+        self.push_str("if");
+
+        self.space();
+        self.push('(');
+        node.condition.traverse(self);
+        self.push(')');
+        self.new_line();
+
+        self.indent();
+        node.consequent.traverse(self);
+        self.dedent();
+
+        if node.alternate.is_some() {
+            self.push_str("else");
+            self.new_line();
+
+            self.indent();
+            node.alternate.traverse(self);
+            self.dedent();
+        }
+
+        false
+    }
+
     fn enter_switch_case(&mut self, node: &mut SwitchCase) -> bool {
         if node.test.is_some() {
             self.push_str("case ");

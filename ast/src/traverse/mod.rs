@@ -61,6 +61,7 @@ generate_fold_and_visit! {
             Continue
             Break
             Switch
+            If
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
@@ -200,5 +201,11 @@ generate_fold_and_visit! {
         StmtSwitch: (enter: enter_switch_stmt, exit: exit_switch_stmt) {}
 
         SwitchCase: (enter: enter_switch_case, exit: exit_switch_case) {}
+
+        StmtIf: (enter: enter_if_stmt, exit: exit_if_stmt) {
+            condition
+            consequent
+            alternate
+        }
     }
 }

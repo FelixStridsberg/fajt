@@ -1,23 +1,26 @@
 ```js
-if ( a ) b; else c
+if (a)
+    b;
+else
+    c;
 ```
 
 ```json
 {
   "If": {
-    "span": "0:18",
+    "span": "0:25",
     "condition": {
       "IdentRef": {
-        "span": "5:6",
+        "span": "4:5",
         "name": "a"
       }
     },
     "consequent": {
       "Expr": {
-        "span": "9:11",
+        "span": "11:13",
         "expr": {
           "IdentRef": {
-            "span": "9:10",
+            "span": "11:12",
             "name": "b"
           }
         }
@@ -25,10 +28,10 @@ if ( a ) b; else c
     },
     "alternate": {
       "Expr": {
-        "span": "17:18",
+        "span": "23:25",
         "expr": {
           "IdentRef": {
-            "span": "17:18",
+            "span": "23:24",
             "name": "c"
           }
         }
