@@ -134,6 +134,13 @@ impl Visitor for CodeGenerator {
         self.space();
         node.block.traverse(self);
 
+        if let Some(catch) = node.handler.as_mut() {
+            self.space();
+            self.push_str("catch");
+            self.space();
+            catch.traverse(self);
+        }
+
         if let Some(finalizer) = node.finalizer.as_mut() {
             self.space();
             self.push_str("finally");
@@ -141,6 +148,18 @@ impl Visitor for CodeGenerator {
             finalizer.traverse(self);
         }
 
+        false
+    }
+
+    fn enter_catch_clause(&mut self, node: &mut CatchClause) -> bool {
+        if node.parameter.is_some() {
+            self.push('(');
+            node.parameter.traverse(self);
+            self.push(')');
+            self.space();
+        }
+
+        node.body.traverse(self);
         false
     }
 

@@ -165,9 +165,14 @@ generate_fold_and_visit! {
 
 
         StmtTry: (enter: enter_try_stmt, exit: exit_try_stmt) {
+            handler
             block
         }
 
+        CatchClause: (enter: enter_catch_clause, exit: exit_catch_clause) {
+            parameter
+            body
+        }
 
         StmtDebugger: (enter: enter_debugger_stmt, exit: exit_debugger_stmt) {}
 
