@@ -182,6 +182,23 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_switch_stmt(&mut self, node: &mut StmtSwitch) -> bool {
+        self.push_str("switch");
+        self.space();
+
+        self.push('(');
+        node.discriminant.traverse(self);
+        self.push(')');
+
+        self.space();
+
+        if node.cases.is_empty() {
+            self.push_str("{}");
+        }
+
+        false
+    }
+
     fn enter_binary_expr(&mut self, node: &mut ExprBinary) -> bool {
         node.left.traverse(self);
         self.space();

@@ -1,11 +1,11 @@
 ```js
-switch (a) { }
+switch (a) {}
 ```
 
 ```json
 {
   "Switch": {
-    "span": "0:14",
+    "span": "0:13",
     "discriminant": {
       "IdentRef": {
         "span": "8:9",

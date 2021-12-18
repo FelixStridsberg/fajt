@@ -60,6 +60,7 @@ generate_fold_and_visit! {
             With
             Continue
             Break
+            Switch
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
@@ -195,5 +196,7 @@ generate_fold_and_visit! {
         StmtContinue: (enter: enter_continue_stmt, exit: exit_continue_stmt) {}
 
         StmtBreak: (enter: enter_break_stmt, exit: exit_break_stmt) {}
+
+        StmtSwitch: (enter: enter_switch_stmt, exit: exit_switch_stmt) {}
     }
 }
