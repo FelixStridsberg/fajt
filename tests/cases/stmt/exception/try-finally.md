@@ -1,6 +1,5 @@
 ```js
-try {}
-finally {}
+try {} finally {}
 ```
 
 ```json

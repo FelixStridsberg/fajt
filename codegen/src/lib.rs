@@ -135,6 +135,7 @@ impl Visitor for CodeGenerator {
         node.block.traverse(self);
 
         if let Some(finalizer) = node.finalizer.as_mut() {
+            self.space();
             self.push_str("finally");
             self.space();
             finalizer.traverse(self);
