@@ -516,6 +516,18 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_break_stmt(&mut self, node: &mut StmtBreak) -> bool {
+        self.push_str("break");
+
+        if node.label.is_some() {
+            self.push(' ');
+            node.label.traverse(self);
+        }
+
+        self.push(';');
+        false
+    }
+
     fn exit_stmt(&mut self, _node: &mut Stmt) {
         if self.last_new_line != self.data.len() {
             self.new_line();

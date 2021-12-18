@@ -1,11 +1,11 @@
 ```js
-break a
+break a;
 ```
 
 ```json
 {
   "Break": {
-    "span": "0:7",
+    "span": "0:8",
     "label": {
       "span": "6:7",
       "name": "a"
