@@ -56,7 +56,7 @@ impl CodeGenerator {
     }
 
     fn block_end(&mut self) -> &mut Self {
-        self.push('}').new_line();
+        self.push('}');
         self
     }
 
@@ -115,7 +115,7 @@ impl CodeGenerator {
 impl Visitor for CodeGenerator {
     fn enter_block_stmt(&mut self, node: &mut StmtBlock) -> bool {
         if node.statements.is_empty() {
-            self.push_str("{}").new_line();
+            self.push_str("{}");
             return false;
         }
 
@@ -195,7 +195,6 @@ impl Visitor for CodeGenerator {
 
         if node.body.is_empty() {
             self.push_str("{}");
-            self.new_line();
             return false;
         }
 
@@ -233,12 +232,13 @@ impl Visitor for CodeGenerator {
 
         self.space();
         node.body.traverse(self);
+        self.new_line();
         false
     }
 
     fn enter_body(&mut self, node: &mut Body) -> bool {
         if node.statements.is_empty() && node.directives.is_empty() {
-            self.push_str("{}").new_line();
+            self.push_str("{}");
             return false;
         }
 
@@ -261,7 +261,6 @@ impl Visitor for CodeGenerator {
         self.push_str("return ");
         node.argument.traverse(self);
         self.push(';');
-        self.new_line();
         false
     }
 
@@ -288,7 +287,6 @@ impl Visitor for CodeGenerator {
 
     fn enter_empty_statement(&mut self, _node: &mut StmtEmpty) -> bool {
         self.push(';');
-        self.new_line();
         false
     }
 
@@ -337,7 +335,6 @@ impl Visitor for CodeGenerator {
                 }
             } else {
                 self.push(';');
-                self.new_line();
             }
         }
 
@@ -458,10 +455,13 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn exit_stmt(&mut self, _node: &mut Stmt) {
+        self.new_line();
+    }
+
     fn enter_stmt_expr(&mut self, node: &mut StmtExpr) -> bool {
         node.expr.traverse(self);
         self.push(';');
-        self.new_line();
         false
     }
 
