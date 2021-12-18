@@ -243,6 +243,8 @@ impl Visitor for CodeGenerator {
             self.push(';');
         }
 
+        node.test.traverse(self);
+
         self.push(';');
         self.push(')');
 
