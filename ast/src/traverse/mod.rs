@@ -88,6 +88,11 @@ generate_fold_and_visit! {
         ClassElement: (enter: enter_class_element, exit: exit_class_element) {
             Method
         }
+
+        ForInit: (enter: enter_for_init, exit: exit_for_init) {
+            Expr
+            Declaration
+        }
     }
 
     structs: {

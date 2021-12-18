@@ -1,11 +1,11 @@
 ```js
-for (var a;;) ;
+for (var a;;);
 ```
 
 ```json
 {
   "For": {
-    "span": "0:15",
+    "span": "0:14",
     "init": {
       "Declaration": {
         "span": "5:10",
@@ -28,7 +28,7 @@ for (var a;;) ;
     "update": null,
     "body": {
       "Empty": {
-        "span": "14:15"
+        "span": "13:14"
       }
     }
   }

@@ -237,7 +237,12 @@ impl Visitor for CodeGenerator {
         self.push_str("for");
         self.space();
         self.push('(');
-        self.push(';');
+
+        node.init.traverse(self);
+        if node.init.is_none() {
+            self.push(';');
+        }
+
         self.push(';');
         self.push(')');
 
