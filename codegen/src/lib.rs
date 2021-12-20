@@ -299,6 +299,20 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_do_while_stmt(&mut self, node: &mut StmtDoWhile) -> bool {
+        self.push_str("do ");
+        node.body.traverse(self);
+
+        self.push_str("while");
+        self.space();
+
+        self.push('(');
+        node.test.traverse(self);
+        self.push(')');
+
+        false
+    }
+
     fn enter_switch_case(&mut self, node: &mut SwitchCase) -> bool {
         if node.test.is_some() {
             self.push_str("case ");

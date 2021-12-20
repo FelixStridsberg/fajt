@@ -66,6 +66,7 @@ generate_fold_and_visit! {
             ForOf
             ForIn
             While
+            DoWhile
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
@@ -224,5 +225,7 @@ generate_fold_and_visit! {
         StmtForIn: (enter: enter_for_in_stmt, exit: exit_for_in_stmt) {}
 
         StmtWhile: (enter: enter_while_stmt, exit: exit_while_stmt) {}
+
+        StmtDoWhile: (enter: enter_do_while_stmt, exit: exit_do_while_stmt) {}
     }
 }
