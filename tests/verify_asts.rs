@@ -149,7 +149,7 @@ generate_test_module!(
     mod_name: stmt,
     ast_type: Stmt,
     source_type: Script,
-    folders: ["tests/cases/stmt"],
+    folders: ["tests/cases/stmt", "parser/tests/cases/stmt"],
 );
 
 generate_test_module!(
