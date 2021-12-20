@@ -700,16 +700,14 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn exit_stmt_expr(&mut self, _node: &mut StmtExpr) {
+        self.push(';');
+    }
+
     fn exit_stmt(&mut self, _node: &mut Stmt) {
         if self.last_new_line != self.data.len() {
             self.new_line();
         }
-    }
-
-    fn enter_stmt_expr(&mut self, node: &mut StmtExpr) -> bool {
-        node.expr.traverse(self);
-        self.push(';');
-        false
     }
 
     fn enter_with_stmt(&mut self, node: &mut StmtWith) -> bool {
