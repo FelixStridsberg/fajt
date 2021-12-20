@@ -66,6 +66,10 @@ impl CodeGenerator {
         self
     }
 
+    fn pop(&mut self) {
+        self.data.pop();
+    }
+
     fn push_str(&mut self, str: &str) -> &mut Self {
         self.maybe_indent();
         self.data.push_str(str);
@@ -239,9 +243,7 @@ impl Visitor for CodeGenerator {
         self.push('(');
 
         node.init.traverse(self);
-        if node.init.is_none() || matches!(node.init, Some(ForInit::Expr(_))) {
-            self.push(';');
-        }
+        self.push(';');
 
         node.test.traverse(self);
         self.push(';');
@@ -271,6 +273,13 @@ impl Visitor for CodeGenerator {
         self.space();
         node.body.traverse(self);
         false
+    }
+
+    fn exit_for_init(&mut self, node: &mut ForInit) {
+        if matches!(node, ForInit::Declaration(_)) {
+            // Variable statements ends with semicolon, don't want that inside for syntax.
+            self.pop();
+        }
     }
 
     fn enter_for_in_stmt(&mut self, node: &mut StmtForIn) -> bool {
