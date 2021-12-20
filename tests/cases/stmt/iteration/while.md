@@ -1,11 +1,11 @@
 ```js
-while (true) a
+while (true) a;
 ```
 
 ```json
 {
   "While": {
-    "span": "0:14",
+    "span": "0:15",
     "test": {
       "Literal": {
         "span": "7:11",
@@ -16,7 +16,7 @@ while (true) a
     },
     "body": {
       "Expr": {
-        "span": "13:14",
+        "span": "13:15",
         "expr": {
           "IdentRef": {
             "span": "13:14",

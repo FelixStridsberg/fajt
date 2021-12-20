@@ -287,6 +287,18 @@ impl Visitor for CodeGenerator {
         false
     }
 
+    fn enter_while_stmt(&mut self, node: &mut StmtWhile) -> bool {
+        self.push_str("while");
+        self.space();
+        self.push('(');
+        node.test.traverse(self);
+        self.push(')');
+        self.space();
+        node.body.traverse(self);
+
+        false
+    }
+
     fn enter_switch_case(&mut self, node: &mut SwitchCase) -> bool {
         if node.test.is_some() {
             self.push_str("case ");
@@ -609,6 +621,25 @@ impl Visitor for CodeGenerator {
         if let Some(initializer) = node.initializer.as_mut() {
             self.push_str(" = ");
             initializer.traverse(self);
+        }
+
+        false
+    }
+
+    fn enter_literal(&mut self, node: &mut Literal) -> bool {
+        match node {
+            Literal::Null => {
+                self.push_str("null");
+            }
+            Literal::Boolean(true) => {
+                self.push_str("true");
+            }
+            Literal::Boolean(false) => {
+                self.push_str("false");
+            }
+            _ => {
+                return true;
+            }
         }
 
         false
