@@ -52,10 +52,12 @@ impl CodeGenerator {
     fn block_start(&mut self) -> &mut Self {
         self.push('{').new_line();
         self.last_block_start = self.data.len();
+        self.indent();
         self
     }
 
     fn block_end(&mut self) -> &mut Self {
+        self.dedent();
         self.push('}');
         self
     }
@@ -124,11 +126,7 @@ impl Visitor for CodeGenerator {
         }
 
         self.block_start();
-        self.indent();
-
         node.statements.traverse(self);
-
-        self.dedent();
         self.block_end();
         false
     }
@@ -202,11 +200,7 @@ impl Visitor for CodeGenerator {
         }
 
         self.block_start();
-        self.indent();
-
         node.cases.traverse(self);
-
-        self.dedent();
         self.block_end();
 
         false
@@ -395,11 +389,7 @@ impl Visitor for CodeGenerator {
         }
 
         self.block_start();
-        self.indent();
-
         node.body.traverse(self);
-
-        self.dedent();
         self.block_end();
         false
     }
@@ -439,7 +429,6 @@ impl Visitor for CodeGenerator {
         }
 
         self.block_start();
-        self.indent();
 
         for x in &mut node.directives {
             x.traverse(self);
@@ -448,7 +437,6 @@ impl Visitor for CodeGenerator {
         }
 
         node.statements.traverse(self);
-        self.dedent();
         self.block_end();
         false
     }
