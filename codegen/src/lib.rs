@@ -57,6 +57,11 @@ impl CodeGenerator {
     }
 
     fn block_end(&mut self) -> &mut Self {
+        if self.last_block_start == self.data.len() {
+            self.data.pop(); // Pop \n from empty blocks
+            self.last_new_line = 0;
+        }
+
         self.dedent();
         self.push('}');
         self
@@ -120,11 +125,6 @@ impl CodeGenerator {
 
 impl Visitor for CodeGenerator {
     fn enter_block_stmt(&mut self, node: &mut StmtBlock) -> bool {
-        if node.statements.is_empty() {
-            self.push_str("{}");
-            return false;
-        }
-
         self.block_start();
         node.statements.traverse(self);
         self.block_end();
@@ -186,18 +186,12 @@ impl Visitor for CodeGenerator {
 
     fn enter_switch_stmt(&mut self, node: &mut StmtSwitch) -> bool {
         self.push_str("switch");
-        self.space();
 
+        self.space();
         self.push('(');
         node.discriminant.traverse(self);
         self.push(')');
-
         self.space();
-
-        if node.cases.is_empty() {
-            self.push_str("{}");
-            return false;
-        }
 
         self.block_start();
         node.cases.traverse(self);
@@ -233,9 +227,9 @@ impl Visitor for CodeGenerator {
 
     fn enter_for_stmt(&mut self, node: &mut StmtFor) -> bool {
         self.push_str("for");
+
         self.space();
         self.push('(');
-
         node.init.traverse(self);
         self.push(';');
 
@@ -244,8 +238,8 @@ impl Visitor for CodeGenerator {
 
         node.update.traverse(self);
         self.push(')');
-
         self.space();
+
         node.body.traverse(self);
         false
     }
@@ -383,11 +377,6 @@ impl Visitor for CodeGenerator {
 
         self.space();
 
-        if node.body.is_empty() {
-            self.push_str("{}");
-            return false;
-        }
-
         self.block_start();
         node.body.traverse(self);
         self.block_end();
@@ -423,11 +412,6 @@ impl Visitor for CodeGenerator {
     }
 
     fn enter_body(&mut self, node: &mut Body) -> bool {
-        if node.statements.is_empty() && node.directives.is_empty() {
-            self.push_str("{}");
-            return false;
-        }
-
         self.block_start();
 
         for x in &mut node.directives {
