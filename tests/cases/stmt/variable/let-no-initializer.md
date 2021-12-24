@@ -2,6 +2,10 @@
 let foo;
 ```
 
+```js min
+let foo
+```
+
 ```json
 {
   "Variable": {

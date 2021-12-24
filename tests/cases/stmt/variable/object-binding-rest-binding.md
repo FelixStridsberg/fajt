@@ -2,6 +2,10 @@
 var { ...rest } = c;
 ```
 
+```js min
+var{...rest}=c
+```
+
 ```json
 {
   "Variable": {

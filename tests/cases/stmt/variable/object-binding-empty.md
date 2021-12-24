@@ -2,6 +2,10 @@
 var {} = a;
 ```
 
+```js min
+var{}=a
+```
+
 ```json
 {
   "Variable": {
