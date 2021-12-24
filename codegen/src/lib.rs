@@ -3,8 +3,6 @@ use fajt_ast::*;
 use std::cell::Cell;
 use std::rc::Rc;
 
-const INDENTATION_SIZE: usize = 4;
-
 pub fn generate_code(mut program: Program) -> String {
     let mut data = String::new();
     let mut codegen = CodeGenerator::new(&mut data);
@@ -13,6 +11,7 @@ pub fn generate_code(mut program: Program) -> String {
 }
 
 struct GeneratorContext {
+    indent_size: usize,
     indent: usize,
     align: Option<usize>,
 }
@@ -20,9 +19,14 @@ struct GeneratorContext {
 impl GeneratorContext {
     fn new() -> Self {
         GeneratorContext {
+            indent_size: 4,
             indent: 0,
             align: None,
         }
+    }
+
+    fn indentation(&self) -> usize {
+        self.indent * self.indent_size
     }
 }
 
@@ -162,7 +166,7 @@ impl CodeGenerator<'_> {
     }
 
     fn maybe_indent(&mut self) {
-        if !self.should_indent() {
+        if self.col_pos() != 0 {
             return;
         }
 
@@ -170,12 +174,8 @@ impl CodeGenerator<'_> {
             self.data.push_str(&" ".repeat(align));
         } else {
             self.data
-                .push_str(&" ".repeat(self.ctx.indent * INDENTATION_SIZE));
+                .push_str(&" ".repeat(self.ctx.indentation()));
         }
-    }
-
-    fn should_indent(&self) -> bool {
-        !self.data.is_empty() && self.pos() == self.index.last_new_line()
     }
 }
 
