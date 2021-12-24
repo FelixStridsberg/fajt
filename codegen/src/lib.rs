@@ -140,7 +140,7 @@ impl CodeGenerator<'_> {
     }
 
     fn push(&mut self, ch: char) -> &mut Self {
-        self.maybe_indent();
+        self.indent();
         self.data.push(ch);
         self
     }
@@ -150,7 +150,7 @@ impl CodeGenerator<'_> {
     }
 
     fn push_str(&mut self, str: &str) -> &mut Self {
-        self.maybe_indent();
+        self.indent();
         self.data.push_str(str);
         self
     }
@@ -169,7 +169,7 @@ impl CodeGenerator<'_> {
         self
     }
 
-    fn maybe_indent(&mut self) {
+    fn indent(&mut self) {
         if self.col_pos() != 0 {
             return;
         }
