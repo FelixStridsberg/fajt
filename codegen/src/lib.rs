@@ -1,6 +1,5 @@
 use fajt_ast::traverse::{Traverse, Visitor};
 use fajt_ast::*;
-use std::borrow::Borrow;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -68,8 +67,14 @@ impl<'a> CodeGenerator<'a> {
 }
 
 impl CodeGenerator<'_> {
+    /// Current byte position from start.
     fn pos(&self) -> usize {
         self.data.len()
+    }
+
+    /// Current byte position from start of current line.
+    fn col_pos(&self) -> usize {
+        self.pos() - self.ctx.last_new_line()
     }
 
     fn with_indent(&mut self) -> CodeGenerator<'_> {
@@ -77,6 +82,18 @@ impl CodeGenerator<'_> {
             data: self.data,
             ctx: GeneratorContext {
                 indent: self.ctx.indent + 1,
+                pos: self.ctx.pos.clone(),
+                ..self.ctx
+            },
+        }
+    }
+
+    fn with_align(&mut self) -> CodeGenerator<'_> {
+        let align = self.col_pos();
+        CodeGenerator {
+            data: self.data,
+            ctx: GeneratorContext {
+                align: Some(align),
                 pos: self.ctx.pos.clone(),
                 ..self.ctx
             },
@@ -94,8 +111,12 @@ impl CodeGenerator<'_> {
         self
     }
 
+    fn at_block_start(&self) -> bool {
+        self.ctx.last_block_start() == self.pos()
+    }
+
     fn block_end(&mut self) -> &mut Self {
-        if self.ctx.last_block_start() == self.pos() {
+        if self.at_block_start() {
             self.data.pop(); // Pop \n from empty blocks
             self.ctx.set_new_line(0); // TODO make better
         }
@@ -120,17 +141,9 @@ impl CodeGenerator<'_> {
         self
     }
 
-    fn start_align(&mut self) {
-        self.ctx.align = Some(self.pos() - self.ctx.last_new_line());
-    }
-
-    fn stop_align(&mut self) {
-        self.ctx.align = None;
-    }
-
     // Separation between logical sections, only adds a new line if not first in block or file.
     fn separation(&mut self) -> &mut Self {
-        if self.pos() != self.ctx.last_block_start() {
+        if !self.at_block_start() {
             self.new_line();
         }
         self
@@ -525,25 +538,22 @@ impl Visitor for CodeGenerator<'_> {
         self.push_str(&kind_str);
         self.push(' ');
 
-        self.start_align();
-
+        let mut printer = self.with_align();
         let mut declarations = node.declarations.iter_mut().peekable();
         while let Some(decl) = declarations.next() {
-            decl.traverse(self);
+            decl.traverse(&mut printer);
 
             if declarations.peek().is_some() {
-                self.push(',');
+                printer.push(',');
                 if decl.initializer.is_some() {
-                    self.new_line();
+                    printer.new_line();
                 } else {
-                    self.push(' ');
+                    printer.push(' ');
                 }
             } else {
-                self.push(';');
+                printer.push(';');
             }
         }
-
-        self.stop_align();
 
         false
     }
