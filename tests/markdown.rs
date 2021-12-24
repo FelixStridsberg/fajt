@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 pub struct TestFile {
     path: PathBuf,
     pub source: String,
+    pub source_min: Option<String>,
     pub ast: Option<String>,
 }
 
@@ -16,11 +17,13 @@ impl TestFile {
             .expect("JS input required.")
             .to_owned();
 
+        let source_min = get_code_block(&data, "js min").map(&str::to_owned);
         let ast = get_code_block(&data, "json").map(&str::to_owned);
 
         TestFile {
             path: PathBuf::from(path.as_ref()),
             source,
+            source_min,
             ast,
         }
     }

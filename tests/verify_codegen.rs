@@ -2,7 +2,7 @@ extern crate fajt_macros;
 
 mod markdown;
 
-use fajt_codegen::generate_code;
+use fajt_codegen::{generate_code, GeneratorContext};
 use fajt_parser::parse_program;
 use markdown::TestFile;
 use std::path::Path;
@@ -26,10 +26,22 @@ fn run_test_file(filename: &str) {
 
     let test_file = TestFile::from(&filename);
     let input = test_file.source;
+    let input_min = test_file.source_min;
     let ast = parse_program(&input).unwrap();
-    let output = generate_code(ast);
+
+    let output = generate_code(ast, GeneratorContext::new());
 
     assert_eq!(output, input);
+
+    if let Some(input_min) = input_min {
+        let mut ctx = GeneratorContext::new();
+        ctx.minified = true;
+
+        let ast = parse_program(&input).unwrap();
+        let output_min = generate_code(ast, ctx);
+
+        assert_eq!(output_min, input_min, "Minified output mismatch.");
+    }
 }
 
 macro_rules! generate_test_cases {

@@ -3,22 +3,25 @@ use fajt_ast::*;
 use std::cell::Cell;
 use std::rc::Rc;
 
-pub fn generate_code(mut program: Program) -> String {
+pub fn generate_code(mut program: Program, ctx: GeneratorContext) -> String {
     let mut data = String::new();
-    let mut codegen = CodeGenerator::new(&mut data);
+    let mut codegen = CodeGenerator::new(&mut data, ctx);
     program.traverse(&mut codegen);
     data
 }
 
-struct GeneratorContext {
+#[derive(Clone)]
+pub struct GeneratorContext {
+    pub minified: bool,
     indent_size: usize,
     indent: usize,
     align: Option<usize>,
 }
 
 impl GeneratorContext {
-    fn new() -> Self {
+    pub fn new() -> Self {
         GeneratorContext {
+            minified: false,
             indent_size: 4,
             indent: 0,
             align: None,
@@ -71,10 +74,10 @@ struct CodeGenerator<'a> {
 }
 
 impl<'a> CodeGenerator<'a> {
-    fn new(data: &'a mut String) -> Self {
+    fn new(data: &'a mut String, ctx: GeneratorContext) -> Self {
         CodeGenerator {
             data,
-            ctx: GeneratorContext::new(),
+            ctx,
             index: Rc::new(Index::new()),
         }
     }
@@ -158,7 +161,9 @@ impl CodeGenerator<'_> {
 
     /// Adds formatting space.
     fn space(&mut self) {
-        self.char(' ');
+        if !self.ctx.minified {
+            self.char(' ');
+        }
     }
 
     fn start_block(&mut self) {

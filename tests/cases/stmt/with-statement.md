@@ -2,6 +2,10 @@
 with({}) {}
 ```
 
+```js min
+with({}){}
+```
+
 ```json
 {
   "With": {
