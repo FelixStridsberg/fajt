@@ -2,6 +2,10 @@
 for (var a in b) ;
 ```
 
+```js min
+for(var a in b);
+```
+
 ```json
 {
   "ForIn": {

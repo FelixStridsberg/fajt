@@ -2,6 +2,10 @@
 for (var a of b) ;
 ```
 
+```js min
+for(var a of b);
+```
+
 ```json
 {
   "ForOf": {

@@ -2,6 +2,10 @@
 while (true) a;
 ```
 
+```js min
+while(true)a
+```
+
 ```json
 {
   "While": {

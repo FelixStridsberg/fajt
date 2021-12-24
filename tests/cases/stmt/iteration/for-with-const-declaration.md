@@ -2,6 +2,10 @@
 for (const a;;) ;
 ```
 
+```js min
+for(const a;;);
+```
+
 ```json
 {
   "For": {

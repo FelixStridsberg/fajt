@@ -2,6 +2,10 @@
 for (;;a) ;
 ```
 
+```js min
+for(;;a);
+```
+
 ```json
 {
   "For": {

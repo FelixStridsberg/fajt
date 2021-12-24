@@ -248,7 +248,11 @@ impl CodeGenerator<'_> {
 impl Visitor for CodeGenerator<'_> {
     fn exit_program(&mut self, _node: &mut Program) {
         if self.ctx.minified {
-            self.remove_last(';');
+            if self.remove_last(';') && matches!(self.last(), Some(')')) {
+                // Don't remove semi colon if that render the last char a ')' since that could
+                // result in invalid code like `for(true)`, `if(true)`, ...
+                self.char(';');
+            }
         }
     }
 
