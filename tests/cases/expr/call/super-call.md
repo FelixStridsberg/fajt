@@ -1,5 +1,9 @@
 ```js
-super()
+super();
+```
+
+```js min
+super();
 ```
 
 ```json

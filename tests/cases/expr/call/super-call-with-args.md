@@ -1,5 +1,9 @@
 ```js
-super(a, b)
+super(a, b);
+```
+
+```js
+super(a,b);
 ```
 
 ```json

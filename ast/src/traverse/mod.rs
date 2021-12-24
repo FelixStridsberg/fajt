@@ -45,6 +45,7 @@ generate_fold_and_visit! {
             Yield
             Assignment
             Logical
+            Call
         }
 
         Stmt: (enter: enter_stmt, exit: exit_stmt) {
@@ -99,6 +100,15 @@ generate_fold_and_visit! {
             Expr
             Declaration
         }
+
+        Callee: (enter: enter_callee, exit: exit_callee) {
+            Expr
+        }
+
+        Argument: (enter: enter_argument, exit: exit_argument) {
+            Expr
+            Spread
+        }
     }
 
     structs: {
@@ -126,6 +136,11 @@ generate_fold_and_visit! {
         ExprLogical: (enter: enter_logical_expr, exit: exit_logical_expr) {
             left
             right
+        }
+
+        ExprCall: (enter: enter_call_expr, exit: exit_call_expr) {
+            callee
+            arguments
         }
 
         ExprParenthesized: (enter: enter_parenthesized_expr, exit: exit_parenthesized_expr) {

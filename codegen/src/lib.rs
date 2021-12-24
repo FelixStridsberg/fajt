@@ -478,6 +478,25 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_call_expr(&mut self, node: &mut ExprCall) -> bool {
+        node.callee.traverse(self);
+        self.char('(');
+        self.comma_separated_with_rest(&mut node.arguments, &mut (None as Option<Argument>));
+        self.char(')');
+        false
+    }
+
+    fn enter_argument(&mut self, node: &mut Argument) -> bool {
+        match node {
+            Argument::Expr(e) => e.traverse(self),
+            Argument::Spread(e) => {
+                self.string("...");
+                e.traverse(self);
+            }
+        }
+        false
+    }
+
     fn enter_parenthesized_expr(&mut self, node: &mut ExprParenthesized) -> bool {
         self.char('(');
         node.expression.traverse(self);
