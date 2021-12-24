@@ -145,39 +145,35 @@ impl CodeGenerator<'_> {
     }
 
     /// Add char to output.
-    fn char(&mut self, ch: char) -> &mut Self {
+    fn char(&mut self, ch: char) {
         self.indent();
         self.data.push(ch);
-        self
     }
 
     /// Add string to output.
-    fn string(&mut self, str: &str) -> &mut Self {
+    fn string(&mut self, str: &str) {
         self.indent();
         self.data.push_str(str);
-        self
     }
 
     /// Adds formatting space.
-    fn space(&mut self) -> &mut Self {
+    fn space(&mut self) {
         self.char(' ');
-        self
     }
 
-    fn start_block(&mut self) -> &mut Self {
-        self.char('{').new_line();
+    fn start_block(&mut self) {
+        self.char('{');
+        self.new_line();
         self.index.set_block_start(self.pos());
-        self
     }
 
-    fn end_block(&mut self) -> &mut Self {
+    fn end_block(&mut self) {
         if self.at_block_start() {
             self.remove_last(); // Remove \n from empty blocks
             self.index.set_new_line(0); // Reset new line index since we are no longer at new line.
         }
 
         self.char('}');
-        self
     }
 
     fn at_block_start(&self) -> bool {
@@ -185,17 +181,15 @@ impl CodeGenerator<'_> {
     }
 
     /// Separation between logical sections, only adds a new line if not first in block or file.
-    fn separation(&mut self) -> &mut Self {
+    fn separation(&mut self) {
         if !self.at_block_start() {
             self.new_line();
         }
-        self
     }
 
-    fn new_line(&mut self) -> &mut Self {
+    fn new_line(&mut self) {
         self.char('\n');
         self.index.set_new_line(self.pos());
-        self
     }
 
     fn indent(&mut self) {
