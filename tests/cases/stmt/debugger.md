@@ -2,6 +2,10 @@
 debugger
 ```
 
+```js min
+debugger
+```
+
 ```json
 {
   "Debugger": {
