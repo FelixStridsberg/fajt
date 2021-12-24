@@ -104,6 +104,11 @@ impl CodeGenerator<'_> {
         }
     }
 
+    /// Remove last char in output.
+    fn remove_last(&mut self) {
+        self.data.pop();
+    }
+
     /// Current byte position from start.
     fn pos(&self) -> usize {
         self.data.len()
@@ -114,26 +119,39 @@ impl CodeGenerator<'_> {
         self.pos() - self.index.last_new_line.get()
     }
 
+    /// Add char to output.
     fn char(&mut self, ch: char) -> &mut Self {
         self.indent();
         self.data.push(ch);
         self
     }
 
+    /// Add string to output.
     fn string(&mut self, str: &str) -> &mut Self {
         self.indent();
         self.data.push_str(str);
         self
     }
 
+    /// Adds formatting space.
     fn space(&mut self) -> &mut Self {
         self.char(' ');
         self
     }
 
-    fn block_start(&mut self) -> &mut Self {
+    fn start_block(&mut self) -> &mut Self {
         self.char('{').new_line();
         self.index.set_block_start(self.pos());
+        self
+    }
+
+    fn end_block(&mut self) -> &mut Self {
+        if self.at_block_start() {
+            self.remove_last(); // Remove \n from empty blocks
+            self.index.set_new_line(0); // Reset new line index since we are no longer at new line.
+        }
+
+        self.char('}');
         self
     }
 
@@ -141,21 +159,7 @@ impl CodeGenerator<'_> {
         self.index.last_block_start() == self.pos()
     }
 
-    fn block_end(&mut self) -> &mut Self {
-        if self.at_block_start() {
-            self.data.pop(); // Pop \n from empty blocks
-            self.index.set_new_line(0); // TODO make better
-        }
-
-        self.char('}');
-        self
-    }
-
-    fn pop(&mut self) {
-        self.data.pop();
-    }
-
-    // Separation between logical sections, only adds a new line if not first in block or file.
+    /// Separation between logical sections, only adds a new line if not first in block or file.
     fn separation(&mut self) -> &mut Self {
         if !self.at_block_start() {
             self.new_line();
@@ -180,9 +184,9 @@ impl CodeGenerator<'_> {
 
 impl Visitor for CodeGenerator<'_> {
     fn enter_block_stmt(&mut self, node: &mut StmtBlock) -> bool {
-        self.block_start();
+        self.start_block();
         node.statements.traverse(&mut self.with_indent());
-        self.block_end();
+        self.end_block();
         false
     }
 
@@ -248,9 +252,9 @@ impl Visitor for CodeGenerator<'_> {
         self.char(')');
         self.space();
 
-        self.block_start();
+        self.start_block();
         node.cases.traverse(&mut self.with_indent());
-        self.block_end();
+        self.end_block();
 
         false
     }
@@ -317,7 +321,7 @@ impl Visitor for CodeGenerator<'_> {
     fn exit_for_init(&mut self, node: &mut ForInit) {
         if matches!(node, ForInit::Declaration(_)) {
             // Variable statements ends with semicolon, don't want that inside for syntax.
-            self.pop();
+            self.remove_last();
         }
     }
 
@@ -426,9 +430,9 @@ impl Visitor for CodeGenerator<'_> {
 
         self.space();
 
-        self.block_start();
+        self.start_block();
         node.body.traverse(&mut self.with_indent());
-        self.block_end();
+        self.end_block();
         false
     }
 
@@ -461,7 +465,7 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_body(&mut self, node: &mut Body) -> bool {
-        self.block_start();
+        self.start_block();
 
         let mut printer = self.with_indent();
         for x in &mut node.directives {
@@ -471,7 +475,7 @@ impl Visitor for CodeGenerator<'_> {
         }
 
         node.statements.traverse(&mut printer);
-        self.block_end();
+        self.end_block();
         false
     }
 
