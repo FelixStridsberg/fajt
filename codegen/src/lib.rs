@@ -2,6 +2,7 @@ use fajt_ast::traverse::{Traverse, Visitor};
 use fajt_ast::*;
 use std::cell::Cell;
 use std::rc::Rc;
+use core::slice::IterMut;
 
 pub fn generate_code(mut program: Program) -> String {
     let mut data = String::new();
@@ -76,6 +77,17 @@ impl<'a> CodeGenerator<'a> {
             data,
             ctx: GeneratorContext::new(),
             index: Rc::new(Index::new()),
+        }
+    }
+
+    fn comma_separated<I: Traverse>(&mut self, items: &mut Vec<I>) {
+        let mut items = items.iter_mut().peekable();
+        while let Some(item) = items.next() {
+            item.traverse(self);
+            if items.peek().is_some() {
+                self.char(',');
+                self.space();
+            }
         }
     }
 }
@@ -494,14 +506,7 @@ impl Visitor for CodeGenerator<'_> {
     fn enter_formal_parameters(&mut self, node: &mut FormalParameters) -> bool {
         self.char('(');
 
-        let mut bindings = node.bindings.iter_mut().peekable();
-        while let Some(bind) = bindings.next() {
-            bind.traverse(self);
-            if bindings.peek().is_some() {
-                self.char(',');
-                self.space();
-            }
-        }
+        self.comma_separated(&mut node.bindings);
 
         if let Some(rest) = node.rest.as_mut() {
             self.string("...");
@@ -614,15 +619,7 @@ impl Visitor for CodeGenerator<'_> {
         self.char('{');
         self.space();
 
-        let mut props = node.props.iter_mut().peekable();
-        while let Some(element) = props.next() {
-            element.traverse(self);
-
-            if props.peek().is_some() {
-                self.char(',');
-                self.space();
-            }
-        }
+        self.comma_separated(&mut node.props);
 
         if let Some(rest) = node.rest.as_mut() {
             if !node.props.is_empty() {
