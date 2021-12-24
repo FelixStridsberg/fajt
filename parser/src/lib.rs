@@ -16,7 +16,7 @@ mod module;
 mod stmt;
 mod variable;
 
-use std::cell::RefCell;
+use std::cell::Cell;
 use std::rc::Rc;
 
 use fajt_ast::{Expr, Ident, LitString, Literal, Program, PropertyName, SourceType, Span, Stmt};
@@ -191,7 +191,7 @@ impl Parse for Program {
 
             body.push(parser.parse_stmt()?);
         }
-        Ok(Program::from_body(*parser.source_type.borrow(), body))
+        Ok(Program::from_body(parser.source_type.get(), body))
     }
 }
 
@@ -201,7 +201,7 @@ where
 {
     context: Context,
     reader: &'a mut PeekReader<Token, I>,
-    source_type: Rc<RefCell<SourceType>>,
+    source_type: Rc<Cell<SourceType>>,
 }
 
 impl<'a, I> Parser<'a, I>
@@ -212,7 +212,7 @@ where
         Ok(Parser {
             context: Context::default(),
             reader,
-            source_type: Rc::new(RefCell::new(source_type)),
+            source_type: Rc::new(Cell::new(source_type)),
         })
     }
 
@@ -225,7 +225,7 @@ where
     }
 
     fn source_type(&self) -> SourceType {
-        *(*self.source_type).borrow()
+        self.source_type.get()
     }
 
     fn set_source_type(&mut self, source_type: SourceType) {
