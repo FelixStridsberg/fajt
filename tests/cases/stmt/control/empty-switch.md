@@ -2,6 +2,10 @@
 switch (a) {}
 ```
 
+```js min
+switch(a){}
+```
+
 ```json
 {
   "Switch": {

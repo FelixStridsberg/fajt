@@ -3,6 +3,10 @@ if (a)
     b;
 ```
 
+```js min
+if(a)b
+```
+
 ```json
 {
   "If": {

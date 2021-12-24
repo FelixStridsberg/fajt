@@ -144,9 +144,17 @@ impl CodeGenerator<'_> {
         }
     }
 
-    /// Remove last char in output.
-    fn remove_last(&mut self) {
-        self.data.pop();
+    /// Remove last char in output if match `char`.
+    fn remove_last(&mut self, char: char) -> bool {
+        if let Some(removed) = self.data.pop() {
+            if removed == char {
+                return true;
+            }
+
+            self.data.push(removed);
+        }
+
+        false
     }
 
     /// Current byte position from start.
@@ -186,15 +194,15 @@ impl CodeGenerator<'_> {
 
     fn end_block(&mut self) {
         if self.at_block_start() && !self.ctx.minified {
-            self.remove_last(); // Remove \n from empty blocks
-            self.index.set_new_line(0); // Reset new line index since we are no longer at new line.
+            // Empty blocks should not have line break.
+            if self.remove_last('\n') {
+                self.index.set_new_line(0); // Reset new line index since we are no longer at new line.
+            }
         }
 
         if self.ctx.minified {
-            // Remove unnecessary semicolon at end of block.
-            if matches!(self.data.chars().rev().next(), Some(';')) {
-                self.remove_last();
-            }
+            // No ';' is necessary before a '}'.
+            self.remove_last(';');
         }
 
         self.char('}');
@@ -228,6 +236,12 @@ impl CodeGenerator<'_> {
 }
 
 impl Visitor for CodeGenerator<'_> {
+    fn exit_program(&mut self, _node: &mut Program) {
+        if self.ctx.minified {
+            self.remove_last(';');
+        }
+    }
+
     fn enter_block_stmt(&mut self, node: &mut StmtBlock) -> bool {
         self.start_block();
         node.statements.traverse(&mut self.with_indent());
@@ -366,7 +380,7 @@ impl Visitor for CodeGenerator<'_> {
     fn exit_for_init(&mut self, node: &mut ForInit) {
         if matches!(node, ForInit::Declaration(_)) {
             // Variable statements ends with semicolon, don't want that inside for syntax.
-            self.remove_last();
+            self.remove_last(';');
         }
     }
 
