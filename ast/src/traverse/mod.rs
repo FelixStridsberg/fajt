@@ -43,6 +43,7 @@ generate_fold_and_visit! {
             Literal
             Parenthesized
             Yield
+            Assignment
         }
 
         Stmt: (enter: enter_stmt, exit: exit_stmt) {
@@ -127,6 +128,12 @@ generate_fold_and_visit! {
 
         ExprLiteral: (enter: enter_literal_expr, exit: exit_literal_expr) {
             literal
+        }
+
+
+        ExprAssignment: (enter: enter_assignment_expr, exit: exit_assignment_expr) {
+            left
+            right
         }
 
         StatementList<Stmt>: (enter: enter_stmt_list, exit: exit_stmt_list) {

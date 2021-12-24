@@ -606,6 +606,15 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_assignment_expr(&mut self, node: &mut ExprAssignment) -> bool {
+        node.left.traverse(self);
+        self.space();
+        self.string(&node.operator.to_string());
+        self.space();
+        node.right.traverse(self);
+        false
+    }
+
     fn enter_variable_stmt(&mut self, node: &mut StmtVariable) -> bool {
         let kind_str = node.kind.to_string();
         self.string(&kind_str);

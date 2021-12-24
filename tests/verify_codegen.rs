@@ -73,6 +73,12 @@ generate_test_module!(
     folders: ["tests/cases/stmt"],
 );
 
+generate_test_module!(
+    mod_name: expr,
+    source_type: Script,
+    folders: ["tests/cases/expr"],
+);
+
 #[test]
 fn dummy() {
     // This is just so IDE recognize this is a runnable file.
