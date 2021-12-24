@@ -4,6 +4,10 @@ function fn() {
 }
 ```
 
+```js min
+function fn(){var a=1}
+```
+
 ```json
 {
   "FunctionDecl": {

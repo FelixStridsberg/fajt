@@ -4,6 +4,10 @@ async function fn() {
 }
 ```
 
+```js min
+async function fn(){var a=1}
+```
+
 ```json
 {
   "FunctionDecl": {
