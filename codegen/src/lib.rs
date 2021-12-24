@@ -9,22 +9,34 @@ pub fn generate_code(mut program: Program) -> String {
     codegen.into_string()
 }
 
-struct CodeGenerator {
+struct GeneratorContext {
     indent: usize,
     align: Option<usize>,
-    data: String,
     last_new_line: usize,
     last_block_start: usize,
 }
 
-impl CodeGenerator {
+impl GeneratorContext {
     fn new() -> Self {
-        Self {
+        GeneratorContext {
             indent: 0,
             align: None,
-            data: String::new(),
             last_new_line: 0,
             last_block_start: 0,
+        }
+    }
+}
+
+struct CodeGenerator {
+    data: String,
+    ctx: GeneratorContext,
+}
+
+impl CodeGenerator {
+    fn new() -> Self {
+        CodeGenerator {
+            data: String::new(),
+            ctx: GeneratorContext::new(),
         }
     }
 
@@ -35,12 +47,12 @@ impl CodeGenerator {
 
 impl CodeGenerator {
     fn indent(&mut self) -> &mut Self {
-        self.indent += 1;
+        self.ctx.indent += 1;
         self
     }
 
     fn dedent(&mut self) -> &mut Self {
-        self.indent -= 1;
+        self.ctx.indent -= 1;
         self
     }
 
@@ -51,15 +63,15 @@ impl CodeGenerator {
 
     fn block_start(&mut self) -> &mut Self {
         self.push('{').new_line();
-        self.last_block_start = self.data.len();
+        self.ctx.last_block_start = self.data.len();
         self.indent();
         self
     }
 
     fn block_end(&mut self) -> &mut Self {
-        if self.last_block_start == self.data.len() {
+        if self.ctx.last_block_start == self.data.len() {
             self.data.pop(); // Pop \n from empty blocks
-            self.last_new_line = 0;
+            self.ctx.last_new_line = 0;
         }
 
         self.dedent();
@@ -84,16 +96,16 @@ impl CodeGenerator {
     }
 
     fn start_align(&mut self) {
-        self.align = Some(self.data.len() - self.last_new_line);
+        self.ctx.align = Some(self.data.len() - self.ctx.last_new_line);
     }
 
     fn stop_align(&mut self) {
-        self.align = None;
+        self.ctx.align = None;
     }
 
     // Separation between logical sections, only adds a new line if not first in block or file.
     fn separation(&mut self) -> &mut Self {
-        if self.data.len() != self.last_block_start {
+        if self.data.len() != self.ctx.last_block_start {
             self.new_line();
         }
         self
@@ -101,7 +113,7 @@ impl CodeGenerator {
 
     fn new_line(&mut self) -> &mut Self {
         self.push('\n');
-        self.last_new_line = self.data.len();
+        self.ctx.last_new_line = self.data.len();
         self
     }
 
@@ -110,16 +122,16 @@ impl CodeGenerator {
             return;
         }
 
-        if let Some(align) = self.align {
+        if let Some(align) = self.ctx.align {
             self.data.push_str(&" ".repeat(align));
         } else {
             self.data
-                .push_str(&" ".repeat(self.indent * INDENTATION_SIZE));
+                .push_str(&" ".repeat(self.ctx.indent * INDENTATION_SIZE));
         }
     }
 
     fn should_indent(&self) -> bool {
-        !self.data.is_empty() && self.data.len() == self.last_new_line
+        !self.data.is_empty() && self.data.len() == self.ctx.last_new_line
     }
 }
 
@@ -686,7 +698,7 @@ impl Visitor for CodeGenerator {
     }
 
     fn exit_stmt(&mut self, _node: &mut Stmt) {
-        if self.last_new_line != self.data.len() {
+        if self.ctx.last_new_line != self.data.len() {
             self.new_line();
         }
     }
