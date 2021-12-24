@@ -106,6 +106,18 @@ impl<'a> CodeGenerator<'a> {
             rest.traverse(self);
         }
     }
+
+    fn initializer<I>(&mut self, initializer: &mut Option<I>)
+    where
+        I: Traverse
+    {
+        if let Some(initializer) = initializer.as_mut() {
+            self.space();
+            self.string("=");
+            self.space();
+            initializer.traverse(self);
+        }
+    }
 }
 
 impl CodeGenerator<'_> {
@@ -528,13 +540,7 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_binding_element(&mut self, node: &mut BindingElement) -> bool {
         node.pattern.traverse(self);
-
-        if let Some(initializer) = node.initializer.as_mut() {
-            self.space();
-            self.string("=");
-            self.space();
-            initializer.traverse(self);
-        }
+        self.initializer(&mut node.initializer);
         false
     }
 
@@ -634,13 +640,7 @@ impl Visitor for CodeGenerator<'_> {
         match node {
             ObjectBindingProp::Single(ident, initializer) => {
                 ident.traverse(self);
-
-                if let Some(initializer) = initializer {
-                    self.space();
-                    self.char('=');
-                    self.space();
-                    initializer.traverse(self);
-                }
+                self.initializer(initializer);
             }
             ObjectBindingProp::KeyValue(name, prop) => {
                 name.traverse(self);
@@ -654,14 +654,7 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_variable_declaration(&mut self, node: &mut VariableDeclaration) -> bool {
         node.pattern.traverse(self);
-
-        if let Some(initializer) = node.initializer.as_mut() {
-            self.space();
-            self.string("=");
-            self.space();
-            initializer.traverse(self);
-        }
-
+        self.initializer(&mut node.initializer);
         false
     }
 
