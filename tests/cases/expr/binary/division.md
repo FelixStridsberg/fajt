@@ -1,5 +1,9 @@
 ```js
-a / b / c
+a / b / c;
+```
+
+```js min
+a/b/c
 ```
 
 ```json

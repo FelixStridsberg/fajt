@@ -1,5 +1,9 @@
 ```js
-a + b + c + d
+a + b + c + d;
+```
+
+```js min
+a+b+c+d
 ```
 
 ```json

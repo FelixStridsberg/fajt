@@ -1,4 +1,8 @@
 ```js
+a in b in c;
+```
+
+```js min
 a in b in c
 ```
 

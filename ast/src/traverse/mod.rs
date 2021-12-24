@@ -44,6 +44,7 @@ generate_fold_and_visit! {
             Parenthesized
             Yield
             Assignment
+            Logical
         }
 
         Stmt: (enter: enter_stmt, exit: exit_stmt) {
@@ -118,6 +119,11 @@ generate_fold_and_visit! {
         StmtBlock: (enter: enter_block_stmt, exit: exit_block_stmt) { }
 
         ExprBinary: (enter: enter_binary_expr, exit: exit_binary_expr) {
+            left
+            right
+        }
+
+        ExprLogical: (enter: enter_logical_expr, exit: exit_logical_expr) {
             left
             right
         }

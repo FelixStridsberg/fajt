@@ -469,6 +469,15 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_logical_expr(&mut self, node: &mut ExprLogical) -> bool {
+        node.left.traverse(self);
+        self.space();
+        self.string(&node.operator.to_string());
+        self.space();
+        node.right.traverse(self);
+        false
+    }
+
     fn enter_parenthesized_expr(&mut self, node: &mut ExprParenthesized) -> bool {
         self.char('(');
         node.expression.traverse(self);

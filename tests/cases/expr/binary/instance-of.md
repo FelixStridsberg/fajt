@@ -1,4 +1,8 @@
 ```js
+a instanceof b instanceof c;
+```
+
+```js min
 a instanceof b instanceof c
 ```
 
