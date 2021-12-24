@@ -173,7 +173,7 @@ impl CodeGenerator<'_> {
     }
 
     fn end_block(&mut self) {
-        if self.at_block_start() {
+        if self.at_block_start() && !self.ctx.minified {
             self.remove_last(); // Remove \n from empty blocks
             self.index.set_new_line(0); // Reset new line index since we are no longer at new line.
         }
@@ -193,12 +193,14 @@ impl CodeGenerator<'_> {
     }
 
     fn new_line(&mut self) {
-        self.char('\n');
-        self.index.set_new_line(self.pos());
+        if !self.ctx.minified {
+            self.char('\n');
+            self.index.set_new_line(self.pos());
+        }
     }
 
     fn indent(&mut self) {
-        if self.col_pos() != 0 {
+        if self.ctx.minified || self.col_pos() != 0 {
             return;
         }
 
@@ -431,9 +433,10 @@ impl Visitor for CodeGenerator<'_> {
 
         if node.generator {
             self.char('*');
+            self.space();
+        } else {
+            self.char(' ');
         }
-
-        self.char(' ');
 
         node.identifier.traverse(self);
         node.parameters.traverse(self);
@@ -653,7 +656,9 @@ impl Visitor for CodeGenerator<'_> {
         node.pattern.traverse(self);
 
         if let Some(initializer) = node.initializer.as_mut() {
-            self.string(" = ");
+            self.space();
+            self.string("=");
+            self.space();
             initializer.traverse(self);
         }
 

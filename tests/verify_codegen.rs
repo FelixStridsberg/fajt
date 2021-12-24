@@ -40,7 +40,7 @@ fn run_test_file(filename: &str) {
         let ast = parse_program(&input).unwrap();
         let output_min = generate_code(ast, ctx);
 
-        assert_eq!(output_min, input_min, "Minified output mismatch.");
+        assert_eq!(output_min, input_min.trim(), "Minified output mismatch.");
     }
 }
 
