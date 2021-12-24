@@ -68,6 +68,10 @@ impl<'a> CodeGenerator<'a> {
 }
 
 impl CodeGenerator<'_> {
+    fn pos(&self) -> usize {
+        self.data.len()
+    }
+
     fn with_indent(&mut self) -> CodeGenerator<'_> {
         CodeGenerator {
             data: self.data,
@@ -86,12 +90,12 @@ impl CodeGenerator<'_> {
 
     fn block_start(&mut self) -> &mut Self {
         self.push('{').new_line();
-        self.ctx.set_block_start(self.data.len());
+        self.ctx.set_block_start(self.pos());
         self
     }
 
     fn block_end(&mut self) -> &mut Self {
-        if self.ctx.last_block_start() == self.data.len() {
+        if self.ctx.last_block_start() == self.pos() {
             self.data.pop(); // Pop \n from empty blocks
             self.ctx.set_new_line(0); // TODO make better
         }
@@ -117,7 +121,7 @@ impl CodeGenerator<'_> {
     }
 
     fn start_align(&mut self) {
-        self.ctx.align = Some(self.data.len() - self.ctx.last_new_line());
+        self.ctx.align = Some(self.pos() - self.ctx.last_new_line());
     }
 
     fn stop_align(&mut self) {
@@ -126,7 +130,7 @@ impl CodeGenerator<'_> {
 
     // Separation between logical sections, only adds a new line if not first in block or file.
     fn separation(&mut self) -> &mut Self {
-        if self.data.len() != self.ctx.last_block_start() {
+        if self.pos() != self.ctx.last_block_start() {
             self.new_line();
         }
         self
@@ -134,7 +138,7 @@ impl CodeGenerator<'_> {
 
     fn new_line(&mut self) -> &mut Self {
         self.push('\n');
-        self.ctx.set_new_line(self.data.len());
+        self.ctx.set_new_line(self.pos());
         self
     }
 
@@ -152,7 +156,7 @@ impl CodeGenerator<'_> {
     }
 
     fn should_indent(&self) -> bool {
-        !self.data.is_empty() && self.data.len() == self.ctx.last_new_line()
+        !self.data.is_empty() && self.pos() == self.ctx.last_new_line()
     }
 }
 
@@ -714,7 +718,7 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn exit_stmt(&mut self, _node: &mut Stmt) {
-        if self.ctx.last_new_line() != self.data.len() {
+        if self.ctx.last_new_line() != self.pos() {
             self.new_line();
         }
     }
