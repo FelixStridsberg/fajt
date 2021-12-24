@@ -5,7 +5,7 @@ function fn() {
 ```
 
 ```js min
-function fn(){var await=1;}
+function fn(){var await=1}
 ```
 
 ```json

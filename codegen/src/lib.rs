@@ -109,7 +109,7 @@ impl<'a> CodeGenerator<'a> {
 
     fn initializer<I>(&mut self, initializer: &mut Option<I>)
     where
-        I: Traverse
+        I: Traverse,
     {
         if let Some(initializer) = initializer.as_mut() {
             self.space();
@@ -188,6 +188,13 @@ impl CodeGenerator<'_> {
         if self.at_block_start() && !self.ctx.minified {
             self.remove_last(); // Remove \n from empty blocks
             self.index.set_new_line(0); // Reset new line index since we are no longer at new line.
+        }
+
+        if self.ctx.minified {
+            // Remove unnecessary semicolon at end of block.
+            if matches!(self.data.chars().rev().next(), Some(';')) {
+                self.remove_last();
+            }
         }
 
         self.char('}');

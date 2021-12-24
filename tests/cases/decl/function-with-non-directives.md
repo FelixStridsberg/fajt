@@ -6,7 +6,7 @@ function fn() {
 ```
 
 ```js min
-function fn(){;"use strict";}
+function fn(){;"use strict"}
 ```
 
 ```json
