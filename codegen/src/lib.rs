@@ -1,3 +1,6 @@
+use std::borrow::Borrow;
+use std::cell::RefCell;
+use std::rc::Rc;
 use fajt_ast::traverse::{Traverse, Visitor};
 use fajt_ast::*;
 
@@ -10,11 +13,15 @@ pub fn generate_code(mut program: Program) -> String {
     data
 }
 
+struct Positions {
+    last_new_line: usize,
+    last_block_start: usize,
+}
+
 struct GeneratorContext {
     indent: usize,
     align: Option<usize>,
-    last_new_line: usize,
-    last_block_start: usize,
+    pos: Rc<RefCell<Positions>>,
 }
 
 impl GeneratorContext {
@@ -22,9 +29,27 @@ impl GeneratorContext {
         GeneratorContext {
             indent: 0,
             align: None,
-            last_new_line: 0,
-            last_block_start: 0,
+            pos: Rc::new(RefCell::new(Positions {
+                last_new_line: 0,
+                last_block_start: 0,
+            }))
         }
+    }
+
+    fn last_new_line(&self) -> usize {
+        (*self.pos).borrow().last_new_line
+    }
+
+    fn save_new_line(&mut self, pos: usize) {
+        self.pos.borrow_mut().last_new_line = pos;
+    }
+
+    fn last_block_start(&self) -> usize {
+        (*self.pos).borrow().last_block_start
+    }
+
+    fn save_block_start(&mut self, pos: usize) {
+        self.pos.borrow_mut().last_block_start = pos;
     }
 }
 
@@ -43,14 +68,15 @@ impl<'a> CodeGenerator<'a> {
 }
 
 impl CodeGenerator<'_> {
-    fn indent(&mut self) -> &mut Self {
-        self.ctx.indent += 1;
-        self
-    }
-
-    fn dedent(&mut self) -> &mut Self {
-        self.ctx.indent -= 1;
-        self
+    fn with_indent(&mut self) -> CodeGenerator<'_> {
+        CodeGenerator {
+            data: self.data,
+            ctx: GeneratorContext {
+                indent: self.ctx.indent + 1,
+                pos: self.ctx.pos.clone(),
+                ..self.ctx
+            }
+        }
     }
 
     fn space(&mut self) -> &mut Self {
@@ -60,18 +86,16 @@ impl CodeGenerator<'_> {
 
     fn block_start(&mut self) -> &mut Self {
         self.push('{').new_line();
-        self.ctx.last_block_start = self.data.len();
-        self.indent();
+        self.ctx.save_block_start(self.data.len());
         self
     }
 
     fn block_end(&mut self) -> &mut Self {
-        if self.ctx.last_block_start == self.data.len() {
+        if self.ctx.last_block_start() == self.data.len() {
             self.data.pop(); // Pop \n from empty blocks
-            self.ctx.last_new_line = 0;
+            self.ctx.save_new_line(0); // TODO make better
         }
 
-        self.dedent();
         self.push('}');
         self
     }
@@ -93,7 +117,7 @@ impl CodeGenerator<'_> {
     }
 
     fn start_align(&mut self) {
-        self.ctx.align = Some(self.data.len() - self.ctx.last_new_line);
+        self.ctx.align = Some(self.data.len() - self.ctx.last_new_line());
     }
 
     fn stop_align(&mut self) {
@@ -102,7 +126,7 @@ impl CodeGenerator<'_> {
 
     // Separation between logical sections, only adds a new line if not first in block or file.
     fn separation(&mut self) -> &mut Self {
-        if self.data.len() != self.ctx.last_block_start {
+        if self.data.len() != self.ctx.last_block_start() {
             self.new_line();
         }
         self
@@ -110,7 +134,7 @@ impl CodeGenerator<'_> {
 
     fn new_line(&mut self) -> &mut Self {
         self.push('\n');
-        self.ctx.last_new_line = self.data.len();
+        self.ctx.save_new_line(self.data.len());
         self
     }
 
@@ -128,14 +152,14 @@ impl CodeGenerator<'_> {
     }
 
     fn should_indent(&self) -> bool {
-        !self.data.is_empty() && self.data.len() == self.ctx.last_new_line
+        !self.data.is_empty() && self.data.len() == self.ctx.last_new_line()
     }
 }
 
 impl Visitor for CodeGenerator<'_> {
     fn enter_block_stmt(&mut self, node: &mut StmtBlock) -> bool {
         self.block_start();
-        node.statements.traverse(self);
+        node.statements.traverse(&mut self.with_indent());
         self.block_end();
         false
     }
@@ -203,7 +227,7 @@ impl Visitor for CodeGenerator<'_> {
         self.space();
 
         self.block_start();
-        node.cases.traverse(self);
+        node.cases.traverse(&mut self.with_indent());
         self.block_end();
 
         false
@@ -218,17 +242,13 @@ impl Visitor for CodeGenerator<'_> {
         self.push(')');
         self.new_line();
 
-        self.indent();
-        node.consequent.traverse(self);
-        self.dedent();
+        node.consequent.traverse(&mut self.with_indent());
 
         if node.alternate.is_some() {
             self.push_str("else");
             self.new_line();
 
-            self.indent();
-            node.alternate.traverse(self);
-            self.dedent();
+            node.alternate.traverse(&mut self.with_indent());
         }
 
         false
@@ -330,9 +350,7 @@ impl Visitor for CodeGenerator<'_> {
         self.push(':');
         self.new_line();
 
-        self.indent();
-        node.consequent.traverse(self);
-        self.dedent();
+        node.consequent.traverse(&mut self.with_indent());
         false
     }
 
@@ -387,7 +405,7 @@ impl Visitor for CodeGenerator<'_> {
         self.space();
 
         self.block_start();
-        node.body.traverse(self);
+        node.body.traverse(&mut self.with_indent());
         self.block_end();
         false
     }
@@ -423,13 +441,14 @@ impl Visitor for CodeGenerator<'_> {
     fn enter_body(&mut self, node: &mut Body) -> bool {
         self.block_start();
 
+        let mut printer = self.with_indent();
         for x in &mut node.directives {
-            x.traverse(self);
-            self.push(';');
-            self.new_line();
+            x.traverse(&mut printer);
+            printer.push(';');
+            printer.new_line();
         }
 
-        node.statements.traverse(self);
+        node.statements.traverse(&mut printer);
         self.block_end();
         false
     }
@@ -695,7 +714,7 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn exit_stmt(&mut self, _node: &mut Stmt) {
-        if self.ctx.last_new_line != self.data.len() {
+        if self.ctx.last_new_line() != self.data.len() {
             self.new_line();
         }
     }
