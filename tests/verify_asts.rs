@@ -163,14 +163,14 @@ generate_test_module!(
     mod_name: semicolon,
     ast_type: Program,
     source_type: Unknown,
-    folders: ["tests/cases/semicolon"],
+    folders: ["parser/tests/cases/semicolon"],
 );
 
 generate_test_module!(
     mod_name: strict_mode,
     ast_type: Program,
     source_type: Script,
-    folders: ["tests/cases/strict-mode"],
+    folders: ["parser/tests/cases/strict-mode"],
 );
 
 generate_test_module!(
@@ -184,7 +184,7 @@ generate_test_module!(
     mod_name: source_script,
     ast_type: Program,
     source_type: Script,
-    folders: ["tests/cases/source-script"],
+    folders: ["parser/tests/cases/source-script"],
 );
 
 #[test]
