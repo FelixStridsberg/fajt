@@ -113,7 +113,7 @@ impl<'a> CodeGenerator<'a> {
     {
         if let Some(initializer) = initializer.as_mut() {
             self.space();
-            self.string("=");
+            self.char('=');
             self.space();
             initializer.traverse(self);
         }
@@ -157,6 +157,10 @@ impl CodeGenerator<'_> {
         false
     }
 
+    fn last(&mut self) -> Option<char> {
+        self.data.chars().last()
+    }
+
     /// Current byte position from start.
     fn pos(&self) -> usize {
         self.data.len()
@@ -176,6 +180,12 @@ impl CodeGenerator<'_> {
     /// Add string to output.
     fn string(&mut self, str: &str) {
         self.indent();
+
+        // Make sure we separate keywords
+        if self.last().map(|c| c.is_alphabetic()).unwrap_or(false) {
+            self.data.push(' ');
+        }
+
         self.data.push_str(str);
     }
 
@@ -362,13 +372,13 @@ impl Visitor for CodeGenerator<'_> {
         self.string("for");
 
         if node.asynchronous {
-            self.string(" await");
+            self.string("await");
         }
 
         self.space();
         self.char('(');
         node.left.traverse(self);
-        self.string(" of ");
+        self.string("of");
         node.right.traverse(self);
         self.char(')');
 
@@ -389,7 +399,7 @@ impl Visitor for CodeGenerator<'_> {
         self.space();
         self.char('(');
         node.left.traverse(self);
-        self.string(" in ");
+        self.string("in");
         node.right.traverse(self);
         self.char(')');
 
@@ -479,12 +489,12 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_class_decl(&mut self, node: &mut DeclClass) -> bool {
-        self.string("class ");
+        self.string("class");
 
         node.identifier.traverse(self);
 
         if let Some(super_class) = node.super_class.as_mut() {
-            self.string(" extends ");
+            self.string("extends");
             super_class.traverse(self);
         }
 
@@ -498,7 +508,8 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_class_method(&mut self, node: &mut ClassMethod) -> bool {
         if node.asynchronous {
-            self.string("async ");
+            self.string("async");
+            self.space();
         }
 
         if node.generator {
@@ -506,8 +517,8 @@ impl Visitor for CodeGenerator<'_> {
         }
 
         match node.kind {
-            ClassMethodKind::Get => self.string("get "),
-            ClassMethodKind::Set => self.string("set "),
+            ClassMethodKind::Get => self.string("get"),
+            ClassMethodKind::Set => self.string("set"),
             ClassMethodKind::Method => {}
         }
 
