@@ -12,15 +12,9 @@ pub fn generate_code(mut program: Program) -> String {
     data
 }
 
-struct Positions {
-    last_new_line: usize,
-    last_block_start: usize,
-}
-
 struct GeneratorContext {
     indent: usize,
     align: Option<usize>,
-    pos: Rc<RefCell<Positions>>,
 }
 
 impl GeneratorContext {
@@ -28,6 +22,26 @@ impl GeneratorContext {
         GeneratorContext {
             indent: 0,
             align: None,
+        }
+    }
+}
+
+struct Positions {
+    last_new_line: usize,
+    last_block_start: usize,
+}
+
+struct CodeGenerator<'a> {
+    data: &'a mut String,
+    ctx: GeneratorContext,
+    pos: Rc<RefCell<Positions>>,
+}
+
+impl<'a> CodeGenerator<'a> {
+    fn new(data: &'a mut String) -> Self {
+        CodeGenerator {
+            data,
+            ctx: GeneratorContext::new(),
             pos: Rc::new(RefCell::new(Positions {
                 last_new_line: 0,
                 last_block_start: 0,
@@ -52,20 +66,6 @@ impl GeneratorContext {
     }
 }
 
-struct CodeGenerator<'a> {
-    data: &'a mut String,
-    ctx: GeneratorContext,
-}
-
-impl<'a> CodeGenerator<'a> {
-    fn new(data: &'a mut String) -> Self {
-        CodeGenerator {
-            data,
-            ctx: GeneratorContext::new(),
-        }
-    }
-}
-
 impl CodeGenerator<'_> {
     /// Current byte position from start.
     fn pos(&self) -> usize {
@@ -74,15 +74,15 @@ impl CodeGenerator<'_> {
 
     /// Current byte position from start of current line.
     fn col_pos(&self) -> usize {
-        self.pos() - self.ctx.last_new_line()
+        self.pos() - self.last_new_line()
     }
 
     fn with_indent(&mut self) -> CodeGenerator<'_> {
         CodeGenerator {
             data: self.data,
+            pos: self.pos.clone(),
             ctx: GeneratorContext {
                 indent: self.ctx.indent + 1,
-                pos: self.ctx.pos.clone(),
                 ..self.ctx
             },
         }
@@ -92,9 +92,9 @@ impl CodeGenerator<'_> {
         let align = self.col_pos();
         CodeGenerator {
             data: self.data,
+            pos: self.pos.clone(),
             ctx: GeneratorContext {
                 align: Some(align),
-                pos: self.ctx.pos.clone(),
                 ..self.ctx
             },
         }
@@ -107,18 +107,18 @@ impl CodeGenerator<'_> {
 
     fn block_start(&mut self) -> &mut Self {
         self.push('{').new_line();
-        self.ctx.set_block_start(self.pos());
+        self.set_block_start(self.pos());
         self
     }
 
     fn at_block_start(&self) -> bool {
-        self.ctx.last_block_start() == self.pos()
+        self.last_block_start() == self.pos()
     }
 
     fn block_end(&mut self) -> &mut Self {
         if self.at_block_start() {
             self.data.pop(); // Pop \n from empty blocks
-            self.ctx.set_new_line(0); // TODO make better
+            self.set_new_line(0); // TODO make better
         }
 
         self.push('}');
@@ -151,7 +151,7 @@ impl CodeGenerator<'_> {
 
     fn new_line(&mut self) -> &mut Self {
         self.push('\n');
-        self.ctx.set_new_line(self.pos());
+        self.set_new_line(self.pos());
         self
     }
 
@@ -169,7 +169,7 @@ impl CodeGenerator<'_> {
     }
 
     fn should_indent(&self) -> bool {
-        !self.data.is_empty() && self.pos() == self.ctx.last_new_line()
+        !self.data.is_empty() && self.pos() == self.last_new_line()
     }
 }
 
@@ -728,7 +728,7 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn exit_stmt(&mut self, _node: &mut Stmt) {
-        if self.ctx.last_new_line() != self.pos() {
+        if self.last_new_line() != self.pos() {
             self.new_line();
         }
     }
