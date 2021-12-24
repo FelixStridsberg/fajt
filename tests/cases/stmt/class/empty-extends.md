@@ -2,6 +2,10 @@
 class MyClass extends SuperClass {}
 ```
 
+```js min
+class MyClass extends SuperClass{}
+```
+
 ```json
 {
   "Class": {

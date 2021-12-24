@@ -2,6 +2,10 @@
 function fn() {}
 ```
 
+```js min
+function fn(){}
+```
+
 ```json
 {
   "FunctionDecl": {

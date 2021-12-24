@@ -2,6 +2,10 @@
 class cls {}
 ```
 
+```js min
+class cls{}
+```
+
 ```json
 {
   "Class": {
