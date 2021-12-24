@@ -246,8 +246,12 @@ impl CodeGenerator<'_> {
 
     /// Check if a space must be added before adding str to avoid merging keywords or identifiers.
     fn must_add_space_before(&self, str: &str) -> bool {
-        let last_is_alphanumeric =  self.last().map(char::is_alphanumeric).unwrap_or(false);
-        let first_is_alphanumeric = str.chars().next().map(char::is_alphanumeric).unwrap_or(false);
+        let last_is_alphanumeric = self.last().map(char::is_alphanumeric).unwrap_or(false);
+        let first_is_alphanumeric = str
+            .chars()
+            .next()
+            .map(char::is_alphanumeric)
+            .unwrap_or(false);
         last_is_alphanumeric && first_is_alphanumeric
     }
 }
@@ -486,12 +490,21 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_callee(&mut self, node: &mut Callee) -> bool {
+        match node {
+            Callee::Super => self.string("super"),
+            Callee::Import => self.string("import"),
+            Callee::Expr(expr) => expr.traverse(self),
+        }
+        false
+    }
+
     fn enter_member_property(&mut self, node: &mut MemberProperty) -> bool {
         match node {
             MemberProperty::Ident(i) => {
                 self.char('.');
                 i.traverse(self)
-            },
+            }
             MemberProperty::Expr(expr) => {
                 self.char('[');
                 expr.traverse(self);
