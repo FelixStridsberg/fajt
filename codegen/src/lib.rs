@@ -4,9 +4,10 @@ use fajt_ast::*;
 const INDENTATION_SIZE: usize = 4;
 
 pub fn generate_code(mut program: Program) -> String {
-    let mut codegen = CodeGenerator::new();
+    let mut data = String::new();
+    let mut codegen = CodeGenerator::new(&mut data);
     program.traverse(&mut codegen);
-    codegen.into_string()
+    data
 }
 
 struct GeneratorContext {
@@ -27,25 +28,21 @@ impl GeneratorContext {
     }
 }
 
-struct CodeGenerator {
-    data: String,
+struct CodeGenerator<'a> {
+    data: &'a mut String,
     ctx: GeneratorContext,
 }
 
-impl CodeGenerator {
-    fn new() -> Self {
+impl<'a> CodeGenerator<'a> {
+    fn new(data: &'a mut String) -> Self {
         CodeGenerator {
-            data: String::new(),
+            data,
             ctx: GeneratorContext::new(),
         }
     }
-
-    fn into_string(self) -> String {
-        self.data
-    }
 }
 
-impl CodeGenerator {
+impl CodeGenerator<'_> {
     fn indent(&mut self) -> &mut Self {
         self.ctx.indent += 1;
         self
@@ -135,7 +132,7 @@ impl CodeGenerator {
     }
 }
 
-impl Visitor for CodeGenerator {
+impl Visitor for CodeGenerator<'_> {
     fn enter_block_stmt(&mut self, node: &mut StmtBlock) -> bool {
         self.block_start();
         node.statements.traverse(self);
