@@ -465,13 +465,9 @@ impl Visitor for CodeGenerator<'_> {
         }
 
         match node.kind {
+            ClassMethodKind::Get => self.string("get "),
+            ClassMethodKind::Set => self.string("set "),
             ClassMethodKind::Method => {}
-            ClassMethodKind::Get => {
-                self.string("get ");
-            }
-            ClassMethodKind::Set => {
-                self.string("set ");
-            }
         }
 
         node.name.traverse(self);
@@ -659,18 +655,10 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_literal(&mut self, node: &mut Literal) -> bool {
         match node {
-            Literal::Null => {
-                self.string("null");
-            }
-            Literal::Boolean(true) => {
-                self.string("true");
-            }
-            Literal::Boolean(false) => {
-                self.string("false");
-            }
-            _ => {
-                return true;
-            }
+            Literal::Null => self.string("null"),
+            Literal::Boolean(true) => self.string("true"),
+            Literal::Boolean(false) => self.string("false"),
+            _ => return true,
         }
 
         false
@@ -738,9 +726,7 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_number(&mut self, node: &mut Number) -> bool {
         match node {
-            Number::Integer(n, _) => {
-                self.string(&n.to_string());
-            }
+            Number::Integer(n, _) => self.string(&n.to_string()),
             Number::Decimal(_) => {}
         }
 
