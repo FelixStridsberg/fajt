@@ -4,6 +4,10 @@ function* fn() {
 }
 ```
 
+```js min
+function*fn(){yield yield}
+```
+
 ```json
 {
   "FunctionDecl": {

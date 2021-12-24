@@ -559,7 +559,11 @@ impl Visitor for CodeGenerator<'_> {
         }
 
         if node.argument.is_some() {
-            self.char(' ');
+            if node.delegate {
+                self.space();
+            } else {
+                self.char(' ');
+            }
             node.argument.traverse(self);
         }
 

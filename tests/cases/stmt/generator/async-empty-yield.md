@@ -4,6 +4,10 @@ async function* fn() {
 }
 ```
 
+```js min
+async function*fn(){yield}
+```
+
 ```json
 {
   "FunctionDecl": {
