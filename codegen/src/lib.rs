@@ -2,7 +2,6 @@ use fajt_ast::traverse::{Traverse, Visitor};
 use fajt_ast::*;
 use std::cell::Cell;
 use std::rc::Rc;
-use core::slice::IterMut;
 
 pub fn generate_code(mut program: Program) -> String {
     let mut data = String::new();
@@ -80,14 +79,28 @@ impl<'a> CodeGenerator<'a> {
         }
     }
 
-    fn comma_separated<I: Traverse>(&mut self, items: &mut Vec<I>) {
-        let mut items = items.iter_mut().peekable();
-        while let Some(item) = items.next() {
+    fn comma_separated_with_rest<I, R>(&mut self, items: &mut Vec<I>, rest: &mut Option<R>)
+    where
+        I: Traverse,
+        R: Traverse,
+    {
+        let mut iter = items.iter_mut().peekable();
+        while let Some(item) = iter.next() {
             item.traverse(self);
-            if items.peek().is_some() {
+            if iter.peek().is_some() {
                 self.char(',');
                 self.space();
             }
+        }
+
+        if let Some(rest) = rest.as_mut() {
+            if !items.is_empty() {
+                self.char(',');
+                self.space();
+            }
+
+            self.string("...");
+            rest.traverse(self);
         }
     }
 }
@@ -505,14 +518,7 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_formal_parameters(&mut self, node: &mut FormalParameters) -> bool {
         self.char('(');
-
-        self.comma_separated(&mut node.bindings);
-
-        if let Some(rest) = node.rest.as_mut() {
-            self.string("...");
-            rest.traverse(self);
-        }
-
+        self.comma_separated_with_rest(&mut node.bindings, &mut node.rest);
         self.char(')');
         false
     }
@@ -618,19 +624,7 @@ impl Visitor for CodeGenerator<'_> {
 
         self.char('{');
         self.space();
-
-        self.comma_separated(&mut node.props);
-
-        if let Some(rest) = node.rest.as_mut() {
-            if !node.props.is_empty() {
-                self.char(',');
-                self.space();
-            }
-
-            self.string("...");
-            rest.traverse(self);
-        }
-
+        self.comma_separated_with_rest(&mut node.props, &mut node.rest);
         self.space();
         self.char('}');
         false
