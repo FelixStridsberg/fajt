@@ -27,9 +27,9 @@ fn run_test_file(filename: &str) {
     let test_file = TestFile::from(&filename);
     let input = test_file.source;
     let input_min = test_file.source_min;
-    let ast = parse_program(&input).unwrap();
+    let mut ast = parse_program(&input).unwrap();
 
-    let output = generate_code(ast, GeneratorContext::new());
+    let output = generate_code(&mut ast, GeneratorContext::new());
 
     assert_eq!(output, input);
 
@@ -37,8 +37,7 @@ fn run_test_file(filename: &str) {
         let mut ctx = GeneratorContext::new();
         ctx.minified = true;
 
-        let ast = parse_program(&input).unwrap();
-        let output_min = generate_code(ast, ctx);
+        let output_min = generate_code(&mut ast, ctx);
 
         assert_eq!(output_min, input_min.trim(), "Minified output mismatch.");
     }

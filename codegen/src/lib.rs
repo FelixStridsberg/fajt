@@ -3,7 +3,7 @@ use fajt_ast::*;
 use std::cell::Cell;
 use std::rc::Rc;
 
-pub fn generate_code(mut program: Program, ctx: GeneratorContext) -> String {
+pub fn generate_code(program: &mut Program, ctx: GeneratorContext) -> String {
     let mut data = String::new();
     let mut codegen = CodeGenerator::new(&mut data, ctx);
     program.traverse(&mut codegen);
