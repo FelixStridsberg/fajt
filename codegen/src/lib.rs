@@ -527,7 +527,9 @@ impl Visitor for CodeGenerator<'_> {
         node.pattern.traverse(self);
 
         if let Some(initializer) = node.initializer.as_mut() {
-            self.string(" = ");
+            self.space();
+            self.string("=");
+            self.space();
             initializer.traverse(self);
         }
         false
