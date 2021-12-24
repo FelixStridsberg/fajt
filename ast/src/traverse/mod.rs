@@ -46,6 +46,7 @@ generate_fold_and_visit! {
             Assignment
             Logical
             Call
+            Member
         }
 
         Stmt: (enter: enter_stmt, exit: exit_stmt) {
@@ -109,6 +110,15 @@ generate_fold_and_visit! {
             Expr
             Spread
         }
+
+        MemberObject: (enter: enter_member_object, exit: exit_member_object) {
+            Expr
+        }
+
+        MemberProperty: (enter: enter_member_property, exit: exit_member_property) {
+            Ident
+            Expr
+        }
     }
 
     structs: {
@@ -141,6 +151,11 @@ generate_fold_and_visit! {
         ExprCall: (enter: enter_call_expr, exit: exit_call_expr) {
             callee
             arguments
+        }
+
+        ExprMember: (enter: enter_member_expr, exit: exit_memeber_expr) {
+            object
+            property
         }
 
         ExprParenthesized: (enter: enter_parenthesized_expr, exit: exit_parenthesized_expr) {

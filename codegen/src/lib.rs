@@ -486,6 +486,13 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_member_expr(&mut self, node: &mut ExprMember) -> bool {
+        node.object.traverse(self);
+        self.char('.');
+        node.property.traverse(self);
+        false
+    }
+
     fn enter_argument(&mut self, node: &mut Argument) -> bool {
         match node {
             Argument::Expr(e) => e.traverse(self),
