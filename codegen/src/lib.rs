@@ -791,7 +791,7 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_debugger_stmt(&mut self, _node: &mut StmtDebugger) -> bool {
-        self.string("debugger");
+        self.string("debugger;");
         false
     }
 }
