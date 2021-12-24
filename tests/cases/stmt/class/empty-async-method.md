@@ -4,6 +4,10 @@ class cls {
 }
 ```
 
+```js min
+class cls{async method1(){}}
+```
+
 ```json
 {
   "Class": {

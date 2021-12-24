@@ -4,6 +4,10 @@ class cls {
 }
 ```
 
+```js min
+class cls{set setter(a){}}
+```
+
 ```json
 {
   "Class": {

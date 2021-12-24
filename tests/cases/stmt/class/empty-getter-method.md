@@ -4,6 +4,10 @@ class cls {
 }
 ```
 
+```js min
+class cls{get getter(){}}
+```
+
 ```json
 {
   "Class": {

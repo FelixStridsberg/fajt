@@ -6,6 +6,10 @@ class cls {
 }
 ```
 
+```js min
+class cls{*method1(){yield}}
+```
+
 ```json
 {
   "Class": {
