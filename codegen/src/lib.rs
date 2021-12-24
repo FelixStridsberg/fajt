@@ -26,7 +26,11 @@ impl GeneratorContext {
     }
 
     fn indentation(&self) -> usize {
-        self.indent * self.indent_size
+        if let Some(align) = self.align {
+            align
+        } else {
+            self.indent * self.indent_size
+        }
     }
 }
 
@@ -170,12 +174,7 @@ impl CodeGenerator<'_> {
             return;
         }
 
-        if let Some(align) = self.ctx.align {
-            self.data.push_str(&" ".repeat(align));
-        } else {
-            self.data
-                .push_str(&" ".repeat(self.ctx.indentation()));
-        }
+        self.data.push_str(&" ".repeat(self.ctx.indentation()));
     }
 }
 
