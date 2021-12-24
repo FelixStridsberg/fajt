@@ -486,10 +486,18 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
-    fn enter_member_expr(&mut self, node: &mut ExprMember) -> bool {
-        node.object.traverse(self);
-        self.char('.');
-        node.property.traverse(self);
+    fn enter_member_property(&mut self, node: &mut MemberProperty) -> bool {
+        match node {
+            MemberProperty::Ident(i) => {
+                self.char('.');
+                i.traverse(self)
+            },
+            MemberProperty::Expr(expr) => {
+                self.char('[');
+                expr.traverse(self);
+                self.char(']');
+            }
+        }
         false
     }
 

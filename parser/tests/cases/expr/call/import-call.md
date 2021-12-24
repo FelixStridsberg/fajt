@@ -1,9 +1,5 @@
 ```js
-import(a);
-```
-
-```js min
-import(a);
+import(a)
 ```
 
 ```json

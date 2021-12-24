@@ -142,7 +142,7 @@ generate_test_module!(
     mod_name: expr,
     ast_type: Expr,
     source_type: Script,
-    folders: ["tests/cases/expr"],
+    folders: ["tests/cases/expr", "parser/tests/cases/expr"],
 );
 
 generate_test_module!(
