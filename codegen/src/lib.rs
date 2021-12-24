@@ -1,8 +1,8 @@
+use fajt_ast::traverse::{Traverse, Visitor};
+use fajt_ast::*;
 use std::borrow::Borrow;
 use std::cell::RefCell;
 use std::rc::Rc;
-use fajt_ast::traverse::{Traverse, Visitor};
-use fajt_ast::*;
 
 const INDENTATION_SIZE: usize = 4;
 
@@ -32,7 +32,7 @@ impl GeneratorContext {
             pos: Rc::new(RefCell::new(Positions {
                 last_new_line: 0,
                 last_block_start: 0,
-            }))
+            })),
         }
     }
 
@@ -40,7 +40,7 @@ impl GeneratorContext {
         (*self.pos).borrow().last_new_line
     }
 
-    fn save_new_line(&mut self, pos: usize) {
+    fn set_new_line(&mut self, pos: usize) {
         self.pos.borrow_mut().last_new_line = pos;
     }
 
@@ -48,7 +48,7 @@ impl GeneratorContext {
         (*self.pos).borrow().last_block_start
     }
 
-    fn save_block_start(&mut self, pos: usize) {
+    fn set_block_start(&mut self, pos: usize) {
         self.pos.borrow_mut().last_block_start = pos;
     }
 }
@@ -75,7 +75,7 @@ impl CodeGenerator<'_> {
                 indent: self.ctx.indent + 1,
                 pos: self.ctx.pos.clone(),
                 ..self.ctx
-            }
+            },
         }
     }
 
@@ -86,14 +86,14 @@ impl CodeGenerator<'_> {
 
     fn block_start(&mut self) -> &mut Self {
         self.push('{').new_line();
-        self.ctx.save_block_start(self.data.len());
+        self.ctx.set_block_start(self.data.len());
         self
     }
 
     fn block_end(&mut self) -> &mut Self {
         if self.ctx.last_block_start() == self.data.len() {
             self.data.pop(); // Pop \n from empty blocks
-            self.ctx.save_new_line(0); // TODO make better
+            self.ctx.set_new_line(0); // TODO make better
         }
 
         self.push('}');
@@ -134,7 +134,7 @@ impl CodeGenerator<'_> {
 
     fn new_line(&mut self) -> &mut Self {
         self.push('\n');
-        self.ctx.save_new_line(self.data.len());
+        self.ctx.set_new_line(self.data.len());
         self
     }
 
