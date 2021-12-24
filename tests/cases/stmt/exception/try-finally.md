@@ -2,6 +2,10 @@
 try {} finally {}
 ```
 
+```js min
+try{}finally{}
+```
+
 ```json
 {
   "Try": {

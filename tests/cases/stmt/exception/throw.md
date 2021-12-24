@@ -2,6 +2,10 @@
 throw
 ```
 
+```js min
+throw
+```
+
 ```json
 {
   "Throw": {

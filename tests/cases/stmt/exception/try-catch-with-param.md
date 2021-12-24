@@ -2,6 +2,10 @@
 try {} catch (e) {}
 ```
 
+```js min
+try{}catch(e){}
+```
+
 ```json
 {
   "Try": {
