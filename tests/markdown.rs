@@ -28,6 +28,7 @@ impl TestFile {
         }
     }
 
+    #[allow(unused)]
     pub fn append_json_block(&self, data: &str) {
         let block = generate_code_block(data, "json");
 
@@ -38,6 +39,7 @@ impl TestFile {
         file.write_all(block.as_bytes()).unwrap();
     }
 
+    #[allow(unused)]
     pub fn replace_json_block(&self, contents: &str) {
         let data = read_string(&self.path);
 

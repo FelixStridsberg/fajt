@@ -5,7 +5,6 @@ mod markdown;
 use fajt_codegen::{generate_code, GeneratorContext};
 use fajt_parser::parse_program;
 use markdown::TestFile;
-use std::path::Path;
 
 fn run_test_file(filename: &str) {
     println!("Running: {}", filename);
