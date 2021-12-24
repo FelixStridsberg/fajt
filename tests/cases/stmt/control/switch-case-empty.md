@@ -4,6 +4,10 @@ switch (a) {
 }
 ```
 
+```js min
+switch(a){case b:}
+```
+
 ```json
 {
   "Switch": {

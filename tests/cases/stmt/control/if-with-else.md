@@ -5,6 +5,10 @@ else
     c;
 ```
 
+```js min
+if(a)b;else c
+```
+
 ```json
 {
   "If": {

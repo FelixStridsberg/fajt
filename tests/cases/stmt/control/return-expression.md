@@ -2,6 +2,10 @@
 return a;
 ```
 
+```js min
+return a
+```
+
 ```json
 {
   "Return": {
