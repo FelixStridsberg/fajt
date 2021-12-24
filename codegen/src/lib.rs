@@ -157,7 +157,7 @@ impl CodeGenerator<'_> {
         false
     }
 
-    fn last(&mut self) -> Option<char> {
+    fn last(&self) -> Option<char> {
         self.data.chars().last()
     }
 
@@ -182,7 +182,7 @@ impl CodeGenerator<'_> {
         self.indent();
 
         // Make sure we separate keywords
-        if self.last().map(|c| c.is_alphabetic()).unwrap_or(false) {
+        if self.must_add_space_before(str) {
             self.data.push(' ');
         }
 
@@ -242,6 +242,13 @@ impl CodeGenerator<'_> {
         }
 
         self.data.push_str(&" ".repeat(self.ctx.indentation()));
+    }
+
+    /// Check if a space must be added before adding str to avoid merging keywords or identifiers.
+    fn must_add_space_before(&self, str: &str) -> bool {
+        let last_is_alphanumeric =  self.last().map(char::is_alphanumeric).unwrap_or(false);
+        let first_is_alphanumeric = str.chars().next().map(char::is_alphanumeric).unwrap_or(false);
+        last_is_alphanumeric && first_is_alphanumeric
     }
 }
 
@@ -602,7 +609,7 @@ impl Visitor for CodeGenerator<'_> {
     fn enter_variable_stmt(&mut self, node: &mut StmtVariable) -> bool {
         let kind_str = node.kind.to_string();
         self.string(&kind_str);
-        self.char(' ');
+        self.space();
 
         let mut printer = self.with_align();
         let mut declarations = node.declarations.iter_mut().peekable();

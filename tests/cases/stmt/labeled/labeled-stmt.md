@@ -2,6 +2,10 @@
 label: a;
 ```
 
+```js min
+label:a
+```
+
 ```json
 {
   "Labeled": {

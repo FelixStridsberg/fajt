@@ -2,6 +2,10 @@
 var [ await, ...await ] = c;
 ```
 
+```js min
+var[await,...await]=c
+```
+
 ```json
 {
   "Variable": {

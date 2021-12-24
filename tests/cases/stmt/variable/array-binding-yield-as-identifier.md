@@ -2,6 +2,10 @@
 var [ yield, ...yield ] = c;
 ```
 
+```js min
+var[yield,...yield]=c
+```
+
 ```json
 {
   "Variable": {
