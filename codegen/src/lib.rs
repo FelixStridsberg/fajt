@@ -81,16 +81,6 @@ impl<'a> CodeGenerator<'a> {
 }
 
 impl CodeGenerator<'_> {
-    /// Current byte position from start.
-    fn pos(&self) -> usize {
-        self.data.len()
-    }
-
-    /// Current byte position from start of current line.
-    fn col_pos(&self) -> usize {
-        self.pos() - self.index.last_new_line.get()
-    }
-
     fn with_indent(&mut self) -> CodeGenerator<'_> {
         CodeGenerator {
             data: self.data,
@@ -114,13 +104,35 @@ impl CodeGenerator<'_> {
         }
     }
 
+    /// Current byte position from start.
+    fn pos(&self) -> usize {
+        self.data.len()
+    }
+
+    /// Current byte position from start of current line.
+    fn col_pos(&self) -> usize {
+        self.pos() - self.index.last_new_line.get()
+    }
+
+    fn char(&mut self, ch: char) -> &mut Self {
+        self.indent();
+        self.data.push(ch);
+        self
+    }
+
+    fn string(&mut self, str: &str) -> &mut Self {
+        self.indent();
+        self.data.push_str(str);
+        self
+    }
+
     fn space(&mut self) -> &mut Self {
-        self.push(' ');
+        self.char(' ');
         self
     }
 
     fn block_start(&mut self) -> &mut Self {
-        self.push('{').new_line();
+        self.char('{').new_line();
         self.index.set_block_start(self.pos());
         self
     }
@@ -135,24 +147,12 @@ impl CodeGenerator<'_> {
             self.index.set_new_line(0); // TODO make better
         }
 
-        self.push('}');
-        self
-    }
-
-    fn push(&mut self, ch: char) -> &mut Self {
-        self.indent();
-        self.data.push(ch);
+        self.char('}');
         self
     }
 
     fn pop(&mut self) {
         self.data.pop();
-    }
-
-    fn push_str(&mut self, str: &str) -> &mut Self {
-        self.indent();
-        self.data.push_str(str);
-        self
     }
 
     // Separation between logical sections, only adds a new line if not first in block or file.
@@ -164,7 +164,7 @@ impl CodeGenerator<'_> {
     }
 
     fn new_line(&mut self) -> &mut Self {
-        self.push('\n');
+        self.char('\n');
         self.index.set_new_line(self.pos());
         self
     }
@@ -187,20 +187,20 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_try_stmt(&mut self, node: &mut StmtTry) -> bool {
-        self.push_str("try");
+        self.string("try");
         self.space();
         node.block.traverse(self);
 
         if let Some(catch) = node.handler.as_mut() {
             self.space();
-            self.push_str("catch");
+            self.string("catch");
             self.space();
             catch.traverse(self);
         }
 
         if let Some(finalizer) = node.finalizer.as_mut() {
             self.space();
-            self.push_str("finally");
+            self.string("finally");
             self.space();
             finalizer.traverse(self);
         }
@@ -210,9 +210,9 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_catch_clause(&mut self, node: &mut CatchClause) -> bool {
         if node.parameter.is_some() {
-            self.push('(');
+            self.char('(');
             node.parameter.traverse(self);
-            self.push(')');
+            self.char(')');
             self.space();
         }
 
@@ -222,17 +222,17 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_labeled_stmt(&mut self, node: &mut StmtLabeled) -> bool {
         node.label.traverse(self);
-        self.push(':');
+        self.char(':');
         self.space();
         node.body.traverse(self);
         false
     }
 
     fn enter_throw_stmt(&mut self, node: &mut StmtThrow) -> bool {
-        self.push_str("throw");
+        self.string("throw");
 
         if node.argument.is_some() {
-            self.push(' ');
+            self.char(' ');
             node.argument.traverse(self);
         }
 
@@ -240,12 +240,12 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_switch_stmt(&mut self, node: &mut StmtSwitch) -> bool {
-        self.push_str("switch");
+        self.string("switch");
 
         self.space();
-        self.push('(');
+        self.char('(');
         node.discriminant.traverse(self);
-        self.push(')');
+        self.char(')');
         self.space();
 
         self.block_start();
@@ -256,18 +256,18 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_if_stmt(&mut self, node: &mut StmtIf) -> bool {
-        self.push_str("if");
+        self.string("if");
 
         self.space();
-        self.push('(');
+        self.char('(');
         node.condition.traverse(self);
-        self.push(')');
+        self.char(')');
         self.new_line();
 
         node.consequent.traverse(&mut self.with_indent());
 
         if node.alternate.is_some() {
-            self.push_str("else");
+            self.string("else");
             self.new_line();
 
             node.alternate.traverse(&mut self.with_indent());
@@ -277,18 +277,18 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_for_stmt(&mut self, node: &mut StmtFor) -> bool {
-        self.push_str("for");
+        self.string("for");
 
         self.space();
-        self.push('(');
+        self.char('(');
         node.init.traverse(self);
-        self.push(';');
+        self.char(';');
 
         node.test.traverse(self);
-        self.push(';');
+        self.char(';');
 
         node.update.traverse(self);
-        self.push(')');
+        self.char(')');
         self.space();
 
         node.body.traverse(self);
@@ -296,18 +296,18 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_for_of_stmt(&mut self, node: &mut StmtForOf) -> bool {
-        self.push_str("for");
+        self.string("for");
 
         if node.asynchronous {
-            self.push_str(" await");
+            self.string(" await");
         }
 
         self.space();
-        self.push('(');
+        self.char('(');
         node.left.traverse(self);
-        self.push_str(" of ");
+        self.string(" of ");
         node.right.traverse(self);
-        self.push(')');
+        self.char(')');
 
         self.space();
         node.body.traverse(self);
@@ -322,13 +322,13 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_for_in_stmt(&mut self, node: &mut StmtForIn) -> bool {
-        self.push_str("for");
+        self.string("for");
         self.space();
-        self.push('(');
+        self.char('(');
         node.left.traverse(self);
-        self.push_str(" in ");
+        self.string(" in ");
         node.right.traverse(self);
-        self.push(')');
+        self.char(')');
 
         self.space();
         node.body.traverse(self);
@@ -336,11 +336,11 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_while_stmt(&mut self, node: &mut StmtWhile) -> bool {
-        self.push_str("while");
+        self.string("while");
         self.space();
-        self.push('(');
+        self.char('(');
         node.test.traverse(self);
-        self.push(')');
+        self.char(')');
         self.space();
         node.body.traverse(self);
 
@@ -348,28 +348,28 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_do_while_stmt(&mut self, node: &mut StmtDoWhile) -> bool {
-        self.push_str("do ");
+        self.string("do ");
         node.body.traverse(self);
 
-        self.push_str("while");
+        self.string("while");
         self.space();
 
-        self.push('(');
+        self.char('(');
         node.test.traverse(self);
-        self.push(')');
+        self.char(')');
 
         false
     }
 
     fn enter_switch_case(&mut self, node: &mut SwitchCase) -> bool {
         if node.test.is_some() {
-            self.push_str("case ");
+            self.string("case ");
             node.test.traverse(self);
         } else {
-            self.push_str("default");
+            self.string("default");
         }
 
-        self.push(':');
+        self.char(':');
         self.new_line();
 
         node.consequent.traverse(&mut self.with_indent());
@@ -379,16 +379,16 @@ impl Visitor for CodeGenerator<'_> {
     fn enter_binary_expr(&mut self, node: &mut ExprBinary) -> bool {
         node.left.traverse(self);
         self.space();
-        self.push_str(&node.operator.to_string());
+        self.string(&node.operator.to_string());
         self.space();
         node.right.traverse(self);
         false
     }
 
     fn enter_parenthesized_expr(&mut self, node: &mut ExprParenthesized) -> bool {
-        self.push('(');
+        self.char('(');
         node.expression.traverse(self);
-        self.push(')');
+        self.char(')');
         false
     }
 
@@ -396,16 +396,16 @@ impl Visitor for CodeGenerator<'_> {
         self.separation();
 
         if node.asynchronous {
-            self.push_str("async ");
+            self.string("async ");
         }
 
-        self.push_str("function");
+        self.string("function");
 
         if node.generator {
-            self.push('*');
+            self.char('*');
         }
 
-        self.push(' ');
+        self.char(' ');
 
         node.identifier.traverse(self);
         node.parameters.traverse(self);
@@ -415,12 +415,12 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_class_decl(&mut self, node: &mut DeclClass) -> bool {
-        self.push_str("class ");
+        self.string("class ");
 
         node.identifier.traverse(self);
 
         if let Some(super_class) = node.super_class.as_mut() {
-            self.push_str(" extends ");
+            self.string(" extends ");
             super_class.traverse(self);
         }
 
@@ -434,20 +434,20 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_class_method(&mut self, node: &mut ClassMethod) -> bool {
         if node.asynchronous {
-            self.push_str("async ");
+            self.string("async ");
         }
 
         if node.generator {
-            self.push('*');
+            self.char('*');
         }
 
         match node.kind {
             ClassMethodKind::Method => {}
             ClassMethodKind::Get => {
-                self.push_str("get ");
+                self.string("get ");
             }
             ClassMethodKind::Set => {
-                self.push_str("set ");
+                self.string("set ");
             }
         }
 
@@ -466,7 +466,7 @@ impl Visitor for CodeGenerator<'_> {
         let mut printer = self.with_indent();
         for x in &mut node.directives {
             x.traverse(&mut printer);
-            printer.push(';');
+            printer.char(';');
             printer.new_line();
         }
 
@@ -476,40 +476,40 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_return_stmt(&mut self, node: &mut StmtReturn) -> bool {
-        self.push_str("return");
+        self.string("return");
 
         if node.argument.is_some() {
-            self.push(' ');
+            self.char(' ');
             node.argument.traverse(self);
         }
 
-        self.push(';');
+        self.char(';');
         false
     }
 
     fn enter_formal_parameters(&mut self, node: &mut FormalParameters) -> bool {
-        self.push('(');
+        self.char('(');
 
         let mut bindings = node.bindings.iter_mut().peekable();
         while let Some(bind) = bindings.next() {
             bind.traverse(self);
             if bindings.peek().is_some() {
-                self.push(',');
+                self.char(',');
                 self.space();
             }
         }
 
         if let Some(rest) = node.rest.as_mut() {
-            self.push_str("...");
+            self.string("...");
             rest.traverse(self);
         }
 
-        self.push(')');
+        self.char(')');
         false
     }
 
     fn enter_empty_statement(&mut self, _node: &mut StmtEmpty) -> bool {
-        self.push(';');
+        self.char(';');
         false
     }
 
@@ -517,21 +517,21 @@ impl Visitor for CodeGenerator<'_> {
         node.pattern.traverse(self);
 
         if let Some(initializer) = node.initializer.as_mut() {
-            self.push_str(" = ");
+            self.string(" = ");
             initializer.traverse(self);
         }
         false
     }
 
     fn enter_yield_expr(&mut self, node: &mut ExprYield) -> bool {
-        self.push_str("yield");
+        self.string("yield");
 
         if node.delegate {
-            self.push('*');
+            self.char('*');
         }
 
         if node.argument.is_some() {
-            self.push(' ');
+            self.char(' ');
             node.argument.traverse(self);
         }
 
@@ -540,8 +540,8 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_variable_stmt(&mut self, node: &mut StmtVariable) -> bool {
         let kind_str = node.kind.to_string();
-        self.push_str(&kind_str);
-        self.push(' ');
+        self.string(&kind_str);
+        self.char(' ');
 
         let mut printer = self.with_align();
         let mut declarations = node.declarations.iter_mut().peekable();
@@ -549,14 +549,14 @@ impl Visitor for CodeGenerator<'_> {
             decl.traverse(&mut printer);
 
             if declarations.peek().is_some() {
-                printer.push(',');
+                printer.char(',');
                 if decl.initializer.is_some() {
                     printer.new_line();
                 } else {
-                    printer.push(' ');
+                    printer.char(' ');
                 }
             } else {
-                printer.push(';');
+                printer.char(';');
             }
         }
 
@@ -565,11 +565,11 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_array_binding(&mut self, node: &mut ArrayBinding) -> bool {
         if node.rest.is_none() && node.elements.is_empty() {
-            self.push_str("[]");
+            self.string("[]");
             return false;
         }
 
-        self.push('[');
+        self.char('[');
         self.space();
 
         let mut elements = node.elements.iter_mut().peekable();
@@ -577,7 +577,7 @@ impl Visitor for CodeGenerator<'_> {
             element.traverse(self);
 
             if elements.peek().is_some() || element.is_none() {
-                self.push(',');
+                self.char(',');
             }
 
             if elements.peek().is_some() {
@@ -587,27 +587,27 @@ impl Visitor for CodeGenerator<'_> {
 
         if let Some(rest) = node.rest.as_mut() {
             if !node.elements.is_empty() {
-                self.push(',');
+                self.char(',');
                 self.space();
             }
 
-            self.push_str("...");
+            self.string("...");
             rest.traverse(self);
         }
 
         self.space();
-        self.push(']');
+        self.char(']');
 
         false
     }
 
     fn enter_object_binding(&mut self, node: &mut ObjectBinding) -> bool {
         if node.rest.is_none() && node.props.is_empty() {
-            self.push_str("{}");
+            self.string("{}");
             return false;
         }
 
-        self.push('{');
+        self.char('{');
         self.space();
 
         let mut props = node.props.iter_mut().peekable();
@@ -615,23 +615,23 @@ impl Visitor for CodeGenerator<'_> {
             element.traverse(self);
 
             if props.peek().is_some() {
-                self.push(',');
+                self.char(',');
                 self.space();
             }
         }
 
         if let Some(rest) = node.rest.as_mut() {
             if !node.props.is_empty() {
-                self.push(',');
+                self.char(',');
                 self.space();
             }
 
-            self.push_str("...");
+            self.string("...");
             rest.traverse(self);
         }
 
         self.space();
-        self.push('}');
+        self.char('}');
         false
     }
 
@@ -642,14 +642,14 @@ impl Visitor for CodeGenerator<'_> {
 
                 if let Some(initializer) = initializer {
                     self.space();
-                    self.push('=');
+                    self.char('=');
                     self.space();
                     initializer.traverse(self);
                 }
             }
             ObjectBindingProp::KeyValue(name, prop) => {
                 name.traverse(self);
-                self.push(':');
+                self.char(':');
                 self.space();
                 prop.traverse(self);
             }
@@ -661,7 +661,7 @@ impl Visitor for CodeGenerator<'_> {
         node.pattern.traverse(self);
 
         if let Some(initializer) = node.initializer.as_mut() {
-            self.push_str(" = ");
+            self.string(" = ");
             initializer.traverse(self);
         }
 
@@ -671,13 +671,13 @@ impl Visitor for CodeGenerator<'_> {
     fn enter_literal(&mut self, node: &mut Literal) -> bool {
         match node {
             Literal::Null => {
-                self.push_str("null");
+                self.string("null");
             }
             Literal::Boolean(true) => {
-                self.push_str("true");
+                self.string("true");
             }
             Literal::Boolean(false) => {
-                self.push_str("false");
+                self.string("false");
             }
             _ => {
                 return true;
@@ -688,15 +688,15 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_string_literal(&mut self, node: &mut LitString) -> bool {
-        self.push(node.delimiter);
-        self.push_str(&node.value);
-        self.push(node.delimiter);
+        self.char(node.delimiter);
+        self.string(&node.value);
+        self.char(node.delimiter);
         false
     }
 
     fn enter_object_literal(&mut self, node: &mut Object) -> bool {
         if node.props.is_empty() {
-            self.push_str("{}");
+            self.string("{}");
         } else {
             todo!()
         }
@@ -704,32 +704,32 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_continue_stmt(&mut self, node: &mut StmtContinue) -> bool {
-        self.push_str("continue");
+        self.string("continue");
 
         if node.label.is_some() {
-            self.push(' ');
+            self.char(' ');
             node.label.traverse(self);
         }
 
-        self.push(';');
+        self.char(';');
 
         false
     }
 
     fn enter_break_stmt(&mut self, node: &mut StmtBreak) -> bool {
-        self.push_str("break");
+        self.string("break");
 
         if node.label.is_some() {
-            self.push(' ');
+            self.char(' ');
             node.label.traverse(self);
         }
 
-        self.push(';');
+        self.char(';');
         false
     }
 
     fn exit_stmt_expr(&mut self, _node: &mut StmtExpr) {
-        self.push(';');
+        self.char(';');
     }
 
     fn exit_stmt(&mut self, _node: &mut Stmt) {
@@ -739,9 +739,9 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_with_stmt(&mut self, node: &mut StmtWith) -> bool {
-        self.push_str("with(");
+        self.string("with(");
         node.object.traverse(self);
-        self.push(')');
+        self.char(')');
         self.space();
         node.body.traverse(self);
         false
@@ -750,7 +750,7 @@ impl Visitor for CodeGenerator<'_> {
     fn enter_number(&mut self, node: &mut Number) -> bool {
         match node {
             Number::Integer(n, _) => {
-                self.push_str(&n.to_string());
+                self.string(&n.to_string());
             }
             Number::Decimal(_) => {}
         }
@@ -759,12 +759,12 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_ident(&mut self, node: &mut Ident) -> bool {
-        self.push_str(&node.name);
+        self.string(&node.name);
         false
     }
 
     fn enter_debugger_stmt(&mut self, _node: &mut StmtDebugger) -> bool {
-        self.push_str("debugger");
+        self.string("debugger");
         false
     }
 }
