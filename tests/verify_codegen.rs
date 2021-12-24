@@ -8,20 +8,6 @@ use markdown::TestFile;
 use std::path::Path;
 
 fn run_test_file(filename: &str) {
-    let path = Path::new(filename);
-    if path
-        .file_name()
-        .unwrap()
-        .to_string_lossy()
-        .starts_with("fail-")
-    {
-        println!(
-            "Skipping {}, cannot generate code from failing source.",
-            filename
-        );
-        return;
-    }
-
     println!("Running: {}", filename);
 
     let test_file = TestFile::from(&filename);
