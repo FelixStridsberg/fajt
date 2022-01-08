@@ -1,31 +1,38 @@
 extern crate fajt_macros;
 extern crate fajt_testing;
 
+const MINIFIED_SECTION: &str = "Output: minified";
+
 use fajt_codegen::{generate_code, GeneratorContext};
 use fajt_parser::parse_program;
 use fajt_testing::markdown::Markdown;
-use fajt_testing::read_string;
+use fajt_testing::{read_string, write_string};
 
 fn run_test_file(filename: &str) {
     println!("Running: {}", filename);
 
     let data = read_string(filename.as_ref());
-    let test_file = Markdown::from_string(&data);
+    let mut test_file = Markdown::from_string(&data);
     let input = test_file.get_code("Input").unwrap();
-    let input_min = test_file.get_code("Ouput: minified");
     let mut ast = parse_program(&input).unwrap();
 
     let output = generate_code(&mut ast, GeneratorContext::new());
 
     assert_eq!(output, input);
 
-    if let Some(input_min) = input_min {
+    if test_file.has_section(MINIFIED_SECTION) {
         let mut ctx = GeneratorContext::new();
         ctx.minified = true;
 
         let output_min = generate_code(&mut ast, ctx);
 
-        assert_eq!(output_min, input_min.trim(), "Minified output mismatch.");
+        if let Some(expected_minified) = test_file.get_code(MINIFIED_SECTION) {
+            assert_eq!(output_min, expected_minified.trim(), "Minified output mismatch.");
+        } else {
+            test_file.set_code(MINIFIED_SECTION, "js", &output_min);
+            write_string(filename.as_ref(), &test_file.to_string());
+            panic!("No minified output found in this test. Output generated, verify and rerun.");
+        }
     }
 }
 
