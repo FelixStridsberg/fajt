@@ -26,7 +26,7 @@ extern crate fajt_testing;
 use fajt_ast::SourceType;
 use fajt_parser::error::{ErrorKind, Result};
 use fajt_parser::{parse, Parse};
-use fajt_testing::markdown::{read_string, Markdown};
+use fajt_testing::markdown::{read_string, Markdown, write_string};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::Debug;
@@ -41,14 +41,20 @@ where
     println!("Running: {}", path);
 
     let data = read_string(path.as_ref());
-    let test_file = Markdown::from_string(&data);
+    let mut test_file = Markdown::from_string(&data);
     let result = parse::<T>(&test_file.get_code("Input").unwrap(), source_type);
 
     let ast = test_file.get_code("Output: ast");
     if ast.is_none() {
         // If the test file contain no output, we generate that from result of running the code.
         // I.e. you can add a test file with just code to generate the result.
-        generate_expected_output(result, test_file);
+
+        //generate_expected_output(result, test_file);
+
+        let output = result_to_string(result);
+        test_file.set_code("Output: ast", "json", &output);
+        write_string(path.as_ref(), &test_file.to_string());
+
         panic!("No ast found in this test. Output generated, verify and rerun.");
     }
 
@@ -69,6 +75,17 @@ where
 
         let expected_error: ErrorKind = serde_json::from_str(&ast_json).unwrap();
         assert_eq!(error.kind(), &expected_error)
+    }
+}
+
+fn result_to_string<T>(result: Result<T>) -> String
+    where
+        T: Parse + Serialize + Debug,
+{
+    if let Ok(result) = result {
+        serde_json::to_string_pretty(&result).unwrap()
+    } else {
+        serde_json::to_string_pretty(&result.unwrap_err().kind()).unwrap()
     }
 }
 
