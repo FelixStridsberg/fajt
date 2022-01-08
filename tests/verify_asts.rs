@@ -26,7 +26,7 @@ extern crate fajt_testing;
 use fajt_ast::SourceType;
 use fajt_parser::error::{ErrorKind, Result};
 use fajt_parser::{parse, Parse};
-use fajt_testing::markdown::TestFile;
+use fajt_testing::markdown::Markdown;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::Debug;
@@ -40,7 +40,7 @@ where
 {
     println!("Running: {}", path);
 
-    let test_file = TestFile::from(&path);
+    let test_file = Markdown::from(&path);
     let result = parse::<T>(&test_file.source, source_type);
 
     if test_file.ast.is_none() {
@@ -70,7 +70,7 @@ where
     }
 }
 
-fn generate_expected_output<T>(result: Result<T>, test_file: TestFile)
+fn generate_expected_output<T>(result: Result<T>, test_file: Markdown)
 where
     T: Parse + Serialize + Debug,
 {
@@ -84,7 +84,7 @@ where
 }
 
 #[allow(unused)]
-fn regenerate_asts<T>(result: Result<T>, test_file: TestFile)
+fn regenerate_asts<T>(result: Result<T>, test_file: Markdown)
 where
     T: DeserializeOwned + Serialize + PartialEq + Debug,
 {

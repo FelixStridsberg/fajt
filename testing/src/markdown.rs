@@ -2,14 +2,14 @@ use std::fs::{File, OpenOptions};
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
 
-pub struct TestFile {
+pub struct Markdown {
     path: PathBuf,
     pub source: String,
     pub source_min: Option<String>,
     pub ast: Option<String>,
 }
 
-impl TestFile {
+impl Markdown {
     pub fn from<P: AsRef<Path>>(path: &P) -> Self {
         let data = read_string(path.as_ref());
 
@@ -20,7 +20,7 @@ impl TestFile {
         let source_min = get_code_block(&data, "js min").map(&str::to_owned);
         let ast = get_code_block(&data, "json").map(&str::to_owned);
 
-        TestFile {
+        Markdown {
             path: PathBuf::from(path.as_ref()),
             source,
             source_min,
