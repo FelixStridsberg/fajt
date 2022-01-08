@@ -1,5 +1,5 @@
 ### Input
-```js
+```js parse:expr
 class {
   async method1() {
     yield

@@ -1,5 +1,5 @@
 ### Input
-```js
+```js parse:stmt
 async function fn() { var await = 1 }
 ```
 

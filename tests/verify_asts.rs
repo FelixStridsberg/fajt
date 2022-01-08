@@ -23,7 +23,7 @@
 extern crate fajt_macros;
 extern crate fajt_testing;
 
-use fajt_ast::SourceType;
+use fajt_ast::{Expr, Program, SourceType, Stmt};
 use fajt_parser::error::{ErrorKind, Result};
 use fajt_parser::{parse, Parse};
 use fajt_testing::markdown::Markdown;
@@ -35,30 +35,56 @@ use std::fmt::Debug;
 const AST_SECTION: &str = "Output: ast";
 // TODO possibility to regenerate all asts.
 
-// This runs for each .md file in the ./cases folder.
-fn run_test_file<T>(path: &str, source_type: SourceType)
+fn parse_and_test<T>(path: &str, test: Markdown, source_type: SourceType)
 where
     T: Parse + Serialize + DeserializeOwned + PartialEq + Debug,
 {
-    println!("Running: {}", path);
+    let mut test = test;
+    let result = parse::<T>(&test.get_code("Input").unwrap(), source_type);
 
-    let data = read_string(path.as_ref());
-    let mut test_file = Markdown::from_string(&data);
-    let result = parse::<T>(&test_file.get_code("Input").unwrap(), source_type);
-
-    if let Some(ast_section) = test_file.get_section(AST_SECTION) {
+    if let Some(ast_section) = test.get_section(AST_SECTION) {
         if let Some(ast) = ast_section.get_code() {
             assert_result(result, ast);
         } else {
             // Section exists but ast missing, generate it.
             let output = result_to_string(result);
 
-            test_file.set_code(AST_SECTION, "json", &output);
-            write_string(path.as_ref(), &test_file.to_string());
+            test.set_code(AST_SECTION, "json", &output);
+            write_string(path.as_ref(), &test.to_string());
 
             panic!("Ast generated. Verify and rerun test.");
         }
     }
+}
+
+// This runs for each .md file in the ./cases folder.
+fn run_test_file(path: &str, source_type: SourceType) {
+    println!("Running: {}", path);
+
+    let data = read_string(path.as_ref());
+    let test = Markdown::from_string(&data);
+
+    if let Some(input_block) = test
+        .get_section("Input")
+        .map(|section| section.block.as_ref())
+        .flatten()
+    {
+        let parse_type = get_parse_type(input_block.language);
+        match parse_type {
+            "expr" => parse_and_test::<Expr>(path, test, source_type),
+            "stmt" => parse_and_test::<Stmt>(path, test, source_type),
+            _ => parse_and_test::<Program>(path, test, source_type),
+        };
+    }
+}
+
+fn get_parse_type(title: &str) -> &str {
+    title
+        .split(' ')
+        .find(|s| s.starts_with("parse:"))
+        .map(|attr| attr.split(':').next_back())
+        .flatten()
+        .unwrap_or("program")
 }
 
 fn assert_result<T>(result: Result<T>, ast_json: &str)
@@ -108,17 +134,15 @@ macro_rules! generate_test_cases {
 macro_rules! generate_test_module {
     (
         mod_name: $mod_name:ident,
-        ast_type: $ast_type:ident,
         source_type: $source_type:ident,
         folders: [$( $folder:literal ),*],
     ) => {
         mod $mod_name {
             use fajt_macros::for_each_file;
-            use fajt_ast::$ast_type;
             use fajt_ast::SourceType::$source_type;
 
             fn run_test(test_file: &str) {
-                $crate::run_test_file::<$ast_type>(&test_file, $source_type);
+                $crate::run_test_file(&test_file, $source_type);
             }
 
             $(
@@ -130,49 +154,42 @@ macro_rules! generate_test_module {
 
 generate_test_module!(
     mod_name: expr,
-    ast_type: Expr,
     source_type: Script,
     folders: ["tests/cases/expr", "parser/tests/cases/expr"],
 );
 
 generate_test_module!(
     mod_name: stmt,
-    ast_type: Stmt,
     source_type: Script,
     folders: ["tests/cases/stmt", "parser/tests/cases/stmt"],
 );
 
 generate_test_module!(
     mod_name: decl,
-    ast_type: Stmt,
     source_type: Script,
     folders: ["tests/cases/decl"],
 );
 
 generate_test_module!(
     mod_name: semicolon,
-    ast_type: Program,
     source_type: Unknown,
     folders: ["parser/tests/cases/semicolon"],
 );
 
 generate_test_module!(
     mod_name: strict_mode,
-    ast_type: Program,
     source_type: Script,
     folders: ["parser/tests/cases/strict-mode"],
 );
 
 generate_test_module!(
     mod_name: source_module,
-    ast_type: Program,
     source_type: Module,
     folders: ["tests/cases/source-module"],
 );
 
 generate_test_module!(
     mod_name: source_script,
-    ast_type: Program,
     source_type: Script,
     folders: ["parser/tests/cases/source-script"],
 );

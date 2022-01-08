@@ -1,5 +1,5 @@
 ### Input
-```js
+```js parse:stmt
 if (a)
     b;
 else

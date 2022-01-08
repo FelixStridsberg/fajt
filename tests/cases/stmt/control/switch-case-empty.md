@@ -1,5 +1,5 @@
 ### Input
-```js
+```js parse:stmt
 switch (a) {
     case b:
 }

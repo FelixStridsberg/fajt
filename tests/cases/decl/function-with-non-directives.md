@@ -1,5 +1,5 @@
 ### Input
-```js
+```js parse:stmt
 function fn() {
     ;
     "use strict";

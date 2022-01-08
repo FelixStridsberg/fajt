@@ -1,5 +1,5 @@
 ### Input
-```js
+```js parse:stmt
 var { ...rest, b } = c;
 ```
 

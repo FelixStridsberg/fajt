@@ -1,5 +1,5 @@
 ### Input
-```js
+```js parse:stmt
 class cls {
     set setter(a) {}
 }

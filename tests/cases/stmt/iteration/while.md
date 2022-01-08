@@ -1,5 +1,5 @@
 ### Input
-```js
+```js parse:stmt
 while (true) a;
 ```
 

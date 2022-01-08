@@ -1,5 +1,5 @@
 ### Input
-```js
+```js parse:stmt
 class MyClass extends SuperClass {}
 ```
 

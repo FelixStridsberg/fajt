@@ -1,5 +1,5 @@
 ### Input
-```js
+```js parse:expr
 "this is string"
 ```
 
