@@ -1,3 +1,4 @@
+### Input
 ```js
 export default 1 + 10
 ```

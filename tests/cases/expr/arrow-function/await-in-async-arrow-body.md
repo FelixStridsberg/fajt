@@ -1,3 +1,4 @@
+### Input
 ```js
 async () => {
   await b;

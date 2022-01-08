@@ -1,3 +1,4 @@
+### Input
 ```js
 a instanceof b instanceof c;
 ```

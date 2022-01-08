@@ -1,3 +1,4 @@
+### Input
 ```js
 for (var a of b) ;
 ```

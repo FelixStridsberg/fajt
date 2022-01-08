@@ -1,3 +1,4 @@
+### Input
 ```js
 async function fn() {
     for await (a of b) ;

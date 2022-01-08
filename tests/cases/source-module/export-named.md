@@ -1,3 +1,4 @@
+### Input
 ```js
 export { a, b as c }
 ```

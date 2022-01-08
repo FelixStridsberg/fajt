@@ -1,3 +1,4 @@
+### Input
 ```js
 var { yield, ...yield } = c;
 ```

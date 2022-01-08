@@ -1,3 +1,4 @@
+### Input
 This may seem weird at first glance that `new new a()?.b` fails but `new a()?.b` is valid. That's
 because only nested `new` are `NewExpression`, non nested `new` are `MemberExpression`.
 

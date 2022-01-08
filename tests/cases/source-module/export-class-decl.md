@@ -1,3 +1,4 @@
+### Input
 ```js
 export class cls {}
 ```

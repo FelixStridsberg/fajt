@@ -1,3 +1,4 @@
+### Input
 ```js
 delete a
 ```

@@ -1,3 +1,4 @@
+### Input
 Class definitions are always strict mode.
 ```js
 var cls = class {

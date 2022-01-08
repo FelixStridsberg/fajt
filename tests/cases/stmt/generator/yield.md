@@ -1,3 +1,4 @@
+### Input
 ```js
 function* fn() {
     yield a;

@@ -1,3 +1,4 @@
+### Input
 ```js
 var { a = b } = c;
 ```

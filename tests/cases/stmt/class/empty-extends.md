@@ -1,3 +1,4 @@
+### Input
 ```js
 class MyClass extends SuperClass {}
 ```

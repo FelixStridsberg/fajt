@@ -1,3 +1,4 @@
+### Input
 ```js
 do a;
 while (true)

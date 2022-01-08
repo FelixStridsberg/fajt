@@ -1,3 +1,4 @@
+### Input
 ```js
 async a => b
 ```

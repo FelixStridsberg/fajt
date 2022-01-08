@@ -1,3 +1,4 @@
+### Input
 ```js
 export * as alias from 'other-module'
 ```

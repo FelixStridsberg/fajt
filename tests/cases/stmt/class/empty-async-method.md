@@ -1,3 +1,4 @@
+### Input
 ```js
 class cls {
     async method1() {}

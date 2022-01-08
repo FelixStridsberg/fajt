@@ -1,3 +1,4 @@
+### Input
 ```js
 function fn() {
     var await = 1;

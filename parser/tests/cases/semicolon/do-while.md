@@ -1,3 +1,4 @@
+### Input
 ```js
 do {} while(true)
 do {} while (true);

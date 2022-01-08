@@ -1,3 +1,4 @@
+### Input
 ```js
 import { a, b as c } from 'module'
 ```
