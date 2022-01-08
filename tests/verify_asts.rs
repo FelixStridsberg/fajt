@@ -21,13 +21,12 @@
 //! ASTs in the test cases and just verify the diff instead of manually refactoring hundreds of
 //! test assertions.
 extern crate fajt_macros;
-
-mod markdown;
+extern crate fajt_testing;
 
 use fajt_ast::SourceType;
 use fajt_parser::error::{ErrorKind, Result};
 use fajt_parser::{parse, Parse};
-use markdown::TestFile;
+use fajt_testing::markdown::TestFile;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::Debug;

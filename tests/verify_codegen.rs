@@ -1,10 +1,9 @@
 extern crate fajt_macros;
-
-mod markdown;
+extern crate fajt_testing;
 
 use fajt_codegen::{generate_code, GeneratorContext};
 use fajt_parser::parse_program;
-use markdown::TestFile;
+use fajt_testing::markdown::TestFile;
 
 fn run_test_file(filename: &str) {
     println!("Running: {}", filename);

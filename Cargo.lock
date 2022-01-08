@@ -52,6 +52,7 @@ dependencies = [
  "fajt_codegen",
  "fajt_macros",
  "fajt_parser",
+ "fajt_testing",
  "serde",
  "serde_json",
 ]
@@ -109,6 +110,10 @@ dependencies = [
  "serde",
  "serde_json",
 ]
+
+[[package]]
+name = "fajt_testing"
+version = "0.1.0"
 
 [[package]]
 name = "hermit-abi"
