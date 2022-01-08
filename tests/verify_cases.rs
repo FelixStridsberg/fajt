@@ -65,8 +65,6 @@ const INPUT_SECTION: &str = "Input";
 const MINIFIED_SECTION: &str = "Output: minified";
 const AST_SECTION: &str = "Output: ast";
 
-// TODO possibility to regenerate all output.
-
 // This runs for each .md file in the ./cases folder.
 fn run_test(path: &str) {
     println!("Running: {}", path);
