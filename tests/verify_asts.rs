@@ -26,7 +26,8 @@ extern crate fajt_testing;
 use fajt_ast::SourceType;
 use fajt_parser::error::{ErrorKind, Result};
 use fajt_parser::{parse, Parse};
-use fajt_testing::markdown::{read_string, Markdown, write_string};
+use fajt_testing::markdown::Markdown;
+use fajt_testing::{read_string, write_string};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::Debug;
@@ -48,9 +49,6 @@ where
     if ast.is_none() {
         // If the test file contain no output, we generate that from result of running the code.
         // I.e. you can add a test file with just code to generate the result.
-
-        //generate_expected_output(result, test_file);
-
         let output = result_to_string(result);
         test_file.set_code("Output: ast", "json", &output);
         write_string(path.as_ref(), &test_file.to_string());
@@ -79,40 +77,13 @@ where
 }
 
 fn result_to_string<T>(result: Result<T>) -> String
-    where
-        T: Parse + Serialize + Debug,
+where
+    T: Parse + Serialize + Debug,
 {
     if let Ok(result) = result {
         serde_json::to_string_pretty(&result).unwrap()
     } else {
         serde_json::to_string_pretty(&result.unwrap_err().kind()).unwrap()
-    }
-}
-
-fn generate_expected_output<T>(result: Result<T>, test_file: Markdown)
-where
-    T: Parse + Serialize + Debug,
-{
-    if let Ok(result) = result {
-        let json = serde_json::to_string_pretty(&result).unwrap();
-        test_file.append_json_block(&json);
-    } else {
-        let error = serde_json::to_string_pretty(&result.unwrap_err().kind()).unwrap();
-        test_file.append_json_block(&error);
-    }
-}
-
-#[allow(unused)]
-fn regenerate_asts<T>(result: Result<T>, test_file: Markdown)
-where
-    T: DeserializeOwned + Serialize + PartialEq + Debug,
-{
-    if let Ok(result) = result {
-        let json = serde_json::to_string_pretty(&result).unwrap();
-        test_file.replace_json_block(&json)
-    } else {
-        let json = serde_json::to_string_pretty(&result.unwrap_err().kind()).unwrap();
-        test_file.replace_json_block(&json)
     }
 }
 
