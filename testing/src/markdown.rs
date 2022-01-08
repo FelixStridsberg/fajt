@@ -10,7 +10,7 @@ pub struct Markdown<'a> {
 
 impl<'a> Markdown<'a> {
     pub fn from_string(data: &'a str) -> Self {
-        let sections = MarkdownSection::from_string(&data);
+        let sections = MarkdownSection::from_string(data);
         Markdown { sections }
     }
 

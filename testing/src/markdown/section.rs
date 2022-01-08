@@ -16,10 +16,8 @@ pub struct MarkdownBlock<'a> {
 impl MarkdownSection<'_> {
     pub fn from_string(data: &str) -> Vec<MarkdownSection> {
         let reg = Regex::new(r"(?m)^###").unwrap();
-        let sections: Vec<&str> = reg.split(&data).filter(|s| !s.is_empty()).collect();
-
-        sections
-            .into_iter()
+        reg.split(data)
+            .filter(|s| !s.is_empty())
             .map(|section| {
                 let (name, content) = split_title(section);
                 let (text, block) = split_code_block(content);
@@ -63,10 +61,13 @@ impl ToString for MarkdownSection<'_> {
         string.push_str(self.name);
         string.push('\n');
 
-        self.text.map(|text| string.push_str(text));
-        self.block
-            .as_ref()
-            .map(|block| string.push_str(&block.to_string()));
+        if let Some(text) = self.text {
+            string.push_str(text);
+        }
+
+        if let Some(block) = self.block.as_ref() {
+            string.push_str(&block.to_string());
+        }
 
         string
     }

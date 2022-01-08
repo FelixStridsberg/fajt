@@ -23,7 +23,9 @@
 extern crate fajt_macros;
 extern crate fajt_testing;
 
+use fajt_ast::traverse::Traverse;
 use fajt_ast::{Expr, Program, SourceType, Stmt};
+use fajt_codegen::{generate_code, GeneratorContext};
 use fajt_parser::error::{ErrorKind, Result};
 use fajt_parser::{parse, Parse};
 use fajt_testing::markdown::Markdown;
@@ -31,8 +33,6 @@ use fajt_testing::{read_string, write_string};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::Debug;
-use fajt_ast::traverse::Traverse;
-use fajt_codegen::{generate_code, GeneratorContext};
 
 const INPUT_SECTION: &str = "Input";
 const MINIFIED_SECTION: &str = "Output: minified";
@@ -100,8 +100,8 @@ where
 }
 
 fn assert_result<T>(result: &Result<T>, ast_json: &str)
-    where
-        T: Parse + Serialize + DeserializeOwned + PartialEq + Debug,
+where
+    T: Parse + Serialize + DeserializeOwned + PartialEq + Debug,
 {
     if let Ok(result) = result {
         let expected_expr: T = serde_json::from_str(&ast_json).unwrap();
