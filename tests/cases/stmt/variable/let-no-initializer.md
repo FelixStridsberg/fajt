@@ -3,6 +3,7 @@
 let foo;
 ```
 
+### Output: minified
 ```js min
 let foo
 ```

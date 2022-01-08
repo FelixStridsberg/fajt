@@ -3,6 +3,7 @@
 for (const a;;) ;
 ```
 
+### Output: minified
 ```js min
 for(const a;;);
 ```

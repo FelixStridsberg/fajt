@@ -3,6 +3,7 @@
 var [ yield, ...yield ] = c;
 ```
 
+### Output: minified
 ```js min
 var[yield,...yield]=c
 ```

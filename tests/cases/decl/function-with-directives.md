@@ -7,6 +7,7 @@ function fn() {
 }
 ```
 
+### Output: minified
 ```js min
 function fn(){"use strict";'custom1';"custom2"}
 ```

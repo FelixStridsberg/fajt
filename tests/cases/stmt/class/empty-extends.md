@@ -3,6 +3,7 @@
 class MyClass extends SuperClass {}
 ```
 
+### Output: minified
 ```js min
 class MyClass extends SuperClass{}
 ```

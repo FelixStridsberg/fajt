@@ -3,6 +3,7 @@
 try {} finally {}
 ```
 
+### Output: minified
 ```js min
 try{}finally{}
 ```

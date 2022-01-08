@@ -3,6 +3,7 @@
 var { ...rest } = c;
 ```
 
+### Output: minified
 ```js min
 var{...rest}=c
 ```

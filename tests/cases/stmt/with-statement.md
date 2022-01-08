@@ -3,6 +3,7 @@
 with({}) {}
 ```
 
+### Output: minified
 ```js min
 with({}){}
 ```

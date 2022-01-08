@@ -3,6 +3,7 @@
 for (let a;;) ;
 ```
 
+### Output: minified
 ```js min
 for(let a;;);
 ```

@@ -3,6 +3,7 @@
 class cls {}
 ```
 
+### Output: minified
 ```js min
 class cls{}
 ```

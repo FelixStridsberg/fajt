@@ -3,6 +3,7 @@
 a >>>= b;
 ```
 
+### Output: minified
 ```js min
 a>>>=b
 ```

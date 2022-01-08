@@ -4,6 +4,7 @@ if (a)
     b;
 ```
 
+### Output: minified
 ```js min
 if(a)b
 ```

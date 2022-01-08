@@ -3,6 +3,7 @@
 a instanceof b instanceof c;
 ```
 
+### Output: minified
 ```js min
 a instanceof b instanceof c
 ```

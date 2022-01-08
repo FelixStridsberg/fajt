@@ -3,6 +3,7 @@
 for (var a in b) ;
 ```
 
+### Output: minified
 ```js min
 for(var a in b);
 ```

@@ -8,6 +8,7 @@ switch (a) {
 }
 ```
 
+### Output: minified
 ```js min
 switch(a){case b:case c:d;default:}
 ```

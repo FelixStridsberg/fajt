@@ -3,6 +3,7 @@
 a in b in c;
 ```
 
+### Output: minified
 ```js min
 a in b in c
 ```

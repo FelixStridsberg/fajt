@@ -3,6 +3,7 @@
 switch (a) {}
 ```
 
+### Output: minified
 ```js min
 switch(a){}
 ```

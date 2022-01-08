@@ -6,6 +6,7 @@
 }
 ```
 
+### Output: minified
 ```js min
 {;}
 ```

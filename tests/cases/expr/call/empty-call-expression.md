@@ -3,6 +3,7 @@
 fn();
 ```
 
+### Output: minified
 ```js min
 fn();
 ```

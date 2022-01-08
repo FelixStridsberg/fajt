@@ -5,6 +5,7 @@ class cls {
 }
 ```
 
+### Output: minified
 ```js min
 class cls{set setter(a){}}
 ```

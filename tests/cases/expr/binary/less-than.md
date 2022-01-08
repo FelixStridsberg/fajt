@@ -3,6 +3,7 @@
 a < b < c;
 ```
 
+### Output: minified
 ```js min
 a<b<c
 ```

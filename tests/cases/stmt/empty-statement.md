@@ -3,6 +3,7 @@
 ;
 ```
 
+### Output: minified
 ```js min
 ```
 

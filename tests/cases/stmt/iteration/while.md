@@ -3,6 +3,7 @@
 while (true) a;
 ```
 
+### Output: minified
 ```js min
 while(true)a
 ```

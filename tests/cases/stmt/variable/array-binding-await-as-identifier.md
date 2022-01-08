@@ -3,6 +3,7 @@
 var [ await, ...await ] = c;
 ```
 
+### Output: minified
 ```js min
 var[await,...await]=c
 ```

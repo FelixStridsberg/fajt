@@ -3,6 +3,7 @@
 label: a;
 ```
 
+### Output: minified
 ```js min
 label:a
 ```

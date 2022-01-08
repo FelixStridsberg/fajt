@@ -6,6 +6,7 @@ else
     c;
 ```
 
+### Output: minified
 ```js min
 if(a)b;else c
 ```

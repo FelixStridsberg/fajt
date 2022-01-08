@@ -3,6 +3,7 @@
 try {} catch (e) {}
 ```
 
+### Output: minified
 ```js min
 try{}catch(e){}
 ```

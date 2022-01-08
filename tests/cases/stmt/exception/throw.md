@@ -3,6 +3,7 @@
 throw
 ```
 
+### Output: minified
 ```js min
 throw
 ```

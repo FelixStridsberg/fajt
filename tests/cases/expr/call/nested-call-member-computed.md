@@ -3,6 +3,7 @@
 f1()["f2"]();
 ```
 
+### Output: minified
 ```js min
 f1()["f2"]();
 ```

@@ -5,6 +5,7 @@ async function fn() {
 }
 ```
 
+### Output: minified
 ```js min
 async function fn(){var a=1}
 ```

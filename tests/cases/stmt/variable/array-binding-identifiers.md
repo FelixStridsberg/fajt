@@ -3,6 +3,7 @@
 var [ a, b, c ] = d;
 ```
 
+### Output: minified
 ```js min
 var[a,b,c]=d
 ```

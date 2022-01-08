@@ -5,6 +5,7 @@ switch (a) {
 }
 ```
 
+### Output: minified
 ```js min
 switch(a){case b:}
 ```

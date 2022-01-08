@@ -3,6 +3,7 @@
 super();
 ```
 
+### Output: minified
 ```js min
 super();
 ```
