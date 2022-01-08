@@ -6,7 +6,6 @@ use std::path::{Path, PathBuf};
 /// Markdown document.
 #[derive(Eq, PartialEq, Debug)]
 pub struct Markdown {
-    path: PathBuf,
     pub sections: Vec<MarkdownSection>,
     pub source: String,
     pub source_min: Option<String>,
@@ -110,9 +109,7 @@ mod tests {
 }
 
 impl Markdown {
-    pub fn from<P: AsRef<Path>>(path: &P) -> Self {
-        let data = read_string(path.as_ref());
-
+    pub fn from_string(data: &str) -> Self {
         let source = get_code_block(&data, "js")
             .expect("JS input required.")
             .to_owned();
@@ -122,7 +119,6 @@ impl Markdown {
 
         let sections = MarkdownSection::from_string(&data);
         Markdown {
-            path: path.as_ref().to_path_buf(),
             sections,
             source,
             source_min,
@@ -132,28 +128,28 @@ impl Markdown {
 
     #[allow(unused)]
     pub fn append_json_block(&self, data: &str) {
-        let block = generate_code_block(data, "json");
+        //let block = generate_code_block(data, "json");
 
-        let mut file = OpenOptions::new().write(true).open(&self.path).unwrap();
+        //let mut file = OpenOptions::new().write(true).open(&self.path).unwrap();
 
-        file.seek(SeekFrom::End(0)).unwrap();
-        file.write_all("\n".as_bytes()).unwrap();
-        file.write_all(block.as_bytes()).unwrap();
+        //file.seek(SeekFrom::End(0)).unwrap();
+        //file.write_all("\n".as_bytes()).unwrap();
+        //file.write_all(block.as_bytes()).unwrap();
     }
 
     #[allow(unused)]
     pub fn replace_json_block(&self, contents: &str) {
-        let data = read_string(&self.path);
+        //let data = read_string(&self.path);
 
-        if let Some((start, end)) = get_code_block_pos(&data, "json") {
-            let mut new_data = String::new();
-            new_data.push_str(&data[..start]);
-            new_data.push_str(contents);
-            new_data.push_str(&data[end - 1..]);
+        //if let Some((start, end)) = get_code_block_pos(&data, "json") {
+        //    let mut new_data = String::new();
+        //    new_data.push_str(&data[..start]);
+        //    new_data.push_str(contents);
+        //    new_data.push_str(&data[end - 1..]);
 
-            let mut file = OpenOptions::new().write(true).open(&self.path).unwrap();
-            file.write_all(new_data.as_bytes()).unwrap();
-        }
+        //    let mut file = OpenOptions::new().write(true).open(&self.path).unwrap();
+        //    file.write_all(new_data.as_bytes()).unwrap();
+        //}
     }
 }
 
@@ -190,7 +186,7 @@ fn generate_code_block(data: &str, annotation: &str) -> String {
     )
 }
 
-fn read_string(path: &Path) -> String {
+pub fn read_string(path: &Path) -> String {
     let mut file = File::open(path).expect("Failed to open file.");
     let mut data = String::new();
     file.read_to_string(&mut data)

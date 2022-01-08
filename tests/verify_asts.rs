@@ -26,7 +26,7 @@ extern crate fajt_testing;
 use fajt_ast::SourceType;
 use fajt_parser::error::{ErrorKind, Result};
 use fajt_parser::{parse, Parse};
-use fajt_testing::markdown::Markdown;
+use fajt_testing::markdown::{Markdown, read_string};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::Debug;
@@ -40,7 +40,8 @@ where
 {
     println!("Running: {}", path);
 
-    let test_file = Markdown::from(&path);
+    let data = read_string(path.as_ref());
+    let test_file = Markdown::from_string(&data);
     let result = parse::<T>(&test_file.source, source_type);
 
     if test_file.ast.is_none() {

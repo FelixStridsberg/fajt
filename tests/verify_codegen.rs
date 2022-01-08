@@ -3,12 +3,13 @@ extern crate fajt_testing;
 
 use fajt_codegen::{generate_code, GeneratorContext};
 use fajt_parser::parse_program;
-use fajt_testing::markdown::Markdown;
+use fajt_testing::markdown::{Markdown, read_string};
 
 fn run_test_file(filename: &str) {
     println!("Running: {}", filename);
 
-    let test_file = Markdown::from(&filename);
+    let data = read_string(filename.as_ref());
+    let test_file = Markdown::from_string(&data);
     let input = test_file.source;
     let input_min = test_file.source_min;
     let mut ast = parse_program(&input).unwrap();
