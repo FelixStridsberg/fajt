@@ -8,6 +8,7 @@ var cls = class {
 }
 ```
 
+### Output: ast
 ```json
 {
   "UnexpectedToken": {

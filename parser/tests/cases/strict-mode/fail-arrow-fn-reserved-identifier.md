@@ -6,6 +6,7 @@ const fn = () => {
 }
 ```
 
+### Output: ast
 ```json
 {
   "UnexpectedToken": {

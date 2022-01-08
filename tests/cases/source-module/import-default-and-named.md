@@ -3,6 +3,7 @@
 import def, {a, b} from 'module'
 ```
 
+### Output: ast
 ```json
 {
   "Module": {

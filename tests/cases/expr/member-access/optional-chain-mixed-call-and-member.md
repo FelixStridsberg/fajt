@@ -3,6 +3,7 @@
 a.b?.c()?.d?.()
 ```
 
+### Output: ast
 ```json
 {
   "OptionalCall": {

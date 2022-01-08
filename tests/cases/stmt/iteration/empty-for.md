@@ -3,6 +3,7 @@
 for (;;) ;
 ```
 
+### Output: ast
 ```json
 {
   "For": {

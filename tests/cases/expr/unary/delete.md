@@ -3,6 +3,7 @@
 delete a
 ```
 
+### Output: ast
 ```json
 {
   "Unary": {

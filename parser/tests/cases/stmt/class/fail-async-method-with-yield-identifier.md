@@ -7,6 +7,7 @@ class cls {
 }
 ```
 
+### Output: ast
 ```json
 {
   "UnexpectedToken": {

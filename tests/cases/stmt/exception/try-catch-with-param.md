@@ -7,6 +7,7 @@ try {} catch (e) {}
 try{}catch(e){}
 ```
 
+### Output: ast
 ```json
 {
   "Try": {

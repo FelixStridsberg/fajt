@@ -3,6 +3,7 @@
 async function *fn() {}
 ```
 
+### Output: ast
 ```json
 {
   "Function": {

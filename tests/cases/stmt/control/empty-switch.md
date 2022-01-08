@@ -7,6 +7,7 @@ switch (a) {}
 switch(a){}
 ```
 
+### Output: ast
 ```json
 {
   "Switch": {

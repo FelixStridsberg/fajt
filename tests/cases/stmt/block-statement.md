@@ -10,6 +10,7 @@
 {;}
 ```
 
+### Output: ast
 ```json
 {
   "Block": {

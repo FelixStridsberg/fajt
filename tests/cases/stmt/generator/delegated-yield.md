@@ -9,6 +9,7 @@ function* fn() {
 function*fn(){yield*a}
 ```
 
+### Output: ast
 ```json
 {
   "FunctionDecl": {

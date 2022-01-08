@@ -3,6 +3,7 @@
 const foo;
 ```
 
+### Output: ast
 ```json
 {
   "Variable": {

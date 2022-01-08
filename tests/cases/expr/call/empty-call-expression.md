@@ -7,6 +7,7 @@ fn();
 fn();
 ```
 
+### Output: ast
 ```json
 {
   "Call": {

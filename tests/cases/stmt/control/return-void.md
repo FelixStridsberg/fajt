@@ -7,6 +7,7 @@ return;
 return
 ```
 
+### Output: ast
 ```json
 {
   "Return": {

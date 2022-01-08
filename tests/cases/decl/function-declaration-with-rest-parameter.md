@@ -7,6 +7,7 @@ function fn(...a) {}
 function fn(...a){}
 ```
 
+### Output: ast
 ```json
 {
   "FunctionDecl": {

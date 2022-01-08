@@ -7,6 +7,7 @@ var { ...rest } = c;
 var{...rest}=c
 ```
 
+### Output: ast
 ```json
 {
   "Variable": {

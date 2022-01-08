@@ -7,6 +7,7 @@ a /= b;
 a/=b
 ```
 
+### Output: ast
 ```json
 {
   "Assignment": {

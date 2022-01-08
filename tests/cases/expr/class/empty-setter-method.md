@@ -3,6 +3,7 @@
 class { set setter(a) {} }
 ```
 
+### Output: ast
 ```json
 {
   "Class": {

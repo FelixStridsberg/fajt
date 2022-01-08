@@ -3,6 +3,7 @@
 import.meta
 ```
 
+### Output: ast
 ```json
 {
   "MetaProperty": {

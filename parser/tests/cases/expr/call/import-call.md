@@ -3,6 +3,7 @@
 import(a)
 ```
 
+### Output: ast
 ```json
 {
   "Call": {

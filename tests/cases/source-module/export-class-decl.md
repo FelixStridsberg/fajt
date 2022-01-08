@@ -3,6 +3,7 @@
 export class cls {}
 ```
 
+### Output: ast
 ```json
 {
   "Module": {

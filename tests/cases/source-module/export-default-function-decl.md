@@ -3,6 +3,7 @@
 export default function fn () {}
 ```
 
+### Output: ast
 ```json
 {
   "Module": {

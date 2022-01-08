@@ -9,6 +9,7 @@ function* fn() {
 function*fn(){yield*yield*yield}
 ```
 
+### Output: ast
 ```json
 {
   "FunctionDecl": {

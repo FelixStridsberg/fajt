@@ -3,6 +3,7 @@
 var [ ...rest, b ] = c;
 ```
 
+### Output: ast
 ```json
 {
   "SyntaxError": [

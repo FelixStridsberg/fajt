@@ -8,6 +8,7 @@ if (a)
 if(a)b
 ```
 
+### Output: ast
 ```json
 {
   "If": {

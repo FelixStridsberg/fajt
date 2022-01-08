@@ -7,6 +7,7 @@ let foo;
 let foo
 ```
 
+### Output: ast
 ```json
 {
   "Variable": {

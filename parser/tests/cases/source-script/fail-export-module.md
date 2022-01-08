@@ -3,6 +3,7 @@
 import 'module'
 ```
 
+### Output: ast
 ```json
 {
   "SyntaxError": [

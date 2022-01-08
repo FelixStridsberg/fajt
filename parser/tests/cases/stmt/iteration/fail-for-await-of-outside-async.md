@@ -5,6 +5,7 @@ function fn() {
 }
 ```
 
+### Output: ast
 ```json
 {
   "UnexpectedToken": {

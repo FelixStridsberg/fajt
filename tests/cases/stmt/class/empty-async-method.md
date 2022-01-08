@@ -9,6 +9,7 @@ class cls {
 class cls{async method1(){}}
 ```
 
+### Output: ast
 ```json
 {
   "Class": {

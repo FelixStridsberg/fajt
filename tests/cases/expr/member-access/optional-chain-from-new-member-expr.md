@@ -6,6 +6,7 @@ because only nested `new` are `NewExpression`, non nested `new` are `MemberExpre
 new a()?.b
 ```
 
+### Output: ast
 ```json
 {
   "OptionalMember": {

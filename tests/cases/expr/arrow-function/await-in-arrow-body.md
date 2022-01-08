@@ -5,6 +5,7 @@
 }
 ```
 
+### Output: ast
 ```json
 {
   "ArrowFunction": {

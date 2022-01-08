@@ -3,6 +3,7 @@
 new.target
 ```
 
+### Output: ast
 ```json
 {
   "MetaProperty": {

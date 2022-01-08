@@ -6,6 +6,7 @@ because only nested `new` are `NewExpression`, non nested `new` are `MemberExpre
 new new a()?.b
 ```
 
+### Output: ast
 ```json
 {
   "SyntaxError": [

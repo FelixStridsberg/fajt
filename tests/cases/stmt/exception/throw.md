@@ -7,6 +7,7 @@ throw
 throw
 ```
 
+### Output: ast
 ```json
 {
   "Throw": {

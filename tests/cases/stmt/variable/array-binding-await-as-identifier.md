@@ -7,6 +7,7 @@ var [ await, ...await ] = c;
 var[await,...await]=c
 ```
 
+### Output: ast
 ```json
 {
   "Variable": {

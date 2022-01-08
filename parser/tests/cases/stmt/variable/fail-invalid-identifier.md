@@ -3,6 +3,7 @@
 var * = c;
 ```
 
+### Output: ast
 ```json
 {
   "UnexpectedToken": {

@@ -7,6 +7,7 @@ while (true) a;
 while(true)a
 ```
 
+### Output: ast
 ```json
 {
   "While": {

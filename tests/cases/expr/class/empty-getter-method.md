@@ -3,6 +3,7 @@
 class { get getter() {} }
 ```
 
+### Output: ast
 ```json
 {
   "Class": {

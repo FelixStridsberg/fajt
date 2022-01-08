@@ -3,6 +3,7 @@
 do ; while(a) b
 ```
 
+### Output: ast
 ```json
 {
   "Script": {

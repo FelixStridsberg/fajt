@@ -7,6 +7,7 @@ try {} finally {}
 try{}finally{}
 ```
 
+### Output: ast
 ```json
 {
   "Try": {

@@ -3,6 +3,7 @@
 null
 ```
 
+### Output: ast
 ```json
 {
   "Literal": {

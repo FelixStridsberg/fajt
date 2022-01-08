@@ -4,6 +4,7 @@ throw
 a
 ```
 
+### Output: ast
 ```json
 {
   "Throw": {

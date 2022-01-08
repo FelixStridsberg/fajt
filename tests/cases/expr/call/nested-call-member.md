@@ -7,6 +7,7 @@ f1().f2();
 f1().f2();
 ```
 
+### Output: ast
 ```json
 {
   "Call": {

@@ -7,6 +7,7 @@ for (const a;;) ;
 for(const a;;);
 ```
 
+### Output: ast
 ```json
 {
   "For": {

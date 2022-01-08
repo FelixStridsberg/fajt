@@ -4,6 +4,7 @@ var a
 var a;
 ```
 
+### Output: ast
 ```json
 {
   "Script": {

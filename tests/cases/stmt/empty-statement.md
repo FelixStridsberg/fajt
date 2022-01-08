@@ -6,6 +6,7 @@
 ```js min
 ```
 
+### Output: ast
 ```json
 {
   "Empty": {

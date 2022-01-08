@@ -9,6 +9,7 @@ switch (a) {
 switch(a){case b:}
 ```
 
+### Output: ast
 ```json
 {
   "Switch": {

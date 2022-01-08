@@ -3,6 +3,7 @@
 new a(b, !null)
 ```
 
+### Output: ast
 ```json
 {
   "New": {

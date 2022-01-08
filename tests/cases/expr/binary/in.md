@@ -7,6 +7,7 @@ a in b in c;
 a in b in c
 ```
 
+### Output: ast
 ```json
 {
   "Binary": {

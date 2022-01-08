@@ -4,6 +4,7 @@ do a;
 while (true)
 ```
 
+### Output: ast
 ```json
 {
   "DoWhile": {

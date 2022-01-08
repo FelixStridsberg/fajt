@@ -3,6 +3,7 @@
 import {} from 'module'
 ```
 
+### Output: ast
 ```json
 {
   "Module": {

@@ -3,6 +3,7 @@
 test ? consequent : alternate
 ```
 
+### Output: ast
 ```json
 {
   "Conditional": {

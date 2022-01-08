@@ -9,6 +9,7 @@ class cls {
 class cls{method1(){}}
 ```
 
+### Output: ast
 ```json
 {
   "Class": {

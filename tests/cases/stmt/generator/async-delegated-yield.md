@@ -9,6 +9,7 @@ async function* fn() {
 async function*fn(){yield*a}
 ```
 
+### Output: ast
 ```json
 {
   "FunctionDecl": {

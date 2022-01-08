@@ -3,6 +3,7 @@
 export default class {}
 ```
 
+### Output: ast
 ```json
 {
   "Module": {

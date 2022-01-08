@@ -4,6 +4,7 @@ debugger
 debugger;
 ```
 
+### Output: ast
 ```json
 {
   "Script": {

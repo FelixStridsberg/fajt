@@ -3,6 +3,7 @@
 export async function fn () {}
 ```
 
+### Output: ast
 ```json
 {
   "Module": {

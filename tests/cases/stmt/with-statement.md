@@ -7,6 +7,7 @@ with({}) {}
 with({}){}
 ```
 
+### Output: ast
 ```json
 {
   "With": {

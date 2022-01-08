@@ -3,6 +3,7 @@
 void a
 ```
 
+### Output: ast
 ```json
 {
   "Unary": {

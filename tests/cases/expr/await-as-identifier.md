@@ -3,6 +3,7 @@
 await
 ```
 
+### Output: ast
 ```json
 {
   "IdentRef": {

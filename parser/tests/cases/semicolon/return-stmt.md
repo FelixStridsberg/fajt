@@ -4,6 +4,7 @@ return
 return;
 ```
 
+### Output: ast
 ```json
 {
   "Script": {

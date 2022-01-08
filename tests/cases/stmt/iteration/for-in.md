@@ -7,6 +7,7 @@ for (a in b) ;
 for(a in b);
 ```
 
+### Output: ast
 ```json
 {
   "ForIn": {

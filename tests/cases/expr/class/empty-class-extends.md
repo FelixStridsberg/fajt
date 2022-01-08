@@ -3,6 +3,7 @@
 class MyClass extends SuperClass {}
 ```
 
+### Output: ast
 ```json
 {
   "Class": {

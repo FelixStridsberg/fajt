@@ -3,6 +3,7 @@
 super.b
 ```
 
+### Output: ast
 ```json
 {
   "Member": {

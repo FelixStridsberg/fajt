@@ -7,6 +7,7 @@ a <= b <= c;
 a<=b<=c
 ```
 
+### Output: ast
 ```json
 {
   "Binary": {

@@ -3,6 +3,7 @@
 import * as ns from 'module'
 ```
 
+### Output: ast
 ```json
 {
   "Module": {

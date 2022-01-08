@@ -8,6 +8,7 @@ var a = b,
 var a=b,c
 ```
 
+### Output: ast
 ```json
 {
   "Variable": {

@@ -3,6 +3,7 @@
 var { a, } = b;
 ```
 
+### Output: ast
 ```json
 {
   "Variable": {

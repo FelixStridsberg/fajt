@@ -10,6 +10,7 @@ else
 if(a)b;else c
 ```
 
+### Output: ast
 ```json
 {
   "If": {

@@ -3,6 +3,7 @@
 export { a, b as c } from "other-module"
 ```
 
+### Output: ast
 ```json
 {
   "Module": {

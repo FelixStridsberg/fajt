@@ -3,6 +3,7 @@
 (a, b, ...rest) => { ; }
 ```
 
+### Output: ast
 ```json
 {
   "ArrowFunction": {

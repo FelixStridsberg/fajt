@@ -3,6 +3,7 @@
 continue a;
 ```
 
+### Output: ast
 ```json
 {
   "Continue": {

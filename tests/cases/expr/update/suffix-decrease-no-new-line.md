@@ -5,6 +5,7 @@ a
 ```
 
 // TODO this should probably fail on the --?
+### Output: ast
 ```json
 {
   "IdentRef": {

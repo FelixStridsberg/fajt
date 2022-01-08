@@ -3,6 +3,7 @@
 export * from 'other-module'
 ```
 
+### Output: ast
 ```json
 {
   "Module": {

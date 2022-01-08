@@ -9,6 +9,7 @@ class cls {
 class cls{get getter(){}}
 ```
 
+### Output: ast
 ```json
 {
   "Class": {

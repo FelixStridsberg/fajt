@@ -3,6 +3,7 @@
 export 'module'
 ```
 
+### Output: ast
 ```json
 {
   "SyntaxError": [

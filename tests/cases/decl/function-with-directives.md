@@ -11,6 +11,7 @@ function fn() {
 function fn(){"use strict";'custom1';"custom2"}
 ```
 
+### Output: ast
 ```json
 {
   "FunctionDecl": {

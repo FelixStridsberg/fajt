@@ -3,6 +3,7 @@
 1234.5
 ```
 
+### Output: ast
 ```json
 {
   "Literal": {

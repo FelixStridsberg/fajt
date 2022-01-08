@@ -5,6 +5,7 @@ async function fn() {
 }
 ```
 
+### Output: ast
 ```json
 {
   "FunctionDecl": {

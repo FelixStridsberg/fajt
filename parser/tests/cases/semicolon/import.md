@@ -7,6 +7,7 @@ import {} from 'module';
 import def, {} from 'module';
 ```
 
+### Output: ast
 ```json
 {
   "Module": {

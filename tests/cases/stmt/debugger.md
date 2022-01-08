@@ -7,6 +7,7 @@ debugger;
 debugger
 ```
 
+### Output: ast
 ```json
 {
   "Debugger": {

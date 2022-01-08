@@ -3,6 +3,7 @@
 typeof a
 ```
 
+### Output: ast
 ```json
 {
   "Unary": {

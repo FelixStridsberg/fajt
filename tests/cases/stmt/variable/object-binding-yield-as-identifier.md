@@ -7,6 +7,7 @@ var { yield, ...yield } = c;
 var{yield,...yield}=c
 ```
 
+### Output: ast
 ```json
 {
   "Variable": {

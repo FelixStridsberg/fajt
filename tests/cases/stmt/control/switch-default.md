@@ -10,6 +10,7 @@ switch (a) {
 switch(a){default:b}
 ```
 
+### Output: ast
 ```json
 {
   "Switch": {

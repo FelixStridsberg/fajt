@@ -9,6 +9,7 @@ class cls {
 class cls{set setter(a){}}
 ```
 
+### Output: ast
 ```json
 {
   "Class": {

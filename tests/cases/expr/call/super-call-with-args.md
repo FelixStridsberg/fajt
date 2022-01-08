@@ -7,6 +7,7 @@ super(a, b);
 super(a,b);
 ```
 
+### Output: ast
 ```json
 {
   "Call": {

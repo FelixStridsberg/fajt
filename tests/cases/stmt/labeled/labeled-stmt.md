@@ -7,6 +7,7 @@ label: a;
 label:a
 ```
 
+### Output: ast
 ```json
 {
   "Labeled": {

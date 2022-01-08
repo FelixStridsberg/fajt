@@ -9,6 +9,7 @@ function fn() {
 function fn(){var a=1}
 ```
 
+### Output: ast
 ```json
 {
   "FunctionDecl": {

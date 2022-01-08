@@ -3,6 +3,7 @@
 export { a, b as c }
 ```
 
+### Output: ast
 ```json
 {
   "Module": {

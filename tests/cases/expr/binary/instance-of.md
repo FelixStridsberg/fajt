@@ -7,6 +7,7 @@ a instanceof b instanceof c;
 a instanceof b instanceof c
 ```
 
+### Output: ast
 ```json
 {
   "Binary": {

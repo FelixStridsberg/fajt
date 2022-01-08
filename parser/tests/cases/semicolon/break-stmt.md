@@ -4,6 +4,7 @@ break
 break;
 ```
 
+### Output: ast
 ```json
 {
   "Script": {

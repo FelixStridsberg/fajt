@@ -3,6 +3,7 @@
 class {}
 ```
 
+### Output: ast
 ```json
 {
   "Class": {

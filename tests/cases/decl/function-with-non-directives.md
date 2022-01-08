@@ -10,6 +10,7 @@ function fn() {
 function fn(){;"use strict"}
 ```
 
+### Output: ast
 ```json
 {
   "FunctionDecl": {

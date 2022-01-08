@@ -22,6 +22,7 @@ export class name {}
 export class name {};
 ```
 
+### Output: ast
 ```json
 {
   "Module": {

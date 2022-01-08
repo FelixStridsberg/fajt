@@ -7,6 +7,7 @@ fn().a;
 fn().a
 ```
 
+### Output: ast
 ```json
 {
   "Member": {

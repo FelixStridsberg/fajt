@@ -3,6 +3,7 @@
 async () => await b
 ```
 
+### Output: ast
 ```json
 {
   "ArrowFunction": {

@@ -3,6 +3,7 @@
 a = b;
 ```
 
+### Output: ast
 ```json
 {
   "Assignment": {

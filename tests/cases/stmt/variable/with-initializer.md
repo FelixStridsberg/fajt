@@ -7,6 +7,7 @@ var foo = a;
 var foo=a
 ```
 
+### Output: ast
 ```json
 {
   "Variable": {

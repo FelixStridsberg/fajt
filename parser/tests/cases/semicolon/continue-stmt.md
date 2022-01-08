@@ -4,6 +4,7 @@ continue
 continue;
 ```
 
+### Output: ast
 ```json
 {
   "Script": {

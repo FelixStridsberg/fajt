@@ -3,6 +3,7 @@
 0b11110000
 ```
 
+### Output: ast
 ```json
 {
   "Literal": {

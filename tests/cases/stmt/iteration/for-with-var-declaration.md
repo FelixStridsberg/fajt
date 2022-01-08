@@ -7,6 +7,7 @@ for (var a;;) ;
 for(var a;;);
 ```
 
+### Output: ast
 ```json
 {
   "For": {

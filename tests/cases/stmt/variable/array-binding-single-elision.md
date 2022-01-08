@@ -7,6 +7,7 @@ var [ , ] = b;
 var[,]=b
 ```
 
+### Output: ast
 ```json
 {
   "Variable": {

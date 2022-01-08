@@ -3,6 +3,7 @@
 function (param) { ; }
 ```
 
+### Output: ast
 ```json
 {
   "Function": {

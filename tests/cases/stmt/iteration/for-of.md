@@ -7,6 +7,7 @@ for (a of b) ;
 for(a of b);
 ```
 
+### Output: ast
 ```json
 {
   "ForOf": {

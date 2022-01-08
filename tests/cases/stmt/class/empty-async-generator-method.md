@@ -11,6 +11,7 @@ class cls {
 class cls{async*method1(){yield}}
 ```
 
+### Output: ast
 ```json
 {
   "Class": {
