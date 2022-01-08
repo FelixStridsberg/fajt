@@ -1,5 +1,5 @@
 ### Input
-```js
+```js source:module
 import * as ns from 'module'
 ```
 

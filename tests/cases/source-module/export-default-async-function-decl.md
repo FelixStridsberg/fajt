@@ -1,5 +1,5 @@
 ### Input
-```js
+```js source:module
 export default async function fn () {}
 ```
 

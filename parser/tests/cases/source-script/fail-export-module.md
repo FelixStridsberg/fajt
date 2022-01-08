@@ -1,5 +1,5 @@
 ### Input
-```js
+```js source:script
 import 'module'
 ```
 

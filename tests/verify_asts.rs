@@ -58,7 +58,7 @@ where
 }
 
 // This runs for each .md file in the ./cases folder.
-fn run_test_file(path: &str, source_type: SourceType) {
+fn run_test_file(path: &str) {
     println!("Running: {}", path);
 
     let data = read_string(path.as_ref());
@@ -69,7 +69,8 @@ fn run_test_file(path: &str, source_type: SourceType) {
         .map(|section| section.block.as_ref())
         .flatten()
     {
-        let parse_type = get_parse_type(input_block.language);
+        let parse_type = get_attribute(input_block.language, "parse:").unwrap_or("program");
+        let source_type = get_source_type(input_block.language);
         match parse_type {
             "expr" => parse_and_test::<Expr>(path, test, source_type),
             "stmt" => parse_and_test::<Stmt>(path, test, source_type),
@@ -78,13 +79,21 @@ fn run_test_file(path: &str, source_type: SourceType) {
     }
 }
 
-fn get_parse_type(title: &str) -> &str {
-    title
+fn get_source_type(language: &str) -> SourceType {
+    let source_type = get_attribute(language, "source:").unwrap_or("unknown");
+    match source_type {
+        "script" => SourceType::Script,
+        "module" => SourceType::Module,
+        _ => SourceType::Unknown,
+    }
+}
+
+fn get_attribute<'a>(language: &'a str, attribute: &str) -> Option<&'a str> {
+    language
         .split(' ')
-        .find(|s| s.starts_with("parse:"))
+        .find(|s| s.starts_with(attribute))
         .map(|attr| attr.split(':').next_back())
         .flatten()
-        .unwrap_or("program")
 }
 
 fn assert_result<T>(result: Result<T>, ast_json: &str)
@@ -134,15 +143,13 @@ macro_rules! generate_test_cases {
 macro_rules! generate_test_module {
     (
         mod_name: $mod_name:ident,
-        source_type: $source_type:ident,
         folders: [$( $folder:literal ),*],
     ) => {
         mod $mod_name {
             use fajt_macros::for_each_file;
-            use fajt_ast::SourceType::$source_type;
 
             fn run_test(test_file: &str) {
-                $crate::run_test_file(&test_file, $source_type);
+                $crate::run_test_file(&test_file);
             }
 
             $(
@@ -154,43 +161,36 @@ macro_rules! generate_test_module {
 
 generate_test_module!(
     mod_name: expr,
-    source_type: Script,
     folders: ["tests/cases/expr", "parser/tests/cases/expr"],
 );
 
 generate_test_module!(
     mod_name: stmt,
-    source_type: Script,
     folders: ["tests/cases/stmt", "parser/tests/cases/stmt"],
 );
 
 generate_test_module!(
     mod_name: decl,
-    source_type: Script,
     folders: ["tests/cases/decl"],
 );
 
 generate_test_module!(
     mod_name: semicolon,
-    source_type: Unknown,
     folders: ["parser/tests/cases/semicolon"],
 );
 
 generate_test_module!(
     mod_name: strict_mode,
-    source_type: Script,
     folders: ["parser/tests/cases/strict-mode"],
 );
 
 generate_test_module!(
     mod_name: source_module,
-    source_type: Module,
     folders: ["tests/cases/source-module"],
 );
 
 generate_test_module!(
     mod_name: source_script,
-    source_type: Script,
     folders: ["parser/tests/cases/source-script"],
 );
 
