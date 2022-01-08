@@ -4,7 +4,7 @@ debugger;
 ```
 
 ### Output: minified
-```js min
+```js
 debugger
 ```
 

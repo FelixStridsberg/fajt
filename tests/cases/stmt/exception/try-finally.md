@@ -4,7 +4,7 @@ try {} finally {}
 ```
 
 ### Output: minified
-```js min
+```js
 try{}finally{}
 ```
 

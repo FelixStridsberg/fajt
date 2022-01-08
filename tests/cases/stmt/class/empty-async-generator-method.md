@@ -8,7 +8,7 @@ class cls {
 ```
 
 ### Output: minified
-```js min
+```js
 class cls{async*method1(){yield}}
 ```
 

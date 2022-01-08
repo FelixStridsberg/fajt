@@ -4,7 +4,7 @@ class MyClass extends SuperClass {}
 ```
 
 ### Output: minified
-```js min
+```js
 class MyClass extends SuperClass{}
 ```
 

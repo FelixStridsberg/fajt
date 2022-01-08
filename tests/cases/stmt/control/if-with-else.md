@@ -7,7 +7,7 @@ else
 ```
 
 ### Output: minified
-```js min
+```js
 if(a)b;else c
 ```
 

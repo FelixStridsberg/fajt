@@ -7,7 +7,7 @@
 ```
 
 ### Output: minified
-```js min
+```js
 {;}
 ```
 

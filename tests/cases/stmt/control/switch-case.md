@@ -8,7 +8,7 @@ switch (a) {
 ```
 
 ### Output: minified
-```js min
+```js
 switch(a){case b:c;d}
 ```
 

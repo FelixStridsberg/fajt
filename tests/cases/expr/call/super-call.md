@@ -4,7 +4,7 @@ super();
 ```
 
 ### Output: minified
-```js min
+```js
 super();
 ```
 

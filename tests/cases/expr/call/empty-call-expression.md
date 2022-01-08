@@ -4,7 +4,7 @@ fn();
 ```
 
 ### Output: minified
-```js min
+```js
 fn();
 ```
 

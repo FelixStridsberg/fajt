@@ -4,7 +4,7 @@ var { ...rest } = c;
 ```
 
 ### Output: minified
-```js min
+```js
 var{...rest}=c
 ```
 

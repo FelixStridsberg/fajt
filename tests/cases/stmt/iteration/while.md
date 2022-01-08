@@ -4,7 +4,7 @@ while (true) a;
 ```
 
 ### Output: minified
-```js min
+```js
 while(true)a
 ```
 

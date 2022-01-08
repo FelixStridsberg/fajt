@@ -5,7 +5,7 @@ var a = b,
 ```
 
 ### Output: minified
-```js min
+```js
 var a=b,c
 ```
 

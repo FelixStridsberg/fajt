@@ -4,7 +4,7 @@ var [ a = b ] = c;
 ```
 
 ### Output: minified
-```js min
+```js
 var[a=b]=c
 ```
 

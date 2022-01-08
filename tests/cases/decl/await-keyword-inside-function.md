@@ -6,7 +6,7 @@ function fn() {
 ```
 
 ### Output: minified
-```js min
+```js
 function fn(){var await=1}
 ```
 

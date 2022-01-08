@@ -4,7 +4,7 @@ let foo;
 ```
 
 ### Output: minified
-```js min
+```js
 let foo
 ```
 

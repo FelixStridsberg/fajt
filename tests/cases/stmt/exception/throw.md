@@ -4,7 +4,7 @@ throw
 ```
 
 ### Output: minified
-```js min
+```js
 throw
 ```
 

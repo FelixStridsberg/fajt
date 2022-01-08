@@ -4,7 +4,7 @@ for (var a of b) ;
 ```
 
 ### Output: minified
-```js min
+```js
 for(var a of b);
 ```
 

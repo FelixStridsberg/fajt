@@ -4,7 +4,7 @@ label: a;
 ```
 
 ### Output: minified
-```js min
+```js
 label:a
 ```
 

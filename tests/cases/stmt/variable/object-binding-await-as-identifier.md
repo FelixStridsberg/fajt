@@ -4,7 +4,7 @@ var { await, ...await } = c;
 ```
 
 ### Output: minified
-```js min
+```js
 var{await,...await}=c
 ```
 

@@ -4,7 +4,7 @@ function fn(a, b = c) {}
 ```
 
 ### Output: minified
-```js min
+```js
 function fn(a,b=c){}
 ```
 

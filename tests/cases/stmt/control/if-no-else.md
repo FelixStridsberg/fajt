@@ -5,7 +5,7 @@ if (a)
 ```
 
 ### Output: minified
-```js min
+```js
 if(a)b
 ```
 

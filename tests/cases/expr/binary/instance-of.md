@@ -4,7 +4,7 @@ a instanceof b instanceof c;
 ```
 
 ### Output: minified
-```js min
+```js
 a instanceof b instanceof c
 ```
 

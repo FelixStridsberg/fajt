@@ -4,7 +4,7 @@
 ```
 
 ### Output: minified
-```js min
+```js
 ```
 
 ### Output: ast

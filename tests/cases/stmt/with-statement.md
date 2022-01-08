@@ -4,7 +4,7 @@ with({}) {}
 ```
 
 ### Output: minified
-```js min
+```js
 with({}){}
 ```
 

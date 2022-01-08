@@ -4,7 +4,7 @@ var foo = a;
 ```
 
 ### Output: minified
-```js min
+```js
 var foo=a
 ```
 

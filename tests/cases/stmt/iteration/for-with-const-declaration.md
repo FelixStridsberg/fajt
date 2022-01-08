@@ -4,7 +4,7 @@ for (const a;;) ;
 ```
 
 ### Output: minified
-```js min
+```js
 for(const a;;);
 ```
 

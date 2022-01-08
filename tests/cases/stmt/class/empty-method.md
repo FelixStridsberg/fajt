@@ -6,7 +6,7 @@ class cls {
 ```
 
 ### Output: minified
-```js min
+```js
 class cls{method1(){}}
 ```
 

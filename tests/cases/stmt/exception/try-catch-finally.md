@@ -4,7 +4,7 @@ try {} catch (e) {} finally {}
 ```
 
 ### Output: minified
-```js min
+```js
 try{}catch(e){}finally{}
 ```
 

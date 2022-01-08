@@ -4,7 +4,7 @@ fn().a;
 ```
 
 ### Output: minified
-```js min
+```js
 fn().a
 ```
 

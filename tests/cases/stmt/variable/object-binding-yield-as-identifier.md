@@ -4,7 +4,7 @@ var { yield, ...yield } = c;
 ```
 
 ### Output: minified
-```js min
+```js
 var{yield,...yield}=c
 ```
 

@@ -8,7 +8,7 @@ function fn() {
 ```
 
 ### Output: minified
-```js min
+```js
 function fn(){"use strict";'custom1';"custom2"}
 ```
 

@@ -4,7 +4,7 @@ a + b + c + d;
 ```
 
 ### Output: minified
-```js min
+```js
 a+b+c+d
 ```
 

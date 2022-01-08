@@ -4,7 +4,7 @@ return a;
 ```
 
 ### Output: minified
-```js min
+```js
 return a
 ```
 

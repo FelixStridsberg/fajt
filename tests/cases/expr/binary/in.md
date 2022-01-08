@@ -4,7 +4,7 @@ a in b in c;
 ```
 
 ### Output: minified
-```js min
+```js
 a in b in c
 ```
 

@@ -4,7 +4,7 @@ var [ , ] = b;
 ```
 
 ### Output: minified
-```js min
+```js
 var[,]=b
 ```
 

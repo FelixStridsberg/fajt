@@ -6,7 +6,7 @@ async function* fn() {
 ```
 
 ### Output: minified
-```js min
+```js
 async function*fn(){yield}
 ```
 

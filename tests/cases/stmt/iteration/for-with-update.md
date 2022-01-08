@@ -4,7 +4,7 @@ for (;;a) ;
 ```
 
 ### Output: minified
-```js min
+```js
 for(;;a);
 ```
 

@@ -4,7 +4,7 @@ for (a in b) ;
 ```
 
 ### Output: minified
-```js min
+```js
 for(a in b);
 ```
 

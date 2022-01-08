@@ -4,7 +4,7 @@ f1().f2();
 ```
 
 ### Output: minified
-```js min
+```js
 f1().f2();
 ```
 
