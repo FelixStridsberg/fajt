@@ -89,20 +89,17 @@ fn parse_and_test<T>(path: &str, test: Markdown, source_type: SourceType)
 where
     T: Parse + Serialize + DeserializeOwned + PartialEq + Debug + Traverse,
 {
+    let mut regenerate_ast = false;
+    let mut regenerate_min = None;
+
     let mut test = test;
-    let result = parse::<T>(&test.get_block_content(INPUT_SECTION).unwrap(), source_type);
+    let mut result = parse::<T>(&test.get_block_content(INPUT_SECTION).unwrap(), source_type);
 
     if let Some(ast_section) = test.get_section(AST_SECTION) {
         if let Some(ast) = ast_section.get_code() {
             assert_result(&result, ast);
         } else {
-            // Section exists but ast missing, generate it.
-            let output = result_to_string(result);
-
-            test.set_block_content(AST_SECTION, "json", &output);
-            write_string(path.as_ref(), &test.to_string());
-
-            panic!("Ast generated. Verify and rerun test.");
+            regenerate_ast = true;
         }
     }
 
@@ -110,7 +107,7 @@ where
         let mut ctx = GeneratorContext::new();
         ctx.minified = true;
 
-        let output_min = generate_code(&mut result.unwrap(), ctx);
+        let output_min = generate_code(result.as_mut().unwrap(), ctx);
 
         if let Some(expected_minified) = minified_section.get_code() {
             assert_eq!(
@@ -119,10 +116,25 @@ where
                 "Minified output mismatch."
             );
         } else {
-            test.set_block_content(MINIFIED_SECTION, "js", &output_min);
-            write_string(path.as_ref(), &test.to_string());
-            panic!("Minified output generated. Verify and rerun test.");
+            regenerate_min = Some(output_min);
         }
+    }
+
+
+    #[allow(unused_assignments)]
+    let mut ast_output = None; // Just to make sure it lives until written
+    if regenerate_ast {
+        ast_output = Some(result_to_string(result));
+        test.set_block_content(AST_SECTION, "json", ast_output.as_ref().unwrap());
+    }
+
+    if let Some(min) = regenerate_min.as_ref() {
+        test.set_block_content(MINIFIED_SECTION, "js", min);
+    }
+
+    if regenerate_ast || regenerate_min.is_some() {
+        write_string(path.as_ref(), &test.to_string());
+        panic!("Output generated. Verify and rerun test.");
     }
 }
 
