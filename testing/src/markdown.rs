@@ -1,12 +1,112 @@
+use regex::Regex;
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
 
+/// Markdown document.
+#[derive(Eq, PartialEq, Debug)]
 pub struct Markdown {
     path: PathBuf,
+    pub sections: Vec<MarkdownSection>,
     pub source: String,
     pub source_min: Option<String>,
     pub ast: Option<String>,
+}
+
+/// Sections are divided by titles.
+#[derive(Eq, PartialEq, Debug)]
+pub struct MarkdownSection {
+    pub name: String,
+    pub text: Option<String>,
+    pub block: Option<MarkdownBlock>,
+}
+
+/// Code block within the markdown document.
+#[derive(Eq, PartialEq, Debug)]
+pub struct MarkdownBlock {
+    pub language: String,
+    pub contents: String,
+}
+
+impl MarkdownSection {
+    fn from_string(data: &str) -> Vec<MarkdownSection> {
+        let reg = Regex::new(r"(?m)^###").unwrap();
+        let sections: Vec<&str> = reg.split(&data).filter(|s| !s.is_empty()).collect();
+
+        sections
+            .into_iter()
+            .map(|section| {
+                let (name, content) = split_title(section);
+                let (text, block) = split_code_block(content);
+
+                MarkdownSection {
+                    name: name.to_string(),
+                    text: Some(text.to_string()),
+                    block,
+                }
+            })
+            .collect()
+    }
+}
+
+fn split_title(str: &str) -> (&str, &str) {
+    let (title_line, rest) = str.split_once('\n').unwrap();
+
+    (title_line.trim(), rest.trim())
+}
+
+fn split_code_block(str: &str) -> (&str, Option<MarkdownBlock>) {
+    let reg = Regex::new(r"(?m)^```").unwrap();
+    if let Some(m) = reg.find(str) {
+        let start = m.end();
+        let length = reg
+            .find(&str[start..])
+            .expect("Missing end of code block.")
+            .start();
+        let content = &str[start..(start + length)];
+
+        let (lang, content) = content.split_once('\n').unwrap();
+        let text = &str[..m.start()];
+        (
+            text.trim(),
+            Some(MarkdownBlock {
+                language: lang.trim().to_string(),
+                contents: content.to_string(),
+            }),
+        )
+    } else {
+        (str, None)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_sections() {
+        let data = "### Title 1\nsection 2\n```js\nvar a = 1;\n```\n### Title 2\nsection 2\nsection 2 again";
+        let sections = MarkdownSection::from_string(data);
+
+        assert_eq!(
+            sections,
+            vec![
+                MarkdownSection {
+                    name: "Title 1".to_string(),
+                    text: Some("section 2".to_string()),
+                    block: Some(MarkdownBlock {
+                        language: "js".to_string(),
+                        contents: "var a = 1;\n".to_string()
+                    })
+                },
+                MarkdownSection {
+                    name: "Title 2".to_string(),
+                    text: Some("section 2\nsection 2 again".to_string()),
+                    block: None
+                }
+            ]
+        );
+    }
 }
 
 impl Markdown {
@@ -20,8 +120,10 @@ impl Markdown {
         let source_min = get_code_block(&data, "js min").map(&str::to_owned);
         let ast = get_code_block(&data, "json").map(&str::to_owned);
 
+        let sections = MarkdownSection::from_string(&data);
         Markdown {
-            path: PathBuf::from(path.as_ref()),
+            path: path.as_ref().to_path_buf(),
+            sections,
             source,
             source_min,
             ast,
