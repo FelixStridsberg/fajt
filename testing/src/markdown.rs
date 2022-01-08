@@ -115,6 +115,12 @@ impl<'a> Markdown<'a> {
         self.sections.iter().find(|s| s.name == name)
     }
 
+    pub fn get_code(&self, section_name: &str) -> Option<&str> {
+        self.get_section(section_name)
+            .map(|section| section.block.as_ref().map(|block| block.contents))
+            .flatten()
+    }
+
     #[allow(unused)]
     pub fn append_json_block(&self, data: &str) {
         //let block = generate_code_block(data, "json");

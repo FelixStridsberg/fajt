@@ -42,23 +42,9 @@ where
 
     let data = read_string(path.as_ref());
     let test_file = Markdown::from_string(&data);
-    let result = parse::<T>(
-        &test_file
-            .get_section("Input")
-            .unwrap()
-            .block
-            .as_ref()
-            .unwrap()
-            .contents,
-        source_type,
-    );
+    let result = parse::<T>(&test_file.get_code("Input").unwrap(), source_type);
 
-    let ast = test_file
-        .get_section("Output: ast")
-        .unwrap()
-        .block
-        .as_ref()
-        .map(|b| b.contents);
+    let ast = test_file.get_code("Output: ast");
     if ast.is_none() {
         // If the test file contain no output, we generate that from result of running the code.
         // I.e. you can add a test file with just code to generate the result.
