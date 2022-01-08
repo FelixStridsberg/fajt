@@ -26,7 +26,7 @@ extern crate fajt_testing;
 use fajt_ast::SourceType;
 use fajt_parser::error::{ErrorKind, Result};
 use fajt_parser::{parse, Parse};
-use fajt_testing::markdown::{Markdown, read_string};
+use fajt_testing::markdown::{read_string, Markdown};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::Debug;

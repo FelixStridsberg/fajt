@@ -3,7 +3,7 @@ extern crate fajt_testing;
 
 use fajt_codegen::{generate_code, GeneratorContext};
 use fajt_parser::parse_program;
-use fajt_testing::markdown::{Markdown, read_string};
+use fajt_testing::markdown::{read_string, Markdown};
 
 fn run_test_file(filename: &str) {
     println!("Running: {}", filename);

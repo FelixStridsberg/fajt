@@ -5,8 +5,8 @@ use std::path::{Path, PathBuf};
 
 /// Markdown document.
 #[derive(Eq, PartialEq, Debug)]
-pub struct Markdown {
-    pub sections: Vec<MarkdownSection>,
+pub struct Markdown<'a> {
+    pub sections: Vec<MarkdownSection<'a>>,
     pub source: String,
     pub source_min: Option<String>,
     pub ast: Option<String>,
@@ -14,20 +14,20 @@ pub struct Markdown {
 
 /// Sections are divided by titles.
 #[derive(Eq, PartialEq, Debug)]
-pub struct MarkdownSection {
-    pub name: String,
-    pub text: Option<String>,
-    pub block: Option<MarkdownBlock>,
+pub struct MarkdownSection<'a> {
+    pub name: &'a str,
+    pub text: Option<&'a str>,
+    pub block: Option<MarkdownBlock<'a>>,
 }
 
 /// Code block within the markdown document.
 #[derive(Eq, PartialEq, Debug)]
-pub struct MarkdownBlock {
-    pub language: String,
-    pub contents: String,
+pub struct MarkdownBlock<'a> {
+    pub language: &'a str,
+    pub contents: &'a str,
 }
 
-impl MarkdownSection {
+impl MarkdownSection<'_> {
     fn from_string(data: &str) -> Vec<MarkdownSection> {
         let reg = Regex::new(r"(?m)^###").unwrap();
         let sections: Vec<&str> = reg.split(&data).filter(|s| !s.is_empty()).collect();
@@ -39,8 +39,8 @@ impl MarkdownSection {
                 let (text, block) = split_code_block(content);
 
                 MarkdownSection {
-                    name: name.to_string(),
-                    text: Some(text.to_string()),
+                    name,
+                    text: Some(text),
                     block,
                 }
             })
@@ -64,13 +64,13 @@ fn split_code_block(str: &str) -> (&str, Option<MarkdownBlock>) {
             .start();
         let content = &str[start..(start + length)];
 
-        let (lang, content) = content.split_once('\n').unwrap();
+        let (lang, contents) = content.split_once('\n').unwrap();
         let text = &str[..m.start()];
         (
             text.trim(),
             Some(MarkdownBlock {
-                language: lang.trim().to_string(),
-                contents: content.to_string(),
+                language: lang.trim(),
+                contents,
             }),
         )
     } else {
@@ -91,16 +91,16 @@ mod tests {
             sections,
             vec![
                 MarkdownSection {
-                    name: "Title 1".to_string(),
-                    text: Some("section 2".to_string()),
+                    name: "Title 1",
+                    text: Some("section 2"),
                     block: Some(MarkdownBlock {
-                        language: "js".to_string(),
-                        contents: "var a = 1;\n".to_string()
+                        language: "js",
+                        contents: "var a = 1;\n",
                     })
                 },
                 MarkdownSection {
-                    name: "Title 2".to_string(),
-                    text: Some("section 2\nsection 2 again".to_string()),
+                    name: "Title 2",
+                    text: Some("section 2\nsection 2 again"),
                     block: None
                 }
             ]
@@ -108,8 +108,8 @@ mod tests {
     }
 }
 
-impl Markdown {
-    pub fn from_string(data: &str) -> Self {
+impl<'a> Markdown<'a> {
+    pub fn from_string(data: &'a str) -> Self {
         let source = get_code_block(&data, "js")
             .expect("JS input required.")
             .to_owned();
