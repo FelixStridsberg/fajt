@@ -58,7 +58,7 @@ where
 }
 
 // This runs for each .md file in the ./cases folder.
-fn run_test_file(path: &str) {
+fn run_test(path: &str) {
     println!("Running: {}", path);
 
     let data = read_string(path.as_ref());
@@ -127,71 +127,49 @@ macro_rules! generate_test_cases {
     ("md", $file_path:literal, $ident:ident) => {
         #[test]
         fn $ident() {
-            run_test($file_path)
+            $crate::run_test($file_path)
         }
     };
     ("md_ignore", $file_path:literal, $ident:ident) => {
         #[ignore]
         #[test]
         fn $ident() {
-            run_test($file_path)
+            $crate::run_test($file_path)
         }
     };
     ($extension:literal, $file_path:literal, $ident:ident) => {};
 }
 
-macro_rules! generate_test_module {
+macro_rules! generate_test_modules {
     (
-        mod_name: $mod_name:ident,
-        folders: [$( $folder:literal ),*],
+        $(
+            $mod_name:ident: [
+                $(
+                    $folder:literal
+                ),*
+            ],
+        )*
     ) => {
-        mod $mod_name {
-            use fajt_macros::for_each_file;
+        $(
+            mod $mod_name {
+                use fajt_macros::for_each_file;
 
-            fn run_test(test_file: &str) {
-                $crate::run_test_file(&test_file);
+                $(
+                    for_each_file!($folder, generate_test_cases);
+                )*
             }
-
-            $(
-                for_each_file!($folder, generate_test_cases);
-            )*
-        }
+        )*
     }
 }
 
-generate_test_module!(
-    mod_name: expr,
-    folders: ["tests/cases/expr", "parser/tests/cases/expr"],
-);
-
-generate_test_module!(
-    mod_name: stmt,
-    folders: ["tests/cases/stmt", "parser/tests/cases/stmt"],
-);
-
-generate_test_module!(
-    mod_name: decl,
-    folders: ["tests/cases/decl"],
-);
-
-generate_test_module!(
-    mod_name: semicolon,
-    folders: ["parser/tests/cases/semicolon"],
-);
-
-generate_test_module!(
-    mod_name: strict_mode,
-    folders: ["parser/tests/cases/strict-mode"],
-);
-
-generate_test_module!(
-    mod_name: source_module,
-    folders: ["tests/cases/source-module"],
-);
-
-generate_test_module!(
-    mod_name: source_script,
-    folders: ["parser/tests/cases/source-script"],
+generate_test_modules!(
+    expr: ["tests/cases/expr", "parser/tests/cases/expr"],
+    stmt: ["tests/cases/stmt", "parser/tests/cases/stmt"],
+    decl: ["tests/cases/decl"],
+    semicolon: ["parser/tests/cases/semicolon"],
+    strict_mode: ["parser/tests/cases/strict-mode"],
+    source_module: ["tests/cases/source-module"],
+    source_script: ["parser/tests/cases/source-script"],
 );
 
 #[test]
