@@ -31,11 +31,14 @@ use fajt_testing::{read_string, write_string};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::Debug;
+use fajt_ast::traverse::Traverse;
+use fajt_codegen::{generate_code, GeneratorContext};
 
 const INPUT_SECTION: &str = "Input";
+const MINIFIED_SECTION: &str = "Output: minified";
 const AST_SECTION: &str = "Output: ast";
 
-// TODO possibility to regenerate all asts.
+// TODO possibility to regenerate all output.
 
 // This runs for each .md file in the ./cases folder.
 fn run_test(path: &str) {
@@ -57,14 +60,14 @@ fn run_test(path: &str) {
 
 fn parse_and_test<T>(path: &str, test: Markdown, source_type: SourceType)
 where
-    T: Parse + Serialize + DeserializeOwned + PartialEq + Debug,
+    T: Parse + Serialize + DeserializeOwned + PartialEq + Debug + Traverse,
 {
     let mut test = test;
     let result = parse::<T>(&test.get_code(INPUT_SECTION).unwrap(), source_type);
 
     if let Some(ast_section) = test.get_section(AST_SECTION) {
         if let Some(ast) = ast_section.get_code() {
-            assert_result(result, ast);
+            assert_result(&result, ast);
         } else {
             // Section exists but ast missing, generate it.
             let output = result_to_string(result);
@@ -75,17 +78,36 @@ where
             panic!("Ast generated. Verify and rerun test.");
         }
     }
+
+    if let Some(minified_section) = test.get_section(MINIFIED_SECTION) {
+        let mut ctx = GeneratorContext::new();
+        ctx.minified = true;
+
+        let output_min = generate_code(&mut result.unwrap(), ctx);
+
+        if let Some(expected_minified) = minified_section.get_code() {
+            assert_eq!(
+                output_min,
+                expected_minified.trim(),
+                "Minified output mismatch."
+            );
+        } else {
+            test.set_code(MINIFIED_SECTION, "js", &output_min);
+            write_string(path.as_ref(), &test.to_string());
+            panic!("Minified output generated. Verify and rerun test.");
+        }
+    }
 }
 
-fn assert_result<T>(result: Result<T>, ast_json: &str)
+fn assert_result<T>(result: &Result<T>, ast_json: &str)
     where
         T: Parse + Serialize + DeserializeOwned + PartialEq + Debug,
 {
     if let Ok(result) = result {
         let expected_expr: T = serde_json::from_str(&ast_json).unwrap();
-        assert_eq!(result, expected_expr)
+        assert_eq!(result, &expected_expr)
     } else {
-        let error = result.unwrap_err();
+        let error = result.as_ref().unwrap_err();
         println!("Error: {:?}", error);
 
         let expected_error: ErrorKind = serde_json::from_str(&ast_json).unwrap();
