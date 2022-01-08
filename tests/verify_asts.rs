@@ -32,15 +32,35 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::Debug;
 
+const INPUT_SECTION: &str = "Input";
 const AST_SECTION: &str = "Output: ast";
+
 // TODO possibility to regenerate all asts.
+
+// This runs for each .md file in the ./cases folder.
+fn run_test(path: &str) {
+    println!("Running: {}", path);
+
+    let data = read_string(path.as_ref());
+    let test = Markdown::from_string(&data);
+
+    if let Some(input_block) = test.get_block(INPUT_SECTION) {
+        let parse_type = get_attribute(input_block.language, "parse:").unwrap_or("program");
+        let source_type = get_source_type(input_block.language);
+        match parse_type {
+            "expr" => parse_and_test::<Expr>(path, test, source_type),
+            "stmt" => parse_and_test::<Stmt>(path, test, source_type),
+            _ => parse_and_test::<Program>(path, test, source_type),
+        };
+    }
+}
 
 fn parse_and_test<T>(path: &str, test: Markdown, source_type: SourceType)
 where
     T: Parse + Serialize + DeserializeOwned + PartialEq + Debug,
 {
     let mut test = test;
-    let result = parse::<T>(&test.get_code("Input").unwrap(), source_type);
+    let result = parse::<T>(&test.get_code(INPUT_SECTION).unwrap(), source_type);
 
     if let Some(ast_section) = test.get_section(AST_SECTION) {
         if let Some(ast) = ast_section.get_code() {
@@ -57,25 +77,19 @@ where
     }
 }
 
-// This runs for each .md file in the ./cases folder.
-fn run_test(path: &str) {
-    println!("Running: {}", path);
+fn assert_result<T>(result: Result<T>, ast_json: &str)
+    where
+        T: Parse + Serialize + DeserializeOwned + PartialEq + Debug,
+{
+    if let Ok(result) = result {
+        let expected_expr: T = serde_json::from_str(&ast_json).unwrap();
+        assert_eq!(result, expected_expr)
+    } else {
+        let error = result.unwrap_err();
+        println!("Error: {:?}", error);
 
-    let data = read_string(path.as_ref());
-    let test = Markdown::from_string(&data);
-
-    if let Some(input_block) = test
-        .get_section("Input")
-        .map(|section| section.block.as_ref())
-        .flatten()
-    {
-        let parse_type = get_attribute(input_block.language, "parse:").unwrap_or("program");
-        let source_type = get_source_type(input_block.language);
-        match parse_type {
-            "expr" => parse_and_test::<Expr>(path, test, source_type),
-            "stmt" => parse_and_test::<Stmt>(path, test, source_type),
-            _ => parse_and_test::<Program>(path, test, source_type),
-        };
+        let expected_error: ErrorKind = serde_json::from_str(&ast_json).unwrap();
+        assert_eq!(error.kind(), &expected_error)
     }
 }
 
@@ -94,22 +108,6 @@ fn get_attribute<'a>(language: &'a str, attribute: &str) -> Option<&'a str> {
         .find(|s| s.starts_with(attribute))
         .map(|attr| attr.split(':').next_back())
         .flatten()
-}
-
-fn assert_result<T>(result: Result<T>, ast_json: &str)
-where
-    T: Parse + Serialize + DeserializeOwned + PartialEq + Debug,
-{
-    if let Ok(result) = result {
-        let expected_expr: T = serde_json::from_str(&ast_json).unwrap();
-        assert_eq!(result, expected_expr)
-    } else {
-        let error = result.unwrap_err();
-        println!("Error: {:?}", error);
-
-        let expected_error: ErrorKind = serde_json::from_str(&ast_json).unwrap();
-        assert_eq!(error.kind(), &expected_error)
-    }
 }
 
 fn result_to_string<T>(result: Result<T>) -> String
