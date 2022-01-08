@@ -18,10 +18,6 @@ impl<'a> Markdown<'a> {
         self.sections.iter().find(|s| s.name == name)
     }
 
-    pub fn has_section(&self, name: &str) -> bool {
-        self.get_section(name).is_some()
-    }
-
     pub fn get_code(&self, section_name: &str) -> Option<&str> {
         self.get_section(section_name)
             .map(|section| section.block.as_ref().map(|block| block.contents))

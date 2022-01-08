@@ -20,18 +20,22 @@ fn run_test_file(filename: &str) {
 
     assert_eq!(output, input);
 
-    if test_file.has_section(MINIFIED_SECTION) {
+    if let Some(minified_section) = test_file.get_section(MINIFIED_SECTION) {
         let mut ctx = GeneratorContext::new();
         ctx.minified = true;
 
         let output_min = generate_code(&mut ast, ctx);
 
-        if let Some(expected_minified) = test_file.get_code(MINIFIED_SECTION) {
-            assert_eq!(output_min, expected_minified.trim(), "Minified output mismatch.");
+        if let Some(expected_minified) = minified_section.get_code() {
+            assert_eq!(
+                output_min,
+                expected_minified.trim(),
+                "Minified output mismatch."
+            );
         } else {
             test_file.set_code(MINIFIED_SECTION, "js", &output_min);
             write_string(filename.as_ref(), &test_file.to_string());
-            panic!("No minified output found in this test. Output generated, verify and rerun.");
+            panic!("Minified output generated. Verify and rerun test.");
         }
     }
 }

@@ -32,6 +32,7 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::Debug;
 
+const AST_SECTION: &str = "Output: ast";
 // TODO possibility to regenerate all asts.
 
 // This runs for each .md file in the ./cases folder.
@@ -45,19 +46,19 @@ where
     let mut test_file = Markdown::from_string(&data);
     let result = parse::<T>(&test_file.get_code("Input").unwrap(), source_type);
 
-    let ast = test_file.get_code("Output: ast");
-    if ast.is_none() {
-        // If the test file contain no output, we generate that from result of running the code.
-        // I.e. you can add a test file with just code to generate the result.
-        let output = result_to_string(result);
-        test_file.set_code("Output: ast", "json", &output);
-        write_string(path.as_ref(), &test_file.to_string());
+    if let Some(ast_section) = test_file.get_section(AST_SECTION) {
+        if let Some(ast) = ast_section.get_code() {
+            assert_result(result, ast);
+        } else {
+            // Section exists but ast missing, generate it.
+            let output = result_to_string(result);
 
-        panic!("No ast found in this test. Output generated, verify and rerun.");
+            test_file.set_code(AST_SECTION, "json", &output);
+            write_string(path.as_ref(), &test_file.to_string());
+
+            panic!("Ast generated. Verify and rerun test.");
+        }
     }
-
-    let ast = ast.unwrap();
-    assert_result(result, ast);
 }
 
 fn assert_result<T>(result: Result<T>, ast_json: &str)

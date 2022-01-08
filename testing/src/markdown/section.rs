@@ -28,6 +28,10 @@ impl MarkdownSection<'_> {
             })
             .collect()
     }
+
+    pub fn get_code(&self) -> Option<&str> {
+        self.block.as_ref().map(|block| block.contents)
+    }
 }
 
 impl ToString for MarkdownBlock<'_> {
