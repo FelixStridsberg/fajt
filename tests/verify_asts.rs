@@ -42,20 +42,35 @@ where
 
     let data = read_string(path.as_ref());
     let test_file = Markdown::from_string(&data);
-    let result = parse::<T>(&test_file.source, source_type);
+    let result = parse::<T>(
+        &test_file
+            .get_section("Input")
+            .unwrap()
+            .block
+            .as_ref()
+            .unwrap()
+            .contents,
+        source_type,
+    );
 
-    if test_file.ast.is_none() {
+    let ast = test_file
+        .get_section("Output: ast")
+        .unwrap()
+        .block
+        .as_ref()
+        .map(|b| b.contents);
+    if ast.is_none() {
         // If the test file contain no output, we generate that from result of running the code.
         // I.e. you can add a test file with just code to generate the result.
         generate_expected_output(result, test_file);
         panic!("No ast found in this test. Output generated, verify and rerun.");
     }
 
-    let ast = test_file.ast.unwrap();
+    let ast = ast.unwrap();
     assert_result(result, ast);
 }
 
-fn assert_result<T>(result: Result<T>, ast_json: String)
+fn assert_result<T>(result: Result<T>, ast_json: &str)
 where
     T: Parse + Serialize + DeserializeOwned + PartialEq + Debug,
 {

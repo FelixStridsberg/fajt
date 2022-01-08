@@ -10,8 +10,16 @@ fn run_test_file(filename: &str) {
 
     let data = read_string(filename.as_ref());
     let test_file = Markdown::from_string(&data);
-    let input = test_file.source;
-    let input_min = test_file.source_min;
+    let input = test_file
+        .get_section("Input")
+        .unwrap()
+        .block
+        .as_ref()
+        .unwrap()
+        .contents;
+    let input_min = test_file
+        .get_section("Ouput: minified")
+        .map(|s| s.block.as_ref().unwrap().contents);
     let mut ast = parse_program(&input).unwrap();
 
     let output = generate_code(&mut ast, GeneratorContext::new());
