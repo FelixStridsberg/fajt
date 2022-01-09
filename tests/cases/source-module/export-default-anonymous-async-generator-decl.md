@@ -1,34 +1,39 @@
 ### Source
 ```js source:module
-export default async function*() {}
+export default async function* () {}
+```
+
+### Output: minified
+```js
+export default async function*(){}
 ```
 
 ### Output: ast
 ```json
 {
   "Module": {
-    "span": "0:35",
+    "span": "0:36",
     "body": [
       {
         "ExportDeclaration": {
           "DefaultDecl": {
-            "span": "0:35",
+            "span": "0:36",
             "decl": {
               "FunctionDecl": {
-                "span": "15:35",
+                "span": "15:36",
                 "asynchronous": true,
                 "generator": true,
                 "identifier": {
-                  "span": "30:30",
+                  "span": "31:31",
                   "name": ""
                 },
                 "parameters": {
-                  "span": "30:32",
+                  "span": "31:33",
                   "bindings": [],
                   "rest": null
                 },
                 "body": {
-                  "span": "33:35",
+                  "span": "34:36",
                   "directives": [],
                   "statements": []
                 }

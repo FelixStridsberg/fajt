@@ -680,6 +680,18 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_export_default_decl(&mut self, node: &mut ExportDefaultDecl) -> bool {
+        self.string("export default");
+        self.space();
+
+        if matches!(*node.decl, Stmt::FunctionDecl(_)) {
+            self.skip_next_separation = true;
+        }
+
+        node.decl.traverse(self);
+        false
+    }
+
     fn enter_export_namespace(&mut self, node: &mut ExportNamespace) -> bool {
         self.string("export");
         self.space();
