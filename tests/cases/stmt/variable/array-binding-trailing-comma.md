@@ -1,6 +1,11 @@
 ### Source
-```js parse:stmt
+```js parse:stmt check-format:no
 var [ a, ] = b;
+```
+
+### Output: minified
+```js
+var[a]=b;
 ```
 
 ### Output: ast

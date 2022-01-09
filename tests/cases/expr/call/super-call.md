@@ -1,11 +1,11 @@
 ### Source
 ```js parse:expr
-super();
+super()
 ```
 
 ### Output: minified
 ```js
-super();
+super()
 ```
 
 ### Output: ast

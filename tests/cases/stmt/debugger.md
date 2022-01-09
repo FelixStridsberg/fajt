@@ -5,7 +5,7 @@ debugger;
 
 ### Output: minified
 ```js
-debugger
+debugger;
 ```
 
 ### Output: ast

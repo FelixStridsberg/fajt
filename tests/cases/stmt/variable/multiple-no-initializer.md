@@ -3,6 +3,11 @@
 var a, b;
 ```
 
+### Output: minified
+```js
+var a, b;
+```
+
 ### Output: ast
 ```json
 {

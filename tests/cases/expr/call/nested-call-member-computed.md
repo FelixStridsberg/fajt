@@ -1,11 +1,11 @@
 ### Source
 ```js parse:expr
-f1()["f2"]();
+f1()["f2"]()
 ```
 
 ### Output: minified
 ```js
-f1()["f2"]();
+f1()["f2"]()
 ```
 
 ### Output: ast

@@ -5,7 +5,7 @@ var [ yield, ...yield ] = c;
 
 ### Output: minified
 ```js
-var[yield,...yield]=c
+var[yield,...yield]=c;
 ```
 
 ### Output: ast

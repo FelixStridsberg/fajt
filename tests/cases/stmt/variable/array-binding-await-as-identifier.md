@@ -5,7 +5,7 @@ var [ await, ...await ] = c;
 
 ### Output: minified
 ```js
-var[await,...await]=c
+var[await,...await]=c;
 ```
 
 ### Output: ast

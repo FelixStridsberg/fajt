@@ -5,7 +5,7 @@ var foo;
 
 ### Output: minified
 ```js
-var foo
+var foo;
 ```
 
 ### Output: ast

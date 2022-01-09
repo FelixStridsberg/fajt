@@ -5,7 +5,7 @@ label: a;
 
 ### Output: minified
 ```js
-label:a
+label:a;
 ```
 
 ### Output: ast

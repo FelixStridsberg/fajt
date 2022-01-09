@@ -5,7 +5,7 @@ var [ , ] = b;
 
 ### Output: minified
 ```js
-var[,]=b
+var[,]=b;
 ```
 
 ### Output: ast

@@ -1,10 +1,6 @@
 ### Source
 ```js parse:expr
-super(a, b);
-```
-
-```js
-super(a,b);
+super(a, b)
 ```
 
 ### Output: ast

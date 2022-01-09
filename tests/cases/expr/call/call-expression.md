@@ -1,11 +1,11 @@
 ### Source
 ```js parse:expr
-fn(a, ...b);
+fn(a, ...b)
 ```
 
 ### Output: minified
 ```js
-fn(a,...b);
+fn(a,...b)
 ```
 
 ### Output: ast

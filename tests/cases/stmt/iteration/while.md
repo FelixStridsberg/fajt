@@ -5,7 +5,7 @@ while (true) a;
 
 ### Output: minified
 ```js
-while(true)a
+while(true)a;
 ```
 
 ### Output: ast

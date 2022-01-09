@@ -3,6 +3,11 @@
 const foo;
 ```
 
+### Output: minified
+```js
+const foo;
+```
+
 ### Output: ast
 ```json
 {

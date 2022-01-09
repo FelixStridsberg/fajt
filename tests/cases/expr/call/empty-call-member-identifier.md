@@ -1,6 +1,6 @@
 ### Source
 ```js parse:expr
-fn().a;
+fn().a
 ```
 
 ### Output: minified

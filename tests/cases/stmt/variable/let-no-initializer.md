@@ -5,7 +5,7 @@ let foo;
 
 ### Output: minified
 ```js
-let foo
+let foo;
 ```
 
 ### Output: ast

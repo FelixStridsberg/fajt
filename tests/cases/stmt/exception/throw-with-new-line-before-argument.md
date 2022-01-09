@@ -1,7 +1,12 @@
 ### Source
-```js parse:stmt
+```js parse:stmt check-format:no
 throw
 a
+```
+
+### Output: minified
+```js
+throw;a;
 ```
 
 ### Output: ast

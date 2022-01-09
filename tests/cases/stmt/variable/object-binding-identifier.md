@@ -5,7 +5,7 @@ var { a } = b;
 
 ### Output: minified
 ```js
-var{a}=b
+var{a}=b;
 ```
 
 ### Output: ast
