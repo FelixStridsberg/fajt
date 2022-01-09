@@ -91,7 +91,9 @@ where
     let mut regenerate_min = None;
 
     let mut test = test;
-    let mut result = parse::<T>(&test.get_block_content(INPUT_SECTION).unwrap(), source_type);
+    let input_block = test.get_block(INPUT_SECTION).unwrap();
+    let source = input_block.contents;
+    let mut result = parse::<T>(&source, source_type);
 
     if let Some(ast_section) = test.get_section(AST_SECTION) {
         if let Some(ast) = ast_section.get_code() {
@@ -99,6 +101,15 @@ where
         } else {
             regenerate_ast = true;
         }
+    }
+
+    let parse_type = get_attribute(input_block.language, "parse:").unwrap_or("program");
+    let code_output = generate_code(result.as_mut().unwrap(), GeneratorContext::new());
+
+    if parse_type == "expr" {
+        assert_eq!(code_output.trim(), source.trim());
+    } else {
+        assert_eq!(code_output, source);
     }
 
     if let Some(minified_section) = test.get_section(MINIFIED_SECTION) {
@@ -117,7 +128,6 @@ where
             regenerate_min = Some(output_min);
         }
     }
-
 
     #[allow(unused_assignments)]
     let mut ast_output = None; // Just to make sure it lives until written

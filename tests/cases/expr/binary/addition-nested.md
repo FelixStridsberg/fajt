@@ -1,6 +1,6 @@
 ### Input
 ```js parse:expr
-a + b + c + d;
+a + b + c + d
 ```
 
 ### Output: minified

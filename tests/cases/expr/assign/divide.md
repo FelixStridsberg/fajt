@@ -1,6 +1,6 @@
 ### Input
 ```js parse:expr
-a /= b;
+a /= b
 ```
 
 ### Output: minified

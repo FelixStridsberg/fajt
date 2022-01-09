@@ -1,6 +1,11 @@
 ### Input
 ```js parse:expr
-a = b;
+a = b
+```
+
+### Output: minified
+```js
+a=b
 ```
 
 ### Output: ast

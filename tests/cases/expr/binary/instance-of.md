@@ -1,6 +1,6 @@
 ### Input
 ```js parse:expr
-a instanceof b instanceof c;
+a instanceof b instanceof c
 ```
 
 ### Output: minified
