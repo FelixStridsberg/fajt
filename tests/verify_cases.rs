@@ -55,7 +55,7 @@ use fajt_ast::{Expr, Program, SourceType, Stmt};
 use fajt_codegen::{generate_code, GeneratorContext};
 use fajt_parser::error::{ErrorKind, Result};
 use fajt_parser::{parse, Parse};
-use fajt_testing::markdown::Markdown;
+use fajt_testing::markdown::{Markdown, MarkdownBlock};
 use fajt_testing::{read_string, write_string};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -97,38 +97,22 @@ where
 
     if let Some(ast_section) = test.get_section(AST_SECTION) {
         if let Some(ast) = ast_section.get_code() {
-            assert_result(&result, ast);
+            assert_ast(&result, ast);
         } else {
             regenerate_ast = true;
         }
     }
 
     if result.is_ok() {
-        let parse_type = get_attribute(source_block.language, "parse:").unwrap_or("program");
-        let code_output = generate_code(result.as_mut().unwrap(), GeneratorContext::new());
-
-        if parse_type == "expr" {
-            assert_eq!(
-                code_output.trim(),
-                source.trim(),
-                "Source do not match formatted output."
-            );
-        } else {
-            assert_eq!(code_output, source, "Source do not match formatted output.");
-        }
+        assert_source_format(source_block, source, &mut result);
 
         if let Some(minified_section) = test.get_section(MINIFIED_SECTION) {
             let mut ctx = GeneratorContext::new();
             ctx.minified = true;
 
             let output_min = generate_code(result.as_mut().unwrap(), ctx);
-
             if let Some(expected_minified) = minified_section.get_code() {
-                assert_eq!(
-                    output_min,
-                    expected_minified.trim(),
-                    "Minified output mismatch."
-                );
+                assert_minified_output(&output_min, expected_minified);
             } else {
                 regenerate_min = Some(output_min);
             }
@@ -152,7 +136,7 @@ where
     }
 }
 
-fn assert_result<T>(result: &Result<T>, ast_json: &str)
+fn assert_ast<T>(result: &Result<T>, ast_json: &str)
 where
     T: Parse + Serialize + DeserializeOwned + PartialEq + Debug,
 {
@@ -166,6 +150,32 @@ where
         let expected_error: ErrorKind = serde_json::from_str(&ast_json).unwrap();
         assert_eq!(error.kind(), &expected_error)
     }
+}
+
+fn assert_source_format<T>(source_block: &MarkdownBlock, source: &str, result: &mut Result<T>)
+where
+    T: Parse + Serialize + DeserializeOwned + PartialEq + Debug + Traverse,
+{
+    let parse_type = get_attribute(source_block.language, "parse:").unwrap_or("program");
+    let code_output = generate_code(result.as_mut().unwrap(), GeneratorContext::new());
+
+    if parse_type == "expr" {
+        assert_eq!(
+            code_output.trim(),
+            source.trim(),
+            "Source do not match formatted output."
+        );
+    } else {
+        assert_eq!(code_output, source, "Source do not match formatted output.");
+    }
+}
+
+fn assert_minified_output(output_min: &String, expected_minified: &str) {
+    assert_eq!(
+        output_min.trim(),
+        expected_minified.trim(),
+        "Minified output mismatch."
+    );
 }
 
 fn get_source_type(language: &str) -> SourceType {
