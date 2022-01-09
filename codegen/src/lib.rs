@@ -871,6 +871,11 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_sequence_expr(&mut self, node: &mut ExprSequence) -> bool {
+        self.comma_separated_with_rest(&mut node.expr, &mut (None as Option<Argument>));
+        false
+    }
+
     fn enter_number(&mut self, node: &mut Number) -> bool {
         match node {
             Number::Integer(n, _) => self.string(&n.to_string()),

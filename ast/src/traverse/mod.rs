@@ -50,6 +50,7 @@ generate_fold_and_visit! {
             Member
             Conditional
             Update
+            Sequence
         }
 
         Stmt: (enter: enter_stmt, exit: exit_stmt) {
@@ -228,6 +229,10 @@ generate_fold_and_visit! {
 
         ExprUpdate: (enter: enter_update_expr, exit: exit_update_expr) {
             argument
+        }
+
+        ExprSequence: (enter: enter_sequence_expr, exit: exit_sequence_expr) {
+            expr
         }
 
         DeclClass: (enter: enter_class_decl, exit: exit_class_decl) {
