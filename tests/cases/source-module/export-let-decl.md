@@ -1,21 +1,28 @@
 ### Source
 ```js source:module
-export const a = 1, b = 2, c
+export const a = 1,
+             b = 2,
+             c;
+```
+
+### Output: minified
+```js
+export const a=1,b=2,c
 ```
 
 ### Output: ast
 ```json
 {
   "Module": {
-    "span": "0:28",
+    "span": "0:55",
     "body": [
       {
         "ExportDeclaration": {
           "Decl": {
-            "span": "0:28",
+            "span": "0:55",
             "decl": {
               "Variable": {
-                "span": "7:28",
+                "span": "7:55",
                 "kind": "Const",
                 "declarations": [
                   {
@@ -41,16 +48,16 @@ export const a = 1, b = 2, c
                     }
                   },
                   {
-                    "span": "20:25",
+                    "span": "33:38",
                     "pattern": {
                       "Ident": {
-                        "span": "20:21",
+                        "span": "33:34",
                         "name": "b"
                       }
                     },
                     "initializer": {
                       "Literal": {
-                        "span": "24:25",
+                        "span": "37:38",
                         "literal": {
                           "Number": {
                             "Integer": [
@@ -63,10 +70,10 @@ export const a = 1, b = 2, c
                     }
                   },
                   {
-                    "span": "27:28",
+                    "span": "53:54",
                     "pattern": {
                       "Ident": {
-                        "span": "27:28",
+                        "span": "53:54",
                         "name": "c"
                       }
                     },

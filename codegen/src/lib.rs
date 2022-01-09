@@ -71,6 +71,7 @@ struct CodeGenerator<'a> {
     data: &'a mut String,
     ctx: GeneratorContext,
     index: Rc<Index>,
+    skip_next_separation: bool,
 }
 
 impl<'a> CodeGenerator<'a> {
@@ -79,6 +80,7 @@ impl<'a> CodeGenerator<'a> {
             data,
             ctx,
             index: Rc::new(Index::new()),
+            skip_next_separation: false,
         }
     }
 
@@ -124,6 +126,7 @@ impl CodeGenerator<'_> {
     fn with_indent(&mut self) -> CodeGenerator<'_> {
         CodeGenerator {
             data: self.data,
+            skip_next_separation: self.skip_next_separation,
             index: self.index.clone(),
             ctx: GeneratorContext {
                 indent: self.ctx.indent + 1,
@@ -136,6 +139,7 @@ impl CodeGenerator<'_> {
         let align = self.col_pos();
         CodeGenerator {
             data: self.data,
+            skip_next_separation: self.skip_next_separation,
             index: self.index.clone(),
             ctx: GeneratorContext {
                 align: Some(align),
@@ -224,6 +228,11 @@ impl CodeGenerator<'_> {
 
     /// Separation between logical sections, only adds a new line if not first in block or file.
     fn separation(&mut self) {
+        if self.skip_next_separation {
+            self.skip_next_separation = false;
+            return;
+        }
+
         if !self.at_block_start() {
             self.new_line();
         }
@@ -656,6 +665,18 @@ impl Visitor for CodeGenerator<'_> {
             self.comma_separated_with_rest(&mut node.arguments, &mut (None as Option<Argument>));
             self.char(')');
         }
+        false
+    }
+
+    fn enter_export_decl(&mut self, node: &mut ExportDecl) -> bool {
+        self.string("export");
+        self.space();
+
+        if matches!(*node.decl, Stmt::FunctionDecl(_)) {
+            self.skip_next_separation = true;
+        }
+
+        node.decl.traverse(self);
         false
     }
 

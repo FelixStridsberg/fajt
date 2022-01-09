@@ -78,6 +78,7 @@ generate_fold_and_visit! {
             ForIn
             While
             DoWhile
+            ExportDeclaration
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
@@ -130,6 +131,14 @@ generate_fold_and_visit! {
         ArrayElement: (enter: enter_array_element, exit: exit_array_element) {
             Expr
             Spread
+        }
+
+        DeclExport: (enter: enter_export, exit: exit_export) {
+            Decl
+            DefaultExpr
+            DefaultDecl
+            Named
+            Namespace
         }
     }
 
@@ -313,5 +322,15 @@ generate_fold_and_visit! {
         StmtWhile: (enter: enter_while_stmt, exit: exit_while_stmt) {}
 
         StmtDoWhile: (enter: enter_do_while_stmt, exit: exit_do_while_stmt) {}
+
+        ExportDecl: (enter: enter_export_decl, exit: exit_export_decl) {}
+
+        ExportDefaultDecl: (enter: enter_export_default_decl, exit: exit_export_default_decl) {}
+
+        ExportDefaultExpr: (enter: enter_export_default_expr, exit: exit_export_default_expr) {}
+
+        ExportNamed: (enter: enter_export_named, exit: exit_export_named) {}
+
+        ExportNamespace: (enter: enter_export_namespace, exit: exit_export_namespace) {}
     }
 }

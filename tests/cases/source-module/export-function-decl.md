@@ -1,21 +1,26 @@
 ### Source
 ```js source:module
-export function fn () {}
+export function fn() {}
+```
+
+### Output: minified
+```js
+export function fn(){}
 ```
 
 ### Output: ast
 ```json
 {
   "Module": {
-    "span": "0:24",
+    "span": "0:23",
     "body": [
       {
         "ExportDeclaration": {
           "Decl": {
-            "span": "0:24",
+            "span": "0:23",
             "decl": {
               "FunctionDecl": {
-                "span": "7:24",
+                "span": "7:23",
                 "asynchronous": false,
                 "generator": false,
                 "identifier": {
@@ -23,12 +28,12 @@ export function fn () {}
                   "name": "fn"
                 },
                 "parameters": {
-                  "span": "19:21",
+                  "span": "18:20",
                   "bindings": [],
                   "rest": null
                 },
                 "body": {
-                  "span": "22:24",
+                  "span": "21:23",
                   "directives": [],
                   "statements": []
                 }
