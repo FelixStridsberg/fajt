@@ -1,5 +1,5 @@
 ### Source
-```js
+```js check-format:no
 export default a + b
 export default a + b;
 export default function () {}

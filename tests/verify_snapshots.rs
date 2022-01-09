@@ -104,8 +104,8 @@ where
     }
 
     if result.is_ok() {
-        let source_format = get_attribute(source_block.language, "format:");
-        if source_format != Some("invalid") {
+        let source_format = get_attribute(source_block.language, "check-format:");
+        if source_format != Some("no") {
             assert_source_format(source_block, source, &mut result);
         }
 

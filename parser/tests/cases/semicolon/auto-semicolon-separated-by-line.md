@@ -1,5 +1,5 @@
 ### Source
-```js
+```js check-format:no
 a
 b
 ```

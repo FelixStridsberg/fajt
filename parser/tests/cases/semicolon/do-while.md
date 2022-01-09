@@ -1,5 +1,5 @@
 ### Source
-```js
+```js check-format:no
 do {} while(true)
 do {} while (true);
 do ; while(a) b

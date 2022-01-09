@@ -1,5 +1,5 @@
 ### Source
-```js
+```js check-format:no
 export {a}
 export {a};
 export {a} from 'b'
