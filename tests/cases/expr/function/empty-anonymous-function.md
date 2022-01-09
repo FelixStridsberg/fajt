@@ -3,6 +3,11 @@
 function () {}
 ```
 
+### Output: minified
+```js
+function(){}
+```
+
 ### Output: ast
 ```json
 {

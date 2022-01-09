@@ -1,13 +1,20 @@
 ### Source
 ```js parse:expr
-async function fn(param) { ; }
+async function fn(param) {
+    ;
+}
+```
+
+### Output: minified
+```js
+async function fn(param){}
 ```
 
 ### Output: ast
 ```json
 {
   "Function": {
-    "span": "0:30",
+    "span": "0:34",
     "asynchronous": true,
     "generator": false,
     "identifier": {
@@ -31,12 +38,12 @@ async function fn(param) { ; }
       "rest": null
     },
     "body": {
-      "span": "25:30",
+      "span": "25:34",
       "directives": [],
       "statements": [
         {
           "Empty": {
-            "span": "27:28"
+            "span": "31:32"
           }
         }
       ]

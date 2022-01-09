@@ -549,6 +549,26 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_function_expr(&mut self, node: &mut ExprFunction) -> bool {
+        if node.asynchronous {
+            self.string("async ");
+        }
+
+        self.string("function");
+
+        if node.generator {
+            self.char('*');
+        }
+        self.space();
+
+        node.identifier.traverse(self);
+        node.parameters.traverse(self);
+
+        self.space();
+        node.body.traverse(self);
+        false
+    }
+
     fn enter_function_decl(&mut self, node: &mut DeclFunction) -> bool {
         self.separation();
 
@@ -560,10 +580,8 @@ impl Visitor for CodeGenerator<'_> {
 
         if node.generator {
             self.char('*');
-            self.space();
-        } else {
-            self.char(' ');
         }
+        self.space();
 
         node.identifier.traverse(self);
         node.parameters.traverse(self);

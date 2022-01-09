@@ -1,6 +1,11 @@
 ### Source
 ```js parse:expr
-async function *() {}
+async function* () {}
+```
+
+### Output: minified
+```js
+async function*(){}
 ```
 
 ### Output: ast

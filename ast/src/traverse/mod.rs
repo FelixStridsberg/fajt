@@ -52,6 +52,7 @@ generate_fold_and_visit! {
             Update
             Sequence
             This
+            Function
         }
 
         Stmt: (enter: enter_stmt, exit: exit_stmt) {
@@ -242,6 +243,12 @@ generate_fold_and_visit! {
         }
 
         ExprThis: (enter: enter_this_expr, exit: exit_this_expr) {}
+
+        ExprFunction: (enter: enter_function_expr, exit: exit_function_expr) {
+            identifier
+            parameters
+            body
+        }
 
         DeclClass: (enter: enter_class_decl, exit: exit_class_decl) {
             super_class

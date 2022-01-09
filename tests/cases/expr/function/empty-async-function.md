@@ -3,6 +3,11 @@
 async function fn() {}
 ```
 
+### Output: minified
+```js
+async function fn(){}
+```
+
 ### Output: ast
 ```json
 {
