@@ -464,6 +464,12 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_unary_expr(&mut self, node: &mut ExprUnary) -> bool {
+        self.string(&node.operator.to_string());
+        node.argument.traverse(self);
+        false
+    }
+
     fn enter_binary_expr(&mut self, node: &mut ExprBinary) -> bool {
         node.left.traverse(self);
         self.space();

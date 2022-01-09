@@ -38,6 +38,7 @@ generate_fold_and_visit! {
         }
 
         Expr: (enter: enter_expr, exit: exit_expr) {
+            Unary
             Binary
             IdentRef
             Literal
@@ -141,6 +142,10 @@ generate_fold_and_visit! {
         ExprBinary: (enter: enter_binary_expr, exit: exit_binary_expr) {
             left
             right
+        }
+
+        ExprUnary: (enter: enter_unary_expr, exit: exit_unary_expr) {
+            argument
         }
 
         ExprLogical: (enter: enter_logical_expr, exit: exit_logical_expr) {

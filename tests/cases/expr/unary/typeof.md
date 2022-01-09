@@ -3,6 +3,11 @@
 typeof a
 ```
 
+### Output: minified
+```js
+typeof a
+```
+
 ### Output: ast
 ```json
 {

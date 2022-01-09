@@ -3,6 +3,11 @@
 void a
 ```
 
+### Output: minified
+```js
+void a
+```
+
 ### Output: ast
 ```json
 {

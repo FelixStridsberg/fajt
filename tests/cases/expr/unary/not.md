@@ -3,6 +3,11 @@
 !a
 ```
 
+### Output: minified
+```js
+!a
+```
+
 ### Output: ast
 ```json
 {

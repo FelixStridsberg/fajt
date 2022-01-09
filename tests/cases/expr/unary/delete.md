@@ -3,6 +3,11 @@
 delete a
 ```
 
+### Output: minified
+```js
+delete a
+```
+
 ### Output: ast
 ```json
 {
