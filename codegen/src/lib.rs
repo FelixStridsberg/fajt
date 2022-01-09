@@ -604,6 +604,19 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_conditional_expr(&mut self, node: &mut ExprConditional) -> bool {
+        node.condition.traverse(self);
+        self.space();
+        self.char('?');
+        self.space();
+        node.consequent.traverse(self);
+        self.space();
+        self.char(':');
+        self.space();
+        node.alternate.traverse(self);
+        false
+    }
+
     fn enter_body(&mut self, node: &mut Body) -> bool {
         self.start_block();
 

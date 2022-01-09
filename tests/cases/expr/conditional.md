@@ -3,6 +3,11 @@
 test ? consequent : alternate
 ```
 
+### Output: minified
+```js
+test?consequent:alternate
+```
+
 ### Output: ast
 ```json
 {

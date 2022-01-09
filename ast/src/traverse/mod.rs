@@ -48,6 +48,7 @@ generate_fold_and_visit! {
             Logical
             Call
             Member
+            Conditional
         }
 
         Stmt: (enter: enter_stmt, exit: exit_stmt) {
@@ -216,6 +217,12 @@ generate_fold_and_visit! {
 
         ExprYield: (enter: enter_yield_expr, exit: exit_yield_expr) {
             argument
+        }
+
+        ExprConditional: (enter: enter_conditional_expr, exit: exit_conditional_expr) {
+            condition
+            consequent
+            condition
         }
 
         DeclClass: (enter: enter_class_decl, exit: exit_class_decl) {
