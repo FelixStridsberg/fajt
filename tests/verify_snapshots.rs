@@ -249,13 +249,13 @@ macro_rules! generate_test_modules {
 }
 
 generate_test_modules!(
-    expr: ["tests/cases/expr", "parser/tests/cases/expr"],
-    stmt: ["tests/cases/stmt", "parser/tests/cases/stmt"],
+    expr: ["tests/cases/expr"],
+    stmt: ["tests/cases/stmt"],
     decl: ["tests/cases/decl"],
-    semicolon: ["parser/tests/cases/semicolon"],
-    strict_mode: ["parser/tests/cases/strict-mode"],
+    semicolon: ["tests/cases/semicolon"],
+    strict_mode: ["tests/cases/strict-mode"],
     source_module: ["tests/cases/source-module"],
-    source_script: ["parser/tests/cases/source-script"],
+    source_script: ["tests/cases/source-script"],
 );
 
 #[test]

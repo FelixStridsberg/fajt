@@ -1,11 +1,6 @@
 # Integration tests
 
-These are reusable test cases that can be use for testing any part of the
-parsing and code generation process.
+The [./cases/](./cases/) folder contains markdown files with source and asserted output. These are used for integration
+tests of parsing and code generation.
 
-All tests that go here must...
-- Be parseable
-- Be properly formatted (so codegen can compare input with output)
-
-Failing tests and tests that can not be properly formatted should go in the
-proper workspace instead.
+See [verify_snapshots.rs](./verify_snapshots.rs) for documentation on file format.
