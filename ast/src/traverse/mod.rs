@@ -123,6 +123,11 @@ generate_fold_and_visit! {
             Ident
             Expr
         }
+
+        ArrayElement: (enter: enter_array_element, exit: exit_array_element) {
+            Expr
+            Spread
+        }
     }
 
     structs: {

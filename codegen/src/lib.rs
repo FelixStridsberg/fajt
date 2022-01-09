@@ -800,11 +800,39 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_array_element(&mut self, node: &mut ArrayElement) -> bool {
+        match node {
+            ArrayElement::None => false,
+            ArrayElement::Expr(_) => true,
+            ArrayElement::Spread(_) => {
+                self.string("...");
+                true
+            }
+        }
+    }
+
     fn enter_literal(&mut self, node: &mut Literal) -> bool {
         match node {
             Literal::Null => self.string("null"),
             Literal::Boolean(true) => self.string("true"),
             Literal::Boolean(false) => self.string("false"),
+            Literal::Array(array) => {
+                if array.elements.is_empty() {
+                    self.string("[]");
+                    return false;
+                }
+
+                self.char('[');
+                self.space();
+
+                self.comma_separated_with_rest(
+                    &mut array.elements,
+                    &mut (None as Option<Argument>),
+                );
+
+                self.space();
+                self.char(']');
+            }
             _ => return true,
         }
 

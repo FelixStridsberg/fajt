@@ -1,13 +1,18 @@
 ### Source
 ```js parse:expr
-[ a,, b ]
+[ a, , b ]
+```
+
+### Output: minified
+```js
+[a,,b]
 ```
 
 ### Output: ast
 ```json
 {
   "Literal": {
-    "span": "0:9",
+    "span": "0:10",
     "literal": {
       "Array": {
         "elements": [
@@ -23,7 +28,7 @@
           {
             "Expr": {
               "IdentRef": {
-                "span": "6:7",
+                "span": "7:8",
                 "name": "b"
               }
             }
