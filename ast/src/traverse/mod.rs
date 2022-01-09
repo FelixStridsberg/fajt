@@ -49,6 +49,7 @@ generate_fold_and_visit! {
             Call
             Member
             Conditional
+            Update
         }
 
         Stmt: (enter: enter_stmt, exit: exit_stmt) {
@@ -223,6 +224,10 @@ generate_fold_and_visit! {
             condition
             consequent
             condition
+        }
+
+        ExprUpdate: (enter: enter_update_expr, exit: exit_update_expr) {
+            argument
         }
 
         DeclClass: (enter: enter_class_decl, exit: exit_class_decl) {

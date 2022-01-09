@@ -470,6 +470,17 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_update_expr(&mut self, node: &mut ExprUpdate) -> bool {
+        if node.prefix {
+            self.string(&node.operator.to_string());
+        }
+        node.argument.traverse(self);
+        if !node.prefix {
+            self.string(&node.operator.to_string());
+        }
+        false
+    }
+
     fn enter_binary_expr(&mut self, node: &mut ExprBinary) -> bool {
         node.left.traverse(self);
         self.space();
