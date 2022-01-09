@@ -1,15 +1,20 @@
 ### Source
 ```js parse:expr
 function* fn() {
-  yield a
+    yield a;
 }
+```
+
+### Output: minified
+```js
+function*fn(){yield a}
 ```
 
 ### Output: ast
 ```json
 {
   "Function": {
-    "span": "0:28",
+    "span": "0:31",
     "asynchronous": false,
     "generator": true,
     "identifier": {
@@ -22,18 +27,18 @@ function* fn() {
       "rest": null
     },
     "body": {
-      "span": "15:28",
+      "span": "15:31",
       "directives": [],
       "statements": [
         {
           "Expr": {
-            "span": "19:26",
+            "span": "21:29",
             "expr": {
               "Yield": {
-                "span": "19:26",
+                "span": "21:28",
                 "argument": {
                   "IdentRef": {
-                    "span": "25:26",
+                    "span": "27:28",
                     "name": "a"
                   }
                 },

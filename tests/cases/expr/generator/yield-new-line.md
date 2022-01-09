@@ -1,16 +1,21 @@
 ### Source
-```js parse:expr
+```js parse:expr check-format:no
 function* () {
-  yield
-  a
+    yield
+    a
 }
+```
+
+### Output: minified
+```js
+function*(){yield;a}
 ```
 
 ### Output: ast
 ```json
 {
   "Function": {
-    "span": "0:28",
+    "span": "0:32",
     "asynchronous": false,
     "generator": true,
     "identifier": null,
@@ -20,15 +25,15 @@ function* () {
       "rest": null
     },
     "body": {
-      "span": "13:28",
+      "span": "13:32",
       "directives": [],
       "statements": [
         {
           "Expr": {
-            "span": "17:22",
+            "span": "19:24",
             "expr": {
               "Yield": {
-                "span": "17:22",
+                "span": "19:24",
                 "argument": null,
                 "delegate": false
               }
@@ -37,10 +42,10 @@ function* () {
         },
         {
           "Expr": {
-            "span": "25:26",
+            "span": "29:30",
             "expr": {
               "IdentRef": {
-                "span": "25:26",
+                "span": "29:30",
                 "name": "a"
               }
             }
