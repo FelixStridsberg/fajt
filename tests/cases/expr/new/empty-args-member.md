@@ -3,6 +3,11 @@
 new a.b()
 ```
 
+### Output: minified
+```js
+new a.b()
+```
+
 ### Output: ast
 ```json
 {

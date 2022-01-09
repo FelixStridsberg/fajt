@@ -646,6 +646,19 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_new_expr(&mut self, node: &mut ExprNew) -> bool {
+        self.string("new");
+        self.space();
+        node.callee.traverse(self);
+
+        if node.arguments_span.is_some() {
+            self.char('(');
+            self.comma_separated_with_rest(&mut node.arguments, &mut (None as Option<Argument>));
+            self.char(')');
+        }
+        false
+    }
+
     fn enter_body(&mut self, node: &mut Body) -> bool {
         self.start_block();
 

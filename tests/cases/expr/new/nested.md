@@ -1,6 +1,11 @@
 ### Source
 ```js parse:expr
-new new a;
+new new a
+```
+
+### Output: minified
+```js
+new new a
 ```
 
 ### Output: ast

@@ -3,6 +3,11 @@
 new a(...b, c, ...[])
 ```
 
+### Output: minified
+```js
+new a(...b,c,...[])
+```
+
 ### Output: ast
 ```json
 {

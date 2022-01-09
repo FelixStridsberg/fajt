@@ -3,6 +3,11 @@
 new a(b, !null)
 ```
 
+### Output: minified
+```js
+new a(b,!null)
+```
+
 ### Output: ast
 ```json
 {

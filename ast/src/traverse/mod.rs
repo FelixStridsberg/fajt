@@ -53,6 +53,7 @@ generate_fold_and_visit! {
             Sequence
             This
             Function
+            New
         }
 
         Stmt: (enter: enter_stmt, exit: exit_stmt) {
@@ -248,6 +249,11 @@ generate_fold_and_visit! {
             identifier
             parameters
             body
+        }
+
+        ExprNew: (enter: enter_new_expr, exit: exit_new_expr) {
+            callee
+            arguments
         }
 
         DeclClass: (enter: enter_class_decl, exit: exit_class_decl) {
