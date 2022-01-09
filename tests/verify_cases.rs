@@ -107,9 +107,13 @@ where
     let code_output = generate_code(result.as_mut().unwrap(), GeneratorContext::new());
 
     if parse_type == "expr" {
-        assert_eq!(code_output.trim(), source.trim());
+        assert_eq!(
+            code_output.trim(),
+            source.trim(),
+            "Source do not match formatted output."
+        );
     } else {
-        assert_eq!(code_output, source);
+        assert_eq!(code_output, source, "Source do not match formatted output.");
     }
 
     if let Some(minified_section) = test.get_section(MINIFIED_SECTION) {
