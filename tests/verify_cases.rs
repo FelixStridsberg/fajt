@@ -103,33 +103,35 @@ where
         }
     }
 
-    let parse_type = get_attribute(source_block.language, "parse:").unwrap_or("program");
-    let code_output = generate_code(result.as_mut().unwrap(), GeneratorContext::new());
+    if result.is_ok() {
+        let parse_type = get_attribute(source_block.language, "parse:").unwrap_or("program");
+        let code_output = generate_code(result.as_mut().unwrap(), GeneratorContext::new());
 
-    if parse_type == "expr" {
-        assert_eq!(
-            code_output.trim(),
-            source.trim(),
-            "Source do not match formatted output."
-        );
-    } else {
-        assert_eq!(code_output, source, "Source do not match formatted output.");
-    }
-
-    if let Some(minified_section) = test.get_section(MINIFIED_SECTION) {
-        let mut ctx = GeneratorContext::new();
-        ctx.minified = true;
-
-        let output_min = generate_code(result.as_mut().unwrap(), ctx);
-
-        if let Some(expected_minified) = minified_section.get_code() {
+        if parse_type == "expr" {
             assert_eq!(
-                output_min,
-                expected_minified.trim(),
-                "Minified output mismatch."
+                code_output.trim(),
+                source.trim(),
+                "Source do not match formatted output."
             );
         } else {
-            regenerate_min = Some(output_min);
+            assert_eq!(code_output, source, "Source do not match formatted output.");
+        }
+
+        if let Some(minified_section) = test.get_section(MINIFIED_SECTION) {
+            let mut ctx = GeneratorContext::new();
+            ctx.minified = true;
+
+            let output_min = generate_code(result.as_mut().unwrap(), ctx);
+
+            if let Some(expected_minified) = minified_section.get_code() {
+                assert_eq!(
+                    output_min,
+                    expected_minified.trim(),
+                    "Minified output mismatch."
+                );
+            } else {
+                regenerate_min = Some(output_min);
+            }
         }
     }
 
