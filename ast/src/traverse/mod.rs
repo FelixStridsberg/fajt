@@ -332,5 +332,10 @@ generate_fold_and_visit! {
         ExportNamed: (enter: enter_export_named, exit: exit_export_named) {}
 
         ExportNamespace: (enter: enter_export_namespace, exit: exit_export_namespace) {}
+
+        NamedExport: (enter: enter_named_export, exit: exit_named_export) {
+            name
+            alias_of
+        }
     }
 }

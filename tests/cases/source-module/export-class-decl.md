@@ -3,6 +3,11 @@
 export class cls {}
 ```
 
+### Output: minified
+```js
+export class cls{}
+```
+
 ### Output: ast
 ```json
 {

@@ -1,18 +1,23 @@
 ### Source
 ```js source:module
-export { a, b as c }
+export { a, b as c };
+```
+
+### Output: minified
+```js
+export{a,b as c}
 ```
 
 ### Output: ast
 ```json
 {
   "Module": {
-    "span": "0:20",
+    "span": "0:21",
     "body": [
       {
         "ExportDeclaration": {
           "Named": {
-            "span": "0:20",
+            "span": "0:21",
             "named_exports": [
               {
                 "span": "9:10",
@@ -33,7 +38,8 @@ export { a, b as c }
                   "name": "b"
                 }
               }
-            ]
+            ],
+            "from": null
           }
         }
       }

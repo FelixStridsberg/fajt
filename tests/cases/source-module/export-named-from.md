@@ -1,18 +1,23 @@
 ### Source
 ```js source:module
-export { a, b as c } from "other-module"
+export { a, b as c } from 'other-module';
+```
+
+### Output: minified
+```js
+export{a,b as c}from'other-module'
 ```
 
 ### Output: ast
 ```json
 {
   "Module": {
-    "span": "0:40",
+    "span": "0:41",
     "body": [
       {
         "ExportDeclaration": {
           "Named": {
-            "span": "0:40",
+            "span": "0:41",
             "named_exports": [
               {
                 "span": "9:10",

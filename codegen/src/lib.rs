@@ -720,6 +720,43 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_export_named(&mut self, node: &mut ExportNamed) -> bool {
+        self.string("export");
+        self.space();
+        self.char('{');
+
+        if !node.named_exports.is_empty() {
+            self.space();
+            self.comma_separated_with_rest(&mut node.named_exports, &mut (None as Option<Argument>));
+            self.space();
+        }
+
+        self.char('}');
+
+        if let Some(from) = &node.from {
+            self.space();
+            self.string("from");
+            self.space();
+            self.char('\''); // TODO should not be hard coded to '
+            self.string(from);
+            self.char('\'');
+        }
+
+        self.char(';');
+        false
+    }
+
+    fn enter_named_export(&mut self, node: &mut NamedExport) -> bool {
+        if let Some(alias_of) = node.alias_of.as_mut() {
+            alias_of.traverse(self);
+            self.space();
+            self.string("as");
+            self.space();
+        }
+        node.name.traverse(self);
+        false
+    }
+
     fn enter_body(&mut self, node: &mut Body) -> bool {
         self.start_block();
 
