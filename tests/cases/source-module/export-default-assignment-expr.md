@@ -1,18 +1,23 @@
 ### Source
 ```js source:module
-export default 1 + 10
+export default 1 + 10;
+```
+
+### Output: minified
+```js
+export default 1+10
 ```
 
 ### Output: ast
 ```json
 {
   "Module": {
-    "span": "0:21",
+    "span": "0:22",
     "body": [
       {
         "ExportDeclaration": {
           "DefaultExpr": {
-            "span": "0:21",
+            "span": "0:22",
             "expr": {
               "Binary": {
                 "span": "15:21",

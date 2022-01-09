@@ -692,6 +692,15 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_export_default_expr(&mut self, node: &mut ExportDefaultExpr) -> bool {
+        self.string("export default");
+        self.space();
+
+        node.expr.traverse(self);
+        self.char(';');
+        false
+    }
+
     fn enter_export_namespace(&mut self, node: &mut ExportNamespace) -> bool {
         self.string("export");
         self.space();
