@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js source:module
 export { a, b as c } from "other-module"
 ```

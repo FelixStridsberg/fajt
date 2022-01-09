@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js
 function fn() {
   "use strict";

@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js parse:expr
 function* fn() {
   yield* a

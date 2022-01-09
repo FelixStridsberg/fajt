@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js parse:stmt
 function fn() {
     var a = 1;

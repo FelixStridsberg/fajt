@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js source:module
 export var a = 1, b = 2, c
 ```

@@ -1,7 +1,7 @@
 //! This generates test cases for all markdown files in ./cases
 //!
 //! The markdown are expected to have the format:
-//!     ### Input
+//!     ### Source
 //!     ```js
 //!     var a = 1;
 //!     ```
@@ -22,7 +22,7 @@
 //! actual output will be generated.
 //!
 //! For example, add a file with:
-//!     ### Input
+//!     ### Source
 //!     ```js
 //!     var a = 1;
 //!     ```
@@ -61,7 +61,7 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::Debug;
 
-const INPUT_SECTION: &str = "Input";
+const SOURCE_SECTION: &str = "Source";
 const MINIFIED_SECTION: &str = "Output: minified";
 const AST_SECTION: &str = "Output: ast";
 
@@ -72,9 +72,9 @@ fn run_test(path: &str) {
     let data = read_string(path.as_ref());
     let test = Markdown::from_string(&data);
 
-    if let Some(input_block) = test.get_block(INPUT_SECTION) {
-        let parse_type = get_attribute(input_block.language, "parse:").unwrap_or("program");
-        let source_type = get_source_type(input_block.language);
+    if let Some(source_block) = test.get_block(SOURCE_SECTION) {
+        let parse_type = get_attribute(source_block.language, "parse:").unwrap_or("program");
+        let source_type = get_source_type(source_block.language);
         match parse_type {
             "expr" => parse_and_test::<Expr>(path, test, source_type),
             "stmt" => parse_and_test::<Stmt>(path, test, source_type),
@@ -91,8 +91,8 @@ where
     let mut regenerate_min = None;
 
     let mut test = test;
-    let input_block = test.get_block(INPUT_SECTION).unwrap();
-    let source = input_block.contents;
+    let source_block = test.get_block(SOURCE_SECTION).unwrap();
+    let source = source_block.contents;
     let mut result = parse::<T>(&source, source_type);
 
     if let Some(ast_section) = test.get_section(AST_SECTION) {
@@ -103,7 +103,7 @@ where
         }
     }
 
-    let parse_type = get_attribute(input_block.language, "parse:").unwrap_or("program");
+    let parse_type = get_attribute(source_block.language, "parse:").unwrap_or("program");
     let code_output = generate_code(result.as_mut().unwrap(), GeneratorContext::new());
 
     if parse_type == "expr" {

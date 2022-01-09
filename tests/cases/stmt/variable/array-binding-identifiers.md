@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js parse:stmt
 var [ a, b, c ] = d;
 ```

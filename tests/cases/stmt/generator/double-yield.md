@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js parse:stmt
 function* fn() {
     yield yield;

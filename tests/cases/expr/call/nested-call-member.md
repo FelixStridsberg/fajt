@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js parse:expr
 f1().f2();
 ```

@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js source:module
 export default function fn () {}
 ```

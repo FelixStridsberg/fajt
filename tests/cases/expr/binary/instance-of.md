@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js parse:expr
 a instanceof b instanceof c
 ```

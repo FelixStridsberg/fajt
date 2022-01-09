@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js source:script
 export 'module'
 ```

@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js parse:expr
 class { set setter(a) {} }
 ```

@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js parse:stmt
 function fn() {
   for await (a of b) ;

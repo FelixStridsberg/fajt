@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js
 do {} while(true)
 do {} while (true);

@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js parse:stmt
 let foo;
 ```

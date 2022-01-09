@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js
 throw a
 throw a;

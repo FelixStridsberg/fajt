@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js parse:expr
 'this is string'
 ```

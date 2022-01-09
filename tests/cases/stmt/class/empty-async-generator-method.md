@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js parse:stmt
 class cls {
     async *method1() {

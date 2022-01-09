@@ -1,4 +1,4 @@
-### Input
+### Source
 ```js parse:stmt
 var [ await, ...await ] = c;
 ```
