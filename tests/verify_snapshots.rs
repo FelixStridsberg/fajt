@@ -104,7 +104,10 @@ where
     }
 
     if result.is_ok() {
-        assert_source_format(source_block, source, &mut result);
+        let source_format = get_attribute(source_block.language, "format:");
+        if source_format != Some("invalid") {
+            assert_source_format(source_block, source, &mut result);
+        }
 
         if let Some(minified_section) = test.get_section(MINIFIED_SECTION) {
             let mut ctx = GeneratorContext::new();

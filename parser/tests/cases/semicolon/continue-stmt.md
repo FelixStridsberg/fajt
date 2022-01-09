@@ -1,5 +1,5 @@
 ### Source
-```js
+```js format:invalid
 continue
 continue;
 ```
