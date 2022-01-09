@@ -3,6 +3,11 @@
 export * from 'other-module'
 ```
 
+### Output: minified
+```js
+export*from'other-module'
+```
+
 ### Output: ast
 ```json
 {

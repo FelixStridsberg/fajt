@@ -3,6 +3,11 @@
 export * as alias from 'other-module'
 ```
 
+### Output: minified
+```js
+export*as alias from'other-module'
+```
+
 ### Output: ast
 ```json
 {

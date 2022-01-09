@@ -680,6 +680,25 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_export_namespace(&mut self, node: &mut ExportNamespace) -> bool {
+        self.string("export");
+        self.space();
+        self.char('*');
+        if let Some(alias) = node.alias.as_mut() {
+            self.space();
+            self.string("as");
+            self.space();
+            alias.traverse(self);
+        }
+        self.space();
+        self.string("from");
+        self.space();
+        self.char('\''); // TODO should not be hard coded to '
+        self.string(&node.from);
+        self.char('\'');
+        false
+    }
+
     fn enter_body(&mut self, node: &mut Body) -> bool {
         self.start_block();
 
