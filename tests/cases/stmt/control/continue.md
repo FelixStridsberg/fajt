@@ -3,6 +3,11 @@
 continue;
 ```
 
+### Output: minified
+```js
+continue;
+```
+
 ### Output: ast
 ```json
 {

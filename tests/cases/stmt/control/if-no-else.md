@@ -6,7 +6,7 @@ if (a)
 
 ### Output: minified
 ```js
-if(a)b
+if(a)b;
 ```
 
 ### Output: ast

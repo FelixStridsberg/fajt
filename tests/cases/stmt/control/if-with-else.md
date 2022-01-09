@@ -8,7 +8,7 @@ else
 
 ### Output: minified
 ```js
-if(a)b;else c
+if(a)b;else c;
 ```
 
 ### Output: ast

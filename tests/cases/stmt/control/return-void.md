@@ -5,7 +5,7 @@ return;
 
 ### Output: minified
 ```js
-return
+return;
 ```
 
 ### Output: ast
