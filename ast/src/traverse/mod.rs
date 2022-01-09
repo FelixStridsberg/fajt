@@ -51,6 +51,7 @@ generate_fold_and_visit! {
             Conditional
             Update
             Sequence
+            This
         }
 
         Stmt: (enter: enter_stmt, exit: exit_stmt) {
@@ -239,6 +240,8 @@ generate_fold_and_visit! {
         ExprSequence: (enter: enter_sequence_expr, exit: exit_sequence_expr) {
             expr
         }
+
+        ExprThis: (enter: enter_this_expr, exit: exit_this_expr) {}
 
         DeclClass: (enter: enter_class_decl, exit: exit_class_decl) {
             super_class

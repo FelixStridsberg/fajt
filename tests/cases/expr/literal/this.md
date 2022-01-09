@@ -3,6 +3,11 @@
 this
 ```
 
+### Output: minified
+```js
+this
+```
+
 ### Output: ast
 ```json
 {

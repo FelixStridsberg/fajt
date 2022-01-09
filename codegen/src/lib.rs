@@ -811,6 +811,11 @@ impl Visitor for CodeGenerator<'_> {
         }
     }
 
+    fn enter_this_expr(&mut self, _node: &mut ExprThis) -> bool {
+        self.string("this");
+        false
+    }
+
     fn enter_literal(&mut self, node: &mut Literal) -> bool {
         match node {
             Literal::Null => self.string("null"),
