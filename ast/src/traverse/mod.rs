@@ -54,6 +54,8 @@ generate_fold_and_visit! {
             This
             Function
             New
+            ArrowFunction
+            Await
         }
 
         Stmt: (enter: enter_stmt, exit: exit_stmt) {
@@ -139,6 +141,11 @@ generate_fold_and_visit! {
             DefaultDecl
             Named
             Namespace
+        }
+
+        ArrowFunctionBody: (enter: enter_arrow_function_body, exit: exit_arrow_function_body) {
+            Expr
+            Body
         }
     }
 
@@ -263,6 +270,15 @@ generate_fold_and_visit! {
         ExprNew: (enter: enter_new_expr, exit: exit_new_expr) {
             callee
             arguments
+        }
+
+        ExprArrowFunction: (enter: enter_arrow_function, exit: exit_arrow_function) {
+            parameters
+            body
+        }
+
+        ExprAwait: (enter: enter_await_expr, exit: exit_await_expr) {
+            argument
         }
 
         DeclClass: (enter: enter_class_decl, exit: exit_class_decl) {

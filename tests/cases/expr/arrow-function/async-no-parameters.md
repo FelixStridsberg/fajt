@@ -3,6 +3,11 @@
 async () => {}
 ```
 
+### Output: minified
+```js
+async()=>{}
+```
+
 ### Output: ast
 ```json
 {

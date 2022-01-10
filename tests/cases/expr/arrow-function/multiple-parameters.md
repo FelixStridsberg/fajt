@@ -1,13 +1,20 @@
 ### Source
 ```js parse:expr
-(a, b, ...rest) => { ; }
+(a, b, ...rest) => {
+    ;
+}
+```
+
+### Output: minified
+```js
+(a,b,...rest)=>{}
 ```
 
 ### Output: ast
 ```json
 {
   "ArrowFunction": {
-    "span": "0:24",
+    "span": "0:28",
     "asynchronous": false,
     "binding_parameter": false,
     "parameters": {
@@ -43,12 +50,12 @@
     },
     "body": {
       "Body": {
-        "span": "19:24",
+        "span": "19:28",
         "directives": [],
         "statements": [
           {
             "Empty": {
-              "span": "21:22"
+              "span": "25:26"
             }
           }
         ]

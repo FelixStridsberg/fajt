@@ -3,6 +3,11 @@
 () => await
 ```
 
+### Output: minified
+```js
+()=>await
+```
+
 ### Output: ast
 ```json
 {

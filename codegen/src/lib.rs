@@ -373,6 +373,34 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_arrow_function(&mut self, node: &mut ExprArrowFunction) -> bool {
+        if node.asynchronous {
+            self.string("async");
+            self.space();
+        }
+
+        if node.binding_parameter {
+            node.parameters.bindings.traverse(self);
+        } else {
+            node.parameters.traverse(self);
+        }
+
+        self.space();
+        self.string("=>");
+        self.space();
+
+        node.body.traverse(self);
+
+        false
+    }
+
+    fn enter_await_expr(&mut self, node: &mut ExprAwait) -> bool {
+        self.string("await");
+        self.space();
+        node.argument.traverse(self);
+        false
+    }
+
     fn enter_for_stmt(&mut self, node: &mut StmtFor) -> bool {
         self.string("for");
 
