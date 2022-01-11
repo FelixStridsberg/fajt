@@ -93,6 +93,7 @@ generate_fold_and_visit! {
         Literal: (enter: enter_literal, exit: exit_literal) {
             Number
             String
+            Array
             Object
         }
 
@@ -235,6 +236,8 @@ generate_fold_and_visit! {
         StmtEmpty: (enter: enter_empty_statement, exit: exit_empty_statement) {}
 
         LitString: (enter: enter_string_literal, exit: exit_string_literal) {}
+
+        Array: (enter: enter_array_literal, exit: exit_array_literal) {}
 
         Object: (enter: enter_object_literal, exit: exit_object_literal) {}
 

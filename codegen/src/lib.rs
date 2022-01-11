@@ -1042,23 +1042,6 @@ impl Visitor for CodeGenerator<'_> {
             Literal::Null => self.string("null"),
             Literal::Boolean(true) => self.string("true"),
             Literal::Boolean(false) => self.string("false"),
-            Literal::Array(array) => {
-                if array.elements.is_empty() {
-                    self.string("[]");
-                    return false;
-                }
-
-                self.char('[');
-                self.space();
-
-                self.comma_separated_with_rest(
-                    &mut array.elements,
-                    &mut (None as Option<Argument>),
-                );
-
-                self.space();
-                self.char(']');
-            }
             _ => return true,
         }
 
@@ -1069,6 +1052,22 @@ impl Visitor for CodeGenerator<'_> {
         self.char(node.delimiter);
         self.string(&node.value);
         self.char(node.delimiter);
+        false
+    }
+
+    fn enter_array_literal(&mut self, node: &mut Array) -> bool {
+        if node.elements.is_empty() {
+            self.string("[]");
+            return false;
+        }
+
+        self.char('[');
+        self.space();
+
+        self.comma_separated_with_rest(&mut node.elements, &mut (None as Option<Argument>));
+
+        self.space();
+        self.char(']');
         false
     }
 
