@@ -682,6 +682,24 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_class_expr(&mut self, node: &mut ExprClass) -> bool {
+        self.string("class");
+
+        node.identifier.traverse(self);
+
+        if let Some(super_class) = node.super_class.as_mut() {
+            self.string("extends");
+            super_class.traverse(self);
+        }
+
+        self.space();
+
+        self.start_block();
+        node.body.traverse(&mut self.with_indent());
+        self.end_block();
+        false
+    }
+
     fn enter_class_method(&mut self, node: &mut ClassMethod) -> bool {
         if node.asynchronous {
             self.string("async");

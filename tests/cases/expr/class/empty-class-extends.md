@@ -3,6 +3,11 @@
 class MyClass extends SuperClass {}
 ```
 
+### Output: minified
+```js
+class MyClass extends SuperClass{}
+```
+
 ### Output: ast
 ```json
 {

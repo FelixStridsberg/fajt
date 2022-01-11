@@ -3,6 +3,11 @@
 class MyClass {}
 ```
 
+### Output: minified
+```js
+class MyClass{}
+```
+
 ### Output: ast
 ```json
 {

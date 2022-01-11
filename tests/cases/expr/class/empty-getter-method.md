@@ -1,33 +1,40 @@
 ### Source
 ```js parse:expr
-class { get getter() {} }
+class {
+    get getter() {}
+}
+```
+
+### Output: minified
+```js
+class{get getter(){}}
 ```
 
 ### Output: ast
 ```json
 {
   "Class": {
-    "span": "0:25",
+    "span": "0:29",
     "identifier": null,
     "super_class": null,
     "body": [
       {
         "Method": {
-          "span": "8:23",
+          "span": "12:27",
           "name": {
             "Ident": {
-              "span": "12:18",
+              "span": "16:22",
               "name": "getter"
             }
           },
           "kind": "Get",
           "parameters": {
-            "span": "18:20",
+            "span": "22:24",
             "bindings": [],
             "rest": null
           },
           "body": {
-            "span": "21:23",
+            "span": "25:27",
             "directives": [],
             "statements": []
           },

@@ -1,33 +1,40 @@
 ### Source
 ```js parse:expr
-class { async method1() {} }
+class {
+    async method1() {}
+}
+```
+
+### Output: minified
+```js
+class{async method1(){}}
 ```
 
 ### Output: ast
 ```json
 {
   "Class": {
-    "span": "0:28",
+    "span": "0:32",
     "identifier": null,
     "super_class": null,
     "body": [
       {
         "Method": {
-          "span": "8:26",
+          "span": "12:30",
           "name": {
             "Ident": {
-              "span": "14:21",
+              "span": "18:25",
               "name": "method1"
             }
           },
           "kind": "Method",
           "parameters": {
-            "span": "21:23",
+            "span": "25:27",
             "bindings": [],
             "rest": null
           },
           "body": {
-            "span": "24:26",
+            "span": "28:30",
             "directives": [],
             "statements": []
           },

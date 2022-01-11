@@ -1,34 +1,41 @@
 ### Source
 ```js parse:expr
-class { set setter(a) {} }
+class {
+    set setter(a) {}
+}
+```
+
+### Output: minified
+```js
+class{set setter(a){}}
 ```
 
 ### Output: ast
 ```json
 {
   "Class": {
-    "span": "0:26",
+    "span": "0:30",
     "identifier": null,
     "super_class": null,
     "body": [
       {
         "Method": {
-          "span": "8:24",
+          "span": "12:28",
           "name": {
             "Ident": {
-              "span": "12:18",
+              "span": "16:22",
               "name": "setter"
             }
           },
           "kind": "Set",
           "parameters": {
-            "span": "18:21",
+            "span": "22:25",
             "bindings": [
               {
-                "span": "19:20",
+                "span": "23:24",
                 "pattern": {
                   "Ident": {
-                    "span": "19:20",
+                    "span": "23:24",
                     "name": "a"
                   }
                 },
@@ -38,7 +45,7 @@ class { set setter(a) {} }
             "rest": null
           },
           "body": {
-            "span": "22:24",
+            "span": "26:28",
             "directives": [],
             "statements": []
           },

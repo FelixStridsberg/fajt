@@ -59,6 +59,7 @@ generate_fold_and_visit! {
             ArrowFunction
             Await
             MetaProperty
+            Class
         }
 
         Stmt: (enter: enter_stmt, exit: exit_stmt) {
@@ -312,6 +313,12 @@ generate_fold_and_visit! {
         }
 
         DeclClass: (enter: enter_class_decl, exit: exit_class_decl) {
+            super_class
+            identifier
+            body
+        }
+
+        ExprClass: (enter: enter_class_expr, exit: exit_class_expr) {
             super_class
             identifier
             body
