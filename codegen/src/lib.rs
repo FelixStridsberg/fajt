@@ -1146,8 +1146,11 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_number(&mut self, node: &mut Number) -> bool {
         match node {
-            Number::Integer(n, _) => self.string(&n.to_string()),
-            Number::Decimal(_) => {}
+            Number::Integer(n, Base::Decimal) => self.string(&n.to_string()),
+            Number::Integer(n, Base::Hex) => self.string(&format!("0x{:x}", n)),
+            Number::Integer(n, Base::Octal) => self.string(&format!("0o{:o}", n)),
+            Number::Integer(n, Base::Binary) => self.string(&format!("0b{:b}", n)),
+            Number::Decimal(n) => self.string(&n.to_string()),
         }
 
         false
