@@ -149,6 +149,11 @@ generate_fold_and_visit! {
             Expr
             Body
         }
+
+        PropertyDefinition: (enter: enter_property_definition, exit: exit_property_definition) {
+            IdentRef
+            Spread
+        }
     }
 
     structs: {

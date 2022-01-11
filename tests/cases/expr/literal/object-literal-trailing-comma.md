@@ -1,6 +1,11 @@
 ### Source
-```js parse:expr
+```js parse:expr check-format:no
 { a, }
+```
+
+### Output: minified
+```js
+{a}
 ```
 
 ### Output: ast

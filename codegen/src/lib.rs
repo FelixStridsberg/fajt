@@ -1074,10 +1074,25 @@ impl Visitor for CodeGenerator<'_> {
     fn enter_object_literal(&mut self, node: &mut Object) -> bool {
         if node.props.is_empty() {
             self.string("{}");
-        } else {
-            todo!()
+            return false;
         }
+
+        self.char('{');
+        self.space();
+
+        self.comma_separated_with_rest(&mut node.props, &mut (None as Option<Argument>));
+
+        self.space();
+        self.char('}');
+
         false
+    }
+
+    fn enter_property_definition(&mut self, node: &mut PropertyDefinition) -> bool {
+        if matches!(node, PropertyDefinition::Spread(_)) {
+            self.string("...");
+        }
+        true
     }
 
     fn enter_continue_stmt(&mut self, node: &mut StmtContinue) -> bool {
