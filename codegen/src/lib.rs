@@ -128,13 +128,38 @@ impl<'a> CodeGenerator<'a> {
         }
     }
 
-    fn maybe_as_alias<T>(&mut self, alias: &mut Option<T>) where T: Traverse {
+    fn maybe_as_alias<T>(&mut self, alias: &mut Option<T>)
+    where
+        T: Traverse,
+    {
         if let Some(alias) = alias.as_mut() {
             self.space();
             self.string("as");
             self.space();
             alias.traverse(self);
         }
+    }
+
+    fn class<I, S, B>(&mut self, identifier: &mut I, super_class: &mut Option<S>, body: &mut B)
+    where
+        I: Traverse,
+        S: Traverse,
+        B: Traverse,
+    {
+        self.string("class");
+
+        identifier.traverse(self);
+
+        if let Some(super_class) = super_class.as_mut() {
+            self.string("extends");
+            super_class.traverse(self);
+        }
+
+        self.space();
+
+        self.start_block();
+        body.traverse(&mut self.with_indent());
+        self.end_block();
     }
 }
 
@@ -681,38 +706,12 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_class_decl(&mut self, node: &mut DeclClass) -> bool {
-        self.string("class");
-
-        node.identifier.traverse(self);
-
-        if let Some(super_class) = node.super_class.as_mut() {
-            self.string("extends");
-            super_class.traverse(self);
-        }
-
-        self.space();
-
-        self.start_block();
-        node.body.traverse(&mut self.with_indent());
-        self.end_block();
+        self.class(&mut node.identifier, &mut node.super_class, &mut node.body);
         false
     }
 
     fn enter_class_expr(&mut self, node: &mut ExprClass) -> bool {
-        self.string("class");
-
-        node.identifier.traverse(self);
-
-        if let Some(super_class) = node.super_class.as_mut() {
-            self.string("extends");
-            super_class.traverse(self);
-        }
-
-        self.space();
-
-        self.start_block();
-        node.body.traverse(&mut self.with_indent());
-        self.end_block();
+        self.class(&mut node.identifier, &mut node.super_class, &mut node.body);
         false
     }
 
