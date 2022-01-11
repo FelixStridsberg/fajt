@@ -127,6 +127,15 @@ impl<'a> CodeGenerator<'a> {
             initializer.traverse(self);
         }
     }
+
+    fn maybe_as_alias<T>(&mut self, alias: &mut Option<T>) where T: Traverse {
+        if let Some(alias) = alias.as_mut() {
+            self.space();
+            self.string("as");
+            self.space();
+            alias.traverse(self);
+        }
+    }
 }
 
 impl CodeGenerator<'_> {
@@ -795,12 +804,8 @@ impl Visitor for CodeGenerator<'_> {
         self.string("export");
         self.space();
         self.char('*');
-        if let Some(alias) = node.alias.as_mut() {
-            self.space();
-            self.string("as");
-            self.space();
-            alias.traverse(self);
-        }
+        self.maybe_as_alias(&mut node.alias);
+
         self.space();
         self.string("from");
         self.space();
@@ -902,13 +907,7 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_named_import(&mut self, node: &mut NamedImport) -> bool {
         node.name.traverse(self);
-
-        if let Some(alias) = node.alias.as_mut() {
-            self.space();
-            self.string("as");
-            self.space();
-            alias.traverse(self);
-        }
+        self.maybe_as_alias(&mut node.alias);
         false
     }
 
