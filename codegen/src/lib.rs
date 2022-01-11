@@ -84,10 +84,9 @@ impl<'a> CodeGenerator<'a> {
         }
     }
 
-    fn comma_separated_with_rest<I, R>(&mut self, items: &mut Vec<I>, rest: &mut Option<R>)
+    fn comma_separated<I>(&mut self, items: &mut Vec<I>)
     where
         I: Traverse,
-        R: Traverse,
     {
         let mut iter = items.iter_mut().peekable();
         while let Some(item) = iter.next() {
@@ -97,6 +96,14 @@ impl<'a> CodeGenerator<'a> {
                 self.space();
             }
         }
+    }
+
+    fn comma_separated_with_rest<I, R>(&mut self, items: &mut Vec<I>, rest: &mut Option<R>)
+    where
+        I: Traverse,
+        R: Traverse,
+    {
+        self.comma_separated(items);
 
         if let Some(rest) = rest.as_mut() {
             if !items.is_empty() {
@@ -535,7 +542,7 @@ impl Visitor for CodeGenerator<'_> {
     fn enter_call_expr(&mut self, node: &mut ExprCall) -> bool {
         node.callee.traverse(self);
         self.char('(');
-        self.comma_separated_with_rest(&mut node.arguments, &mut (None as Option<Argument>));
+        self.comma_separated(&mut node.arguments);
         self.char(')');
         false
     }
@@ -569,7 +576,7 @@ impl Visitor for CodeGenerator<'_> {
         }
 
         self.char('(');
-        self.comma_separated_with_rest(&mut node.arguments, &mut (None as Option<Argument>));
+        self.comma_separated(&mut node.arguments);
         self.char(')');
         false
     }
@@ -745,7 +752,7 @@ impl Visitor for CodeGenerator<'_> {
 
         if node.arguments_span.is_some() {
             self.char('(');
-            self.comma_separated_with_rest(&mut node.arguments, &mut (None as Option<Argument>));
+            self.comma_separated(&mut node.arguments);
             self.char(')');
         }
         false
@@ -810,10 +817,7 @@ impl Visitor for CodeGenerator<'_> {
 
         if !node.named_exports.is_empty() {
             self.space();
-            self.comma_separated_with_rest(
-                &mut node.named_exports,
-                &mut (None as Option<Argument>),
-            );
+            self.comma_separated(&mut node.named_exports);
             self.space();
         }
 
@@ -873,7 +877,7 @@ impl Visitor for CodeGenerator<'_> {
             self.char('{');
             if !named.is_empty() {
                 self.space();
-                self.comma_separated_with_rest(named, &mut (None as Option<Argument>));
+                self.comma_separated(named);
                 self.space();
             }
             self.char('}');
@@ -1123,7 +1127,7 @@ impl Visitor for CodeGenerator<'_> {
         self.char('[');
         self.space();
 
-        self.comma_separated_with_rest(&mut node.elements, &mut (None as Option<Argument>));
+        self.comma_separated(&mut node.elements);
 
         self.space();
         self.char(']');
@@ -1139,7 +1143,7 @@ impl Visitor for CodeGenerator<'_> {
         self.char('{');
         self.space();
 
-        self.comma_separated_with_rest(&mut node.props, &mut (None as Option<Argument>));
+        self.comma_separated(&mut node.props);
 
         self.space();
         self.char('}');
@@ -1199,7 +1203,7 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_sequence_expr(&mut self, node: &mut ExprSequence) -> bool {
-        self.comma_separated_with_rest(&mut node.expr, &mut (None as Option<Argument>));
+        self.comma_separated(&mut node.expr);
         false
     }
 
