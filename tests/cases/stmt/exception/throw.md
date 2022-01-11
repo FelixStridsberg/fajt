@@ -1,19 +1,24 @@
 ### Source
 ```js parse:stmt
-throw
+throw a
 ```
 
 ### Output: minified
 ```js
-throw
+throw a
 ```
 
 ### Output: ast
 ```json
 {
   "Throw": {
-    "span": "0:5",
-    "argument": null
+    "span": "0:7",
+    "argument": {
+      "IdentRef": {
+        "span": "6:7",
+        "name": "a"
+      }
+    }
   }
 }
 ```

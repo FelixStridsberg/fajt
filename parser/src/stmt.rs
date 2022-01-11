@@ -191,7 +191,20 @@ where
         let span_start = self.position();
         self.consume_assert(keyword!("throw"))?;
 
-        let argument = self.stmt_not_ended().then_try(|| self.parse_expr())?;
+        match self.current() {
+            token_matches!(ok: punct!(";")) | Err(_) => {
+                return err!(UnexpectedToken(self.consume()?))
+            }
+            Ok(token) if token.first_on_line => {
+                return err!(SyntaxError(
+                    "Unexpected newline after throw.".to_owned(),
+                    self.current()?.span.clone()
+                ))
+            }
+            _ => {}
+        }
+
+        let argument = self.parse_expr()?;
         self.maybe_consume(punct!(";"))?;
 
         let span = self.span_from(span_start);

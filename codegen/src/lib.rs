@@ -327,12 +327,8 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_throw_stmt(&mut self, node: &mut StmtThrow) -> bool {
         self.string("throw");
-
-        if node.argument.is_some() {
-            self.char(' ');
-            node.argument.traverse(self);
-        }
-
+        self.space();
+        node.argument.traverse(self);
         false
     }
 

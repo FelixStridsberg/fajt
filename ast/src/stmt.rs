@@ -161,7 +161,7 @@ ast_struct! {
 ast_struct! {
     pub struct StmtThrow {
         pub span: Span,
-        pub argument: Option<Expr>,
+        pub argument: Expr,
     }
 }
 
