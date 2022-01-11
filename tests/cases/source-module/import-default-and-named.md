@@ -1,17 +1,22 @@
 ### Source
 ```js source:module
-import def, {a, b} from 'module'
+import def, { a, b } from 'module';
+```
+
+### Output: minified
+```js
+import def,{a,b}from'module'
 ```
 
 ### Output: ast
 ```json
 {
   "Module": {
-    "span": "0:32",
+    "span": "0:35",
     "body": [
       {
         "ImportDeclaration": {
-          "span": "0:32",
+          "span": "0:35",
           "default_binding": {
             "span": "7:10",
             "name": "def"
@@ -19,17 +24,17 @@ import def, {a, b} from 'module'
           "namespace_binding": null,
           "named_imports": [
             {
-              "span": "13:14",
+              "span": "14:15",
               "name": {
-                "span": "13:14",
+                "span": "14:15",
                 "name": "a"
               },
               "alias": null
             },
             {
-              "span": "16:17",
+              "span": "17:18",
               "name": {
-                "span": "16:17",
+                "span": "17:18",
                 "name": "b"
               },
               "alias": null

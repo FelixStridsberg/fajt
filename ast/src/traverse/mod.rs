@@ -81,6 +81,7 @@ generate_fold_and_visit! {
             While
             DoWhile
             ExportDeclaration
+            ImportDeclaration
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
@@ -352,6 +353,16 @@ generate_fold_and_visit! {
         NamedExport: (enter: enter_named_export, exit: exit_named_export) {
             name
             alias_of
+        }
+
+        DeclImport: (enter: enter_import, exit: exit_import) {
+            default_binding
+            named_imports
+        }
+
+        NamedImport: (enter: enter_named_import, exit: exit_named_import) {
+            name
+            alias
         }
     }
 }

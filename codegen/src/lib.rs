@@ -755,7 +755,10 @@ impl Visitor for CodeGenerator<'_> {
 
         if !node.named_exports.is_empty() {
             self.space();
-            self.comma_separated_with_rest(&mut node.named_exports, &mut (None as Option<Argument>));
+            self.comma_separated_with_rest(
+                &mut node.named_exports,
+                &mut (None as Option<Argument>),
+            );
             self.space();
         }
 
@@ -782,6 +785,71 @@ impl Visitor for CodeGenerator<'_> {
             self.space();
         }
         node.name.traverse(self);
+        false
+    }
+
+    fn enter_import(&mut self, node: &mut DeclImport) -> bool {
+        self.string("import");
+
+        if let Some(default) = node.default_binding.as_mut() {
+            self.space();
+            default.traverse(self);
+        }
+
+        if let Some(namespace) = node.namespace_binding.as_mut() {
+            if node.default_binding.is_some() {
+                self.char(',');
+            }
+
+            self.space();
+            self.char('*');
+            self.space();
+            self.string("as");
+            self.space();
+            namespace.traverse(self);
+        }
+
+        if let Some(named) = node.named_imports.as_mut() {
+            if node.default_binding.is_some() {
+                self.char(',');
+            }
+
+            self.space();
+            self.char('{');
+            if !named.is_empty() {
+                self.space();
+                self.comma_separated_with_rest(named, &mut (None as Option<Argument>));
+                self.space();
+            }
+            self.char('}');
+        }
+
+        if node.default_binding.is_some()
+            || node.namespace_binding.is_some()
+            || node.named_imports.is_some()
+        {
+            self.space();
+            self.string("from");
+        }
+
+        self.space();
+        self.char('\''); // TODO should not be hard coded to '
+        self.string(&node.from);
+        self.char('\'');
+
+        self.char(';');
+        false
+    }
+
+    fn enter_named_import(&mut self, node: &mut NamedImport) -> bool {
+        node.name.traverse(self);
+
+        if let Some(alias) = node.alias.as_mut() {
+            self.space();
+            self.string("as");
+            self.space();
+            alias.traverse(self);
+        }
         false
     }
 

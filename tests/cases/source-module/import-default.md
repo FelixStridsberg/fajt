@@ -1,17 +1,17 @@
 ### Source
 ```js source:module
-import abc from 'module'
+import abc from 'module';
 ```
 
 ### Output: ast
 ```json
 {
   "Module": {
-    "span": "0:24",
+    "span": "0:25",
     "body": [
       {
         "ImportDeclaration": {
-          "span": "0:24",
+          "span": "0:25",
           "default_binding": {
             "span": "7:10",
             "name": "abc"

@@ -7,6 +7,11 @@ import {} from 'module';
 import def, {} from 'module';
 ```
 
+### Output: minified
+```js
+import'module';import def from'module';import*as ns from'module';import{}from'module';import def,{}from'module'
+```
+
 ### Output: ast
 ```json
 {
