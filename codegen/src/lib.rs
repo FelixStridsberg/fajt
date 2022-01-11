@@ -561,6 +561,19 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_optional_call_expr(&mut self, node: &mut ExprOptionalCall) -> bool {
+        node.callee.traverse(self);
+
+        if node.optional {
+            self.string("?.");
+        }
+
+        self.char('(');
+        self.comma_separated_with_rest(&mut node.arguments, &mut (None as Option<Argument>));
+        self.char(')');
+        false
+    }
+
     fn enter_optional_member_expr(&mut self, node: &mut ExprOptionalMember) -> bool {
         if !node.optional {
             return true;

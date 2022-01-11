@@ -49,6 +49,7 @@ generate_fold_and_visit! {
             Call
             Member
             OptionalMember
+            OptionalCall
             Conditional
             Update
             Sequence
@@ -205,6 +206,11 @@ generate_fold_and_visit! {
         ExprOptionalMember: (enter: enter_optional_member_expr, exit: exit_optional_member_expr) {
             object
             property
+        }
+
+        ExprOptionalCall: (enter: enter_optional_call_expr, exit: exit_optional_call_expr) {
+            callee
+            arguments
         }
 
         ExprParenthesized: (enter: enter_parenthesized_expr, exit: exit_parenthesized_expr) {
