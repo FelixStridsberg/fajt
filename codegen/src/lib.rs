@@ -930,7 +930,7 @@ impl Visitor for CodeGenerator<'_> {
         self.string("return");
 
         if node.argument.is_some() {
-            self.char(' ');
+            self.space();
             node.argument.traverse(self);
         }
 
@@ -964,11 +964,7 @@ impl Visitor for CodeGenerator<'_> {
         }
 
         if node.argument.is_some() {
-            if node.delegate {
-                self.space();
-            } else {
-                self.char(' ');
-            }
+            self.space();
             node.argument.traverse(self);
         }
 
@@ -999,7 +995,7 @@ impl Visitor for CodeGenerator<'_> {
                 if decl.initializer.is_some() {
                     printer.new_line();
                 } else {
-                    printer.char(' ');
+                    printer.space();
                 }
             } else {
                 printer.char(';');
@@ -1161,7 +1157,7 @@ impl Visitor for CodeGenerator<'_> {
         self.string("continue");
 
         if node.label.is_some() {
-            self.char(' ');
+            self.space();
             node.label.traverse(self);
         }
 
@@ -1174,7 +1170,7 @@ impl Visitor for CodeGenerator<'_> {
         self.string("break");
 
         if node.label.is_some() {
-            self.char(' ');
+            self.space();
             node.label.traverse(self);
         }
 
