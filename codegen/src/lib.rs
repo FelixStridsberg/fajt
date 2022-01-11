@@ -161,6 +161,36 @@ impl<'a> CodeGenerator<'a> {
         body.traverse(&mut self.with_indent());
         self.end_block();
     }
+
+    fn function<I, P, B>(
+        &mut self,
+        asynchronous: bool,
+        generator: bool,
+        identifier: &mut I,
+        parameters: &mut P,
+        body: &mut B,
+    ) where
+        I: Traverse,
+        P: Traverse,
+        B: Traverse,
+    {
+        if asynchronous {
+            self.string("async ");
+        }
+
+        self.string("function");
+
+        if generator {
+            self.char('*');
+        }
+        self.space();
+
+        identifier.traverse(self);
+        parameters.traverse(self);
+
+        self.space();
+        body.traverse(self);
+    }
 }
 
 impl CodeGenerator<'_> {
@@ -665,43 +695,25 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_function_expr(&mut self, node: &mut ExprFunction) -> bool {
-        if node.asynchronous {
-            self.string("async ");
-        }
-
-        self.string("function");
-
-        if node.generator {
-            self.char('*');
-        }
-        self.space();
-
-        node.identifier.traverse(self);
-        node.parameters.traverse(self);
-
-        self.space();
-        node.body.traverse(self);
+        self.function(
+            node.asynchronous,
+            node.generator,
+            &mut node.identifier,
+            &mut node.parameters,
+            &mut node.body,
+        );
         false
     }
 
     fn enter_function_decl(&mut self, node: &mut DeclFunction) -> bool {
         self.separation();
-
-        if node.asynchronous {
-            self.string("async ");
-        }
-
-        self.string("function");
-
-        if node.generator {
-            self.char('*');
-        }
-        self.space();
-
-        node.identifier.traverse(self);
-        node.parameters.traverse(self);
-        self.space();
-        node.body.traverse(self);
+        self.function(
+            node.asynchronous,
+            node.generator,
+            &mut node.identifier,
+            &mut node.parameters,
+            &mut node.body,
+        );
         false
     }
 
