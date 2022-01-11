@@ -48,6 +48,7 @@ generate_fold_and_visit! {
             Logical
             Call
             Member
+            OptionalMember
             Conditional
             Update
             Sequence
@@ -196,7 +197,12 @@ generate_fold_and_visit! {
             arguments
         }
 
-        ExprMember: (enter: enter_member_expr, exit: exit_memeber_expr) {
+        ExprMember: (enter: enter_member_expr, exit: exit_member_expr) {
+            object
+            property
+        }
+
+        ExprOptionalMember: (enter: enter_optional_member_expr, exit: exit_optional_member_expr) {
             object
             property
         }

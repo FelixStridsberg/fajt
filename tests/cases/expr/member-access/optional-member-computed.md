@@ -3,6 +3,11 @@
 a?.[b]
 ```
 
+### Output: minified
+```js
+a?.[b]
+```
+
 ### Output: ast
 ```json
 {

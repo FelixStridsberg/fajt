@@ -3,6 +3,11 @@
 a?.b?.c?.d
 ```
 
+### Output: minified
+```js
+a?.b?.c?.d
+```
+
 ### Output: ast
 ```json
 {

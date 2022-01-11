@@ -561,6 +561,22 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_optional_member_expr(&mut self, node: &mut ExprOptionalMember) -> bool {
+        if !node.optional {
+            return true;
+        }
+
+        node.object.traverse(self);
+        self.char('?');
+
+        if matches!(node.property, MemberProperty::Expr(_)) {
+            self.char('.');
+        }
+
+        node.property.traverse(self);
+        false
+    }
+
     fn enter_member_property(&mut self, node: &mut MemberProperty) -> bool {
         match node {
             MemberProperty::Ident(i) => {
