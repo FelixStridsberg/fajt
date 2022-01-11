@@ -3,6 +3,11 @@
 super.b
 ```
 
+### Output: minified
+```js
+super.b
+```
+
 ### Output: ast
 ```json
 {

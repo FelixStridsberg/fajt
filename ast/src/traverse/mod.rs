@@ -56,6 +56,7 @@ generate_fold_and_visit! {
             New
             ArrowFunction
             Await
+            MetaProperty
         }
 
         Stmt: (enter: enter_stmt, exit: exit_stmt) {
@@ -125,7 +126,10 @@ generate_fold_and_visit! {
 
         MemberObject: (enter: enter_member_object, exit: exit_member_object) {
             Expr
+            Super
         }
+
+        Super: (enter: enter_super, exit: exit_super) { }
 
         MemberProperty: (enter: enter_member_property, exit: exit_member_property) {
             Ident
@@ -288,6 +292,11 @@ generate_fold_and_visit! {
 
         ExprAwait: (enter: enter_await_expr, exit: exit_await_expr) {
             argument
+        }
+
+        ExprMetaProperty: (enter: enter_meta_property, exit: exit_meta_property) {
+            meta
+            property
         }
 
         DeclClass: (enter: enter_class_decl, exit: exit_class_decl) {

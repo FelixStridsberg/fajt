@@ -549,6 +549,18 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_super(&mut self, _node: &mut Super) -> bool {
+        self.string("super");
+        false
+    }
+
+    fn enter_meta_property(&mut self, node: &mut ExprMetaProperty) -> bool {
+        node.meta.traverse(self);
+        self.char('.');
+        node.property.traverse(self);
+        false
+    }
+
     fn enter_member_property(&mut self, node: &mut MemberProperty) -> bool {
         match node {
             MemberProperty::Ident(i) => {
