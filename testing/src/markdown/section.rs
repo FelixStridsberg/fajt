@@ -63,6 +63,7 @@ impl ToString for MarkdownSection<'_> {
 
         if let Some(text) = self.text {
             string.push_str(text);
+            string.push_str("\n\n");
         }
 
         if let Some(block) = self.block.as_ref() {
