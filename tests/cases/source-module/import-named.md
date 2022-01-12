@@ -40,7 +40,10 @@ import{a,b as c}from'module'
               }
             }
           ],
-          "from": "module"
+          "from": {
+            "value": "module",
+            "delimiter": "'"
+          }
         }
       }
     ]

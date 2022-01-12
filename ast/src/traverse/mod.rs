@@ -107,7 +107,7 @@ generate_fold_and_visit! {
 
         PropertyName: (enter: enter_property_name, exit: exit_property_name) {
             Ident
-            // TODO: String
+            String
             Number
             Computed
         }
@@ -195,7 +195,7 @@ generate_fold_and_visit! {
             default_binding
             named_imports
             named_imports
-            // TODO: from (should probably be string literal)
+            from
         }
 
         StmtExpr: (enter: enter_stmt_expr, exit: exit_stmt_expr) {
@@ -458,12 +458,12 @@ generate_fold_and_visit! {
 
         ExportNamed: (enter: enter_export_named, exit: exit_export_named) {
             named_exports
-            // TODO: from (should probably be string literal)
+            from
         }
 
         ExportNamespace: (enter: enter_export_namespace, exit: exit_export_namespace) {
             alias
-            // TODO: from (should probably be string literal)
+            from
         }
 
         NamedExport: (enter: enter_named_export, exit: exit_named_export) {

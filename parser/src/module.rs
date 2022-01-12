@@ -3,7 +3,7 @@ use crate::error::{Result, ThenTry};
 use crate::{ContextModify, Parser};
 use fajt_ast::{
     DeclExport, DeclImport, ExportDecl, ExportDefaultDecl, ExportDefaultExpr, ExportNamed,
-    ExportNamespace, Ident, NamedExport, NamedImport, Stmt,
+    ExportNamespace, Ident, LitString, NamedExport, NamedImport, Stmt,
 };
 use fajt_common::io::PeekRead;
 use fajt_lexer::keyword;
@@ -158,13 +158,12 @@ where
     }
 
     /// Parses the `ModuleSpecifier` goal symbol.
-    fn parse_module_specifier(&mut self) -> Result<String> {
+    fn parse_module_specifier(&mut self) -> Result<LitString> {
         let module_name = self
             .parse_literal()?
             .unwrap_literal()
             .literal
-            .unwrap_string()
-            .value;
+            .unwrap_string();
         Ok(module_name)
     }
 

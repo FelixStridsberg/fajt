@@ -23,7 +23,10 @@ import*as ns from'module'
             "name": "ns"
           },
           "named_imports": null,
-          "from": "module"
+          "from": {
+            "value": "module",
+            "delimiter": "'"
+          }
         }
       }
     ]

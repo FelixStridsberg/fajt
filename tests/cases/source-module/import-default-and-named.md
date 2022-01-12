@@ -40,7 +40,10 @@ import def,{a,b}from'module'
               "alias": null
             }
           ],
-          "from": "module"
+          "from": {
+            "value": "module",
+            "delimiter": "'"
+          }
         }
       }
     ]

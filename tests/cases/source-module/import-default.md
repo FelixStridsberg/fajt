@@ -3,6 +3,11 @@
 import abc from 'module';
 ```
 
+### Output: minified
+```js
+import abc from'module'
+```
+
 ### Output: ast
 ```json
 {
@@ -18,7 +23,10 @@ import abc from 'module';
           },
           "namespace_binding": null,
           "named_imports": null,
-          "from": "module"
+          "from": {
+            "value": "module",
+            "delimiter": "'"
+          }
         }
       }
     ]

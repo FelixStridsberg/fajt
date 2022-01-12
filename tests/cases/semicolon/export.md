@@ -3,11 +3,11 @@
 export {a}
 export {a};
 export {a} from 'b'
-export {a} from 'b';
+export {a} from "b";
 export * from 'b'
-export * from 'b';
+export * from "b";
 export * as b from 'c'
-export * as b from 'c';
+export * as b from "c";
 export var a = b
 export var a = b;
 export let a = b
@@ -78,7 +78,10 @@ export class name {};
                 "alias_of": null
               }
             ],
-            "from": "b"
+            "from": {
+              "value": "b",
+              "delimiter": "'"
+            }
           }
         }
       },
@@ -96,7 +99,10 @@ export class name {};
                 "alias_of": null
               }
             ],
-            "from": "b"
+            "from": {
+              "value": "b",
+              "delimiter": "\""
+            }
           }
         }
       },
@@ -105,7 +111,10 @@ export class name {};
           "Namespace": {
             "span": "64:81",
             "alias": null,
-            "from": "b"
+            "from": {
+              "value": "b",
+              "delimiter": "'"
+            }
           }
         }
       },
@@ -114,7 +123,10 @@ export class name {};
           "Namespace": {
             "span": "82:100",
             "alias": null,
-            "from": "b"
+            "from": {
+              "value": "b",
+              "delimiter": "\""
+            }
           }
         }
       },
@@ -126,7 +138,10 @@ export class name {};
               "span": "113:114",
               "name": "b"
             },
-            "from": "c"
+            "from": {
+              "value": "c",
+              "delimiter": "'"
+            }
           }
         }
       },
@@ -138,7 +153,10 @@ export class name {};
               "span": "136:137",
               "name": "b"
             },
-            "from": "c"
+            "from": {
+              "value": "c",
+              "delimiter": "\""
+            }
           }
         }
       },

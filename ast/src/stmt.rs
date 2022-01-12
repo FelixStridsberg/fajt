@@ -287,7 +287,7 @@ ast_struct! {
         pub default_binding: Option<Ident>,
         pub namespace_binding: Option<Ident>,
         pub named_imports: Option<Vec<NamedImport>>,
-        pub from: String,
+        pub from: LitString,
     }
 }
 
@@ -340,7 +340,7 @@ ast_struct! {
     pub struct ExportNamed {
         pub span: Span,
         pub named_exports: Vec<NamedExport>,
-        pub from: Option<String>,
+        pub from: Option<LitString>,
     }
 }
 
@@ -348,7 +348,7 @@ ast_struct! {
     pub struct ExportNamespace {
         pub span: Span,
         pub alias: Option<Ident>,
-        pub from: String,
+        pub from: LitString,
     }
 }
 

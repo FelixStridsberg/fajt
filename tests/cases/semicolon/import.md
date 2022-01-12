@@ -2,14 +2,14 @@
 ```js
 import 'module';
 import def from 'module';
-import * as ns from 'module';
+import * as ns from "module";
 import {} from 'module';
-import def, {} from 'module';
+import def, {} from "module";
 ```
 
 ### Output: minified
 ```js
-import'module';import def from'module';import*as ns from'module';import{}from'module';import def,{}from'module'
+import'module';import def from'module';import*as ns from"module";import{}from'module';import def,{}from"module"
 ```
 
 ### Output: ast
@@ -24,7 +24,10 @@ import'module';import def from'module';import*as ns from'module';import{}from'mo
           "default_binding": null,
           "namespace_binding": null,
           "named_imports": null,
-          "from": "module"
+          "from": {
+            "value": "module",
+            "delimiter": "'"
+          }
         }
       },
       {
@@ -36,7 +39,10 @@ import'module';import def from'module';import*as ns from'module';import{}from'mo
           },
           "namespace_binding": null,
           "named_imports": null,
-          "from": "module"
+          "from": {
+            "value": "module",
+            "delimiter": "'"
+          }
         }
       },
       {
@@ -48,7 +54,10 @@ import'module';import def from'module';import*as ns from'module';import{}from'mo
             "name": "ns"
           },
           "named_imports": null,
-          "from": "module"
+          "from": {
+            "value": "module",
+            "delimiter": "\""
+          }
         }
       },
       {
@@ -57,7 +66,10 @@ import'module';import def from'module';import*as ns from'module';import{}from'mo
           "default_binding": null,
           "namespace_binding": null,
           "named_imports": [],
-          "from": "module"
+          "from": {
+            "value": "module",
+            "delimiter": "'"
+          }
         }
       },
       {
@@ -69,7 +81,10 @@ import'module';import def from'module';import*as ns from'module';import{}from'mo
           },
           "namespace_binding": null,
           "named_imports": [],
-          "from": "module"
+          "from": {
+            "value": "module",
+            "delimiter": "\""
+          }
         }
       }
     ]

@@ -39,7 +39,10 @@ export{a,b as c}from'other-module'
                 }
               }
             ],
-            "from": "other-module"
+            "from": {
+              "value": "other-module",
+              "delimiter": "'"
+            }
           }
         }
       }

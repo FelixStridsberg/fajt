@@ -1,4 +1,4 @@
-use crate::{Expr, Ident, LitNumber, Span};
+use crate::{Expr, Ident, LitNumber, LitString, Span};
 
 ast_mapping! {
     pub enum BindingPattern {
@@ -40,7 +40,7 @@ impl From<Ident> for ObjectBindingProp {
 ast_node! {
     pub enum PropertyName {
         Ident(Ident),
-        String(String, char), // TODO LitString?
+        String(LitString),
         Number(LitNumber),
         Computed(Expr),
     }

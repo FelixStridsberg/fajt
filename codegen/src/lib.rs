@@ -857,8 +857,7 @@ impl Visitor for CodeGenerator<'_> {
         self.string("from");
         self.space();
 
-        // TODO should not be hard coded to '
-        self.quote('\'', &node.from);
+        node.from.traverse(self);
         false
     }
 
@@ -869,13 +868,12 @@ impl Visitor for CodeGenerator<'_> {
         let spaced = !node.named_exports.is_empty();
         self.parenthesize('{', spaced, |s| s.comma_separated(&mut node.named_exports));
 
-        if let Some(from) = &node.from {
+        if let Some(from) = node.from.as_mut() {
             self.space();
             self.string("from");
             self.space();
 
-            // TODO should not be hard coded to '
-            self.quote('\'', from);
+            from.traverse(self);
         }
 
         self.char(';');
@@ -933,8 +931,7 @@ impl Visitor for CodeGenerator<'_> {
 
         self.space();
 
-        // TODO should not be hard coded to '
-        self.quote('\'', &node.from);
+        node.from.traverse(self);
         self.char(';');
         false
     }

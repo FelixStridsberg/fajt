@@ -26,7 +26,10 @@ import def,*as a from'module'
             "name": "a"
           },
           "named_imports": null,
-          "from": "module"
+          "from": {
+            "value": "module",
+            "delimiter": "'"
+          }
         }
       }
     ]

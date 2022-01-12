@@ -19,7 +19,10 @@ export*from'other-module'
           "Namespace": {
             "span": "0:28",
             "alias": null,
-            "from": "other-module"
+            "from": {
+              "value": "other-module",
+              "delimiter": "'"
+            }
           }
         }
       }

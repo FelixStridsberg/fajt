@@ -20,7 +20,10 @@ import'module'
           "default_binding": null,
           "namespace_binding": null,
           "named_imports": null,
-          "from": "module"
+          "from": {
+            "value": "module",
+            "delimiter": "'"
+          }
         }
       }
     ]

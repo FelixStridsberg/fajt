@@ -22,7 +22,10 @@ export*as alias from'other-module'
               "span": "12:17",
               "name": "alias"
             },
-            "from": "other-module"
+            "from": {
+              "value": "other-module",
+              "delimiter": "'"
+            }
           }
         }
       }
