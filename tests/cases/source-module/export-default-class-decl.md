@@ -15,11 +15,11 @@ export default class cls{}
     "span": "0:27",
     "body": [
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultDecl": {
             "span": "0:27",
             "decl": {
-              "Class": {
+              "ClassDecl": {
                 "span": "15:27",
                 "identifier": {
                   "span": "21:24",

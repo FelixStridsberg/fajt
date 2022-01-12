@@ -15,7 +15,7 @@ export default function fn(){}
     "span": "0:31",
     "body": [
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultDecl": {
             "span": "0:31",
             "decl": {

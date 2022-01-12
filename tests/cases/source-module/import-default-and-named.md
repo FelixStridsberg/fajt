@@ -15,7 +15,7 @@ import def,{a,b}from'module'
     "span": "0:35",
     "body": [
       {
-        "ImportDeclaration": {
+        "ImportDecl": {
           "span": "0:35",
           "default_binding": {
             "span": "7:10",

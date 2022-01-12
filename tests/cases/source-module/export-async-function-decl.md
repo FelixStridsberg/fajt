@@ -15,7 +15,7 @@ export async function fn(){}
     "span": "0:29",
     "body": [
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Decl": {
             "span": "0:29",
             "decl": {

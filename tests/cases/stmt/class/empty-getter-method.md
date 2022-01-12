@@ -13,7 +13,7 @@ class cls{get getter(){}}
 ### Output: ast
 ```json
 {
-  "Class": {
+  "ClassDecl": {
     "span": "0:33",
     "identifier": {
       "span": "6:9",

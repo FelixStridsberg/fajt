@@ -17,7 +17,7 @@ export const a=1,b=2,c
     "span": "0:55",
     "body": [
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Decl": {
             "span": "0:55",
             "decl": {

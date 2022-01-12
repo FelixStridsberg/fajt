@@ -11,7 +11,7 @@ class cls{}
 ### Output: ast
 ```json
 {
-  "Class": {
+  "ClassDecl": {
     "span": "0:12",
     "identifier": {
       "span": "6:9",

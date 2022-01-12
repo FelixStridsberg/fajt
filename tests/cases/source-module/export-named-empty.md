@@ -15,7 +15,7 @@ export{}
     "span": "0:10",
     "body": [
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Named": {
             "span": "0:10",
             "named_exports": [],

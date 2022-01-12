@@ -15,7 +15,7 @@ export*from'other-module'
     "span": "0:28",
     "body": [
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Namespace": {
             "span": "0:28",
             "alias": null,

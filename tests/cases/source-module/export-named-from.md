@@ -15,7 +15,7 @@ export{a,b as c}from'other-module'
     "span": "0:41",
     "body": [
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Named": {
             "span": "0:41",
             "named_exports": [

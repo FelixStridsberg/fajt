@@ -13,7 +13,7 @@ class cls{method1(){}}
 ### Output: ast
 ```json
 {
-  "Class": {
+  "ClassDecl": {
     "span": "0:30",
     "identifier": {
       "span": "6:9",

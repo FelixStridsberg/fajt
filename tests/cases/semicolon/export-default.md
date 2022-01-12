@@ -23,7 +23,7 @@ export default class cls {};
     "span": "0:402",
     "body": [
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultExpr": {
             "span": "0:20",
             "expr": {
@@ -48,7 +48,7 @@ export default class cls {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultExpr": {
             "span": "21:42",
             "expr": {
@@ -73,7 +73,7 @@ export default class cls {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultDecl": {
             "span": "43:72",
             "decl": {
@@ -101,7 +101,7 @@ export default class cls {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultDecl": {
             "span": "73:102",
             "decl": {
@@ -134,7 +134,7 @@ export default class cls {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultDecl": {
             "span": "104:135",
             "decl": {
@@ -162,7 +162,7 @@ export default class cls {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultDecl": {
             "span": "136:167",
             "decl": {
@@ -195,7 +195,7 @@ export default class cls {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultDecl": {
             "span": "169:198",
             "decl": {
@@ -223,7 +223,7 @@ export default class cls {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultDecl": {
             "span": "199:228",
             "decl": {
@@ -256,7 +256,7 @@ export default class cls {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultDecl": {
             "span": "230:262",
             "decl": {
@@ -284,7 +284,7 @@ export default class cls {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultDecl": {
             "span": "263:295",
             "decl": {
@@ -317,11 +317,11 @@ export default class cls {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultDecl": {
             "span": "297:320",
             "decl": {
-              "Class": {
+              "ClassDecl": {
                 "span": "312:320",
                 "identifier": {
                   "span": "318:318",
@@ -335,11 +335,11 @@ export default class cls {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultDecl": {
             "span": "321:344",
             "decl": {
-              "Class": {
+              "ClassDecl": {
                 "span": "336:344",
                 "identifier": {
                   "span": "342:342",
@@ -358,11 +358,11 @@ export default class cls {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultDecl": {
             "span": "346:373",
             "decl": {
-              "Class": {
+              "ClassDecl": {
                 "span": "361:373",
                 "identifier": {
                   "span": "367:370",
@@ -376,11 +376,11 @@ export default class cls {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultDecl": {
             "span": "374:401",
             "decl": {
-              "Class": {
+              "ClassDecl": {
                 "span": "389:401",
                 "identifier": {
                   "span": "395:398",

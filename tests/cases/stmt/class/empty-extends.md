@@ -11,7 +11,7 @@ class MyClass extends SuperClass{}
 ### Output: ast
 ```json
 {
-  "Class": {
+  "ClassDecl": {
     "span": "0:35",
     "identifier": {
       "span": "6:13",

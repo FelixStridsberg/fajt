@@ -15,7 +15,7 @@ export*as alias from'other-module'
     "span": "0:37",
     "body": [
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Namespace": {
             "span": "0:37",
             "alias": {

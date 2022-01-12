@@ -15,7 +15,7 @@ export default 1+10
     "span": "0:22",
     "body": [
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultExpr": {
             "span": "0:22",
             "expr": {

@@ -17,7 +17,7 @@ export let a=1,b=2,c
     "span": "0:49",
     "body": [
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Decl": {
             "span": "0:49",
             "decl": {

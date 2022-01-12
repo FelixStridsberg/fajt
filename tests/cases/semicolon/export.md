@@ -29,7 +29,7 @@ export class name {};
     "span": "0:417",
     "body": [
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Named": {
             "span": "0:10",
             "named_exports": [
@@ -47,7 +47,7 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Named": {
             "span": "11:22",
             "named_exports": [
@@ -65,7 +65,7 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Named": {
             "span": "23:42",
             "named_exports": [
@@ -86,7 +86,7 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Named": {
             "span": "43:63",
             "named_exports": [
@@ -107,7 +107,7 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Namespace": {
             "span": "64:81",
             "alias": null,
@@ -119,7 +119,7 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Namespace": {
             "span": "82:100",
             "alias": null,
@@ -131,7 +131,7 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Namespace": {
             "span": "101:123",
             "alias": {
@@ -146,7 +146,7 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Namespace": {
             "span": "124:147",
             "alias": {
@@ -161,7 +161,7 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Decl": {
             "span": "148:164",
             "decl": {
@@ -191,7 +191,7 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Decl": {
             "span": "165:182",
             "decl": {
@@ -221,7 +221,7 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Decl": {
             "span": "183:199",
             "decl": {
@@ -251,7 +251,7 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Decl": {
             "span": "200:217",
             "decl": {
@@ -281,7 +281,7 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Decl": {
             "span": "218:236",
             "decl": {
@@ -311,7 +311,7 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Decl": {
             "span": "237:256",
             "decl": {
@@ -341,7 +341,7 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Decl": {
             "span": "257:288",
             "decl": {
@@ -369,7 +369,7 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Decl": {
             "span": "289:320",
             "decl": {
@@ -402,7 +402,7 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Decl": {
             "span": "322:347",
             "decl": {
@@ -430,7 +430,7 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Decl": {
             "span": "348:373",
             "decl": {
@@ -463,11 +463,11 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Decl": {
             "span": "375:395",
             "decl": {
-              "Class": {
+              "ClassDecl": {
                 "span": "382:395",
                 "identifier": {
                   "span": "388:392",
@@ -481,11 +481,11 @@ export class name {};
         }
       },
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "Decl": {
             "span": "396:416",
             "decl": {
-              "Class": {
+              "ClassDecl": {
                 "span": "403:416",
                 "identifier": {
                   "span": "409:413",

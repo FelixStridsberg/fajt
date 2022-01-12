@@ -13,7 +13,7 @@ class cls{async method1(){}}
 ### Output: ast
 ```json
 {
-  "Class": {
+  "ClassDecl": {
     "span": "0:36",
     "identifier": {
       "span": "6:9",

@@ -15,7 +15,7 @@ class cls{async*method1(){yield}}
 ### Output: ast
 ```json
 {
-  "Class": {
+  "ClassDecl": {
     "span": "0:57",
     "identifier": {
       "span": "6:9",

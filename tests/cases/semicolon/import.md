@@ -19,7 +19,7 @@ import'module';import def from'module';import*as ns from"module";import{}from'mo
     "span": "0:127",
     "body": [
       {
-        "ImportDeclaration": {
+        "ImportDecl": {
           "span": "0:16",
           "default_binding": null,
           "namespace_binding": null,
@@ -31,7 +31,7 @@ import'module';import def from'module';import*as ns from"module";import{}from'mo
         }
       },
       {
-        "ImportDeclaration": {
+        "ImportDecl": {
           "span": "17:42",
           "default_binding": {
             "span": "24:27",
@@ -46,7 +46,7 @@ import'module';import def from'module';import*as ns from"module";import{}from'mo
         }
       },
       {
-        "ImportDeclaration": {
+        "ImportDecl": {
           "span": "43:72",
           "default_binding": null,
           "namespace_binding": {
@@ -61,7 +61,7 @@ import'module';import def from'module';import*as ns from"module";import{}from'mo
         }
       },
       {
-        "ImportDeclaration": {
+        "ImportDecl": {
           "span": "73:97",
           "default_binding": null,
           "namespace_binding": null,
@@ -73,7 +73,7 @@ import'module';import def from'module';import*as ns from"module";import{}from'mo
         }
       },
       {
-        "ImportDeclaration": {
+        "ImportDecl": {
           "span": "98:127",
           "default_binding": {
             "span": "105:108",

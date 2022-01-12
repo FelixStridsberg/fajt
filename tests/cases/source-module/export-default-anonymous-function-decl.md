@@ -15,7 +15,7 @@ export default function(){}
     "span": "0:29",
     "body": [
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultDecl": {
             "span": "0:29",
             "decl": {

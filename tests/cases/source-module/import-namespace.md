@@ -15,7 +15,7 @@ import*as ns from'module'
     "span": "0:29",
     "body": [
       {
-        "ImportDeclaration": {
+        "ImportDecl": {
           "span": "0:29",
           "default_binding": null,
           "namespace_binding": {

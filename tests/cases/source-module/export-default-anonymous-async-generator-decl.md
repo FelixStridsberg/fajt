@@ -15,7 +15,7 @@ export default async function*(){}
     "span": "0:36",
     "body": [
       {
-        "ExportDeclaration": {
+        "ExportDecl": {
           "DefaultDecl": {
             "span": "0:36",
             "decl": {

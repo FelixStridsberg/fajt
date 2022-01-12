@@ -13,7 +13,7 @@ class cls{set setter(a){}}
 ### Output: ast
 ```json
 {
-  "Class": {
+  "ClassDecl": {
     "span": "0:34",
     "identifier": {
       "span": "6:9",

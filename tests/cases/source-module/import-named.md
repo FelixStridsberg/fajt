@@ -15,7 +15,7 @@ import{a,b as c}from'module'
     "span": "0:35",
     "body": [
       {
-        "ImportDeclaration": {
+        "ImportDecl": {
           "span": "0:35",
           "default_binding": null,
           "namespace_binding": null,

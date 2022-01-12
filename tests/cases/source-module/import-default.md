@@ -15,7 +15,7 @@ import abc from'module'
     "span": "0:25",
     "body": [
       {
-        "ImportDeclaration": {
+        "ImportDecl": {
           "span": "0:25",
           "default_binding": {
             "span": "7:10",
