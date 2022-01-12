@@ -30,15 +30,15 @@ pub trait Spanned {
 }
 
 #[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
-pub struct StatementList<T> {
+pub struct StmtList<T> {
     pub span: Span,
     pub body: Vec<T>,
 }
 
 #[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
 pub enum Program {
-    Script(StatementList<Stmt>),
-    Module(StatementList<Stmt>),
+    Script(StmtList<Stmt>),
+    Module(StmtList<Stmt>),
 }
 
 impl Program {
@@ -48,9 +48,9 @@ impl Program {
         let span = Span::new(span_start, span_end);
 
         if source_type == SourceType::Module {
-            Program::Module(StatementList { span, body })
+            Program::Module(StmtList { span, body })
         } else {
-            Program::Script(StatementList { span, body })
+            Program::Script(StmtList { span, body })
         }
     }
 

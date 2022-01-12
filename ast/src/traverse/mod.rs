@@ -147,14 +147,6 @@ generate_fold_and_visit! {
             Spread
         }
 
-        DeclExport: (enter: enter_export, exit: exit_export) {
-            Decl
-            DefaultExpr
-            DefaultDecl
-            Named
-            Namespace
-        }
-
         ArrowFunctionBody: (enter: enter_arrow_function_body, exit: exit_arrow_function_body) {
             Expr
             Body
@@ -174,20 +166,36 @@ generate_fold_and_visit! {
         UnaryOperator: (enter: enter_unary_operator, exit: exit_unary_operator) { }
 
         UpdateOperator: (enter: enter_update_operator, exit: exit_update_operator) { }
+
+        DeclExport: (enter: enter_export, exit: exit_export) {
+            Decl
+            DefaultExpr
+            DefaultDecl
+            Named
+            Namespace
+        }
     }
 
     // The order of the fields for structs reflects the order of traversal. The order should follow the
     // order the syntax appear in the source as close as possible.
     structs: {
-        Body: (enter: enter_body, exit: exit_body) {
-            directives
-            statements
-        }
-
         DeclFunction: (enter: enter_function_decl, exit: exit_function_decl) {
             identifier
             parameters
             body
+        }
+
+        DeclClass: (enter: enter_class_decl, exit: exit_class_decl) {
+            identifier
+            super_class
+            body
+        }
+
+        DeclImport: (enter: enter_import, exit: exit_import) {
+            default_binding
+            named_imports
+            named_imports
+            // TODO: from (should probably be string literal)
         }
 
         StmtExpr: (enter: enter_stmt_expr, exit: exit_stmt_expr) {
@@ -243,62 +251,10 @@ generate_fold_and_visit! {
             literal
         }
 
-
         ExprAssignment: (enter: enter_assignment_expr, exit: exit_assignment_expr) {
             left
             operator
             right
-        }
-
-        StatementList<Stmt>: (enter: enter_stmt_list, exit: exit_stmt_list) {
-            body
-        }
-
-        BindingElement: (enter: enter_binding_element, exit: exit_binding_element) {
-            pattern
-            initializer
-        }
-
-        FormalParameters: (enter: enter_formal_parameters, exit: exit_formal_parameters) {
-            bindings
-            rest
-        }
-
-        Ident: (enter: enter_ident, exit: exit_ident) {}
-
-        StmtReturn: (enter: enter_return_stmt, exit: exit_return_stmt) {
-            argument
-        }
-
-        StmtVariable: (enter: enter_variable_stmt, exit: exit_variable_stmt) {
-            declarations
-        }
-
-        VariableDeclaration: (enter: enter_variable_declaration, exit: exit_variable_declaration) {
-            pattern
-            initializer
-        }
-
-        StmtEmpty: (enter: enter_empty_statement, exit: exit_empty_statement) {}
-
-        LitString: (enter: enter_string_literal, exit: exit_string_literal) {}
-
-        Array: (enter: enter_array_literal, exit: exit_array_literal) {
-            elements
-        }
-
-        Object: (enter: enter_object_literal, exit: exit_object_literal) {
-            props
-        }
-
-        ArrayBinding: (enter: enter_array_binding, exit: exit_array_binding) {
-            elements
-            rest
-        }
-
-        ObjectBinding: (enter: enter_object_binding, exit: exit_object_binding) {
-            props
-            rest
         }
 
         ExprYield: (enter: enter_yield_expr, exit: exit_yield_expr) {
@@ -347,33 +303,26 @@ generate_fold_and_visit! {
             property
         }
 
-        DeclClass: (enter: enter_class_decl, exit: exit_class_decl) {
-            identifier
-            super_class
-            body
-        }
-
         ExprClass: (enter: enter_class_expr, exit: exit_class_expr) {
             identifier
             super_class
             body
         }
 
-        ClassMethod: (enter: enter_class_method, exit: exit_class_method) {
-            name
-            parameters
-            body
+        StmtReturn: (enter: enter_return_stmt, exit: exit_return_stmt) {
+            argument
         }
+
+        StmtVariable: (enter: enter_variable_stmt, exit: exit_variable_stmt) {
+            declarations
+        }
+
+        StmtEmpty: (enter: enter_empty_statement, exit: exit_empty_statement) {}
 
         StmtTry: (enter: enter_try_stmt, exit: exit_try_stmt) {
             block
             handler
             finalizer
-        }
-
-        CatchClause: (enter: enter_catch_clause, exit: exit_catch_clause) {
-            parameter
-            body
         }
 
         StmtDebugger: (enter: enter_debugger_stmt, exit: exit_debugger_stmt) {}
@@ -403,11 +352,6 @@ generate_fold_and_visit! {
         StmtSwitch: (enter: enter_switch_stmt, exit: exit_switch_stmt) {
             discriminant
             cases
-        }
-
-        SwitchCase: (enter: enter_switch_case, exit: exit_switch_case) {
-            test
-            consequent
         }
 
         StmtIf: (enter: enter_if_stmt, exit: exit_if_stmt) {
@@ -445,6 +389,61 @@ generate_fold_and_visit! {
             test
         }
 
+        StmtList<Stmt>: (enter: enter_stmt_list, exit: exit_stmt_list) {
+            body
+        }
+
+        BindingElement: (enter: enter_binding_element, exit: exit_binding_element) {
+            pattern
+            initializer
+        }
+
+        FormalParameters: (enter: enter_formal_parameters, exit: exit_formal_parameters) {
+            bindings
+            rest
+        }
+
+        VariableDeclaration: (enter: enter_variable_declaration, exit: exit_variable_declaration) {
+            pattern
+            initializer
+        }
+
+        LitString: (enter: enter_string_literal, exit: exit_string_literal) {}
+
+        Array: (enter: enter_array_literal, exit: exit_array_literal) {
+            elements
+        }
+
+        Object: (enter: enter_object_literal, exit: exit_object_literal) {
+            props
+        }
+
+        ArrayBinding: (enter: enter_array_binding, exit: exit_array_binding) {
+            elements
+            rest
+        }
+
+        ObjectBinding: (enter: enter_object_binding, exit: exit_object_binding) {
+            props
+            rest
+        }
+
+        ClassMethod: (enter: enter_class_method, exit: exit_class_method) {
+            name
+            parameters
+            body
+        }
+
+        CatchClause: (enter: enter_catch_clause, exit: exit_catch_clause) {
+            parameter
+            body
+        }
+
+        SwitchCase: (enter: enter_switch_case, exit: exit_switch_case) {
+            test
+            consequent
+        }
+
         ExportDecl: (enter: enter_export_decl, exit: exit_export_decl) {
             decl
         }
@@ -472,16 +471,16 @@ generate_fold_and_visit! {
             alias_of
         }
 
-        DeclImport: (enter: enter_import, exit: exit_import) {
-            default_binding
-            named_imports
-            named_imports
-            // TODO: from (should probably be string literal)
-        }
-
         NamedImport: (enter: enter_named_import, exit: exit_named_import) {
             name
             alias
+        }
+
+        Ident: (enter: enter_ident, exit: exit_ident) {}
+
+        Body: (enter: enter_body, exit: exit_body) {
+            directives
+            statements
         }
     }
 }
