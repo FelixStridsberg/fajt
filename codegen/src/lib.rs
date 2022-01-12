@@ -191,6 +191,30 @@ impl<'a> CodeGenerator<'a> {
         self.space();
         body.traverse(self);
     }
+
+    #[inline]
+    fn parenthesize<F: FnMut(&mut Self)>(&mut self, open_paren: char, space: bool, mut content: F) {
+        self.char(open_paren);
+        if space {
+            self.space();
+        }
+
+        content(self);
+
+        if space {
+            self.space();
+        }
+        self.char(Self::get_closing_paren(open_paren));
+    }
+
+    fn get_closing_paren(open: char) -> char {
+        match open {
+            '{' => '}',
+            '[' => ']',
+            '(' => ')',
+            _ => unreachable!(),
+        }
+    }
 }
 
 impl CodeGenerator<'_> {
@@ -378,9 +402,9 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_catch_clause(&mut self, node: &mut CatchClause) -> bool {
         if node.parameter.is_some() {
-            self.char('(');
-            node.parameter.traverse(self);
-            self.char(')');
+            self.parenthesize('(', false, |s| {
+                node.parameter.traverse(s);
+            });
             self.space();
         }
 
@@ -405,13 +429,13 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_switch_stmt(&mut self, node: &mut StmtSwitch) -> bool {
         self.string("switch");
-
-        self.space();
-        self.char('(');
-        node.discriminant.traverse(self);
-        self.char(')');
         self.space();
 
+        self.parenthesize('(', false, |s| {
+            node.discriminant.traverse(s);
+        });
+
+        self.space();
         self.start_block();
         node.cases.traverse(&mut self.with_indent());
         self.end_block();
@@ -421,11 +445,12 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_if_stmt(&mut self, node: &mut StmtIf) -> bool {
         self.string("if");
-
         self.space();
-        self.char('(');
-        node.condition.traverse(self);
-        self.char(')');
+
+        self.parenthesize('(', false, |s| {
+            node.condition.traverse(s);
+        });
+
         self.new_line();
 
         node.consequent.traverse(&mut self.with_indent());
@@ -470,19 +495,19 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_for_stmt(&mut self, node: &mut StmtFor) -> bool {
         self.string("for");
-
-        self.space();
-        self.char('(');
-        node.init.traverse(self);
-        self.char(';');
-
-        node.test.traverse(self);
-        self.char(';');
-
-        node.update.traverse(self);
-        self.char(')');
         self.space();
 
+        self.parenthesize('(', false, |s| {
+            node.init.traverse(s);
+            s.char(';');
+
+            node.test.traverse(s);
+            s.char(';');
+
+            node.update.traverse(s);
+        });
+
+        self.space();
         node.body.traverse(self);
         false
     }
@@ -495,11 +520,12 @@ impl Visitor for CodeGenerator<'_> {
         }
 
         self.space();
-        self.char('(');
-        node.left.traverse(self);
-        self.string("of");
-        node.right.traverse(self);
-        self.char(')');
+
+        self.parenthesize('(', false, |s| {
+            node.left.traverse(s);
+            s.string("of");
+            node.right.traverse(s);
+        });
 
         self.space();
         node.body.traverse(self);
@@ -516,11 +542,12 @@ impl Visitor for CodeGenerator<'_> {
     fn enter_for_in_stmt(&mut self, node: &mut StmtForIn) -> bool {
         self.string("for");
         self.space();
-        self.char('(');
-        node.left.traverse(self);
-        self.string("in");
-        node.right.traverse(self);
-        self.char(')');
+
+        self.parenthesize('(', false, |s| {
+            node.left.traverse(s);
+            s.string("in");
+            node.right.traverse(s);
+        });
 
         self.space();
         node.body.traverse(self);
@@ -530,9 +557,11 @@ impl Visitor for CodeGenerator<'_> {
     fn enter_while_stmt(&mut self, node: &mut StmtWhile) -> bool {
         self.string("while");
         self.space();
-        self.char('(');
-        node.test.traverse(self);
-        self.char(')');
+
+        self.parenthesize('(', false, |s| {
+            node.test.traverse(s);
+        });
+
         self.space();
         node.body.traverse(self);
 
@@ -546,9 +575,9 @@ impl Visitor for CodeGenerator<'_> {
         self.string("while");
         self.space();
 
-        self.char('(');
-        node.test.traverse(self);
-        self.char(')');
+        self.parenthesize('(', false, |s| {
+            node.test.traverse(s);
+        });
 
         false
     }
@@ -605,9 +634,9 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_call_expr(&mut self, node: &mut ExprCall) -> bool {
         node.callee.traverse(self);
-        self.char('(');
-        self.comma_separated(&mut node.arguments);
-        self.char(')');
+        self.parenthesize('(', false, |s| {
+            s.comma_separated(&mut node.arguments);
+        });
         false
     }
 
@@ -639,9 +668,9 @@ impl Visitor for CodeGenerator<'_> {
             self.string("?.");
         }
 
-        self.char('(');
-        self.comma_separated(&mut node.arguments);
-        self.char(')');
+        self.parenthesize('(', false, |s| {
+            s.comma_separated(&mut node.arguments);
+        });
         false
     }
 
@@ -688,9 +717,9 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_parenthesized_expr(&mut self, node: &mut ExprParenthesized) -> bool {
-        self.char('(');
-        node.expression.traverse(self);
-        self.char(')');
+        self.parenthesize('(', false, |s| {
+            node.expression.traverse(s);
+        });
         false
     }
 
@@ -771,9 +800,9 @@ impl Visitor for CodeGenerator<'_> {
         node.callee.traverse(self);
 
         if node.arguments_span.is_some() {
-            self.char('(');
-            self.comma_separated(&mut node.arguments);
-            self.char(')');
+            self.parenthesize('(', false, |s| {
+                s.comma_separated(&mut node.arguments);
+            });
         }
         false
     }
@@ -829,15 +858,9 @@ impl Visitor for CodeGenerator<'_> {
     fn enter_export_named(&mut self, node: &mut ExportNamed) -> bool {
         self.string("export");
         self.space();
-        self.char('{');
 
-        if !node.named_exports.is_empty() {
-            self.space();
-            self.comma_separated(&mut node.named_exports);
-            self.space();
-        }
-
-        self.char('}');
+        let spaced = !node.named_exports.is_empty();
+        self.parenthesize('{', spaced, |s| s.comma_separated(&mut node.named_exports));
 
         if let Some(from) = &node.from {
             self.space();
@@ -890,13 +913,7 @@ impl Visitor for CodeGenerator<'_> {
             }
 
             self.space();
-            self.char('{');
-            if !named.is_empty() {
-                self.space();
-                self.comma_separated(named);
-                self.space();
-            }
-            self.char('}');
+            self.parenthesize('{', !named.is_empty(), |s| s.comma_separated(named));
         }
 
         if node.default_binding.is_some()
@@ -1017,54 +1034,39 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_array_binding(&mut self, node: &mut ArrayBinding) -> bool {
-        if node.rest.is_none() && node.elements.is_empty() {
-            self.string("[]");
-            return false;
-        }
+        let spaced = !node.elements.is_empty() || node.rest.is_some();
+        self.parenthesize('[', spaced, |s| {
+            let mut elements = node.elements.iter_mut().peekable();
+            while let Some(element) = elements.next() {
+                element.traverse(s);
 
-        self.char('[');
-        self.space();
+                if elements.peek().is_some() || element.is_none() {
+                    s.char(',');
+                }
 
-        let mut elements = node.elements.iter_mut().peekable();
-        while let Some(element) = elements.next() {
-            element.traverse(self);
-
-            if elements.peek().is_some() || element.is_none() {
-                self.char(',');
+                if elements.peek().is_some() {
+                    s.space();
+                }
             }
 
-            if elements.peek().is_some() {
-                self.space();
+            if let Some(rest) = node.rest.as_mut() {
+                if !node.elements.is_empty() {
+                    s.char(',');
+                    s.space();
+                }
+
+                s.string("...");
+                rest.traverse(s);
             }
-        }
-
-        if let Some(rest) = node.rest.as_mut() {
-            if !node.elements.is_empty() {
-                self.char(',');
-                self.space();
-            }
-
-            self.string("...");
-            rest.traverse(self);
-        }
-
-        self.space();
-        self.char(']');
-
+        });
         false
     }
 
     fn enter_object_binding(&mut self, node: &mut ObjectBinding) -> bool {
-        if node.rest.is_none() && node.props.is_empty() {
-            self.string("{}");
-            return false;
-        }
-
-        self.char('{');
-        self.space();
-        self.comma_separated_with_rest(&mut node.props, &mut node.rest);
-        self.space();
-        self.char('}');
+        let spaced = !node.props.is_empty() || node.rest.is_some();
+        self.parenthesize('{', spaced, |s| {
+            s.comma_separated_with_rest(&mut node.props, &mut node.rest);
+        });
         false
     }
 
@@ -1125,35 +1127,18 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_array_literal(&mut self, node: &mut Array) -> bool {
-        if node.elements.is_empty() {
-            self.string("[]");
-            return false;
-        }
-
-        self.char('[');
-        self.space();
-
-        self.comma_separated(&mut node.elements);
-
-        self.space();
-        self.char(']');
+        let spaced = !node.elements.is_empty();
+        self.parenthesize('[', spaced, |s| {
+            s.comma_separated(&mut node.elements);
+        });
         false
     }
 
     fn enter_object_literal(&mut self, node: &mut Object) -> bool {
-        if node.props.is_empty() {
-            self.string("{}");
-            return false;
-        }
-
-        self.char('{');
-        self.space();
-
-        self.comma_separated(&mut node.props);
-
-        self.space();
-        self.char('}');
-
+        let spaced = !node.props.is_empty();
+        self.parenthesize('{', spaced, |s| {
+            s.comma_separated(&mut node.props);
+        });
         false
     }
 
