@@ -101,7 +101,7 @@ generate_fold_and_visit! {
             Object
         }
 
-        Number: (enter: enter_number, exit: exit_number) {}
+        LitNumber: (enter: enter_number_literal, exit: exit_number_literal) {}
 
         ObjectBindingProp: (enter: enter_object_binding_prop, exit: exit_object_binding_prop) {}
 
@@ -410,11 +410,11 @@ generate_fold_and_visit! {
 
         LitString: (enter: enter_string_literal, exit: exit_string_literal) {}
 
-        Array: (enter: enter_array_literal, exit: exit_array_literal) {
+        LitArray: (enter: enter_array_literal, exit: exit_array_literal) {
             elements
         }
 
-        Object: (enter: enter_object_literal, exit: exit_object_literal) {
+        LitObject: (enter: enter_object_literal, exit: exit_object_literal) {
             props
         }
 

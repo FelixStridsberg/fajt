@@ -1,7 +1,7 @@
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 use crate::Parser;
-use fajt_ast::{Array, ArrayElement, Expr, ExprLiteral, Literal, Object, PropertyDefinition};
+use fajt_ast::{ArrayElement, Expr, ExprLiteral, LitArray, LitObject, Literal, PropertyDefinition};
 use fajt_common::io::PeekRead;
 use fajt_lexer::punct;
 use fajt_lexer::token::{Token, TokenValue};
@@ -71,7 +71,7 @@ where
         let span = self.span_from(span_start);
         Ok(ExprLiteral {
             span,
-            literal: Literal::Array(Array { elements }),
+            literal: Literal::Array(LitArray { elements }),
         }
         .into())
     }
@@ -107,7 +107,7 @@ where
         let span = self.span_from(span_start);
         Ok(ExprLiteral {
             span,
-            literal: Literal::Object(Object { props }),
+            literal: Literal::Object(LitObject { props }),
         }
         .into())
     }

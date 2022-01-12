@@ -311,7 +311,7 @@ macro_rules! literal(
     (decimal, $value:expr) => {
          $crate::token::TokenValue::Literal(
             fajt_ast::Literal::Number(
-                fajt_ast::Number::Decimal(
+                fajt_ast::LitNumber::Decimal(
                     $value
                 )
             )
@@ -320,7 +320,7 @@ macro_rules! literal(
     (number, $type:expr, $value:expr) => {
         $crate::token::TokenValue::Literal(
             fajt_ast::Literal::Number(
-                fajt_ast::Number::Integer(
+                fajt_ast::LitNumber::Integer(
                     $value, $type
                 )
             )

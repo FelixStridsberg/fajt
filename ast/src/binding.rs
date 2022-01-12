@@ -1,4 +1,4 @@
-use crate::{Expr, Ident, Number, Span};
+use crate::{Expr, Ident, LitNumber, Span};
 
 ast_mapping! {
     pub enum BindingPattern {
@@ -41,7 +41,7 @@ ast_node! {
     pub enum PropertyName {
         Ident(Ident),
         String(String, char), // TODO LitString?
-        Number(Number),
+        Number(LitNumber),
         Computed(Expr),
     }
 }

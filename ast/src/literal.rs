@@ -5,9 +5,9 @@ ast_node! {
         Null,
         Boolean(bool),
         String(LitString),
-        Number(Number), // TODO LitNumber
-        Array(Array), // TODO LitArray
-        Object(Object), // TODO  LitObject
+        Number(LitNumber),
+        Array(LitArray),
+        Object(LitObject),
     }
 }
 
@@ -29,7 +29,7 @@ ast_node! {
 }
 
 ast_node! {
-    pub struct Array {
+    pub struct LitArray {
         pub elements: Vec<ArrayElement>,
     }
 }
@@ -43,7 +43,7 @@ ast_node! {
 }
 
 ast_node! {
-    pub struct Object {
+    pub struct LitObject {
         pub props: Vec<PropertyDefinition>,
     }
 }
@@ -56,7 +56,7 @@ ast_node! {
 }
 
 ast_node! {
-    pub enum Number {
+    pub enum LitNumber {
         Integer(i64, Base),
         Decimal(f64),
     }

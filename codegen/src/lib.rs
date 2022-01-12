@@ -1130,7 +1130,7 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
-    fn enter_array_literal(&mut self, node: &mut Array) -> bool {
+    fn enter_array_literal(&mut self, node: &mut LitArray) -> bool {
         let spaced = !node.elements.is_empty();
         self.parenthesize('[', spaced, |s| {
             s.comma_separated(&mut node.elements);
@@ -1138,7 +1138,7 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
-    fn enter_object_literal(&mut self, node: &mut Object) -> bool {
+    fn enter_object_literal(&mut self, node: &mut LitObject) -> bool {
         let spaced = !node.props.is_empty();
         self.parenthesize('{', spaced, |s| {
             s.comma_separated(&mut node.props);
@@ -1202,13 +1202,13 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
-    fn enter_number(&mut self, node: &mut Number) -> bool {
+    fn enter_number_literal(&mut self, node: &mut LitNumber) -> bool {
         match node {
-            Number::Integer(n, Base::Decimal) => self.string(&n.to_string()),
-            Number::Integer(n, Base::Hex) => self.string(&format!("0x{:x}", n)),
-            Number::Integer(n, Base::Octal) => self.string(&format!("0o{:o}", n)),
-            Number::Integer(n, Base::Binary) => self.string(&format!("0b{:b}", n)),
-            Number::Decimal(n) => self.string(&n.to_string()),
+            LitNumber::Integer(n, Base::Decimal) => self.string(&n.to_string()),
+            LitNumber::Integer(n, Base::Hex) => self.string(&format!("0x{:x}", n)),
+            LitNumber::Integer(n, Base::Octal) => self.string(&format!("0o{:o}", n)),
+            LitNumber::Integer(n, Base::Binary) => self.string(&format!("0b{:b}", n)),
+            LitNumber::Decimal(n) => self.string(&n.to_string()),
         }
 
         false
