@@ -23,10 +23,10 @@ ast_mapping! {
         Variable(StmtVariable),
         While(StmtWhile),
         With(StmtWith),
-        Class(DeclClass), // TODO decl naming
+        ClassDecl(DeclClass),
         FunctionDecl(DeclFunction),
-        ImportDeclaration(DeclImport), // Only applicable for Module
-        ExportDeclaration(DeclExport), // Only applicable for Module
+        ImportDecl(DeclImport), // Only applicable for Module
+        ExportDecl(DeclExport), // Only applicable for Module
     }
 }
 

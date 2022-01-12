@@ -82,10 +82,10 @@ generate_fold_and_visit! {
             Variable
             While
             With
-            Class
+            ClassDecl
             FunctionDecl
-            ImportDeclaration
-            ExportDeclaration
+            ImportDecl
+            ExportDecl
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
