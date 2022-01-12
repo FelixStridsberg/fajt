@@ -27,7 +27,7 @@ ast_struct! {
 ast_node! {
     pub enum ObjectBindingProp {
         Single(SingleNameBinding),
-        KeyValue(PropertyName, BindingElement), // TODO make struct
+        Named(NamedBinding),
     }
 }
 
@@ -36,6 +36,14 @@ ast_struct! {
         pub span: Span,
         pub ident: Ident,
         pub initializer: Option<Expr>,
+    }
+}
+
+ast_struct! {
+    pub struct NamedBinding {
+        pub span: Span,
+        pub property: PropertyName,
+        pub binding: BindingElement,
     }
 }
 

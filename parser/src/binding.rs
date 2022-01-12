@@ -2,8 +2,8 @@ use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::{Result, ThenTry};
 use crate::Parser;
 use fajt_ast::{
-    ArrayBinding, BindingElement, BindingPattern, Ident, ObjectBinding, ObjectBindingProp,
-    SingleNameBinding,
+    ArrayBinding, BindingElement, BindingPattern, Ident, NamedBinding, ObjectBinding,
+    ObjectBindingProp, SingleNameBinding,
 };
 use fajt_common::io::PeekRead;
 use fajt_lexer::punct;
@@ -45,11 +45,7 @@ where
                     break;
                 }
                 _ if self.peek_matches(punct!(":")) => {
-                    let property_name = self.parse_property_name()?;
-                    self.consume_assert(punct!(":"))?;
-
-                    let binding_element = self.parse_binding_element()?;
-                    props.push(ObjectBindingProp::KeyValue(property_name, binding_element));
+                    props.push(ObjectBindingProp::Named(self.parse_named_binding()?));
 
                     self.consume_object_delimiter()?;
                 }
@@ -79,6 +75,22 @@ where
             span,
             ident,
             initializer,
+        })
+    }
+
+    /// Parses the `PropertyName: BindingElement` case of the `BindingProperty` goal symbol.
+    fn parse_named_binding(&mut self) -> Result<NamedBinding> {
+        let span_start = self.position();
+        let property = self.parse_property_name()?;
+        self.consume_assert(punct!(":"))?;
+
+        let binding = self.parse_binding_element()?;
+
+        let span = self.span_from(span_start);
+        Ok(NamedBinding {
+            span,
+            property,
+            binding,
         })
     }
 

@@ -105,6 +105,7 @@ generate_fold_and_visit! {
 
         ObjectBindingProp: (enter: enter_object_binding_prop, exit: exit_object_binding_prop) {
             Single
+            Named
         }
 
         PropertyName: (enter: enter_property_name, exit: exit_property_name) {
@@ -433,6 +434,11 @@ generate_fold_and_visit! {
         SingleNameBinding: (enter: enter_single_name_binding, exit: exit_single_name_binding) {
             ident
             initializer
+        }
+
+        NamedBinding: (enter: enter_named_binding, exit: exit_named_binding) {
+            property
+            binding
         }
 
         ClassMethod: (enter: enter_class_method, exit: exit_class_method) {

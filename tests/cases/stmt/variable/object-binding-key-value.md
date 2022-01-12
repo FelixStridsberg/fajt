@@ -22,14 +22,15 @@ var{a:b}=c;
             "span": "4:12",
             "props": [
               {
-                "KeyValue": [
-                  {
+                "Named": {
+                  "span": "6:10",
+                  "property": {
                     "Ident": {
                       "span": "6:7",
                       "name": "a"
                     }
                   },
-                  {
+                  "binding": {
                     "span": "9:10",
                     "pattern": {
                       "Ident": {
@@ -39,7 +40,7 @@ var{a:b}=c;
                     },
                     "initializer": null
                   }
-                ]
+                }
               }
             ],
             "rest": null
