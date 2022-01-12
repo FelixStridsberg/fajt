@@ -193,6 +193,13 @@ impl<'a> CodeGenerator<'a> {
     }
 
     #[inline]
+    fn quote(&mut self, delimiter: char, string: &str) {
+        self.char(delimiter);
+        self.string(string);
+        self.char(delimiter);
+    }
+
+    #[inline]
     fn parenthesize<F: FnMut(&mut Self)>(&mut self, open_paren: char, space: bool, mut content: F) {
         self.char(open_paren);
         if space {
@@ -697,9 +704,9 @@ impl Visitor for CodeGenerator<'_> {
                 i.traverse(self)
             }
             MemberProperty::Expr(expr) => {
-                self.char('[');
-                expr.traverse(self);
-                self.char(']');
+                self.parenthesize('[', false, |s| {
+                    expr.traverse(s);
+                });
             }
         }
         false
@@ -849,9 +856,9 @@ impl Visitor for CodeGenerator<'_> {
         self.space();
         self.string("from");
         self.space();
-        self.char('\''); // TODO should not be hard coded to '
-        self.string(&node.from);
-        self.char('\'');
+
+        // TODO should not be hard coded to '
+        self.quote('\'', &node.from);
         false
     }
 
@@ -866,9 +873,9 @@ impl Visitor for CodeGenerator<'_> {
             self.space();
             self.string("from");
             self.space();
-            self.char('\''); // TODO should not be hard coded to '
-            self.string(from);
-            self.char('\'');
+
+            // TODO should not be hard coded to '
+            self.quote('\'', from);
         }
 
         self.char(';');
@@ -925,10 +932,9 @@ impl Visitor for CodeGenerator<'_> {
         }
 
         self.space();
-        self.char('\''); // TODO should not be hard coded to '
-        self.string(&node.from);
-        self.char('\'');
 
+        // TODO should not be hard coded to '
+        self.quote('\'', &node.from);
         self.char(';');
         false
     }
@@ -967,9 +973,9 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_formal_parameters(&mut self, node: &mut FormalParameters) -> bool {
-        self.char('(');
-        self.comma_separated_with_rest(&mut node.bindings, &mut node.rest);
-        self.char(')');
+        self.parenthesize('(', false, |s| {
+            s.comma_separated_with_rest(&mut node.bindings, &mut node.rest);
+        });
         false
     }
 
@@ -1120,9 +1126,7 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_string_literal(&mut self, node: &mut LitString) -> bool {
-        self.char(node.delimiter);
-        self.string(&node.value);
-        self.char(node.delimiter);
+        self.quote(node.delimiter, &node.value);
         false
     }
 
