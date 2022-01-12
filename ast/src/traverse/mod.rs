@@ -27,8 +27,8 @@ impl<F: Traverse> Traverse for Option<F> {
     }
 }
 
-// This macro generates all traverse implementations and a Visitor trait with all methods required for
-// visiting all types defined here. Only the types and fields defined here are traversed.
+// This macro generates all traverse implementations and a Visitor trait with all methods required
+// for visiting all types defined here. Only the types and fields defined here are traversed.
 // It also generates a TraceVisitor struct that can be used to trace the traversal of a tree.
 generate_fold_and_visit! {
     enums: {
@@ -38,54 +38,54 @@ generate_fold_and_visit! {
         }
 
         Expr: (enter: enter_expr, exit: exit_expr) {
-            Unary
+            ArrowFunction
+            Assignment
+            Await
             Binary
+            Call
+            Class
+            Conditional
+            Function
             IdentRef
             Literal
-            Parenthesized
-            Yield
-            Assignment
             Logical
-            Call
             Member
-            OptionalMember
+            MetaProperty
+            New
             OptionalCall
-            Conditional
-            Update
+            OptionalMember
+            Parenthesized
             Sequence
             This
-            Function
-            New
-            ArrowFunction
-            Await
-            MetaProperty
-            Class
+            Unary
+            Update
+            Yield
         }
 
         Stmt: (enter: enter_stmt, exit: exit_stmt) {
-            FunctionDecl
-            Return
-            Expr
-            Variable
-            Empty
             Block
-            Class
-            Try
-            Debugger
-            Throw
-            Labeled
-            With
-            Continue
             Break
-            Switch
-            If
-            For
-            ForOf
-            ForIn
-            While
+            Continue
+            Debugger
             DoWhile
-            ExportDeclaration
+            Empty
+            Expr
+            For
+            ForIn
+            ForOf
+            If
+            Labeled
+            Return
+            Switch
+            Throw
+            Try
+            Variable
+            While
+            With
+            Class
+            FunctionDecl
             ImportDeclaration
+            ExportDeclaration
         }
 
         BindingPattern: (enter: enter_binding_pattern, exit: exit_binding_pattern) {
@@ -107,6 +107,9 @@ generate_fold_and_visit! {
 
         PropertyName: (enter: enter_property_name, exit: exit_property_name) {
             Ident
+            // TODO: String
+            Number
+            Computed
         }
 
         ClassElement: (enter: enter_class_element, exit: exit_class_element) {
@@ -161,10 +164,23 @@ generate_fold_and_visit! {
             IdentRef
             Spread
         }
+
+        BinaryOperator: (enter: enter_binary_operator, exit: exit_binary_operator) { }
+
+        LogicalOperator: (enter: enter_logical_operator, exit: exit_logical_operator) { }
+
+        AssignmentOperator: (enter: enter_assignment_operator, exit: exit_assignment_operator) { }
+
+        UnaryOperator: (enter: enter_unary_operator, exit: exit_unary_operator) { }
+
+        UpdateOperator: (enter: enter_update_operator, exit: exit_update_operator) { }
     }
 
+    // The order of the fields for structs reflects the order of traversal. The order should follow the
+    // order the syntax appear in the source as close as possible.
     structs: {
         Body: (enter: enter_body, exit: exit_body) {
+            directives
             statements
         }
 
@@ -178,20 +194,25 @@ generate_fold_and_visit! {
             expr
         }
 
-        StmtBlock: (enter: enter_block_stmt, exit: exit_block_stmt) { }
+        StmtBlock: (enter: enter_block_stmt, exit: exit_block_stmt) {
+            statements
+        }
 
         ExprBinary: (enter: enter_binary_expr, exit: exit_binary_expr) {
             left
+            operator
             right
-        }
-
-        ExprUnary: (enter: enter_unary_expr, exit: exit_unary_expr) {
-            argument
         }
 
         ExprLogical: (enter: enter_logical_expr, exit: exit_logical_expr) {
             left
+            operator
             right
+        }
+
+        ExprUnary: (enter: enter_unary_expr, exit: exit_unary_expr) {
+            operator
+            argument
         }
 
         ExprCall: (enter: enter_call_expr, exit: exit_call_expr) {
@@ -225,6 +246,7 @@ generate_fold_and_visit! {
 
         ExprAssignment: (enter: enter_assignment_expr, exit: exit_assignment_expr) {
             left
+            operator
             right
         }
 
@@ -234,10 +256,12 @@ generate_fold_and_visit! {
 
         BindingElement: (enter: enter_binding_element, exit: exit_binding_element) {
             pattern
+            initializer
         }
 
         FormalParameters: (enter: enter_formal_parameters, exit: exit_formal_parameters) {
             bindings
+            rest
         }
 
         Ident: (enter: enter_ident, exit: exit_ident) {}
@@ -259,13 +283,23 @@ generate_fold_and_visit! {
 
         LitString: (enter: enter_string_literal, exit: exit_string_literal) {}
 
-        Array: (enter: enter_array_literal, exit: exit_array_literal) {}
+        Array: (enter: enter_array_literal, exit: exit_array_literal) {
+            elements
+        }
 
-        Object: (enter: enter_object_literal, exit: exit_object_literal) {}
+        Object: (enter: enter_object_literal, exit: exit_object_literal) {
+            props
+        }
 
-        ArrayBinding: (enter: enter_array_binding, exit: exit_array_binding) {}
+        ArrayBinding: (enter: enter_array_binding, exit: exit_array_binding) {
+            elements
+            rest
+        }
 
-        ObjectBinding: (enter: enter_object_binding, exit: exit_object_binding) {}
+        ObjectBinding: (enter: enter_object_binding, exit: exit_object_binding) {
+            props
+            rest
+        }
 
         ExprYield: (enter: enter_yield_expr, exit: exit_yield_expr) {
             argument
@@ -279,6 +313,7 @@ generate_fold_and_visit! {
 
         ExprUpdate: (enter: enter_update_expr, exit: exit_update_expr) {
             argument
+            operator
         }
 
         ExprSequence: (enter: enter_sequence_expr, exit: exit_sequence_expr) {
@@ -313,14 +348,14 @@ generate_fold_and_visit! {
         }
 
         DeclClass: (enter: enter_class_decl, exit: exit_class_decl) {
-            super_class
             identifier
+            super_class
             body
         }
 
         ExprClass: (enter: enter_class_expr, exit: exit_class_expr) {
-            super_class
             identifier
+            super_class
             body
         }
 
@@ -330,10 +365,10 @@ generate_fold_and_visit! {
             body
         }
 
-
         StmtTry: (enter: enter_try_stmt, exit: exit_try_stmt) {
-            handler
             block
+            handler
+            finalizer
         }
 
         CatchClause: (enter: enter_catch_clause, exit: exit_catch_clause) {
@@ -343,22 +378,37 @@ generate_fold_and_visit! {
 
         StmtDebugger: (enter: enter_debugger_stmt, exit: exit_debugger_stmt) {}
 
-        StmtThrow: (enter: enter_throw_stmt, exit: exit_throw_stmt) {}
+        StmtThrow: (enter: enter_throw_stmt, exit: exit_throw_stmt) {
+            argument
+        }
 
         StmtLabeled: (enter: enter_labeled_stmt, exit: exit_labeled_stmt) {
             label
             body
         }
 
-        StmtWith: (enter: enter_with_stmt, exit: exit_with_stmt) {}
+        StmtWith: (enter: enter_with_stmt, exit: exit_with_stmt) {
+            object
+            body
+        }
 
-        StmtContinue: (enter: enter_continue_stmt, exit: exit_continue_stmt) {}
+        StmtContinue: (enter: enter_continue_stmt, exit: exit_continue_stmt) {
+            label
+        }
 
-        StmtBreak: (enter: enter_break_stmt, exit: exit_break_stmt) {}
+        StmtBreak: (enter: enter_break_stmt, exit: exit_break_stmt) {
+            label
+        }
 
-        StmtSwitch: (enter: enter_switch_stmt, exit: exit_switch_stmt) {}
+        StmtSwitch: (enter: enter_switch_stmt, exit: exit_switch_stmt) {
+            discriminant
+            cases
+        }
 
-        SwitchCase: (enter: enter_switch_case, exit: exit_switch_case) {}
+        SwitchCase: (enter: enter_switch_case, exit: exit_switch_case) {
+            test
+            consequent
+        }
 
         StmtIf: (enter: enter_if_stmt, exit: exit_if_stmt) {
             condition
@@ -366,25 +416,56 @@ generate_fold_and_visit! {
             alternate
         }
 
-        StmtFor: (enter: enter_for_stmt, exit: exit_for_stmt) {}
+        StmtFor: (enter: enter_for_stmt, exit: exit_for_stmt) {
+            init
+            test
+            update
+            body
+        }
 
-        StmtForOf: (enter: enter_for_of_stmt, exit: exit_for_of_stmt) {}
+        StmtForOf: (enter: enter_for_of_stmt, exit: exit_for_of_stmt) {
+            left
+            right
+            body
+        }
 
-        StmtForIn: (enter: enter_for_in_stmt, exit: exit_for_in_stmt) {}
+        StmtForIn: (enter: enter_for_in_stmt, exit: exit_for_in_stmt) {
+            left
+            right
+            body
+        }
 
-        StmtWhile: (enter: enter_while_stmt, exit: exit_while_stmt) {}
+        StmtWhile: (enter: enter_while_stmt, exit: exit_while_stmt) {
+            test
+            body
+        }
 
-        StmtDoWhile: (enter: enter_do_while_stmt, exit: exit_do_while_stmt) {}
+        StmtDoWhile: (enter: enter_do_while_stmt, exit: exit_do_while_stmt) {
+            body
+            test
+        }
 
-        ExportDecl: (enter: enter_export_decl, exit: exit_export_decl) {}
+        ExportDecl: (enter: enter_export_decl, exit: exit_export_decl) {
+            decl
+        }
 
-        ExportDefaultDecl: (enter: enter_export_default_decl, exit: exit_export_default_decl) {}
+        ExportDefaultDecl: (enter: enter_export_default_decl, exit: exit_export_default_decl) {
+            decl
+        }
 
-        ExportDefaultExpr: (enter: enter_export_default_expr, exit: exit_export_default_expr) {}
+        ExportDefaultExpr: (enter: enter_export_default_expr, exit: exit_export_default_expr) {
+            expr
+        }
 
-        ExportNamed: (enter: enter_export_named, exit: exit_export_named) {}
+        ExportNamed: (enter: enter_export_named, exit: exit_export_named) {
+            named_exports
+            // TODO: from (should probably be string literal)
+        }
 
-        ExportNamespace: (enter: enter_export_namespace, exit: exit_export_namespace) {}
+        ExportNamespace: (enter: enter_export_namespace, exit: exit_export_namespace) {
+            alias
+            // TODO: from (should probably be string literal)
+        }
 
         NamedExport: (enter: enter_named_export, exit: exit_named_export) {
             name
@@ -394,6 +475,8 @@ generate_fold_and_visit! {
         DeclImport: (enter: enter_import, exit: exit_import) {
             default_binding
             named_imports
+            named_imports
+            // TODO: from (should probably be string literal)
         }
 
         NamedImport: (enter: enter_named_import, exit: exit_named_import) {

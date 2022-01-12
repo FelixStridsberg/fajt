@@ -3,8 +3,8 @@ use crate::{Expr, Ident, Number, Span};
 ast_mapping! {
     pub enum BindingPattern {
         Ident(Ident),
-        Object(ObjectBinding),
         Array(ArrayBinding),
+        Object(ObjectBinding),
     }
 }
 

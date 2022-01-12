@@ -4,10 +4,8 @@ use fajt_macros::FromString;
 ast_mapping! {
     /// Note: Declarations are handles as statements since they can appear in the same contexts.
     pub enum Stmt {
-        FunctionDecl(DeclFunction),
         Block(StmtBlock),
         Break(StmtBreak),
-        Class(DeclClass),
         Continue(StmtContinue),
         Debugger(StmtDebugger),
         DoWhile(StmtDoWhile),
@@ -25,6 +23,8 @@ ast_mapping! {
         Variable(StmtVariable),
         While(StmtWhile),
         With(StmtWith),
+        Class(DeclClass), // TODO decl naming
+        FunctionDecl(DeclFunction),
         ImportDeclaration(DeclImport), // Only applicable for Module
         ExportDeclaration(DeclExport), // Only applicable for Module
     }
