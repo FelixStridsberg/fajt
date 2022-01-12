@@ -103,7 +103,9 @@ generate_fold_and_visit! {
 
         LitNumber: (enter: enter_number_literal, exit: exit_number_literal) {}
 
-        ObjectBindingProp: (enter: enter_object_binding_prop, exit: exit_object_binding_prop) {}
+        ObjectBindingProp: (enter: enter_object_binding_prop, exit: exit_object_binding_prop) {
+            Single
+        }
 
         PropertyName: (enter: enter_property_name, exit: exit_property_name) {
             Ident
@@ -426,6 +428,11 @@ generate_fold_and_visit! {
         ObjectBinding: (enter: enter_object_binding, exit: exit_object_binding) {
             props
             rest
+        }
+
+        SingleNameBinding: (enter: enter_single_name_binding, exit: exit_single_name_binding) {
+            ident
+            initializer
         }
 
         ClassMethod: (enter: enter_class_method, exit: exit_class_method) {

@@ -26,14 +26,16 @@ ast_struct! {
 
 ast_node! {
     pub enum ObjectBindingProp {
-        Single(Ident, Option<Expr>), // TODO make struct
+        Single(SingleNameBinding),
         KeyValue(PropertyName, BindingElement), // TODO make struct
     }
 }
 
-impl From<Ident> for ObjectBindingProp {
-    fn from(ident: Ident) -> Self {
-        Self::Single(ident, None)
+ast_struct! {
+    pub struct SingleNameBinding {
+        pub span: Span,
+        pub ident: Ident,
+        pub initializer: Option<Expr>,
     }
 }
 

@@ -3,6 +3,7 @@ use crate::error::{Result, ThenTry};
 use crate::Parser;
 use fajt_ast::{
     ArrayBinding, BindingElement, BindingPattern, Ident, ObjectBinding, ObjectBindingProp,
+    SingleNameBinding,
 };
 use fajt_common::io::PeekRead;
 use fajt_lexer::punct;
@@ -53,12 +54,7 @@ where
                     self.consume_object_delimiter()?;
                 }
                 _ if self.is_identifier() => {
-                    let ident = self.parse_identifier()?;
-                    let initializer = self
-                        .current_matches(punct!("="))
-                        .then_try(|| self.parse_initializer())?;
-                    props.push(ObjectBindingProp::Single(ident, initializer));
-
+                    props.push(ObjectBindingProp::Single(self.parse_single_name_binding()?));
                     self.consume_object_delimiter()?;
                 }
                 _ => return err!(UnexpectedToken(self.consume()?)),
@@ -67,6 +63,23 @@ where
 
         let span = self.span_from(span_start);
         Ok(ObjectBinding { span, props, rest }.into())
+    }
+
+    /// Parses the `SingleNameBinding` goal symbol.
+    fn parse_single_name_binding(&mut self) -> Result<SingleNameBinding> {
+        let span_start = self.position();
+
+        let ident = self.parse_identifier()?;
+        let initializer = self
+            .current_matches(punct!("="))
+            .then_try(|| self.parse_initializer())?;
+
+        let span = self.span_from(span_start);
+        Ok(SingleNameBinding {
+            span,
+            ident,
+            initializer,
+        })
     }
 
     /// Parses the `ArrayBindingPattern` goal symbol.

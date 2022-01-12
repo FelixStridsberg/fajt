@@ -1075,17 +1075,22 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_object_binding_prop(&mut self, node: &mut ObjectBindingProp) -> bool {
         match node {
-            ObjectBindingProp::Single(ident, initializer) => {
-                ident.traverse(self);
-                self.initializer(initializer);
-            }
             ObjectBindingProp::KeyValue(name, prop) => {
                 name.traverse(self);
                 self.char(':');
                 self.space();
                 prop.traverse(self);
             }
+            _ => {
+                return true;
+            }
         }
+        false
+    }
+
+    fn enter_single_name_binding(&mut self, node: &mut SingleNameBinding) -> bool {
+        node.ident.traverse(self);
+        self.initializer(&mut node.initializer);
         false
     }
 
