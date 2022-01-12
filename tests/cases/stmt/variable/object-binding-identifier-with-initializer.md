@@ -22,18 +22,19 @@ var{a=b}=c;
             "span": "4:13",
             "props": [
               {
-                "Single": [
-                  {
+                "Single": {
+                  "span": "6:11",
+                  "ident": {
                     "span": "6:7",
                     "name": "a"
                   },
-                  {
+                  "initializer": {
                     "IdentRef": {
                       "span": "10:11",
                       "name": "b"
                     }
                   }
-                ]
+                }
               }
             ],
             "rest": null

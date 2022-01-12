@@ -1,5 +1,6 @@
 ### Source
 Class definitions are always strict mode.
+
 ```js
 var cls = class {
   method1() {

@@ -9,10 +9,10 @@
   "Literal": {
     "span": "0:16",
     "literal": {
-      "String": [
-        "this is string",
-        "'"
-      ]
+      "String": {
+        "value": "this is string",
+        "delimiter": "'"
+      }
     }
   }
 }

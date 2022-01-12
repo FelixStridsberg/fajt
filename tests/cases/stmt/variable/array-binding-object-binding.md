@@ -28,13 +28,14 @@ var[{a}]=b;
                     "span": "6:11",
                     "props": [
                       {
-                        "Single": [
-                          {
+                        "Single": {
+                          "span": "8:9",
+                          "ident": {
                             "span": "8:9",
                             "name": "a"
                           },
-                          null
-                        ]
+                          "initializer": null
+                        }
                       }
                     ],
                     "rest": null

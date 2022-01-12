@@ -43,10 +43,10 @@ function fn(){;"use strict"}
               "Literal": {
                 "span": "26:38",
                 "literal": {
-                  "String": [
-                    "use strict",
-                    "\""
-                  ]
+                  "String": {
+                    "value": "use strict",
+                    "delimiter": "\""
+                  }
                 }
               }
             }

@@ -22,13 +22,14 @@ var{a}=b;
             "span": "4:10",
             "props": [
               {
-                "Single": [
-                  {
+                "Single": {
+                  "span": "6:7",
+                  "ident": {
                     "span": "6:7",
                     "name": "a"
                   },
-                  null
-                ]
+                  "initializer": null
+                }
               }
             ],
             "rest": null

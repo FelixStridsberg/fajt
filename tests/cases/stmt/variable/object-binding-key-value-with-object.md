@@ -36,13 +36,14 @@ var{a:{b}}=c;
                         "span": "9:14",
                         "props": [
                           {
-                            "Single": [
-                              {
+                            "Single": {
+                              "span": "11:12",
+                              "ident": {
                                 "span": "11:12",
                                 "name": "b"
                               },
-                              null
-                            ]
+                              "initializer": null
+                            }
                           }
                         ],
                         "rest": null

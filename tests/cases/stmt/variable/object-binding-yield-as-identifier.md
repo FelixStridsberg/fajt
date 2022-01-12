@@ -22,13 +22,14 @@ var{yield,...yield}=c;
             "span": "4:23",
             "props": [
               {
-                "Single": [
-                  {
+                "Single": {
+                  "span": "6:11",
+                  "ident": {
                     "span": "6:11",
                     "name": "yield"
                   },
-                  null
-                ]
+                  "initializer": null
+                }
               }
             ],
             "rest": {

@@ -22,22 +22,24 @@ var{a,b}=c;
             "span": "4:12",
             "props": [
               {
-                "Single": [
-                  {
+                "Single": {
+                  "span": "6:7",
+                  "ident": {
                     "span": "6:7",
                     "name": "a"
                   },
-                  null
-                ]
+                  "initializer": null
+                }
               },
               {
-                "Single": [
-                  {
+                "Single": {
+                  "span": "9:10",
+                  "ident": {
                     "span": "9:10",
                     "name": "b"
                   },
-                  null
-                ]
+                  "initializer": null
+                }
               }
             ],
             "rest": null
