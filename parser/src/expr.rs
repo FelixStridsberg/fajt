@@ -1,4 +1,4 @@
-use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
+use crate::error::ErrorKind::{SyntaxError, UnexpectedIdent, UnexpectedToken};
 use crate::error::{Result, ThenTry};
 use crate::{ContextModify, Parser};
 use fajt_ast::assignment_op;
@@ -484,7 +484,10 @@ where
 
                 if !token_matches!(self.current(), ok: punct!(".") | punct!("[")) {
                     let span = self.span_from(span_start);
-                    return err!(SyntaxError("'super' keyword not expected here".to_string(), span))
+                    return err!(SyntaxError(
+                        "'super' keyword not expected here".to_string(),
+                        span
+                    ));
                 }
 
                 self.parse_member_expr_right_side(
@@ -501,7 +504,7 @@ where
 
                 let property = self.parse_identifier()?;
                 if property.name != "target" {
-                    todo!("Error, expected `target` after `new.`");
+                    return err!(UnexpectedIdent(property));
                 }
 
                 let span = self.span_from(span_start);

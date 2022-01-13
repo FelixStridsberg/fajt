@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
 use std::{error, fmt};
 
-use fajt_ast::Span;
+use fajt_ast::{Ident, Span};
 use fajt_common::io::Error as CommonError;
 use fajt_lexer::error::Error as LexerError;
 
@@ -76,6 +76,7 @@ pub enum ErrorKind {
     LexerError(LexerError),
     SyntaxError(String, Span),
     UnexpectedToken(fajt_lexer::token::Token),
+    UnexpectedIdent(Ident),
 }
 
 impl fmt::Display for Error {
@@ -85,6 +86,7 @@ impl fmt::Display for Error {
             ErrorKind::LexerError(e) => write!(f, "Lexer error '{}'", e)?,
             ErrorKind::SyntaxError(msg, span) => write!(f, "{}:{:?}", msg, span)?,
             ErrorKind::UnexpectedToken(t) => write!(f, "Unexpected token: {:?}", t)?,
+            ErrorKind::UnexpectedIdent(i) => write!(f, "Unexpected identifier: {:?}", i)?,
         }
 
         if let (Some(file), Some((row, col))) = (self.file, self.location) {

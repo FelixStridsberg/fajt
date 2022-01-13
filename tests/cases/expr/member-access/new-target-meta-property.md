@@ -3,6 +3,11 @@
 new.target
 ```
 
+### Output: minified
+```js
+new.target
+```
+
 ### Output: ast
 ```json
 {
