@@ -326,10 +326,7 @@ where
         Ok(match token.value {
             TokenValue::Identifier(s) => Ident::new(s, token.span),
             TokenValue::Keyword(k) => {
-                // TODO error handling
-                let str = k
-                    .into_identifier_string(self.context.keyword_context())
-                    .unwrap();
+                let str = k.into_identifier_string(self.context.keyword_context())?;
                 Ident::new(str, token.span)
             }
             _ => return err!(UnexpectedToken(token)),
