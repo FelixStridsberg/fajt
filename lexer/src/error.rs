@@ -1,5 +1,5 @@
 use crate::token::Keyword;
-use fajt_ast::Span;
+use crate::Token;
 use fajt_common::io::Error as CommonError;
 use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
@@ -11,7 +11,7 @@ pub struct Error {
 }
 
 impl Error {
-    pub(crate) fn of(kind: ErrorKind) -> Self {
+    pub fn of(kind: ErrorKind) -> Self {
         Error { kind }
     }
 
@@ -23,7 +23,7 @@ impl Error {
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[non_exhaustive]
 pub enum ErrorKind {
-    InvalidOrUnexpectedToken(Span),
+    InvalidOrUnexpectedToken(Token),
     ForbiddenIdentifier(Keyword),
     EndOfFile,
 }
@@ -32,8 +32,8 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match &self.kind {
             ErrorKind::EndOfFile => write!(f, "End of file reached."),
-            ErrorKind::InvalidOrUnexpectedToken(p) => {
-                write!(f, "Invalid or unexpected token at {}:{}", p.start, p.end)
+            ErrorKind::InvalidOrUnexpectedToken(t) => {
+                write!(f, "Invalid or unexpected token {:?}", t)
             }
             ErrorKind::ForbiddenIdentifier(k) => {
                 write!(

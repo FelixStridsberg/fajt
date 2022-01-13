@@ -11,7 +11,7 @@ pub mod token;
 
 use crate::code_point::CodePoint;
 use crate::error::Error;
-use crate::error::ErrorKind::EndOfFile;
+use crate::error::ErrorKind::{EndOfFile, InvalidOrUnexpectedToken};
 use crate::token::Token;
 use crate::token::TokenValue;
 use fajt_ast::Base::{Binary, Hex, Octal};
@@ -184,7 +184,9 @@ impl<'a> Lexer<'a> {
                     if self.reader.peek() == Some(&'.') {
                         produce!(self, 2, punct!("..."))
                     } else {
-                        todo!("Syntax error, '..' is not a valid punctuator.")
+                        let end = self.reader.position();
+                        let error_token = Token::new(punct!("."), new_line, (start, end));
+                        return Err(Error::of(InvalidOrUnexpectedToken(error_token)));
                     }
                 } else {
                     produce!(self, 1, punct!("."))

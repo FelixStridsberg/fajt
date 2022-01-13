@@ -1,7 +1,11 @@
 mod lib;
 
+use fajt_ast::Span;
+use fajt_lexer::error::Error;
+use fajt_lexer::error::ErrorKind::InvalidOrUnexpectedToken;
 use fajt_lexer::literal;
 use fajt_lexer::punct;
+use fajt_lexer::token::Token;
 
 #[test]
 fn parentheses() {
@@ -120,5 +124,13 @@ fn optional_chaining_exception() {
             (punct!("."), (1, 2)),
             (literal!(integer, 2), (2, 3)),
         ]
+    );
+}
+
+#[test]
+fn two_dots() {
+    assert_lexer!(
+        input: "..",
+        error: Error::of(InvalidOrUnexpectedToken(Token::new(punct!("."), true, Span::new(0, 1))))
     );
 }
