@@ -95,8 +95,15 @@ where
                     props.push(PropertyDefinition::Spread(expr));
                     self.consume_object_delimiter()?;
                 }
+                // TODO MethodDefinition
                 _ if self.is_identifier() => {
                     let ident = self.parse_identifier()?;
+
+                    if self.current_matches(punct!(":")) {
+                        todo!("Key value in object literal");
+                    }
+                    // TODO CoverInitializedName
+
                     props.push(PropertyDefinition::IdentRef(ident));
                     self.consume_object_delimiter()?;
                 }
