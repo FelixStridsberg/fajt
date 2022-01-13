@@ -1,6 +1,6 @@
 use crate::error::Result;
 use crate::Parser;
-use fajt_ast::{Expr, ExprParenthesized, FormalParameters, SourceType, Span};
+use fajt_ast::{Callee, Expr, ExprCall, ExprParenthesized, FormalParameters, SourceType, Span};
 use fajt_common::io::{PeekRead, PeekReader};
 use fajt_lexer::keyword;
 use fajt_lexer::punct;
@@ -59,8 +59,19 @@ impl CoverCallExprAndAsyncArrowHead {
     }
 
     pub fn into_call(self) -> Result<Expr> {
-        // This is call expressions like: async(), async(parameters) since async is not reserved.
-        todo!("CoverCallExpressionAndAsyncArrowHead to call expression")
+        let tokens = self.tokens.into_iter();
+        let mut reader = PeekReader::new(tokens).unwrap();
+        let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
+
+        let async_ident = parser.parse_identifier()?;
+        let (arguments_span, arguments) = parser.parse_arguments()?;
+        Ok(ExprCall {
+            span: self.span,
+            callee: Callee::Expr(async_ident.into()),
+            arguments_span,
+            arguments,
+        }
+        .into())
     }
 }
 
