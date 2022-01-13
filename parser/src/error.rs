@@ -6,15 +6,23 @@ use fajt_ast::{Ident, Span};
 use fajt_common::io::Error as CommonError;
 use fajt_lexer::error::Error as LexerError;
 
-// TODO this macro should expand without debug info for optimized build.
+#[cfg(debug_assertions)]
 #[macro_export]
 macro_rules! err {
     ($expr:expr) => {
-        Err(crate::error::Error::with_debug(
+        Err($crate::error::Error::with_debug(
             $expr,
             file!(),
             (line!(), column!()),
         ))
+    };
+}
+
+#[cfg(not(debug_assertions))]
+#[macro_export]
+macro_rules! err {
+    ($expr:expr) => {
+        Err($crate::error::Error::of($expr))
     };
 }
 
@@ -56,6 +64,7 @@ impl Error {
         }
     }
 
+    #[cfg(debug_assertions)]
     pub(crate) fn with_debug(kind: ErrorKind, file: &'static str, location: (u32, u32)) -> Self {
         Error {
             kind,
