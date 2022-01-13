@@ -483,7 +483,8 @@ where
                 let super_token = self.consume()?;
 
                 if !token_matches!(self.current(), ok: punct!(".") | punct!("[")) {
-                    todo!("Error, unexpected super")
+                    let span = self.span_from(span_start);
+                    return err!(SyntaxError("'super' keyword not expected here".to_string(), span))
                 }
 
                 self.parse_member_expr_right_side(
