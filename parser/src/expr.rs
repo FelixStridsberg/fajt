@@ -522,7 +522,7 @@ where
 
                 let property = self.parse_identifier()?;
                 if property.name != "meta" {
-                    todo!("Error, expected `meta` after `import.`");
+                    return err!(UnexpectedIdent(property));
                 }
 
                 let span = self.span_from(span_start);
