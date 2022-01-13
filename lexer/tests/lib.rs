@@ -16,9 +16,6 @@
 ///     ]
 /// )
 /// ```
-///
-/// Assert error:
-/// TODO, syntax not finalized
 #[macro_export]
 macro_rules! assert_lexer {
     (input: $input:expr, output: [$(($token:expr, ($col1:expr, $col2:expr)),)+]) => {
