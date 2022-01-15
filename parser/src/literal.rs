@@ -93,6 +93,7 @@ where
             }
 
             props.push(self.parse_property_definition()?);
+            self.consume_object_delimiter()?;
         }
 
         let span = self.span_from(span_start);
@@ -109,24 +110,19 @@ where
             token_matches!(punct!("...")) => {
                 self.consume()?;
                 let expr = self.parse_assignment_expr()?;
-                self.consume_object_delimiter()?;
                 Ok(PropertyDefinition::Spread(expr))
             }
             token if token_matches!(token, punct!("[")) || self.peek_matches(punct!(":")) => {
-                let property = self.parse_named_property_definition()?;
-                self.consume_object_delimiter()?;
-                Ok(property)
+                Ok(self.parse_named_property_definition()?)
             }
             _ if self.is_method_definition() => {
                 let method = self.parse_method_definition()?;
-                self.consume_object_delimiter()?;
                 Ok(PropertyDefinition::Method(method))
             }
             // TODO MethodDefinition
             // TODO CoverInitializedName
             _ if self.is_identifier() => {
                 let ident = self.parse_identifier()?;
-                self.consume_object_delimiter()?;
                 Ok(PropertyDefinition::IdentRef(ident))
             }
             _ => return err!(UnexpectedToken(self.consume()?)),
