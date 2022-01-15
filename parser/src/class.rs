@@ -96,9 +96,7 @@ where
             {
                 true
             }
-            token_matches!(ok: keyword!("get") | keyword!("set")) if self.peek_is_identifier() => {
-                true
-            }
+            token_matches!(ok: keyword!("get") | keyword!("set")) => true,
             _ => self.peek_matches(punct!("(")),
         }
     }
