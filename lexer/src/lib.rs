@@ -192,8 +192,8 @@ impl<'a> Lexer<'a> {
                     produce!(self, 1, punct!("."))
                 }
             }
-            // TODO handle comments (/*)
             '/' if self.reader.peek() == Some(&'/') => self.read_single_line_comment(),
+            '/' if self.reader.peek() == Some(&'*') => self.read_multi_line_comment(),
             '/' => produce!(self, 1, punct!("/")),
             '0'..='9' => self.read_number_literal(),
             '"' | '\'' => self.read_string_literal(),
@@ -212,6 +212,27 @@ impl<'a> Lexer<'a> {
         let content = self.reader.read_while(|c| !c.is_ecma_line_terminator())?;
         Ok(TokenValue::Comment(Comment {
             multi_line: false,
+            content,
+        }))
+    }
+
+    fn read_multi_line_comment(&mut self) -> Result<TokenValue> {
+        self.reader.consume()?;
+        self.reader.consume()?;
+
+        let mut content = String::new();
+        loop {
+            if self.reader.current()? == &'*' && self.reader.peek() == Some(&'/') {
+                self.reader.consume()?;
+                self.reader.consume()?;
+                break;
+            }
+
+            content.push(self.reader.consume()?);
+        }
+
+        Ok(TokenValue::Comment(Comment {
+            multi_line: true,
             content,
         }))
     }

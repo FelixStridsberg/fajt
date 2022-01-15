@@ -28,3 +28,21 @@ fn single_line_comment_leaves_new_line() {
     let tokens = lex("// Hello, I am comment.\na");
     assert!(tokens[1].first_on_line);
 }
+
+#[test]
+fn multiline_line_comment() {
+    let tokens = lex("/* Hello, I am comment. */");
+    println!("TOKENS: {:?}", tokens);
+
+    assert_eq!(
+        tokens,
+        vec![Token {
+            value: TokenValue::Comment(Comment {
+                multi_line: true,
+                content: " Hello, I am comment. ".to_string(),
+            }),
+            first_on_line: true,
+            span: Span::new(0, 26)
+        }]
+    );
+}
