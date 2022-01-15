@@ -112,8 +112,11 @@ where
                 self.consume_object_delimiter()?;
                 Ok(PropertyDefinition::Spread(expr))
             }
-            token_matches!(punct!("[")) => self.parse_named_property_definition(),
-            _ if self.peek_matches(punct!(":")) => self.parse_named_property_definition(),
+            token if token_matches!(token, punct!("[")) || self.peek_matches(punct!(":")) => {
+                let property = self.parse_named_property_definition()?;
+                self.consume_object_delimiter()?;
+                Ok(property)
+            }
             // TODO MethodDefinition
             // TODO CoverInitializedName
             _ if self.is_identifier() => {
