@@ -25,7 +25,7 @@ ast_mapping! {
 }
 
 ast_struct! {
-    pub struct ClassMethod {
+    pub struct ClassMethod { // TODO rename, MethodDefinition, this is not class specific
         pub span: Span,
         pub name: PropertyName,
         pub kind: ClassMethodKind,

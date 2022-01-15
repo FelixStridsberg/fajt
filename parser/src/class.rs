@@ -68,38 +68,43 @@ where
         Ok((super_class, body))
     }
 
+    /// Parses the `ClassBody` goal symbol, including the { and } terminals.
     fn parse_class_body(&mut self) -> Result<Vec<ClassElement>> {
         self.consume_assert(punct!("{"))?;
         let mut class_body = Vec::new();
 
         loop {
-            let element: ClassElement = match self.current()? {
-                token_matches!(punct!("}")) => {
-                    self.consume()?;
-                    break;
-                }
-                token_matches!(punct!("*")) => self.parse_class_generator_method()?.into(),
-                token_matches!(keyword!("async")) if !self.followed_by_new_lined() => {
-                    self.parse_class_async_method()?.into()
-                }
-                token_matches!(keyword!("get")) => {
-                    self.parse_class_get_set(ClassMethodKind::Get)?.into()
-                }
-                token_matches!(keyword!("set")) => {
-                    self.parse_class_get_set(ClassMethodKind::Set)?.into()
-                }
-                _ => {
-                    let span_start = self.position();
-                    let name = self.parse_property_name()?;
-                    self.parse_class_method(span_start, name, ClassMethodKind::Method)?
-                        .into()
-                }
-            };
+            if self.current_matches(punct!("}")) {
+                self.consume()?;
+                break;
+            }
 
+            let element: ClassElement = self.parse_method_definition()?.into();
             class_body.push(element);
         }
 
         Ok(class_body)
+    }
+
+    /// Parses the `MethodDefinition` goal symbol.
+    fn parse_method_definition(&mut self) -> Result<ClassMethod> {
+        match self.current()? {
+            token_matches!(punct!("*")) => self.parse_class_generator_method(),
+            token_matches!(keyword!("async")) if !self.followed_by_new_lined() => {
+                self.parse_class_async_method()
+            }
+            token_matches!(keyword!("get")) => {
+                self.parse_class_get_set(ClassMethodKind::Get)
+            }
+            token_matches!(keyword!("set")) => {
+                self.parse_class_get_set(ClassMethodKind::Set)
+            }
+            _ => {
+                let span_start = self.position();
+                let name = self.parse_property_name()?;
+                self.parse_class_method(span_start, name, ClassMethodKind::Method)
+            }
+        }
     }
 
     fn parse_class_get_set(&mut self, kind: ClassMethodKind) -> Result<ClassMethod> {
