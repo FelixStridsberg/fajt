@@ -22,3 +22,9 @@ fn single_line_comment() {
         }]
     );
 }
+
+#[test]
+fn single_line_comment_leaves_new_line() {
+    let tokens = lex("// Hello, I am comment.\na");
+    assert!(tokens[1].first_on_line);
+}
