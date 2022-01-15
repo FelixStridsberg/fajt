@@ -12,8 +12,8 @@ pub mod token;
 use crate::code_point::CodePoint;
 use crate::error::Error;
 use crate::error::ErrorKind::{EndOfFile, InvalidOrUnexpectedToken};
-use crate::token::TokenValue;
 use crate::token::Token;
+use crate::token::TokenValue;
 use fajt_ast::Base::{Binary, Hex, Octal};
 use fajt_ast::{LitString, Literal};
 use fajt_common::io::{PeekRead, PeekReader};
@@ -90,10 +90,7 @@ impl<'a> Lexer<'a> {
     }
 
     pub fn read(&mut self) -> Result<Token> {
-        self.maybe_skip_single_line_comment();
-        let multi_line_comment = self.maybe_skip_multi_line_comment()?;
-
-        let new_line = self.skip_whitespaces()? || multi_line_comment;
+        let new_line = self.skip_comments_and_white_spaces()?;
         let current = self.reader.current()?;
 
         let start = self.reader.position();
@@ -206,25 +203,47 @@ impl<'a> Lexer<'a> {
         Ok(Token::new(value, new_line, (start, end)))
     }
 
-    fn maybe_skip_single_line_comment(&mut self) {
-        if !matches!(self.reader.current(), Ok(&'/')) || self.reader.peek() != Some(&'/') {
-            return;
+    /// Skips all consecutive comments and white spaces, returns true if a new line was skipped.
+    fn skip_comments_and_white_spaces(&mut self) -> Result<bool> {
+        let mut skipped_new_line = false;
+
+        loop {
+            skipped_new_line = self.skip_whitespaces()? || skipped_new_line;
+
+            match self.reader.current() {
+                Ok('/') if self.reader.peek() == Some(&'/') => {
+                    self.skip_single_line_comment();
+                    // Single line comments never includes the ending new line. If at end of file it
+                    // doesn't matter if we lie and say there was a new line.
+                    skipped_new_line = true;
+                }
+                Ok('/') if self.reader.peek() == Some(&'*') => {
+                    skipped_new_line = self.skip_multi_line_comment()? || skipped_new_line;
+                }
+                _ => break,
+            }
         }
 
-        self.reader.consume().unwrap();
-        self.reader.consume().unwrap();
+        skipped_new_line = self.skip_whitespaces()? || skipped_new_line;
 
-        let _content = self
-            .reader
-            .read_while(|c| !c.is_ecma_line_terminator())
-            .unwrap();
+        Ok(skipped_new_line)
     }
 
-    fn maybe_skip_multi_line_comment(&mut self) -> Result<bool> {
-        if !matches!(self.reader.current(), Ok(&'/')) || self.reader.peek() != Some(&'*') {
-            return Ok(false);
-        }
+    fn skip_single_line_comment(&mut self) {
+        self.reader.consume().unwrap();
+        self.reader.consume().unwrap();
 
+        self.reader
+            .read_while(|c| !c.is_ecma_line_terminator())
+            .unwrap();
+
+        if self.reader.current().is_ok() {
+            self.reader.consume().unwrap(); // Consume trailing new line
+        }
+    }
+
+    /// Skips multi line comment, returns true if a new line was skipped.
+    fn skip_multi_line_comment(&mut self) -> Result<bool> {
         self.reader.consume()?;
         self.reader.consume()?;
 
