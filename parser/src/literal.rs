@@ -6,6 +6,7 @@ use fajt_ast::{
     PropertyDefinition,
 };
 use fajt_common::io::PeekRead;
+use fajt_lexer::keyword;
 use fajt_lexer::punct;
 use fajt_lexer::token::{Token, TokenValue};
 use fajt_lexer::token_matches;
@@ -133,7 +134,7 @@ where
                     ClassMethodKind::Method,
                 )?))
             }
-            _ if self.is_method_definition() => {
+            _ if self.is_object_method_definition() => {
                 let method = self.parse_method_definition()?;
                 Ok(PropertyDefinition::Method(method))
             }
@@ -143,6 +144,15 @@ where
                 Ok(PropertyDefinition::IdentRef(ident))
             }
             _ => return err!(UnexpectedToken(self.consume()?)),
+        }
+    }
+
+    pub fn is_object_method_definition(&self) -> bool {
+        match self.current() {
+            token_matches!(ok: punct!("*") | punct!("[")) => true,
+            token_matches!(ok: keyword!("async")) if !self.peek_matches(punct!(":")) => true,
+            token_matches!(ok: keyword!("get") | keyword!("set")) => true,
+            _ => self.peek_matches(punct!("(")),
         }
     }
 

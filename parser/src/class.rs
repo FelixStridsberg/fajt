@@ -87,21 +87,6 @@ where
     }
 
     // TODO move out of class
-    pub(super) fn is_method_definition(&self) -> bool {
-        match self.current() {
-            // TODO rest
-            token_matches!(ok: punct!("*") | punct!("[")) => true,
-            token_matches!(ok: keyword!("async"))
-                if self.peek_is_identifier() || self.peek_matches(punct!("*")) =>
-            {
-                true
-            }
-            token_matches!(ok: keyword!("get") | keyword!("set")) => true,
-            _ => self.peek_matches(punct!("(")),
-        }
-    }
-
-    // TODO move out of class
     /// Parses the `MethodDefinition` goal symbol.
     pub(super) fn parse_method_definition(&mut self) -> Result<ClassMethod> {
         match self.current()? {
