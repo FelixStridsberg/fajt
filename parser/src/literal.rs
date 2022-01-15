@@ -119,7 +119,6 @@ where
                 let method = self.parse_method_definition()?;
                 Ok(PropertyDefinition::Method(method))
             }
-            // TODO MethodDefinition
             // TODO CoverInitializedName
             _ if self.is_identifier() => {
                 let ident = self.parse_identifier()?;

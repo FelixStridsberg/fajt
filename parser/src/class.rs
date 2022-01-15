@@ -91,6 +91,7 @@ where
         match self.current() {
             // TODO rest
             token_matches!(ok: punct!("*")) => true,
+            token_matches!(ok: keyword!("async")) if self.peek_is_identifier() => true,
             _ => self.peek_matches(punct!("(")),
         }
     }
