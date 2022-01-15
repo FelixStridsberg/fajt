@@ -90,6 +90,7 @@ where
     pub(super) fn is_method_definition(&self) -> bool {
         match self.current() {
             // TODO rest
+            token_matches!(ok: punct!("*")) => true,
             _ => self.peek_matches(punct!("(")),
         }
     }
