@@ -84,31 +84,12 @@ where
 
         let mut props = Vec::new();
         loop {
-            match self.current()? {
-                token_matches!(punct!("}")) => {
-                    self.consume()?;
-                    break;
-                }
-                token_matches!(punct!("...")) => {
-                    self.consume()?;
-                    let expr = self.parse_assignment_expr()?;
-                    props.push(PropertyDefinition::Spread(expr));
-                    self.consume_object_delimiter()?;
-                }
-                // TODO MethodDefinition
-                _ if self.is_identifier() => {
-                    let ident = self.parse_identifier()?;
-
-                    if self.current_matches(punct!(":")) {
-                        todo!("Key value in object literal");
-                    }
-                    // TODO CoverInitializedName
-
-                    props.push(PropertyDefinition::IdentRef(ident));
-                    self.consume_object_delimiter()?;
-                }
-                _ => return err!(UnexpectedToken(self.consume()?)),
+            if token_matches!(self.current()?, punct!("}")) {
+                self.consume()?;
+                break;
             }
+
+            props.push(self.parse_property_definition()?);
         }
 
         let span = self.span_from(span_start);
@@ -117,5 +98,30 @@ where
             literal: Literal::Object(LitObject { props }),
         }
         .into())
+    }
+
+    /// Parses the `PropertyDefinition` goal symbol.
+    fn parse_property_definition(&mut self) -> Result<PropertyDefinition> {
+        match self.current()? {
+            token_matches!(punct!("...")) => {
+                self.consume()?;
+                let expr = self.parse_assignment_expr()?;
+                self.consume_object_delimiter()?;
+                Ok(PropertyDefinition::Spread(expr))
+            }
+            // TODO MethodDefinition
+            _ if self.is_identifier() => {
+                let ident = self.parse_identifier()?;
+
+                if self.current_matches(punct!(":")) {
+                    todo!("Key value in object literal");
+                }
+                // TODO CoverInitializedName
+
+                self.consume_object_delimiter()?;
+                Ok(PropertyDefinition::IdentRef(ident))
+            }
+            _ => return err!(UnexpectedToken(self.consume()?)),
+        }
     }
 }
