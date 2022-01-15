@@ -128,7 +128,7 @@ where
                     }));
                 }
 
-                Ok(PropertyDefinition::Method(self.parse_class_method(
+                Ok(PropertyDefinition::Method(self.parse_method(
                     span_start,
                     name,
                     MethodKind::Method,

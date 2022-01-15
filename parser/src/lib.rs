@@ -12,6 +12,7 @@ mod function;
 mod iteration;
 mod literal;
 mod member_access;
+mod method;
 mod module;
 mod stmt;
 mod variable;
