@@ -345,7 +345,22 @@ where
     /// Parses the `PropertyName` goal symbol.
     fn parse_property_name(&mut self) -> Result<PropertyName> {
         match self.current()? {
-            token_matches!(@literal) => todo!(),
+            token_matches!(TokenValue::Literal(Literal::String(_))) => {
+                match self.consume()?.value {
+                    TokenValue::Literal(Literal::String(string)) => {
+                        Ok(PropertyName::String(string))
+                    }
+                    _ => unreachable!()
+                }
+            },
+            token_matches!(TokenValue::Literal(Literal::Number(_))) => {
+                match self.consume()?.value {
+                    TokenValue::Literal(Literal::Number(number)) => {
+                        Ok(PropertyName::Number(number))
+                    }
+                    _ => unreachable!()
+                }
+            },
             token_matches!(punct!("[")) => {
                 self.consume()?;
                 let expr = self.parse_assignment_expr()?;
