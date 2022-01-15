@@ -345,9 +345,14 @@ where
     fn parse_property_name(&mut self) -> Result<PropertyName> {
         match self.current()? {
             token_matches!(@literal) => todo!(),
-            token_matches!(punct!("[")) => todo!(),
+            token_matches!(punct!("[")) => {
+                self.consume()?;
+                let expr = self.parse_assignment_expr()?;
+                self.consume_assert(punct!("]"))?;
+                Ok(PropertyName::Computed(expr))
+            }
             _ if self.is_identifier() => Ok(PropertyName::Ident(self.parse_identifier()?)),
-            _ => return err!(UnexpectedToken(self.consume()?)),
+            _ => err!(UnexpectedToken(self.consume()?)),
         }
     }
 

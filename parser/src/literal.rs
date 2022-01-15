@@ -3,7 +3,7 @@ use crate::error::Result;
 use crate::Parser;
 use fajt_ast::{
     ArrayElement, Expr, ExprLiteral, LitArray, LitObject, Literal, NamedProperty,
-    PropertyDefinition, PropertyName,
+    PropertyDefinition,
 };
 use fajt_common::io::PeekRead;
 use fajt_lexer::punct;
@@ -105,8 +105,6 @@ where
 
     /// Parses the `PropertyDefinition` goal symbol.
     fn parse_property_definition(&mut self) -> Result<PropertyDefinition> {
-        let span_start = self.position();
-
         match self.current()? {
             token_matches!(punct!("...")) => {
                 self.consume()?;
@@ -114,27 +112,31 @@ where
                 self.consume_object_delimiter()?;
                 Ok(PropertyDefinition::Spread(expr))
             }
+            token_matches!(punct!("[")) => self.parse_named_property_definition(),
+            _ if self.peek_matches(punct!(":")) => self.parse_named_property_definition(),
             // TODO MethodDefinition
             // TODO CoverInitializedName
             _ if self.is_identifier() => {
                 let ident = self.parse_identifier()?;
-
-                if self.current_matches(punct!(":")) {
-                    self.consume()?;
-
-                    let value = self.parse_assignment_expr()?;
-                    let span = self.span_from(span_start);
-                    return Ok(PropertyDefinition::Named(NamedProperty {
-                        span,
-                        name: PropertyName::Ident(ident),
-                        value,
-                    }));
-                }
-
                 self.consume_object_delimiter()?;
                 Ok(PropertyDefinition::IdentRef(ident))
             }
             _ => return err!(UnexpectedToken(self.consume()?)),
         }
+    }
+
+    fn parse_named_property_definition(&mut self) -> Result<PropertyDefinition> {
+        let span_start = self.position();
+
+        let name = self.parse_property_name()?;
+        self.consume_assert(punct!(":"))?;
+        let value = self.parse_assignment_expr()?;
+
+        let span = self.span_from(span_start);
+        Ok(PropertyDefinition::Named(NamedProperty {
+            span,
+            name,
+            value,
+        }))
     }
 }

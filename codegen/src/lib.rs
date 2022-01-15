@@ -1156,6 +1156,16 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
+    fn enter_property_name(&mut self, node: &mut PropertyName) -> bool {
+        match node {
+            PropertyName::Computed(expr) => {
+                self.parenthesize('[', false, |s| expr.traverse(s));
+                false
+            }
+            _ => true,
+        }
+    }
+
     fn enter_continue_stmt(&mut self, node: &mut StmtContinue) -> bool {
         self.string("continue");
 
