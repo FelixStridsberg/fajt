@@ -117,6 +117,11 @@ where
                 self.consume_object_delimiter()?;
                 Ok(property)
             }
+            _ if self.is_method_definition() => {
+                let method = self.parse_method_definition()?;
+                self.consume_object_delimiter()?;
+                Ok(PropertyDefinition::Method(method))
+            }
             // TODO MethodDefinition
             // TODO CoverInitializedName
             _ if self.is_identifier() => {

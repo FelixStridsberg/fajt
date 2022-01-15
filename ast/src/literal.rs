@@ -1,4 +1,4 @@
-use crate::{Expr, Ident, PropertyName, Span};
+use crate::{ClassMethod, Expr, Ident, PropertyName, Span};
 
 ast_node! {
     pub enum Literal {
@@ -53,6 +53,7 @@ ast_node! {
         IdentRef(Ident),
         Spread(Expr),
         Named(NamedProperty),
+        Method(ClassMethod),
     }
 }
 

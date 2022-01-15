@@ -86,19 +86,24 @@ where
         Ok(class_body)
     }
 
+    // TODO move out of class
+    pub(super) fn is_method_definition(&self) -> bool {
+        match self.current() {
+            // TODO rest
+            _ => self.peek_matches(punct!("(")),
+        }
+    }
+
+    // TODO move out of class
     /// Parses the `MethodDefinition` goal symbol.
-    fn parse_method_definition(&mut self) -> Result<ClassMethod> {
+    pub(super) fn parse_method_definition(&mut self) -> Result<ClassMethod> {
         match self.current()? {
             token_matches!(punct!("*")) => self.parse_class_generator_method(),
             token_matches!(keyword!("async")) if !self.followed_by_new_lined() => {
                 self.parse_class_async_method()
             }
-            token_matches!(keyword!("get")) => {
-                self.parse_class_get_set(ClassMethodKind::Get)
-            }
-            token_matches!(keyword!("set")) => {
-                self.parse_class_get_set(ClassMethodKind::Set)
-            }
+            token_matches!(keyword!("get")) => self.parse_class_get_set(ClassMethodKind::Get),
+            token_matches!(keyword!("set")) => self.parse_class_get_set(ClassMethodKind::Set),
             _ => {
                 let span_start = self.position();
                 let name = self.parse_property_name()?;

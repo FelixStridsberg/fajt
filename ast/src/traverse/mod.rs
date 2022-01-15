@@ -159,6 +159,7 @@ generate_fold_and_visit! {
             IdentRef
             Spread
             Named
+            Method
         }
 
         BinaryOperator: (enter: enter_binary_operator, exit: exit_binary_operator) { }
