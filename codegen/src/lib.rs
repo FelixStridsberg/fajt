@@ -140,7 +140,7 @@ impl<'a> CodeGenerator<'a> {
         }
     }
 
-    fn class<I, S, B>(&mut self, identifier: &mut I, super_class: &mut Option<S>, body: &mut B)
+    fn class<I, S, B>(&mut self, identifier: &mut I, super_class: &mut Option<S>, body: &mut Vec<B>)
     where
         I: Traverse,
         S: Traverse,
@@ -158,7 +158,13 @@ impl<'a> CodeGenerator<'a> {
         self.space();
 
         self.start_block();
-        body.traverse(&mut self.with_indent());
+
+        let indented = &mut self.with_indent();
+        for item in body {
+            item.traverse(indented);
+            indented.new_line();
+        }
+
         self.end_block();
     }
 
@@ -784,7 +790,6 @@ impl Visitor for CodeGenerator<'_> {
 
         self.space();
         node.body.traverse(self);
-        self.new_line();
         false
     }
 
