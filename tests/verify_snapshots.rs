@@ -256,6 +256,7 @@ generate_test_modules!(
     strict_mode: ["tests/cases/strict-mode"],
     source_module: ["tests/cases/source-module"],
     source_script: ["tests/cases/source-script"],
+    comment: ["tests/cases/comment"],
 );
 
 #[test]

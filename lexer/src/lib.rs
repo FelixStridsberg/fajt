@@ -13,7 +13,7 @@ use crate::code_point::CodePoint;
 use crate::error::Error;
 use crate::error::ErrorKind::{EndOfFile, InvalidOrUnexpectedToken};
 use crate::token::TokenValue;
-use crate::token::{Comment, Token};
+use crate::token::Token;
 use fajt_ast::Base::{Binary, Hex, Octal};
 use fajt_ast::{LitString, Literal};
 use fajt_common::io::{PeekRead, PeekReader};
@@ -90,7 +90,10 @@ impl<'a> Lexer<'a> {
     }
 
     pub fn read(&mut self) -> Result<Token> {
-        let new_line = self.skip_whitespaces()?;
+        self.maybe_skip_single_line_comment();
+        let multi_line_comment = self.maybe_skip_multi_line_comment()?;
+
+        let new_line = self.skip_whitespaces()? || multi_line_comment;
         let current = self.reader.current()?;
 
         let start = self.reader.position();
@@ -192,8 +195,6 @@ impl<'a> Lexer<'a> {
                     produce!(self, 1, punct!("."))
                 }
             }
-            '/' if self.reader.peek() == Some(&'/') => self.read_single_line_comment(),
-            '/' if self.reader.peek() == Some(&'*') => self.read_multi_line_comment(),
             '/' => produce!(self, 1, punct!("/")),
             '0'..='9' => self.read_number_literal(),
             '"' | '\'' => self.read_string_literal(),
@@ -205,36 +206,45 @@ impl<'a> Lexer<'a> {
         Ok(Token::new(value, new_line, (start, end)))
     }
 
-    fn read_single_line_comment(&mut self) -> Result<TokenValue> {
-        self.reader.consume()?;
-        self.reader.consume()?;
+    fn maybe_skip_single_line_comment(&mut self) {
+        if !matches!(self.reader.current(), Ok(&'/')) || self.reader.peek() != Some(&'/') {
+            return;
+        }
 
-        let content = self.reader.read_while(|c| !c.is_ecma_line_terminator())?;
-        Ok(TokenValue::Comment(Comment {
-            multi_line: false,
-            content,
-        }))
+        self.reader.consume().unwrap();
+        self.reader.consume().unwrap();
+
+        let _content = self
+            .reader
+            .read_while(|c| !c.is_ecma_line_terminator())
+            .unwrap();
     }
 
-    fn read_multi_line_comment(&mut self) -> Result<TokenValue> {
+    fn maybe_skip_multi_line_comment(&mut self) -> Result<bool> {
+        if !matches!(self.reader.current(), Ok(&'/')) || self.reader.peek() != Some(&'*') {
+            return Ok(false);
+        }
+
         self.reader.consume()?;
         self.reader.consume()?;
 
+        let mut contains_line_break = false;
         let mut content = String::new();
         loop {
-            if self.reader.current()? == &'*' && self.reader.peek() == Some(&'/') {
+            if matches!(self.reader.current(), Ok('*')) && self.reader.peek() == Some(&'/') {
                 self.reader.consume()?;
                 self.reader.consume()?;
                 break;
             }
 
-            content.push(self.reader.consume()?);
+            let char = self.reader.consume()?;
+            if char.is_ecma_line_terminator() {
+                contains_line_break = true;
+            }
+            content.push(char);
         }
 
-        Ok(TokenValue::Comment(Comment {
-            multi_line: true,
-            content,
-        }))
+        Ok(contains_line_break)
     }
 
     fn read_identifier_or_keyword(&mut self) -> Result<TokenValue> {
