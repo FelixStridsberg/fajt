@@ -12,8 +12,8 @@ pub mod token;
 use crate::code_point::CodePoint;
 use crate::error::Error;
 use crate::error::ErrorKind::{EndOfFile, InvalidOrUnexpectedToken};
-use crate::token::Token;
 use crate::token::TokenValue;
+use crate::token::{Comment, Token};
 use fajt_ast::Base::{Binary, Hex, Octal};
 use fajt_ast::{LitString, Literal};
 use fajt_common::io::{PeekRead, PeekReader};
@@ -192,7 +192,8 @@ impl<'a> Lexer<'a> {
                     produce!(self, 1, punct!("."))
                 }
             }
-            // TODO handle comments (//, /*)
+            // TODO handle comments (/*)
+            '/' if self.reader.peek() == Some(&'/') => self.read_single_line_comment(),
             '/' => produce!(self, 1, punct!("/")),
             '0'..='9' => self.read_number_literal(),
             '"' | '\'' => self.read_string_literal(),
@@ -204,8 +205,19 @@ impl<'a> Lexer<'a> {
         Ok(Token::new(value, new_line, (start, end)))
     }
 
+    fn read_single_line_comment(&mut self) -> Result<TokenValue> {
+        self.reader.consume()?;
+        self.reader.consume()?;
+
+        let content = self.reader.read_until(|c| !c.is_ecma_line_terminator())?;
+        Ok(TokenValue::Comment(Comment {
+            multi_line: false,
+            content,
+        }))
+    }
+
     fn read_identifier_or_keyword(&mut self) -> Result<TokenValue> {
-        let word = self.reader.read_until(|c| char::is_part_of_identifier(c))?;
+        let word = self.reader.read_until(char::is_part_of_identifier)?;
         let value = if let Ok(keyword) = word.parse() {
             TokenValue::Keyword(keyword)
         } else {

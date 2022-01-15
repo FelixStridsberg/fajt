@@ -344,6 +344,13 @@ pub enum TokenValue {
     Identifier(String),
     Punct(Punct),
     Literal(Literal),
+    Comment(Comment),
+}
+
+#[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
+pub struct Comment {
+    pub multi_line: bool,
+    pub content: String,
 }
 
 #[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
