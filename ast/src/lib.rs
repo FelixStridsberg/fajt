@@ -7,6 +7,7 @@ pub mod span;
 pub mod expr;
 pub mod class;
 pub mod literal;
+pub mod method;
 pub mod stmt;
 
 use serde::{Deserialize, Serialize};
@@ -15,6 +16,7 @@ pub use crate::binding::*;
 pub use crate::class::*;
 pub use crate::expr::*;
 pub use crate::literal::*;
+pub use crate::method::*;
 pub use crate::span::*;
 pub use crate::stmt::*;
 

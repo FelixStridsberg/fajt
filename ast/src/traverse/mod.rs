@@ -448,7 +448,7 @@ generate_fold_and_visit! {
             value
         }
 
-        ClassMethod: (enter: enter_class_method, exit: exit_class_method) {
+        MethodDefinition: (enter: enter_method_definition, exit: exit_method_definition) {
             name
             parameters
             body

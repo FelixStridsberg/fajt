@@ -2,7 +2,7 @@ use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 use crate::Parser;
 use fajt_ast::{
-    ArrayElement, ClassMethodKind, Expr, ExprLiteral, LitArray, LitObject, Literal, NamedProperty,
+    ArrayElement, Expr, ExprLiteral, LitArray, LitObject, Literal, MethodKind, NamedProperty,
     PropertyDefinition,
 };
 use fajt_common::io::PeekRead;
@@ -131,7 +131,7 @@ where
                 Ok(PropertyDefinition::Method(self.parse_class_method(
                     span_start,
                     name,
-                    ClassMethodKind::Method,
+                    MethodKind::Method,
                 )?))
             }
             _ if self.is_object_method_definition() => {

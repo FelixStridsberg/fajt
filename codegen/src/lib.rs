@@ -769,7 +769,7 @@ impl Visitor for CodeGenerator<'_> {
         false
     }
 
-    fn enter_class_method(&mut self, node: &mut ClassMethod) -> bool {
+    fn enter_method_definition(&mut self, node: &mut MethodDefinition) -> bool {
         if node.asynchronous {
             self.string("async");
             self.space();
@@ -780,9 +780,9 @@ impl Visitor for CodeGenerator<'_> {
         }
 
         match node.kind {
-            ClassMethodKind::Get => self.string("get"),
-            ClassMethodKind::Set => self.string("set"),
-            ClassMethodKind::Method => {}
+            MethodKind::Get => self.string("get"),
+            MethodKind::Set => self.string("set"),
+            MethodKind::Method => {}
         }
 
         node.name.traverse(self);

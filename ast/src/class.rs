@@ -1,4 +1,4 @@
-use crate::{Body, Expr, FormalParameters, Ident, PropertyName, Span};
+use crate::{Expr, Ident, MethodDefinition, Span};
 
 ast_struct! {
     pub struct DeclClass {
@@ -20,26 +20,6 @@ ast_struct! {
 
 ast_mapping! {
     pub enum ClassElement {
-        Method(ClassMethod),
-    }
-}
-
-ast_struct! {
-    pub struct ClassMethod { // TODO rename, MethodDefinition, this is not class specific
-        pub span: Span,
-        pub name: PropertyName,
-        pub kind: ClassMethodKind,
-        pub parameters: FormalParameters,
-        pub body: Body,
-        pub generator: bool,
-        pub asynchronous: bool,
-    }
-}
-
-ast_node! {
-    pub enum ClassMethodKind {
-        Method,
-        Get,
-        Set,
+        Method(MethodDefinition),
     }
 }
