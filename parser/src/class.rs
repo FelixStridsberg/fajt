@@ -90,7 +90,7 @@ where
     pub(super) fn is_method_definition(&self) -> bool {
         match self.current() {
             // TODO rest
-            token_matches!(ok: punct!("*")) => true,
+            token_matches!(ok: punct!("*") | punct!("[")) => true,
             token_matches!(ok: keyword!("async"))
                 if self.peek_is_identifier() || self.peek_matches(punct!("*")) =>
             {
@@ -146,7 +146,8 @@ where
             .parse_class_method(span_start, name, ClassMethodKind::Method)
     }
 
-    fn parse_class_method(
+    // TODO rename, this is not class specific
+    pub(super) fn parse_class_method(
         &mut self,
         span_start: usize,
         name: PropertyName,

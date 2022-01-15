@@ -2,7 +2,7 @@ use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 use crate::Parser;
 use fajt_ast::{
-    ArrayElement, Expr, ExprLiteral, LitArray, LitObject, Literal, NamedProperty,
+    ArrayElement, ClassMethodKind, Expr, ExprLiteral, LitArray, LitObject, Literal, NamedProperty,
     PropertyDefinition,
 };
 use fajt_common::io::PeekRead;
@@ -112,8 +112,26 @@ where
                 let expr = self.parse_assignment_expr()?;
                 Ok(PropertyDefinition::Spread(expr))
             }
-            token if token_matches!(token, punct!("[")) || self.peek_matches(punct!(":")) => {
-                Ok(self.parse_named_property_definition()?)
+            _ if self.peek_matches(punct!(":")) => Ok(self.parse_named_property_definition()?),
+            token_matches!(punct!("[")) => {
+                let span_start = self.position();
+                let name = self.parse_property_name()?;
+
+                if self.maybe_consume(punct!(":"))? {
+                    let value = self.parse_assignment_expr()?;
+                    let span = self.span_from(span_start);
+                    return Ok(PropertyDefinition::Named(NamedProperty {
+                        span,
+                        name,
+                        value,
+                    }));
+                }
+
+                Ok(PropertyDefinition::Method(self.parse_class_method(
+                    span_start,
+                    name,
+                    ClassMethodKind::Method,
+                )?))
             }
             _ if self.is_method_definition() => {
                 let method = self.parse_method_definition()?;
