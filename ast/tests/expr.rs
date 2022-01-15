@@ -14,11 +14,13 @@ fn traverse_expr() {
             "enter_expr",
             "enter_binary_expr",
             "enter_expr",
-            "enter_ident", // n
+            "enter_ident",
             "exit_ident",
             "exit_expr",
+            "enter_binary_operator",
+            "exit_binary_operator",
             "enter_expr",
-            "enter_ident", // m
+            "enter_ident",
             "exit_ident",
             "exit_expr",
             "exit_binary_expr",
