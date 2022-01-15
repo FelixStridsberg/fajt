@@ -1,4 +1,4 @@
-use crate::{Expr, Ident};
+use crate::{Expr, Ident, PropertyName, Span};
 
 ast_node! {
     pub enum Literal {
@@ -52,6 +52,15 @@ ast_node! {
     pub enum PropertyDefinition {
         IdentRef(Ident),
         Spread(Expr),
+        Named(NamedProperty),
+    }
+}
+
+ast_struct! {
+    pub struct NamedProperty {
+        pub span: Span,
+        pub name: PropertyName,
+        pub value: Expr,
     }
 }
 

@@ -158,6 +158,7 @@ generate_fold_and_visit! {
         PropertyDefinition: (enter: enter_property_definition, exit: exit_property_definition) {
             IdentRef
             Spread
+            Named
         }
 
         BinaryOperator: (enter: enter_binary_operator, exit: exit_binary_operator) { }
@@ -439,6 +440,11 @@ generate_fold_and_visit! {
         NamedBinding: (enter: enter_named_binding, exit: exit_named_binding) {
             property
             binding
+        }
+
+        NamedProperty: (enter: enter_named_property, exit: exit_named_property) {
+            name
+            value
         }
 
         ClassMethod: (enter: enter_class_method, exit: exit_class_method) {

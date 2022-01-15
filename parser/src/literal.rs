@@ -1,7 +1,10 @@
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 use crate::Parser;
-use fajt_ast::{ArrayElement, Expr, ExprLiteral, LitArray, LitObject, Literal, PropertyDefinition};
+use fajt_ast::{
+    ArrayElement, Expr, ExprLiteral, LitArray, LitObject, Literal, NamedProperty,
+    PropertyDefinition, PropertyName,
+};
 use fajt_common::io::PeekRead;
 use fajt_lexer::punct;
 use fajt_lexer::token::{Token, TokenValue};
@@ -102,6 +105,8 @@ where
 
     /// Parses the `PropertyDefinition` goal symbol.
     fn parse_property_definition(&mut self) -> Result<PropertyDefinition> {
+        let span_start = self.position();
+
         match self.current()? {
             token_matches!(punct!("...")) => {
                 self.consume()?;
@@ -110,13 +115,21 @@ where
                 Ok(PropertyDefinition::Spread(expr))
             }
             // TODO MethodDefinition
+            // TODO CoverInitializedName
             _ if self.is_identifier() => {
                 let ident = self.parse_identifier()?;
 
                 if self.current_matches(punct!(":")) {
-                    todo!("Key value in object literal");
+                    self.consume()?;
+
+                    let value = self.parse_assignment_expr()?;
+                    let span = self.span_from(span_start);
+                    return Ok(PropertyDefinition::Named(NamedProperty {
+                        span,
+                        name: PropertyName::Ident(ident),
+                        value,
+                    }));
                 }
-                // TODO CoverInitializedName
 
                 self.consume_object_delimiter()?;
                 Ok(PropertyDefinition::IdentRef(ident))

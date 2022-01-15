@@ -1148,6 +1148,14 @@ impl Visitor for CodeGenerator<'_> {
         true
     }
 
+    fn enter_named_property(&mut self, node: &mut NamedProperty) -> bool {
+        node.name.traverse(self);
+        self.char(':');
+        self.space();
+        node.value.traverse(self);
+        false
+    }
+
     fn enter_continue_stmt(&mut self, node: &mut StmtContinue) -> bool {
         self.string("continue");
 
