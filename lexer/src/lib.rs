@@ -209,7 +209,7 @@ impl<'a> Lexer<'a> {
         self.reader.consume()?;
         self.reader.consume()?;
 
-        let content = self.reader.read_until(|c| !c.is_ecma_line_terminator())?;
+        let content = self.reader.read_while(|c| !c.is_ecma_line_terminator())?;
         Ok(TokenValue::Comment(Comment {
             multi_line: false,
             content,
@@ -217,7 +217,7 @@ impl<'a> Lexer<'a> {
     }
 
     fn read_identifier_or_keyword(&mut self) -> Result<TokenValue> {
-        let word = self.reader.read_until(char::is_part_of_identifier)?;
+        let word = self.reader.read_while(char::is_part_of_identifier)?;
         let value = if let Ok(keyword) = word.parse() {
             TokenValue::Keyword(keyword)
         } else {
@@ -291,7 +291,7 @@ impl<'a> Lexer<'a> {
             self.reader.consume()?;
         }
 
-        let number_str = self.reader.read_until(check)?;
+        let number_str = self.reader.read_while(check)?;
 
         // The check must be strict enough for a safe unwrap here
         Ok(i64::from_str_radix(&number_str, base).unwrap())

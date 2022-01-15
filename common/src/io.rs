@@ -101,7 +101,7 @@ where
     I::Error: Debug,
 {
     /// Read a string until `check` callback returns false or the end of the stream is reached.
-    pub fn read_until(&mut self, check: fn(&char) -> bool) -> Result<String, I::Error> {
+    pub fn read_while(&mut self, check: fn(&char) -> bool) -> Result<String, I::Error> {
         let mut result = String::new();
 
         loop {
