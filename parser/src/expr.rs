@@ -580,6 +580,10 @@ where
                 self.parse_async_function_expr()?
             }
             token_matches!(punct!("/")) => {
+                // The lexer do not account for regexp by default because it is ambiguous with other
+                // goal symbols. But if we find a '/' punctuator here it must be a misinterpreted
+                // regexp literal, so we re-read with current token with correct state and the lexer
+                // will produce the regexp literal for us to consume.
                 self.reader.reread_with_state(LexerState::regex_allowed())?;
                 self.parse_regexp_literal()?
             }
