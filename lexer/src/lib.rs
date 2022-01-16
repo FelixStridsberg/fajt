@@ -295,7 +295,8 @@ impl<'a> Lexer<'a> {
         self.read_until_not_escaped('/', &mut result)?;
         result.push('/');
 
-        // TODO read flags
+        let flags = self.reader.read_while(char::is_part_of_identifier)?;
+        result.push_str(&flags);
 
         Ok(())
     }
