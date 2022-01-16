@@ -1,122 +1,31 @@
 use crate::error::Result;
 use crate::Parser;
-use fajt_ast::{Expr, FormalParameters, SourceType, Span};
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
-use fajt_lexer::{keyword, LexerState};
-use serde::{Deserialize, Serialize};
-
-#[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
-pub struct CoverParenthesizedAndArrowParameters {
-    pub span: Span,
-    #[serde(skip)]
-    pub tokens: Vec<Token>,
-}
-
-impl CoverParenthesizedAndArrowParameters {
-    pub fn into_arrow_parameters(self) -> Result<FormalParameters> {
-        // let tokens = self.tokens.into_iter();
-        // let mut reader = PeekReader::new(tokens).unwrap();
-        // let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
-        // parser.parse_formal_parameters()
-        todo!("Do not work with Seek on lexer")
-    }
-
-    pub fn into_expr(mut self) -> Result<Expr> {
-        // self.tokens.drain(0..1);
-        // self.tokens.pop();
-
-        // let tokens = self.tokens.into_iter();
-        // let mut reader = PeekReader::new(tokens).unwrap();
-        // let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
-
-        // let expr = parser.parse_expr().unwrap();
-
-        // Ok(ExprParenthesized {
-        //     span: self.span,
-        //     expression: expr.into(),
-        // }
-        // .into())
-
-        todo!("Do not work with Seek on lexer")
-    }
-}
-
-#[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
-pub struct CoverCallExprAndAsyncArrowHead {
-    pub span: Span,
-    pub start_token: Token,
-}
-
-impl CoverCallExprAndAsyncArrowHead {
-    pub fn into_arrow_parameters(mut self) -> Result<FormalParameters> {
-        // self.tokens.drain(0..1); // Skip 'async' of 'async (...)'
-
-        // let tokens = self.tokens.into_iter();
-        // let mut reader = PeekReader::new(tokens).unwrap();
-        // let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
-        // parser.parse_formal_parameters()
-
-        todo!("Do not work with Seek on lexer")
-    }
-
-    pub fn into_call(self) -> Result<Expr> {
-        // let tokens = self.tokens.into_iter();
-        // let mut reader = PeekReader::new(tokens).unwrap();
-        // let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
-
-        // let async_ident = parser.parse_identifier()?;
-        // let (arguments_span, arguments) = parser.parse_arguments()?;
-        // Ok(ExprCall {
-        //     span: self.span,
-        //     callee: Callee::Expr(async_ident.into()),
-        //     arguments_span,
-        //     arguments,
-        // }
-        // .into())
-
-        todo!("Do not work with Seek on lexer")
-    }
-}
+use fajt_lexer::LexerState;
 
 impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
     I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
-    /// Parses the `CoverParenthesizedExpressionAndArrowParameterList` goal symbol.
-    pub(super) fn parse_cover_parenthesized_and_arrow_parameters(
-        &mut self,
-    ) -> Result<CoverParenthesizedAndArrowParameters> {
-        let span_start = self.position();
-        let mut tokens = Vec::new();
+    /// Assumes next token is start parenthesis, skips past matching closing parenthesis, reads
+    /// token, then rewinds so next token is start parenthesis again.
+    ///
+    /// We do this to figure out the "cover" goals that requires reading past parenthesis.
+    pub(super) fn token_after_parenthesis(&mut self) -> Result<Option<Token>> {
+        let start = self.consume_assert(punct!("("))?;
+        self.skip_until_closing_parenthesis()?;
 
-        self.collect_parenthesized_tokens(&mut tokens)?;
+        let token = self.consume().ok();
 
-        let span = self.span_from(span_start);
-        Ok(CoverParenthesizedAndArrowParameters { span, tokens })
+        self.reader.reread_from(&start)?;
+        Ok(token)
     }
 
-    /// Parses the `CoverCallExpressionAndAsyncArrowHead` goal symbol.
-    pub(super) fn parse_cover_call_and_async_arrow_head(
-        &mut self,
-    ) -> Result<CoverCallExprAndAsyncArrowHead> {
-        let start_token = self.consume_assert(keyword!("async"))?;
-        let span_start = self.position();
-
-        let mut tokens = Vec::new();
-        self.collect_parenthesized_tokens(&mut tokens)?;
-
-        let span = self.span_from(span_start);
-        Ok(CoverCallExprAndAsyncArrowHead { span, start_token })
-    }
-
-    fn collect_parenthesized_tokens(&mut self, tokens: &mut Vec<Token>) -> Result<()> {
-        let token = self.consume_assert(punct!("("))?;
-        tokens.push(token);
-
+    fn skip_until_closing_parenthesis(&mut self) -> Result<()> {
         let mut depth = 1;
         loop {
             let token = self.consume()?;
@@ -125,8 +34,6 @@ where
                 token_matches!(punct!(")")) => depth -= 1,
                 _ => {}
             }
-
-            tokens.push(token);
 
             if depth == 0 {
                 break;

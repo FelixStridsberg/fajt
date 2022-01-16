@@ -109,28 +109,28 @@ where
     /// Parses the part of `AssignmentExpression` that start with the `(` punctuator.
     fn parse_assignment_expr_open_parentheses(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        let parenthesized_or_arrow_parameters =
-            self.parse_cover_parenthesized_and_arrow_parameters()?;
 
-        if self.current_matches(punct!("=>")) && !self.current().unwrap().first_on_line {
-            self.reader
-                .reread_from(&parenthesized_or_arrow_parameters.tokens[0])?;
+        let after_token = self.token_after_parenthesis()?;
+        if token_matches!(after_token, opt: punct!("=>")) && !after_token.unwrap().first_on_line {
             let parameters = self.parse_formal_parameters()?;
             self.parse_arrow_function_expr(span_start, false, parameters)
         } else {
-            self.reader
-                .reread_from(&parenthesized_or_arrow_parameters.tokens[0])?;
-            self.consume_assert(punct!("("))?;
-            let expr = self.parse_expr()?;
-            self.consume_assert(punct!(")"))?;
-
-            let span = self.span_from(span_start);
-            Ok(ExprParenthesized {
-                span,
-                expression: expr.into(),
-            }
-            .into())
+            self.parse_parenthesized_expr()
         }
+    }
+
+    fn parse_parenthesized_expr(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+        self.consume_assert(punct!("("))?;
+        let expr = self.parse_expr()?;
+        self.consume_assert(punct!(")"))?;
+
+        let span = self.span_from(span_start);
+        Ok(ExprParenthesized {
+            span,
+            expression: expr.into(),
+        }
+        .into())
     }
 
     /// Parses the part of `AssignmentExpression` that starts with the `async` keyword.
@@ -148,18 +148,14 @@ where
             }
             token_matches!(opt: punct!("(")) => {
                 let span_start = self.position();
-                let call_or_arrow_parameters = self.parse_cover_call_and_async_arrow_head()?;
-                if self.current_matches(punct!("=>")) {
-                    self.reader
-                        .reread_from(&call_or_arrow_parameters.start_token)?;
-                    self.consume_assert(keyword!("async"))?;
+
+                let async_ident = self.parse_identifier()?;
+                let after_token = self.token_after_parenthesis()?;
+
+                if token_matches!(after_token, opt: punct!("=>")) {
                     let parameters = self.parse_formal_parameters()?;
                     self.parse_async_arrow_function_expr(span_start, false, parameters)
                 } else {
-                    self.reader
-                        .reread_from(&call_or_arrow_parameters.start_token)?;
-
-                    let async_ident = self.parse_identifier()?;
                     let (arguments_span, arguments) = self.parse_arguments()?;
                     let span = self.span_from(span_start);
                     Ok(ExprCall {
@@ -586,9 +582,7 @@ where
                 self.parse_async_function_expr()?
             }
             // token_matches!(punct!("`")) => todo!("TemplateLiteral"), TODO missing from lexer
-            token_matches!(punct!("(")) => self
-                .parse_cover_parenthesized_and_arrow_parameters()?
-                .into_expr()?,
+            token_matches!(punct!("(")) => self.parse_parenthesized_expr()?,
             _ if self.is_identifier() => self.parse_identifier_reference()?,
             _ => return err!(UnexpectedToken(self.consume()?)),
         })
