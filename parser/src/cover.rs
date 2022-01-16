@@ -21,7 +21,7 @@ where
 
         let token = self.consume().ok();
 
-        self.reader.reread_from(&start)?;
+        self.reader.rewind_to(&start)?;
         Ok(token)
     }
 

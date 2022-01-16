@@ -25,10 +25,15 @@ pub trait PeekRead<T> {
     fn next(&mut self) -> std::result::Result<Option<(usize, T)>, Self::Error>;
 }
 
+// It's not necessarily logic that this trait depends on Seek, it should really be two traits, but
+// the implementation signature is growing too much, will fix that when trait aliases exists in
+// stable.
 pub trait ReReadWithState<T>: Seek {
     type Error;
     type State;
 
+    /// Rewind reader to before a previously read item. `item` must be previously read or a panic is
+    /// likely to occur.
     fn rewind_before(&mut self, item: &T);
 
     /// Re-read the last 2 items with another state. If no change the same two items will be
@@ -54,42 +59,23 @@ where
     I: ReReadWithState<T, Error = E>,
     I: PeekRead<T, Error = E>,
 {
-    pub fn reread_from(&mut self, item: &T) -> Result<(), E> {
+    pub fn rewind_to(&mut self, item: &T) -> Result<(), E> {
         self.inner.rewind_before(item);
         self.current = self.inner.next()?;
         self.next = self.inner.next()?;
         Ok(())
     }
 
+    /// Re-read `current` token with a specific state.
     pub fn reread_with_state(&mut self, state: <I as ReReadWithState<T>>::State) -> Result<(), E> {
-        // TODO fix unwraps
-        let (_, token) = self.current.as_ref().unwrap();
+        if let Some((_, token)) = self.current.as_ref() {
+            self.inner.rewind_before(&token);
 
-        self.inner.rewind_before(&token);
-
-        self.current = self.inner.read_with_state(state)?;
-        self.next = self.inner.next()?;
-
-        Ok(())
-
-        /*
-        let had_next = self.next.is_some();
-
-        let current = mem::take(&mut self.current);
-        let next = mem::take(&mut self.next);
-
-        let [new_current, new_next] = self.inner.read_with_state([current, next], state)?;
-
-        self.current = new_current;
-
-        // If the next was consumed, re-populate next position.
-        if new_next.is_none() && had_next {
+            self.current = self.inner.read_with_state(state)?;
             self.next = self.inner.next()?;
-        } else {
-            self.next = new_next;
         }
 
-        Ok(())*/
+        Ok(())
     }
 }
 
