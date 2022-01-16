@@ -28,11 +28,11 @@ pub trait Reevaluable<T> {
     type Error;
     type State;
 
-    fn reevaluate_last(
+    fn reevaluate(
         &mut self,
-        last: &(usize, T),
+        last: [Option<(usize, T)>; 2],
         state: Self::State,
-    ) -> std::result::Result<Option<(usize, T)>, Self::Error>;
+    ) -> std::result::Result<[Option<(usize, T)>; 2], Self::Error>;
 }
 
 /// The peek reader is always one step ahead to enable peeking.
@@ -43,20 +43,29 @@ pub struct PeekReader<T, I> {
     position: usize,
 }
 
-impl<T, I> PeekReader<T, I>
+impl<T, I, E: Debug> PeekReader<T, I>
 where
-    I: Reevaluable<T>,
-    I: PeekRead<T>,
-    <I as PeekRead<T>>::Error: Debug,
+    I: Reevaluable<T, Error = E>,
+    I: PeekRead<T, Error = E>,
 {
-    pub fn reevaluate_last(
-        &mut self,
-        state: <I as Reevaluable<T>>::State,
-    ) -> Result<T, <I as PeekRead<T>>::Error> {
-        let rev = self
-            .inner
-            .reevaluate_last(self.current.as_ref().unwrap(), state);
-        todo!("REEVALUATED!");
+    pub fn reevaluate_last(&mut self, state: <I as Reevaluable<T>>::State) -> Result<(), E> {
+        let had_next = self.next.is_some();
+
+        let current = mem::take(&mut self.current);
+        let next = mem::take(&mut self.next);
+
+        let [new_current, new_next] = self.inner.reevaluate([current, next], state)?;
+
+        self.current = new_current;
+
+        // We may have consumed next during reevaluation
+        if new_next.is_none() && had_next {
+            self.next = self.inner.next()?;
+        } else {
+            self.next = new_next;
+        }
+
+        Ok(())
     }
 }
 

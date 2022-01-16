@@ -369,18 +369,38 @@ impl<'a> Lexer<'a> {
     }
 }
 
-pub struct LexerState {}
+pub struct LexerState {
+    regex_allowed: bool,
+}
+
+impl LexerState {
+    pub fn regex_allowed() -> Self {
+        LexerState {
+            regex_allowed: true,
+        }
+    }
+}
 
 impl Reevaluable<Token> for Lexer<'_> {
     type Error = error::Error;
     type State = LexerState;
 
-    fn reevaluate_last(
+    fn reevaluate(
         &mut self,
-        _last: &(usize, Token),
-        _state: LexerState,
-    ) -> std::result::Result<Option<(usize, Token)>, Self::Error> {
-        todo!("HELLO FROM LEXER");
+        last: [Option<(usize, Token)>; 2],
+        state: LexerState,
+    ) -> std::result::Result<[Option<(usize, Token)>; 2], Self::Error> {
+        if !state.regex_allowed {
+            todo!("Reevaluate other than regexps.")
+        }
+
+        if let Some((_, first)) = last[0].as_ref() {
+            if token_matches!(first, punct!("/")) {
+                todo!("Lex regexp");
+            }
+        }
+
+        Ok(last)
     }
 }
 

@@ -12,7 +12,7 @@ macro_rules! token_matches {
         token_matches!($token, $crate::token::TokenValue::Literal(_))
     };
     ($token:expr, $($value:pat)|+) => {
-        matches!($token, $( $crate::token::Token { value: $value, .. } )|+);
+        matches!($token, $( $crate::token::Token { value: $value, .. } )|+)
     };
     ($token:expr, opt: $($value:pat)|+) => {
         token_matches!($token, $( $value )|+, wrap: Some)
@@ -368,12 +368,13 @@ impl Reevaluable<Token> for IntoIter<Token> {
     type Error = Error;
     type State = LexerState;
 
-    fn reevaluate_last(
+    fn reevaluate(
         &mut self,
-        _last: &(usize, Token),
+        last: [Option<(usize, Token)>; 2],
         _state: LexerState,
-    ) -> Result<Option<(usize, Token)>, Self::Error> {
-        todo!()
+    ) -> std::result::Result<[Option<(usize, Token)>; 2], Self::Error> {
+        // TODO this is required to parse regex etc inside cover goals.
+        Ok(last)
     }
 }
 

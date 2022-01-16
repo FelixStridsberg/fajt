@@ -540,7 +540,7 @@ where
 
     /// Parses the `PrimaryExpression` goal symbol.
     fn parse_primary_expr(&mut self) -> Result<Expr> {
-        self.reader.reevaluate_last(LexerState {});
+        self.reader.reevaluate_last(LexerState::regex_allowed())?;
 
         Ok(match self.current()? {
             token_matches!(keyword!("this")) => self.parse_this_expr()?,
