@@ -15,9 +15,10 @@ use crate::error::ErrorKind::{EndOfFile, InvalidOrUnexpectedToken};
 use crate::token::Token;
 use crate::token::TokenValue;
 use fajt_ast::Base::{Binary, Hex, Octal};
-use fajt_ast::{LitString, Literal, Span};
-use fajt_common::io::{PeekRead, PeekReader, ReRead};
+use fajt_ast::{LitString, Literal};
+use fajt_common::io::{PeekRead, PeekReader, ReReadWithState};
 use std::io::{Seek, SeekFrom};
+use std::mem;
 use std::str::CharIndices;
 
 /// Consume code points from lexer to produce data.
@@ -66,6 +67,7 @@ pub struct Lexer<'a> {
     data: &'a str,
     state: LexerState,
     reader: PeekReader<char, CharIndices<'a>>,
+    override_first_on_line: bool,
 }
 
 impl<'a> Lexer<'a> {
@@ -77,6 +79,7 @@ impl<'a> Lexer<'a> {
                 regex_allowed: false,
             },
             reader,
+            override_first_on_line: false,
         })
     }
 
@@ -99,8 +102,10 @@ impl<'a> Lexer<'a> {
     }
 
     pub fn read(&mut self) -> Result<Token> {
-        let new_line = self.skip_comments_and_white_spaces()?;
+        let new_line = self.skip_comments_and_white_spaces()? | self.override_first_on_line;
         let current = self.reader.current()?;
+
+        self.override_first_on_line = false;
 
         let start = self.reader.position();
         let value = match current {
@@ -201,6 +206,7 @@ impl<'a> Lexer<'a> {
                     produce!(self, 1, punct!("."))
                 }
             }
+            '/' if self.state.regex_allowed => self.read_regexp_literal(),
             '/' => produce!(self, 1, punct!("/")),
             '0'..='9' => self.read_number_literal(),
             '"' | '\'' => self.read_string_literal(),
@@ -299,15 +305,19 @@ impl<'a> Lexer<'a> {
         })))
     }
 
-    fn read_rest_of_regex_literal(&mut self, start: &mut String) -> Result<()> {
-        let mut result = start;
+    fn read_regexp_literal(&mut self) -> Result<TokenValue> {
+        let mut result = String::new();
+        let regexp_start = self.reader.consume()?;
+        debug_assert_eq!(regexp_start, '/');
+        result.push(regexp_start);
+
         self.read_until_not_escaped('/', &mut result)?;
         result.push('/');
 
         let flags = self.reader.read_while(char::is_part_of_identifier)?;
         result.push_str(&flags);
 
-        Ok(())
+        Ok(TokenValue::Literal(Literal::Regexp(result)))
     }
 
     fn read_until_not_escaped(&mut self, delimiter: char, result: &mut String) -> Result<()> {
@@ -407,6 +417,14 @@ impl LexerState {
     }
 }
 
+impl Default for LexerState {
+    fn default() -> Self {
+        LexerState {
+            regex_allowed: false,
+        }
+    }
+}
+
 impl Seek for Lexer<'_> {
     fn seek(&mut self, pos: SeekFrom) -> std::io::Result<u64> {
         let pos = match pos {
@@ -422,90 +440,28 @@ impl Seek for Lexer<'_> {
     }
 }
 
-impl ReRead<Token> for Lexer<'_> {
+impl ReReadWithState<Token> for Lexer<'_> {
     type Error = error::Error;
     type State = LexerState;
 
-    fn reread_with_state(
+    fn rewind_before(&mut self, token: &Token) {
+        self.seek(SeekFrom::Start(token.span.start as u64)).unwrap();
+        self.override_first_on_line = token.first_on_line;
+    }
+
+    fn read_with_state(
         &mut self,
-        last: [Option<(usize, Token)>; 2],
-        state: LexerState,
-    ) -> std::result::Result<[Option<(usize, Token)>; 2], Self::Error> {
+        mut state: LexerState,
+    ) -> std::result::Result<Option<(usize, Token)>, Self::Error> {
         if !state.regex_allowed {
             todo!("Reevaluate other than regexps.")
         }
 
-        // TODO cleanup
-        if let Some((_, first)) = last[0].as_ref() {
-            if token_matches!(first, punct!("/")) {
-                let mut result = "/".to_string();
+        mem::swap(&mut state, &mut self.state);
+        let result = self.next()?;
+        mem::swap(&mut self.state, &mut state);
 
-                if let Some((_, last)) = last[1].as_ref() {
-                    println!("First {:?}", first);
-                    println!("Last {:?}", last);
-                    match &last.value {
-                        TokenValue::Keyword(_) => {
-                            todo!("String form keyword")
-                        }
-                        TokenValue::Identifier(ident) => {
-                            result.push_str(&ident);
-                        }
-                        TokenValue::Punct(_) => {
-                            todo!("String from punctuator")
-                        }
-                        TokenValue::Literal(lit) => {
-                            match lit {
-                                Literal::Null => {
-                                    todo!("regexp from null")
-                                }
-                                Literal::Boolean(_) => {
-                                    todo!("String from bool")
-                                }
-                                Literal::String(string) => {
-                                    result.push(string.delimiter);
-                                    result.push_str(&string.value);
-                                    result.push(string.delimiter);
-                                }
-                                Literal::Number(_) => {
-                                    todo!("string from number")
-                                }
-                                Literal::Array(_) => {
-                                    todo!("string from array")
-                                }
-                                Literal::Object(_) => {
-                                    // This may be hard, probably need to store reference to real string so we can reparse?
-                                    // Or possibly rewind the string instead of this?
-                                    todo!("string from object")
-                                }
-                                Literal::Regexp(_) => {
-                                    unreachable!()
-                                }
-                            }
-                        }
-                    }
-                }
-
-                self.read_rest_of_regex_literal(&mut result)?;
-
-                let span_end = first.span.start + result.len();
-                let span = Span::new(first.span.start, span_end);
-
-                let value = TokenValue::Literal(Literal::Regexp(result));
-                return Ok([
-                    Some((
-                        span_end,
-                        Token {
-                            span,
-                            value,
-                            first_on_line: first.first_on_line,
-                        },
-                    )),
-                    None,
-                ]);
-            }
-        }
-
-        Ok(last)
+        Ok(result)
     }
 }
 

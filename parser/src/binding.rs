@@ -5,7 +5,7 @@ use fajt_ast::{
     ArrayBinding, BindingElement, BindingPattern, Ident, NamedBinding, ObjectBinding,
     ObjectBindingProp, SingleNameBinding,
 };
-use fajt_common::io::{PeekRead, ReRead};
+use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::token::Punct::{BraceClose, BracketClose};
 use fajt_lexer::token::{Punct, Token, TokenValue};
 use fajt_lexer::token_matches;
@@ -14,7 +14,7 @@ use fajt_lexer::{punct, LexerState};
 impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
-    I: ReRead<Token, State = LexerState, Error = fajt_lexer::error::Error>,
+    I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `BindingPattern` goal symbol.
     pub(super) fn parse_binding_pattern(&mut self) -> Result<BindingPattern> {

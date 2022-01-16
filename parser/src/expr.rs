@@ -9,7 +9,7 @@ use fajt_ast::{
     ExprNew, ExprSequence, ExprThis, ExprUnary, ExprUpdate, ExprYield, Ident, Literal,
     MemberObject, Span, Super,
 };
-use fajt_common::io::{PeekRead, ReRead};
+use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
@@ -18,7 +18,7 @@ use fajt_lexer::{keyword, LexerState};
 impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
-    I: ReRead<Token, State = LexerState, Error = fajt_lexer::error::Error>,
+    I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `Expression` goal symbol.
     pub(super) fn parse_expr(&mut self) -> Result<Expr> {
@@ -557,7 +557,6 @@ where
             token_matches!(keyword!("async")) if !self.followed_by_new_lined() => {
                 self.parse_async_function_expr()?
             }
-            token_matches!(punct!("/")) => todo!("RegularExpressionLiteral"),
             // token_matches!(punct!("`")) => todo!("TemplateLiteral"), TODO missing from lexer
             token_matches!(punct!("(")) => self
                 .parse_cover_parenthesized_and_arrow_parameters()?

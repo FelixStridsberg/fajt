@@ -4,7 +4,7 @@ use fajt_ast::{
     ArrowFunctionBody, BindingElement, Body, DeclFunction, Expr, ExprArrowFunction, ExprFunction,
     FormalParameters, Ident, Span, Stmt,
 };
-use fajt_common::io::{PeekRead, ReRead};
+use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
@@ -13,7 +13,7 @@ use fajt_lexer::{keyword, LexerState};
 impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
-    I: ReRead<Token, State = LexerState, Error = fajt_lexer::error::Error>,
+    I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `ArrowFunction` goal symbol, but expects the parameters as input since that may
     /// be a non terminal before we know if it is an arrow function or parenthesized expression.

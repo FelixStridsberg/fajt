@@ -1,9 +1,10 @@
 use crate::error::{Error, ErrorKind};
 use crate::LexerState;
 use fajt_ast::{Literal, Span};
-use fajt_common::io::{PeekRead, ReRead};
+use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_macros::FromString;
 use serde::{Deserialize, Serialize};
+use std::io::{Seek, SeekFrom};
 use std::vec::IntoIter;
 
 #[macro_export]
@@ -364,19 +365,19 @@ impl Token {
     }
 }
 
-impl ReRead<Token> for IntoIter<Token> {
-    type Error = Error;
-    type State = LexerState;
-
-    fn reread_with_state(
-        &mut self,
-        last: [Option<(usize, Token)>; 2],
-        _state: LexerState,
-    ) -> std::result::Result<[Option<(usize, Token)>; 2], Self::Error> {
-        // TODO this is required to parse regex etc inside cover goals.
-        Ok(last)
-    }
-}
+//impl ReRead<Token> for IntoIter<Token> {
+//    type Error = Error;
+//    type State = LexerState;
+//
+//    fn reread_with_state(
+//        &mut self,
+//        last: [Option<(usize, Token)>; 2],
+//        _state: LexerState,
+//    ) -> std::result::Result<[Option<(usize, Token)>; 2], Self::Error> {
+//        // TODO this is required to parse regex etc inside cover goals.
+//        Ok(last)
+//    }
+//}
 
 impl PeekRead<Token> for IntoIter<Token> {
     type Error = Error;

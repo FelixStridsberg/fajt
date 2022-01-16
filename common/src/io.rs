@@ -1,4 +1,5 @@
 use std::fmt::Debug;
+use std::io::Seek;
 use std::mem;
 use std::str::CharIndices;
 
@@ -24,18 +25,19 @@ pub trait PeekRead<T> {
     fn next(&mut self) -> std::result::Result<Option<(usize, T)>, Self::Error>;
 }
 
-pub trait ReRead<T> {
+pub trait ReReadWithState<T>: Seek {
     type Error;
     type State;
+
+    fn rewind_before(&mut self, item: &T);
 
     /// Re-read the last 2 items with another state. If no change the same two items will be
     /// returned. If result change the first returned item is the new item and second is either
     /// the second parameter of input or None if both in input were consumed.
-    fn reread_with_state(
+    fn read_with_state(
         &mut self,
-        last: [Option<(usize, T)>; 2],
         state: Self::State,
-    ) -> std::result::Result<[Option<(usize, T)>; 2], Self::Error>;
+    ) -> std::result::Result<Option<(usize, T)>, Self::Error>;
 }
 
 /// The peek reader is always one step ahead to enable peeking.
@@ -44,20 +46,34 @@ pub struct PeekReader<T, I> {
     current: Option<(usize, T)>,
     next: Option<(usize, T)>,
     position: usize,
+    offset: usize,
 }
 
 impl<T: Debug, I, E: Debug> PeekReader<T, I>
 where
-    I: ReRead<T, Error = E>,
+    I: ReReadWithState<T, Error = E>,
     I: PeekRead<T, Error = E>,
 {
-    pub fn reread_with_state(&mut self, state: <I as ReRead<T>>::State) -> Result<(), E> {
+    pub fn reread_with_state(&mut self, state: <I as ReReadWithState<T>>::State) -> Result<(), E> {
+        // TODO fix unwraps
+        let (_, token) = self.current.as_ref().unwrap();
+
+        self.inner.rewind_before(&token);
+
+        self.current = self.inner.read_with_state(state)?;
+        println!("CURRENT: {:?}", self.current);
+        self.next = self.inner.next()?;
+        println!("NEXT: {:?}", self.next);
+
+        Ok(())
+
+        /*
         let had_next = self.next.is_some();
 
         let current = mem::take(&mut self.current);
         let next = mem::take(&mut self.next);
 
-        let [new_current, new_next] = self.inner.reread_with_state([current, next], state)?;
+        let [new_current, new_next] = self.inner.read_with_state([current, next], state)?;
 
         self.current = new_current;
 
@@ -68,7 +84,7 @@ where
             self.next = new_next;
         }
 
-        Ok(())
+        Ok(())*/
     }
 }
 
@@ -79,7 +95,11 @@ where
 {
     /// Returns an instance of a PeekReader.
     /// Returns error if inner reader returns error when reading first 2 items.
-    pub fn new(mut inner: I) -> Result<Self, I::Error> {
+    pub fn new(inner: I) -> Result<Self, I::Error> {
+        Self::with_offset(inner, 0)
+    }
+
+    pub fn with_offset(mut inner: I, offset: usize) -> Result<Self, I::Error> {
         let current = inner.next()?;
         let next = inner.next()?;
 
@@ -87,7 +107,8 @@ where
             inner,
             current,
             next,
-            position: 0,
+            position: offset,
+            offset,
         })
     }
 
@@ -127,7 +148,7 @@ where
         mem::swap(&mut current, &mut self.current);
 
         if let Some((position, item)) = current {
-            self.position = position;
+            self.position = position + self.offset;
             Ok(item)
         } else {
             Err(Error::EndOfStream)

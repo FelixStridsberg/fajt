@@ -5,7 +5,7 @@ use fajt_ast::{
     DeclExport, DeclImport, ExportDecl, ExportDefaultDecl, ExportDefaultExpr, ExportNamed,
     ExportNamespace, Ident, LitString, NamedExport, NamedImport, Stmt,
 };
-use fajt_common::io::{PeekRead, ReRead};
+use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
@@ -14,7 +14,7 @@ use fajt_lexer::{keyword, LexerState};
 impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
-    I: ReRead<Token, State = LexerState, Error = fajt_lexer::error::Error>,
+    I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `ExportDeclaration` goal symbol.
     pub(super) fn parse_export_declaration(&mut self) -> Result<Stmt> {

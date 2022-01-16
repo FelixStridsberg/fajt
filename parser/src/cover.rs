@@ -1,7 +1,7 @@
 use crate::error::Result;
 use crate::Parser;
 use fajt_ast::{Callee, Expr, ExprCall, ExprParenthesized, FormalParameters, SourceType, Span};
-use fajt_common::io::{PeekRead, PeekReader, ReRead};
+use fajt_common::io::{PeekRead, PeekReader, ReReadWithState};
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
@@ -17,27 +17,30 @@ pub struct CoverParenthesizedAndArrowParameters {
 
 impl CoverParenthesizedAndArrowParameters {
     pub fn into_arrow_parameters(self) -> Result<FormalParameters> {
-        let tokens = self.tokens.into_iter();
-        let mut reader = PeekReader::new(tokens).unwrap();
-        let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
-        parser.parse_formal_parameters()
+        // let tokens = self.tokens.into_iter();
+        // let mut reader = PeekReader::new(tokens).unwrap();
+        // let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
+        // parser.parse_formal_parameters()
+        todo!("Do not work with Seek on lexer")
     }
 
     pub fn into_expr(mut self) -> Result<Expr> {
-        self.tokens.drain(0..1);
-        self.tokens.pop();
+        // self.tokens.drain(0..1);
+        // self.tokens.pop();
 
-        let tokens = self.tokens.into_iter();
-        let mut reader = PeekReader::new(tokens).unwrap();
-        let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
+        // let tokens = self.tokens.into_iter();
+        // let mut reader = PeekReader::new(tokens).unwrap();
+        // let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
 
-        let expr = parser.parse_expr().unwrap();
+        // let expr = parser.parse_expr().unwrap();
 
-        Ok(ExprParenthesized {
-            span: self.span,
-            expression: expr.into(),
-        }
-        .into())
+        // Ok(ExprParenthesized {
+        //     span: self.span,
+        //     expression: expr.into(),
+        // }
+        // .into())
+
+        todo!("Do not work with Seek on lexer")
     }
 }
 
@@ -50,35 +53,39 @@ pub struct CoverCallExprAndAsyncArrowHead {
 
 impl CoverCallExprAndAsyncArrowHead {
     pub fn into_arrow_parameters(mut self) -> Result<FormalParameters> {
-        self.tokens.drain(0..1); // Skip 'async' of 'async (...)'
+        // self.tokens.drain(0..1); // Skip 'async' of 'async (...)'
 
-        let tokens = self.tokens.into_iter();
-        let mut reader = PeekReader::new(tokens).unwrap();
-        let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
-        parser.parse_formal_parameters()
+        // let tokens = self.tokens.into_iter();
+        // let mut reader = PeekReader::new(tokens).unwrap();
+        // let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
+        // parser.parse_formal_parameters()
+
+        todo!("Do not work with Seek on lexer")
     }
 
     pub fn into_call(self) -> Result<Expr> {
-        let tokens = self.tokens.into_iter();
-        let mut reader = PeekReader::new(tokens).unwrap();
-        let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
+        // let tokens = self.tokens.into_iter();
+        // let mut reader = PeekReader::new(tokens).unwrap();
+        // let mut parser = Parser::new(&mut reader, SourceType::Unknown).unwrap();
 
-        let async_ident = parser.parse_identifier()?;
-        let (arguments_span, arguments) = parser.parse_arguments()?;
-        Ok(ExprCall {
-            span: self.span,
-            callee: Callee::Expr(async_ident.into()),
-            arguments_span,
-            arguments,
-        }
-        .into())
+        // let async_ident = parser.parse_identifier()?;
+        // let (arguments_span, arguments) = parser.parse_arguments()?;
+        // Ok(ExprCall {
+        //     span: self.span,
+        //     callee: Callee::Expr(async_ident.into()),
+        //     arguments_span,
+        //     arguments,
+        // }
+        // .into())
+
+        todo!("Do not work with Seek on lexer")
     }
 }
 
 impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
-    I: ReRead<Token, State = LexerState, Error = fajt_lexer::error::Error>,
+    I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `CoverParenthesizedExpressionAndArrowParameterList` goal symbol.
     pub(super) fn parse_cover_parenthesized_and_arrow_parameters(

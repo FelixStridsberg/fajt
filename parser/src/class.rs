@@ -1,7 +1,7 @@
 use crate::error::{Result, ThenTry};
 use crate::Parser;
 use fajt_ast::{ClassElement, DeclClass, Expr, ExprClass, Ident, Span, Stmt};
-use fajt_common::io::{PeekRead, ReRead};
+use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::{keyword, LexerState};
@@ -9,7 +9,7 @@ use fajt_lexer::{keyword, LexerState};
 impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
-    I: ReRead<Token, State = LexerState, Error = fajt_lexer::error::Error>,
+    I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `ClassDeclaration` goal symbol.
     pub(super) fn parse_class_decl(&mut self) -> Result<Stmt> {
