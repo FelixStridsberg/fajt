@@ -5,9 +5,9 @@ use fajt_ast::unary_op;
 use fajt_ast::update_op;
 use fajt_ast::{assignment_op, ExprParenthesized};
 use fajt_ast::{
-    Argument, Callee, Expr, ExprAssignment, ExprAwait, ExprCall, ExprConditional, ExprMetaProperty,
-    ExprNew, ExprSequence, ExprThis, ExprUnary, ExprUpdate, ExprYield, Ident, Literal,
-    MemberObject, Span, Super,
+    Argument, Callee, Expr, ExprAssignment, ExprAwait, ExprCall, ExprConditional, ExprLiteral,
+    ExprMetaProperty, ExprNew, ExprSequence, ExprThis, ExprUnary, ExprUpdate, ExprYield, Ident,
+    Literal, MemberObject, Span, Super,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
@@ -564,8 +564,6 @@ where
 
     /// Parses the `PrimaryExpression` goal symbol.
     fn parse_primary_expr(&mut self) -> Result<Expr> {
-        self.reader.reread_with_state(LexerState::regex_allowed())?;
-
         Ok(match self.current()? {
             token_matches!(keyword!("this")) => self.parse_this_expr()?,
             token_matches!(keyword!("null")) => self.consume_literal(Literal::Null)?,
@@ -581,11 +579,29 @@ where
             token_matches!(keyword!("async")) if !self.followed_by_new_lined() => {
                 self.parse_async_function_expr()?
             }
+            token_matches!(punct!("/")) => {
+                self.reader.reread_with_state(LexerState::regex_allowed())?;
+                self.parse_regexp_literal()?
+            }
             // token_matches!(punct!("`")) => todo!("TemplateLiteral"), TODO missing from lexer
             token_matches!(punct!("(")) => self.parse_parenthesized_expr()?,
             _ if self.is_identifier() => self.parse_identifier_reference()?,
             _ => return err!(UnexpectedToken(self.consume()?)),
         })
+    }
+
+    /// Parses the `RegularExpressionLiteral` goal symbol.
+    fn parse_regexp_literal(&mut self) -> Result<Expr> {
+        let regexp = self.parse_literal()?;
+        debug_assert!(matches!(
+            regexp,
+            Expr::Literal(ExprLiteral {
+                literal: Literal::Regexp(_),
+                ..
+            })
+        ));
+
+        Ok(regexp)
     }
 
     /// Parses the `this` expression which is part of the `PrimaryExpression` goal symbol.
