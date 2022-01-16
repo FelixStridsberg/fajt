@@ -3,7 +3,7 @@ use crate::Parser;
 use fajt_ast::{
     Expr, ExprMember, ExprOptionalCall, ExprOptionalMember, MemberObject, MemberProperty,
 };
-use fajt_common::io::{PeekRead, Reevaluable};
+use fajt_common::io::{PeekRead, ReRead};
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
 use fajt_lexer::{punct, LexerState};
@@ -11,7 +11,7 @@ use fajt_lexer::{punct, LexerState};
 impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
-    I: Reevaluable<Token, State = LexerState, Error = fajt_lexer::error::Error>,
+    I: ReRead<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `MemberExpression` goal symbol when you already know the left side.
     pub(super) fn parse_member_expr_right_side(

@@ -9,7 +9,7 @@ use fajt_ast::{
     ExprNew, ExprSequence, ExprThis, ExprUnary, ExprUpdate, ExprYield, Ident, Literal,
     MemberObject, Span, Super,
 };
-use fajt_common::io::{PeekRead, Reevaluable};
+use fajt_common::io::{PeekRead, ReRead};
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
@@ -18,7 +18,7 @@ use fajt_lexer::{keyword, LexerState};
 impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
-    I: Reevaluable<Token, State = LexerState, Error = fajt_lexer::error::Error>,
+    I: ReRead<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `Expression` goal symbol.
     pub(super) fn parse_expr(&mut self) -> Result<Expr> {
@@ -540,7 +540,7 @@ where
 
     /// Parses the `PrimaryExpression` goal symbol.
     fn parse_primary_expr(&mut self) -> Result<Expr> {
-        self.reader.reevaluate_last(LexerState::regex_allowed())?;
+        self.reader.reread_with_state(LexerState::regex_allowed())?;
 
         Ok(match self.current()? {
             token_matches!(keyword!("this")) => self.parse_this_expr()?,

@@ -1,7 +1,7 @@
 use crate::error::{Error, ErrorKind};
 use crate::LexerState;
 use fajt_ast::{Literal, Span};
-use fajt_common::io::{PeekRead, Reevaluable};
+use fajt_common::io::{PeekRead, ReRead};
 use fajt_macros::FromString;
 use serde::{Deserialize, Serialize};
 use std::vec::IntoIter;
@@ -364,11 +364,11 @@ impl Token {
     }
 }
 
-impl Reevaluable<Token> for IntoIter<Token> {
+impl ReRead<Token> for IntoIter<Token> {
     type Error = Error;
     type State = LexerState;
 
-    fn reevaluate(
+    fn reread_with_state(
         &mut self,
         last: [Option<(usize, Token)>; 2],
         _state: LexerState,

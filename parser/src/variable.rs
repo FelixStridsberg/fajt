@@ -1,14 +1,14 @@
 use crate::error::{Result, ThenTry};
 use crate::Parser;
 use fajt_ast::{Stmt, StmtVariable, VariableDeclaration, VariableKind};
-use fajt_common::io::{PeekRead, Reevaluable};
+use fajt_common::io::{PeekRead, ReRead};
 use fajt_lexer::token::Token;
 use fajt_lexer::{punct, LexerState};
 
 impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
-    I: Reevaluable<Token, State = LexerState, Error = fajt_lexer::error::Error>,
+    I: ReRead<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `VariableStatement` or `LexicalDeclaration` goal symbol.
     pub(super) fn parse_variable_stmt(&mut self, kind: VariableKind) -> Result<Stmt> {

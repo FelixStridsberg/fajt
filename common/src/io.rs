@@ -24,11 +24,14 @@ pub trait PeekRead<T> {
     fn next(&mut self) -> std::result::Result<Option<(usize, T)>, Self::Error>;
 }
 
-pub trait Reevaluable<T> {
+pub trait ReRead<T> {
     type Error;
     type State;
 
-    fn reevaluate(
+    /// Re-read the last 2 items with another state. If no change the same two items will be
+    /// returned. If result change the first returned item is the new item and second is either
+    /// the second parameter of input or None if both in input were consumed.
+    fn reread_with_state(
         &mut self,
         last: [Option<(usize, T)>; 2],
         state: Self::State,
@@ -45,20 +48,20 @@ pub struct PeekReader<T, I> {
 
 impl<T, I, E: Debug> PeekReader<T, I>
 where
-    I: Reevaluable<T, Error = E>,
+    I: ReRead<T, Error = E>,
     I: PeekRead<T, Error = E>,
 {
-    pub fn reevaluate_last(&mut self, state: <I as Reevaluable<T>>::State) -> Result<(), E> {
+    pub fn reread_with_state(&mut self, state: <I as ReRead<T>>::State) -> Result<(), E> {
         let had_next = self.next.is_some();
 
         let current = mem::take(&mut self.current);
         let next = mem::take(&mut self.next);
 
-        let [new_current, new_next] = self.inner.reevaluate([current, next], state)?;
+        let [new_current, new_next] = self.inner.reread_with_state([current, next], state)?;
 
         self.current = new_current;
 
-        // We may have consumed next during reevaluation
+        // If the next was consumed, re-populate next position.
         if new_next.is_none() && had_next {
             self.next = self.inner.next()?;
         } else {
