@@ -1,9 +1,9 @@
 use crate::error::ErrorKind::{SyntaxError, UnexpectedIdent, UnexpectedToken};
 use crate::error::{Result, ThenTry};
 use crate::{ContextModify, Parser};
-use fajt_ast::assignment_op;
 use fajt_ast::unary_op;
 use fajt_ast::update_op;
+use fajt_ast::{assignment_op, ExprParenthesized};
 use fajt_ast::{
     Argument, Callee, Expr, ExprAssignment, ExprAwait, ExprCall, ExprConditional, ExprMetaProperty,
     ExprNew, ExprSequence, ExprThis, ExprUnary, ExprUpdate, ExprYield, Ident, Literal,
@@ -113,10 +113,23 @@ where
             self.parse_cover_parenthesized_and_arrow_parameters()?;
 
         if self.current_matches(punct!("=>")) && !self.current().unwrap().first_on_line {
-            let parameters = parenthesized_or_arrow_parameters.into_arrow_parameters()?;
+            self.reader
+                .reread_from(&parenthesized_or_arrow_parameters.tokens[0])?;
+            let parameters = self.parse_formal_parameters()?;
             self.parse_arrow_function_expr(span_start, false, parameters)
         } else {
-            parenthesized_or_arrow_parameters.into_expr()
+            self.reader
+                .reread_from(&parenthesized_or_arrow_parameters.tokens[0])?;
+            self.consume_assert(punct!("("))?;
+            let expr = self.parse_expr()?;
+            self.consume_assert(punct!(")"))?;
+
+            let span = self.span_from(span_start);
+            Ok(ExprParenthesized {
+                span,
+                expression: expr.into(),
+            }
+            .into())
         }
     }
 

@@ -1,7 +1,7 @@
 use crate::error::Result;
 use crate::Parser;
-use fajt_ast::{Callee, Expr, ExprCall, ExprParenthesized, FormalParameters, SourceType, Span};
-use fajt_common::io::{PeekRead, PeekReader, ReReadWithState};
+use fajt_ast::{Expr, FormalParameters, SourceType, Span};
+use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
