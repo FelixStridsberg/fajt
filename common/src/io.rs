@@ -54,6 +54,13 @@ where
     I: ReReadWithState<T, Error = E>,
     I: PeekRead<T, Error = E>,
 {
+    pub fn reread_from(&mut self, item: &T) -> Result<(), E> {
+        self.inner.rewind_before(item);
+        self.current = self.inner.next()?;
+        self.next = self.inner.next()?;
+        Ok(())
+    }
+
     pub fn reread_with_state(&mut self, state: <I as ReReadWithState<T>>::State) -> Result<(), E> {
         // TODO fix unwraps
         let (_, token) = self.current.as_ref().unwrap();
@@ -61,9 +68,7 @@ where
         self.inner.rewind_before(&token);
 
         self.current = self.inner.read_with_state(state)?;
-        println!("CURRENT: {:?}", self.current);
         self.next = self.inner.next()?;
-        println!("NEXT: {:?}", self.next);
 
         Ok(())
 

@@ -1,11 +1,7 @@
 use crate::error::{Error, ErrorKind};
-use crate::LexerState;
 use fajt_ast::{Literal, Span};
-use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_macros::FromString;
 use serde::{Deserialize, Serialize};
-use std::io::{Seek, SeekFrom};
-use std::vec::IntoIter;
 
 #[macro_export]
 macro_rules! token_matches {
@@ -361,32 +357,6 @@ impl Token {
             value,
             first_on_line,
             span: span.into(),
-        }
-    }
-}
-
-//impl ReRead<Token> for IntoIter<Token> {
-//    type Error = Error;
-//    type State = LexerState;
-//
-//    fn reread_with_state(
-//        &mut self,
-//        last: [Option<(usize, Token)>; 2],
-//        _state: LexerState,
-//    ) -> std::result::Result<[Option<(usize, Token)>; 2], Self::Error> {
-//        // TODO this is required to parse regex etc inside cover goals.
-//        Ok(last)
-//    }
-//}
-
-impl PeekRead<Token> for IntoIter<Token> {
-    type Error = Error;
-
-    fn next(&mut self) -> std::result::Result<Option<(usize, Token)>, Self::Error> {
-        if let Some(token) = Iterator::next(self) {
-            Ok(Some((token.span.end, token)))
-        } else {
-            Ok(None)
         }
     }
 }

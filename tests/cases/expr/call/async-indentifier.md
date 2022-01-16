@@ -20,7 +20,7 @@ async();async(a,b);
           "span": "0:8",
           "expr": {
             "Call": {
-              "span": "5:7",
+              "span": "0:7",
               "callee": {
                 "Expr": {
                   "IdentRef": {
@@ -40,7 +40,7 @@ async();async(a,b);
           "span": "9:21",
           "expr": {
             "Call": {
-              "span": "14:20",
+              "span": "9:20",
               "callee": {
                 "Expr": {
                   "IdentRef": {

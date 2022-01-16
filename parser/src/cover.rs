@@ -47,8 +47,7 @@ impl CoverParenthesizedAndArrowParameters {
 #[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
 pub struct CoverCallExprAndAsyncArrowHead {
     pub span: Span,
-    #[serde(skip)]
-    pub tokens: Vec<Token>,
+    pub start_token: Token,
 }
 
 impl CoverCallExprAndAsyncArrowHead {
@@ -104,14 +103,14 @@ where
     pub(super) fn parse_cover_call_and_async_arrow_head(
         &mut self,
     ) -> Result<CoverCallExprAndAsyncArrowHead> {
-        let async_token = self.consume_assert(keyword!("async"))?;
+        let start_token = self.consume_assert(keyword!("async"))?;
         let span_start = self.position();
-        let mut tokens = vec![async_token];
 
+        let mut tokens = Vec::new();
         self.collect_parenthesized_tokens(&mut tokens)?;
 
         let span = self.span_from(span_start);
-        Ok(CoverCallExprAndAsyncArrowHead { span, tokens })
+        Ok(CoverCallExprAndAsyncArrowHead { span, start_token })
     }
 
     fn collect_parenthesized_tokens(&mut self, tokens: &mut Vec<Token>) -> Result<()> {

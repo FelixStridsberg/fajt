@@ -137,10 +137,25 @@ where
                 let span_start = self.position();
                 let call_or_arrow_parameters = self.parse_cover_call_and_async_arrow_head()?;
                 if self.current_matches(punct!("=>")) {
-                    let parameters = call_or_arrow_parameters.into_arrow_parameters()?;
+                    self.reader
+                        .reread_from(&call_or_arrow_parameters.start_token)?;
+                    self.consume_assert(keyword!("async"))?;
+                    let parameters = self.parse_formal_parameters()?;
                     self.parse_async_arrow_function_expr(span_start, false, parameters)
                 } else {
-                    call_or_arrow_parameters.into_call()
+                    self.reader
+                        .reread_from(&call_or_arrow_parameters.start_token)?;
+
+                    let async_ident = self.parse_identifier()?;
+                    let (arguments_span, arguments) = self.parse_arguments()?;
+                    let span = self.span_from(span_start);
+                    Ok(ExprCall {
+                        span,
+                        callee: Callee::Expr(async_ident.into()),
+                        arguments_span,
+                        arguments,
+                    }
+                    .into())
                 }
             }
             _ if self.peek_is_identifier() => {
