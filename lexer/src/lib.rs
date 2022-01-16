@@ -17,6 +17,7 @@ use crate::token::TokenValue;
 use fajt_ast::Base::{Binary, Hex, Octal};
 use fajt_ast::{LitString, Literal, Span};
 use fajt_common::io::{PeekRead, PeekReader, ReRead};
+use std::io::{Seek, SeekFrom};
 use std::str::CharIndices;
 
 /// Consume code points from lexer to produce data.
@@ -62,13 +63,21 @@ macro_rules! produce {
 type Result<T> = std::result::Result<T, Error>;
 
 pub struct Lexer<'a> {
+    data: &'a str,
+    state: LexerState,
     reader: PeekReader<char, CharIndices<'a>>,
 }
 
 impl<'a> Lexer<'a> {
     pub fn new(data: &'a str) -> Result<Self> {
         let reader = PeekReader::new(data.char_indices())?;
-        Ok(Lexer { reader })
+        Ok(Lexer {
+            data,
+            state: LexerState {
+                regex_allowed: false,
+            },
+            reader,
+        })
     }
 
     pub fn read_all(&mut self) -> Result<Vec<Token>> {
@@ -395,6 +404,21 @@ impl LexerState {
         LexerState {
             regex_allowed: true,
         }
+    }
+}
+
+impl Seek for Lexer<'_> {
+    fn seek(&mut self, pos: SeekFrom) -> std::io::Result<u64> {
+        let pos = match pos {
+            SeekFrom::Start(offset) => offset,
+            SeekFrom::End(offset) => (self.data.len() as i64 + offset) as u64,
+            SeekFrom::Current(offset) => (self.reader.position() as i64 + offset) as u64,
+        };
+
+        let offset = pos as usize;
+        self.reader = PeekReader::with_offset(self.data[offset..].char_indices(), offset).unwrap();
+
+        Ok(pos)
     }
 }
 
