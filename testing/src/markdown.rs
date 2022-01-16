@@ -118,7 +118,7 @@ mod tests {
         let expected_string = "\
             ### Only text section\n\
             Optional text\n\
-            \n\
+            \n\n\n\
             ### Only code block section\n\
             ```js\n\
             var a = 1;\n\
