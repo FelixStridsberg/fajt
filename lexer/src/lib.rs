@@ -429,8 +429,34 @@ impl ReRead<Token> for Lexer<'_> {
                         TokenValue::Punct(_) => {
                             todo!("String from punctuator")
                         }
-                        TokenValue::Literal(_) => {
-                            todo!("String from literal")
+                        TokenValue::Literal(lit) => {
+                            match lit {
+                                Literal::Null => {
+                                    todo!("regexp from null")
+                                }
+                                Literal::Boolean(_) => {
+                                    todo!("String from bool")
+                                }
+                                Literal::String(string) => {
+                                    result.push(string.delimiter);
+                                    result.push_str(&string.value);
+                                    result.push(string.delimiter);
+                                }
+                                Literal::Number(_) => {
+                                    todo!("string from number")
+                                }
+                                Literal::Array(_) => {
+                                    todo!("string from array")
+                                }
+                                Literal::Object(_) => {
+                                    // This may be hard, probably need to store reference to real string so we can reparse?
+                                    // Or possibly rewind the string instead of this?
+                                    todo!("string from object")
+                                }
+                                Literal::Regexp(_) => {
+                                    unreachable!()
+                                }
+                            }
                         }
                     }
                 }
