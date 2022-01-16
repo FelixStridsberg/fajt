@@ -8,6 +8,7 @@ ast_node! {
         Number(LitNumber),
         Array(LitArray),
         Object(LitObject),
+        Regexp(String),
     }
 }
 

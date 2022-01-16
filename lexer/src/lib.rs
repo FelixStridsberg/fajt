@@ -15,7 +15,7 @@ use crate::error::ErrorKind::{EndOfFile, InvalidOrUnexpectedToken};
 use crate::token::Token;
 use crate::token::TokenValue;
 use fajt_ast::Base::{Binary, Hex, Octal};
-use fajt_ast::{LitString, Literal};
+use fajt_ast::{LitString, Literal, Span};
 use fajt_common::io::{PeekRead, PeekReader, ReRead};
 use std::str::CharIndices;
 
@@ -282,6 +282,25 @@ impl<'a> Lexer<'a> {
         debug_assert!(delimiter == '"' || delimiter == '\'');
 
         let mut value = String::new();
+        self.read_until_not_escaped(delimiter, &mut value)?;
+
+        Ok(TokenValue::Literal(Literal::String(LitString {
+            value,
+            delimiter,
+        })))
+    }
+
+    fn read_rest_of_regex_literal(&mut self, start: &mut String) -> Result<()> {
+        let mut result = start;
+        self.read_until_not_escaped('/', &mut result)?;
+        result.push('/');
+
+        // TODO read flags
+
+        Ok(())
+    }
+
+    fn read_until_not_escaped(&mut self, delimiter: char, result: &mut String) -> Result<()> {
         let mut escape = false;
         loop {
             let c = self.reader.consume()?;
@@ -291,14 +310,11 @@ impl<'a> Lexer<'a> {
 
             escape = c == '\\' && !escape;
             if !escape {
-                value.push(c);
+                result.push(c);
             }
         }
 
-        Ok(TokenValue::Literal(Literal::String(LitString {
-            value,
-            delimiter,
-        })))
+        Ok(())
     }
 
     fn read_number_literal(&mut self) -> Result<TokenValue> {
@@ -394,9 +410,47 @@ impl ReRead<Token> for Lexer<'_> {
             todo!("Reevaluate other than regexps.")
         }
 
+        // TODO cleanup
         if let Some((_, first)) = last[0].as_ref() {
             if token_matches!(first, punct!("/")) {
-                todo!("Lex regexp");
+                let mut result = "/".to_string();
+
+                if let Some((_, last)) = last[1].as_ref() {
+                    println!("First {:?}", first);
+                    println!("Last {:?}", last);
+                    match &last.value {
+                        TokenValue::Keyword(_) => {
+                            todo!("String form keyword")
+                        }
+                        TokenValue::Identifier(ident) => {
+                            result.push_str(&ident);
+                        }
+                        TokenValue::Punct(_) => {
+                            todo!("String from punctuator")
+                        }
+                        TokenValue::Literal(_) => {
+                            todo!("String from literal")
+                        }
+                    }
+                }
+
+                self.read_rest_of_regex_literal(&mut result)?;
+
+                let span_end = first.span.start + result.len();
+                let span = Span::new(first.span.start, span_end);
+
+                let value = TokenValue::Literal(Literal::Regexp(result));
+                return Ok([
+                    Some((
+                        span_end,
+                        Token {
+                            span,
+                            value,
+                            first_on_line: first.first_on_line,
+                        },
+                    )),
+                    None,
+                ]);
             }
         }
 

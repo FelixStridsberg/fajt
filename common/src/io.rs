@@ -46,7 +46,7 @@ pub struct PeekReader<T, I> {
     position: usize,
 }
 
-impl<T, I, E: Debug> PeekReader<T, I>
+impl<T: Debug, I, E: Debug> PeekReader<T, I>
 where
     I: ReRead<T, Error = E>,
     I: PeekRead<T, Error = E>,
