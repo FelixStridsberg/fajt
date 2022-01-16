@@ -21,10 +21,10 @@ use std::cell::Cell;
 use std::rc::Rc;
 
 use fajt_ast::{Expr, Ident, LitString, Literal, Program, PropertyName, SourceType, Span, Stmt};
-use fajt_common::io::{PeekRead, PeekReader};
+use fajt_common::io::{PeekRead, PeekReader, Reevaluable};
 use fajt_lexer::token::{KeywordContext, Token, TokenValue};
-use fajt_lexer::token_matches;
 use fajt_lexer::{punct, Lexer};
+use fajt_lexer::{token_matches, LexerState};
 
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
@@ -156,13 +156,15 @@ impl Default for Context {
 pub trait Parse: Sized {
     fn parse<I>(parser: &mut Parser<I>) -> Result<Self>
     where
-        I: PeekRead<Token, Error = fajt_lexer::error::Error>;
+        I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+        I: Reevaluable<Token, State = LexerState, Error = fajt_lexer::error::Error>;
 }
 
 impl Parse for Expr {
     fn parse<I>(parser: &mut Parser<I>) -> Result<Self>
     where
         I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+        I: Reevaluable<Token, State = LexerState, Error = fajt_lexer::error::Error>,
     {
         parser
             .with_context(ContextModify::new().set_in(true))
@@ -174,6 +176,7 @@ impl Parse for Stmt {
     fn parse<I>(parser: &mut Parser<I>) -> Result<Self>
     where
         I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+        I: Reevaluable<Token, State = LexerState, Error = fajt_lexer::error::Error>,
     {
         parser.parse_stmt()
     }
@@ -183,6 +186,7 @@ impl Parse for Program {
     fn parse<I>(parser: &mut Parser<I>) -> Result<Self>
     where
         I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+        I: Reevaluable<Token, State = LexerState, Error = fajt_lexer::error::Error>,
     {
         let mut body = Vec::new();
         loop {
@@ -208,6 +212,7 @@ where
 impl<'a, I> Parser<'a, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+    I: Reevaluable<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
     pub fn new(reader: &'a mut PeekReader<Token, I>, source_type: SourceType) -> Result<Self> {
         Ok(Parser {

@@ -1,11 +1,11 @@
 use crate::error::Result;
 use crate::Parser;
 use fajt_ast::{Callee, Expr, ExprCall, ExprParenthesized, FormalParameters, SourceType, Span};
-use fajt_common::io::{PeekRead, PeekReader};
-use fajt_lexer::keyword;
+use fajt_common::io::{PeekRead, PeekReader, Reevaluable};
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
+use fajt_lexer::{keyword, LexerState};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
@@ -78,6 +78,7 @@ impl CoverCallExprAndAsyncArrowHead {
 impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+    I: Reevaluable<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `CoverParenthesizedExpressionAndArrowParameterList` goal symbol.
     pub(super) fn parse_cover_parenthesized_and_arrow_parameters(

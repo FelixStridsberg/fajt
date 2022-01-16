@@ -1,15 +1,16 @@
 use crate::error::Result;
 use crate::{ContextModify, Parser};
 use fajt_ast::{MethodDefinition, MethodKind, PropertyName};
-use fajt_common::io::PeekRead;
-use fajt_lexer::keyword;
+use fajt_common::io::{PeekRead, Reevaluable};
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
+use fajt_lexer::{keyword, LexerState};
 
 impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+    I: Reevaluable<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `MethodDefinition` goal symbol.
     pub(super) fn parse_method_definition(&mut self) -> Result<MethodDefinition> {

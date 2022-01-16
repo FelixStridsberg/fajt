@@ -6,15 +6,16 @@ use fajt_ast::{
     StmtExpr, StmtIf, StmtLabeled, StmtReturn, StmtSwitch, StmtThrow, StmtTry, StmtWith,
     SwitchCase, VariableKind,
 };
-use fajt_common::io::PeekRead;
-use fajt_lexer::keyword;
+use fajt_common::io::{PeekRead, Reevaluable};
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
+use fajt_lexer::{keyword, LexerState};
 
 impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+    I: Reevaluable<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
     // Parses statements, we handle declarations as statements as well since they appear in the same
     // contexts.

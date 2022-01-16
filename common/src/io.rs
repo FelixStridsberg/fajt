@@ -24,12 +24,40 @@ pub trait PeekRead<T> {
     fn next(&mut self) -> std::result::Result<Option<(usize, T)>, Self::Error>;
 }
 
+pub trait Reevaluable<T> {
+    type Error;
+    type State;
+
+    fn reevaluate_last(
+        &mut self,
+        last: &(usize, T),
+        state: Self::State,
+    ) -> std::result::Result<Option<(usize, T)>, Self::Error>;
+}
+
 /// The peek reader is always one step ahead to enable peeking.
 pub struct PeekReader<T, I> {
     inner: I,
     current: Option<(usize, T)>,
     next: Option<(usize, T)>,
     position: usize,
+}
+
+impl<T, I> PeekReader<T, I>
+where
+    I: Reevaluable<T>,
+    I: PeekRead<T>,
+    <I as PeekRead<T>>::Error: Debug,
+{
+    pub fn reevaluate_last(
+        &mut self,
+        state: <I as Reevaluable<T>>::State,
+    ) -> Result<T, <I as PeekRead<T>>::Error> {
+        let rev = self
+            .inner
+            .reevaluate_last(self.current.as_ref().unwrap(), state);
+        todo!("REEVALUATED!");
+    }
 }
 
 impl<T, I> PeekReader<T, I>

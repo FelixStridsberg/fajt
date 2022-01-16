@@ -3,15 +3,16 @@ use crate::Parser;
 use fajt_ast::binary_op;
 use fajt_ast::logical_op;
 use fajt_ast::{BinaryOperator, Expr, ExprBinary, ExprLogical, LogicalOperator, Span};
-use fajt_common::io::PeekRead;
-use fajt_lexer::keyword;
+use fajt_common::io::{PeekRead, Reevaluable};
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
+use fajt_lexer::{keyword, LexerState};
 
 impl<'a, I> Parser<'a, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+    I: Reevaluable<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `ShortCircuitExpression` goal symbol.
     pub(super) fn parse_short_circuit_expr(&mut self) -> Result<Expr> {

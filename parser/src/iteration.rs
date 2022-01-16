@@ -5,15 +5,16 @@ use fajt_ast::{
     ForInit, Stmt, StmtDoWhile, StmtFor, StmtForIn, StmtForOf, StmtVariable, StmtWhile,
     VariableKind,
 };
-use fajt_common::io::PeekRead;
-use fajt_lexer::keyword;
+use fajt_common::io::{PeekRead, Reevaluable};
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
+use fajt_lexer::{keyword, LexerState};
 
 impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
+    I: Reevaluable<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
     pub(super) fn parse_do_while_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();

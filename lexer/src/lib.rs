@@ -16,7 +16,7 @@ use crate::token::Token;
 use crate::token::TokenValue;
 use fajt_ast::Base::{Binary, Hex, Octal};
 use fajt_ast::{LitString, Literal};
-use fajt_common::io::{PeekRead, PeekReader};
+use fajt_common::io::{PeekRead, PeekReader, Reevaluable};
 use std::str::CharIndices;
 
 /// Consume code points from lexer to produce data.
@@ -366,6 +366,21 @@ impl<'a> Lexer<'a> {
         }
 
         Ok(line_terminator)
+    }
+}
+
+pub struct LexerState {}
+
+impl Reevaluable<Token> for Lexer<'_> {
+    type Error = error::Error;
+    type State = LexerState;
+
+    fn reevaluate_last(
+        &mut self,
+        _last: &(usize, Token),
+        _state: LexerState,
+    ) -> std::result::Result<Option<(usize, Token)>, Self::Error> {
+        todo!("HELLO FROM LEXER");
     }
 }
 
