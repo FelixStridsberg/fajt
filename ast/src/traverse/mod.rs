@@ -99,9 +99,14 @@ generate_fold_and_visit! {
             String
             Array
             Object
+            Template
         }
 
         LitNumber: (enter: enter_number_literal, exit: exit_number_literal) {}
+
+        TemplatePart: (enter: enter_template_part, exit: exit_template_part) {
+            Expr
+        }
 
         ObjectBindingProp: (enter: enter_object_binding_prop, exit: exit_object_binding_prop) {
             Single

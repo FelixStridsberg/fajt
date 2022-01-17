@@ -9,7 +9,14 @@ ast_node! {
         Array(LitArray),
         Object(LitObject),
         Regexp(String),
-        Template(String), // Todo LitTemplate
+        Template(Vec<TemplatePart>),
+    }
+}
+
+ast_node! {
+    pub enum TemplatePart {
+        String(String),
+        Expr(Box<Expr>),
     }
 }
 

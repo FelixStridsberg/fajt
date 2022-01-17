@@ -1120,9 +1120,9 @@ impl Visitor for CodeGenerator<'_> {
             Literal::Boolean(true) => self.string("true"),
             Literal::Boolean(false) => self.string("false"),
             Literal::Regexp(str) => self.string(str),
-            Literal::Template(str) => {
+            Literal::Template(parts) => {
                 self.char('`');
-                self.string(str);
+                parts.traverse(self);
                 self.char('`');
             }
             _ => return true,
@@ -1149,6 +1149,19 @@ impl Visitor for CodeGenerator<'_> {
         self.parenthesize('{', spaced, |s| {
             s.comma_separated(&mut node.props);
         });
+        false
+    }
+
+    fn enter_template_part(&mut self, node: &mut TemplatePart) -> bool {
+        match node {
+            TemplatePart::String(str) => {
+                self.string(str);
+            }
+            TemplatePart::Expr(expr) => {
+                todo!("Template part: {:?}", expr);
+            }
+        }
+
         false
     }
 

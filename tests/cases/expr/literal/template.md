@@ -21,7 +21,11 @@
             "Literal": {
               "span": "0:25",
               "literal": {
-                "Template": "this is template string"
+                "Template": [
+                  {
+                    "String": "this is template string"
+                  }
+                ]
               }
             }
           }

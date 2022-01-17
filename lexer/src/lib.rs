@@ -15,7 +15,7 @@ use crate::error::ErrorKind::{EndOfFile, InvalidOrUnexpectedToken};
 use crate::token::Token;
 use crate::token::TokenValue;
 use fajt_ast::Base::{Binary, Hex, Octal};
-use fajt_ast::{LitString, Literal};
+use fajt_ast::{LitString, Literal, TemplatePart};
 use fajt_common::io::{PeekRead, PeekReader, ReReadWithState};
 use std::io::{Seek, SeekFrom};
 use std::mem;
@@ -313,7 +313,9 @@ impl<'a> Lexer<'a> {
         let mut value = String::new();
         self.read_until_not_escaped(delimiter, &mut value)?;
 
-        Ok(TokenValue::Literal(Literal::Template(value)))
+        Ok(TokenValue::Literal(Literal::Template(vec![
+            TemplatePart::String(value),
+        ])))
     }
 
     fn read_regexp_literal(&mut self) -> Result<TokenValue> {
