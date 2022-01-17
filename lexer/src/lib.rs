@@ -15,7 +15,7 @@ use crate::error::ErrorKind::{EndOfFile, InvalidOrUnexpectedToken};
 use crate::token::Token;
 use crate::token::TokenValue;
 use fajt_ast::Base::{Binary, Hex, Octal};
-use fajt_ast::{LitString, Literal, TemplatePart};
+use fajt_ast::{LitString, Literal, Span, TemplatePart};
 use fajt_common::io::{PeekRead, PeekReader, ReReadWithState};
 use std::io::{Seek, SeekFrom};
 use std::mem;
@@ -75,9 +75,7 @@ impl<'a> Lexer<'a> {
         let reader = PeekReader::new(data.char_indices())?;
         Ok(Lexer {
             data,
-            state: LexerState {
-                regex_allowed: false,
-            },
+            state: LexerState::default(),
             reader,
             override_first_on_line: false,
         })
@@ -102,6 +100,10 @@ impl<'a> Lexer<'a> {
     }
 
     pub fn read(&mut self) -> Result<Token> {
+        if self.state.inside_template {
+            return self.read_template_literal_middle_or_tail();
+        }
+
         let new_line = self.skip_comments_and_white_spaces()? | self.override_first_on_line;
         let current = self.reader.current()?;
 
@@ -210,7 +212,7 @@ impl<'a> Lexer<'a> {
             '/' => produce!(self, 1, punct!("/")),
             '0'..='9' => self.read_number_literal(),
             '"' | '\'' => self.read_string_literal(),
-            '`' => self.read_template_literal(),
+            '`' => self.read_template_literal_head(),
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             c => unimplemented!("Lexer did not recognize code point '{}'.", c),
         }?;
@@ -306,16 +308,64 @@ impl<'a> Lexer<'a> {
         })))
     }
 
-    fn read_template_literal(&mut self) -> Result<TokenValue> {
+    fn read_template_literal_head(&mut self) -> Result<TokenValue> {
         let delimiter = self.reader.consume()?;
         debug_assert_eq!(delimiter, '`');
 
-        let mut value = String::new();
-        self.read_until_not_escaped(delimiter, &mut value)?;
+        let (value, ending) = self.read_until_end_of_template_literal_part()?;
 
-        Ok(TokenValue::Literal(Literal::Template(vec![
-            TemplatePart::String(value),
-        ])))
+        if ending == "${" {
+            Ok(TokenValue::TemplateHead(value))
+        } else {
+            // Non substitution template literal
+            Ok(TokenValue::Literal(Literal::Template(vec![
+                TemplatePart::String(value),
+            ])))
+        }
+    }
+
+    fn read_template_literal_middle_or_tail(&mut self) -> Result<Token> {
+        let span_start = self.reader.position();
+        let start = self.reader.consume()?;
+        debug_assert_eq!(start, '}');
+
+        let (value, ending) = self.read_until_end_of_template_literal_part()?;
+
+        let value = if ending == "${" {
+            TokenValue::TemplateMiddle(value)
+        } else {
+            TokenValue::TemplateTail(value)
+        };
+
+        let span = Span::new(span_start, self.reader.position());
+        Ok(Token {
+            span,
+            first_on_line: false,
+            value,
+        })
+    }
+
+    /// Returns literal string and what ended it.
+    fn read_until_end_of_template_literal_part(&mut self) -> Result<(String, &'static str)> {
+        let mut result = String::new();
+
+        let mut escape = false;
+        loop {
+            let c = self.reader.consume()?;
+            if !escape && c == '`' {
+                return Ok((result, "`"));
+            }
+
+            if !escape && c == '$' && self.reader.current()? == &'{' {
+                self.reader.consume()?;
+                return Ok((result, "${"));
+            }
+
+            escape = c == '\\' && !escape;
+            if !escape {
+                result.push(c);
+            }
+        }
     }
 
     fn read_regexp_literal(&mut self) -> Result<TokenValue> {
@@ -420,12 +470,21 @@ impl<'a> Lexer<'a> {
 
 pub struct LexerState {
     regex_allowed: bool,
+    inside_template: bool,
 }
 
 impl LexerState {
     pub fn regex_allowed() -> Self {
         LexerState {
             regex_allowed: true,
+            ..Self::default()
+        }
+    }
+
+    pub fn inside_template() -> Self {
+        LexerState {
+            inside_template: true,
+            ..Self::default()
         }
     }
 }
@@ -434,6 +493,7 @@ impl Default for LexerState {
     fn default() -> Self {
         LexerState {
             regex_allowed: false,
+            inside_template: false,
         }
     }
 }
@@ -466,10 +526,6 @@ impl ReReadWithState<Token> for Lexer<'_> {
         &mut self,
         mut state: LexerState,
     ) -> std::result::Result<Option<(usize, Token)>, Self::Error> {
-        if !state.regex_allowed {
-            todo!("Reevaluate other than regexps.")
-        }
-
         mem::swap(&mut state, &mut self.state);
         let result = self.next()?;
         mem::swap(&mut self.state, &mut state);

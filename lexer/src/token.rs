@@ -29,6 +29,9 @@ macro_rules! token_matches {
     (@literal) => {
         token_matches!($crate::token::TokenValue::Literal(_))
     };
+    (@template-head) => {
+        token_matches!($crate::token::TokenValue::TemplateHead(_))
+    };
     (opt: $($value:pat)|+) => {
         Some($crate::token::Token { value: $( $value )|+, .. })
     };
@@ -342,6 +345,9 @@ pub enum TokenValue {
     Identifier(String),
     Punct(Punct),
     Literal(Literal),
+    TemplateHead(String),
+    TemplateMiddle(String),
+    TemplateTail(String),
 }
 
 #[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]

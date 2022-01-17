@@ -1158,7 +1158,9 @@ impl Visitor for CodeGenerator<'_> {
                 self.string(str);
             }
             TemplatePart::Expr(expr) => {
-                todo!("Template part: {:?}", expr);
+                self.string("${");
+                expr.traverse(self);
+                self.char('}');
             }
         }
 

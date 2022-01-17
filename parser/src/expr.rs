@@ -587,7 +587,7 @@ where
                 self.reader.reread_with_state(LexerState::regex_allowed())?;
                 self.parse_regexp_literal()?
             }
-            // token_matches!(punct!("`")) => todo!("TemplateLiteral"), TODO missing from lexer
+            token_matches!(@template-head) => self.parse_template_literal()?,
             token_matches!(punct!("(")) => self.parse_parenthesized_expr()?,
             _ if self.is_identifier() => self.parse_identifier_reference()?,
             _ => return err!(UnexpectedToken(self.consume()?)),

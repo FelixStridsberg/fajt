@@ -3,7 +3,7 @@ use crate::error::Result;
 use crate::Parser;
 use fajt_ast::{
     ArrayElement, Expr, ExprLiteral, LitArray, LitObject, Literal, MethodKind, NamedProperty,
-    PropertyDefinition,
+    PropertyDefinition, TemplatePart,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
@@ -40,6 +40,53 @@ where
         } else {
             unreachable!()
         }
+    }
+
+    /// Parses the `TemplateLiteral` goal symbol
+    /// We only parse literals with substitutions, non-substitution template literals are returned
+    /// as a literal token from lexer.
+    pub(super) fn parse_template_literal(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+        let head = self.consume()?;
+        let head_str = match head.value {
+            TokenValue::TemplateHead(string) => string,
+            _ => unreachable!(),
+        };
+
+        let mut parts = vec![];
+
+        if !head_str.is_empty() {
+            parts.push(TemplatePart::String(head_str));
+        }
+
+        loop {
+            parts.push(TemplatePart::Expr(Box::new(self.parse_expr()?)));
+            self.reader
+                .reread_with_state(LexerState::inside_template())?;
+
+            let token = self.consume()?;
+            match token.value {
+                TokenValue::TemplateMiddle(middle) => {
+                    if !middle.is_empty() {
+                        parts.push(TemplatePart::String(middle));
+                    }
+                }
+                TokenValue::TemplateTail(tail) => {
+                    if !tail.is_empty() {
+                        parts.push(TemplatePart::String(tail));
+                    }
+                    break;
+                }
+                _ => return err!(UnexpectedToken(token)),
+            }
+        }
+
+        let span = self.span_from(span_start);
+        Ok(ExprLiteral {
+            span,
+            literal: Literal::Template(parts),
+        }
+        .into())
     }
 
     /// Parses the `ArrayLiteral` goal symbol.
