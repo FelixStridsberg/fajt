@@ -319,7 +319,8 @@ where
         }
     }
 
-    /// Parses the `LeftHandSideExpression` goal symbol.
+    /// Parses the `LeftHandSideExpression` goal symbol and non recursive parts of the
+    /// `CallExpression` goal symbol.
     pub(super) fn parse_left_hand_side_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let expr = match self.current() {
@@ -334,33 +335,9 @@ where
             }
             _ => {
                 let span_start = self.position();
-                let mut expr = self.parse_member_expr()?;
-
-                loop {
-                    match self.current() {
-                        token_matches!(ok: punct!("(")) => {
-                            let (arguments_span, arguments) = self.parse_arguments()?;
-                            let span = self.span_from(span_start);
-                            expr = ExprCall {
-                                span,
-                                callee: Callee::Expr(expr.into()),
-                                arguments_span,
-                                arguments,
-                            }
-                            .into();
-                        }
-                        token_matches!(ok: punct!(".") | punct!("[")) => {
-                            expr = self.parse_member_expr_right_side(
-                                span_start,
-                                MemberObject::Expr(expr.into()),
-                            )?;
-                        }
-                        // TODO CallExpression TemplateLiteral
-                        _ => break,
-                    }
-                }
-
-                Ok(expr)
+                let expr = self.parse_member_expr()?;
+                let call_expr = self.parse_recursive_call_expression(span_start, expr)?;
+                Ok(call_expr)
             }
         }?;
 
@@ -378,6 +355,40 @@ where
         } else {
             Ok(expr)
         }
+    }
+
+    /// Parses the recursive parts of the `CallExpression` goal symbol.
+    fn parse_recursive_call_expression(
+        &mut self,
+        span_start: usize,
+        previous_expr: Expr,
+    ) -> Result<Expr> {
+        let mut expr = previous_expr;
+        loop {
+            match self.current() {
+                token_matches!(ok: punct!("(")) => {
+                    let (arguments_span, arguments) = self.parse_arguments()?;
+                    let span = self.span_from(span_start);
+                    expr = ExprCall {
+                        span,
+                        callee: Callee::Expr(expr.into()),
+                        arguments_span,
+                        arguments,
+                    }
+                    .into();
+                }
+                token_matches!(ok: punct!(".") | punct!("[")) => {
+                    expr = self.parse_member_expr_right_side(
+                        span_start,
+                        MemberObject::Expr(expr.into()),
+                    )?;
+                }
+                // TODO CallExpression TemplateLiteral
+                _ => break,
+            };
+        }
+
+        Ok(expr)
     }
 
     /// Parses the `SuperCall` goal symbol.
