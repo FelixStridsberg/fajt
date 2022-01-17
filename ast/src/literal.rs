@@ -9,6 +9,7 @@ ast_node! {
         Array(LitArray),
         Object(LitObject),
         Regexp(String),
+        Template(String), // Todo LitTemplate
     }
 }
 

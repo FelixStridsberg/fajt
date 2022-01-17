@@ -1120,6 +1120,11 @@ impl Visitor for CodeGenerator<'_> {
             Literal::Boolean(true) => self.string("true"),
             Literal::Boolean(false) => self.string("false"),
             Literal::Regexp(str) => self.string(str),
+            Literal::Template(str) => {
+                self.char('`');
+                self.string(str);
+                self.char('`');
+            }
             _ => return true,
         }
 

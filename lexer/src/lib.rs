@@ -210,6 +210,7 @@ impl<'a> Lexer<'a> {
             '/' => produce!(self, 1, punct!("/")),
             '0'..='9' => self.read_number_literal(),
             '"' | '\'' => self.read_string_literal(),
+            '`' => self.read_template_literal(),
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             c => unimplemented!("Lexer did not recognize code point '{}'.", c),
         }?;
@@ -303,6 +304,16 @@ impl<'a> Lexer<'a> {
             value,
             delimiter,
         })))
+    }
+
+    fn read_template_literal(&mut self) -> Result<TokenValue> {
+        let delimiter = self.reader.consume()?;
+        debug_assert_eq!(delimiter, '`');
+
+        let mut value = String::new();
+        self.read_until_not_escaped(delimiter, &mut value)?;
+
+        Ok(TokenValue::Literal(Literal::Template(value)))
     }
 
     fn read_regexp_literal(&mut self) -> Result<TokenValue> {
