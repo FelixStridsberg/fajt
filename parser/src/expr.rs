@@ -386,12 +386,12 @@ where
                 token_matches!(ok: TokenValue::Literal(Literal::Template(_))) => {
                     let template = self.parse_template_literal()?;
                     let span = self.span_from(span_start);
-                    return Ok(ExprTaggedTemplate {
+                    expr = ExprTaggedTemplate {
                         span,
                         callee: expr.into(),
                         template,
                     }
-                    .into());
+                    .into();
                 }
                 _ => break,
             };
