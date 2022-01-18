@@ -2,8 +2,8 @@ use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 use crate::Parser;
 use fajt_ast::{
-    ArrayElement, Expr, ExprLiteral, LitArray, LitObject, Literal, MethodKind, NamedProperty,
-    PropertyDefinition, TemplatePart,
+    ArrayElement, Expr, ExprLiteral, LitArray, LitObject, LitTemplate, Literal, MethodKind,
+    NamedProperty, PropertyDefinition, TemplatePart,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
@@ -42,10 +42,23 @@ where
         }
     }
 
-    pub(super) fn parse_template_literal_parts(&mut self) -> Result<Vec<TemplatePart>> {
+    /// Parses the `TemplateLiteral` goal symbol.
+    pub(super) fn parse_template_literal_expr(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+        let template = self.parse_template_literal()?;
+
+        let span = self.span_from(span_start);
+        Ok(ExprLiteral {
+            span,
+            literal: Literal::Template(template),
+        }
+        .into())
+    }
+
+    pub(super) fn parse_template_literal(&mut self) -> Result<LitTemplate> {
         let head = self.consume()?;
         let head_str = match head.value {
-            TokenValue::Literal(Literal::Template(parts)) => return Ok(parts),
+            TokenValue::Literal(Literal::Template(template)) => return Ok(template),
             TokenValue::TemplateHead(string) => string,
             _ => unreachable!(),
         };
@@ -78,20 +91,7 @@ where
             }
         }
 
-        Ok(parts)
-    }
-
-    /// Parses the `TemplateLiteral` goal symbol
-    pub(super) fn parse_template_literal_expr(&mut self) -> Result<Expr> {
-        let span_start = self.position();
-        let parts = self.parse_template_literal_parts()?;
-
-        let span = self.span_from(span_start);
-        Ok(ExprLiteral {
-            span,
-            literal: Literal::Template(parts),
-        }
-        .into())
+        Ok(LitTemplate { parts })
     }
 
     /// Parses the `ArrayLiteral` goal symbol.

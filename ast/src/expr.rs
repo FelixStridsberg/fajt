@@ -435,6 +435,6 @@ ast_struct! {
     pub struct ExprTaggedTemplate {
         pub span: Span,
         pub callee: Box<Expr>,
-        pub template: Vec<TemplatePart>,
+        pub template: LitTemplate,
     }
 }

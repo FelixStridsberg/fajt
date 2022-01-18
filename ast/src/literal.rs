@@ -9,7 +9,7 @@ ast_node! {
         Array(LitArray),
         Object(LitObject),
         Regexp(String),
-        Template(Vec<TemplatePart>),
+        Template(LitTemplate),
     }
 }
 
@@ -34,6 +34,12 @@ ast_node! {
     pub struct LitString {
         pub value: String,
         pub delimiter: char,
+    }
+}
+
+ast_node! {
+    pub struct LitTemplate {
+        pub parts: Vec<TemplatePart>,
     }
 }
 

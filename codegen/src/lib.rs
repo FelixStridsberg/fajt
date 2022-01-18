@@ -1120,11 +1120,6 @@ impl Visitor for CodeGenerator<'_> {
             Literal::Boolean(true) => self.string("true"),
             Literal::Boolean(false) => self.string("false"),
             Literal::Regexp(str) => self.string(str),
-            Literal::Template(parts) => {
-                self.char('`');
-                parts.traverse(self);
-                self.char('`');
-            }
             _ => return true,
         }
 
@@ -1133,6 +1128,13 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_string_literal(&mut self, node: &mut LitString) -> bool {
         self.quote(node.delimiter, &node.value);
+        false
+    }
+
+    fn enter_template_literal(&mut self, node: &mut LitTemplate) -> bool {
+        self.char('`');
+        node.parts.traverse(self);
+        self.char('`');
         false
     }
 

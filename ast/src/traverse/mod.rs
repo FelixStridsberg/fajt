@@ -421,6 +421,10 @@ generate_fold_and_visit! {
 
         LitString: (enter: enter_string_literal, exit: exit_string_literal) {}
 
+        LitTemplate: (enter: enter_template_literal, exit: exit_template_literal) {
+            parts
+        }
+
         LitArray: (enter: enter_array_literal, exit: exit_array_literal) {
             elements
         }

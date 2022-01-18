@@ -1,9 +1,9 @@
 use crate::error::ErrorKind::{SyntaxError, UnexpectedIdent, UnexpectedToken};
 use crate::error::{Result, ThenTry};
 use crate::{ContextModify, Parser};
-use fajt_ast::{ExprTaggedTemplate, unary_op};
 use fajt_ast::update_op;
 use fajt_ast::{assignment_op, ExprParenthesized};
+use fajt_ast::{unary_op, ExprTaggedTemplate};
 use fajt_ast::{
     Argument, Callee, Expr, ExprAssignment, ExprAwait, ExprCall, ExprConditional, ExprLiteral,
     ExprMetaProperty, ExprNew, ExprSequence, ExprThis, ExprUnary, ExprUpdate, ExprYield, Ident,
@@ -384,13 +384,14 @@ where
                     )?;
                 }
                 token_matches!(ok: TokenValue::Literal(Literal::Template(_))) => {
-                    let template = self.parse_template_literal_parts()?;
+                    let template = self.parse_template_literal()?;
                     let span = self.span_from(span_start);
                     return Ok(ExprTaggedTemplate {
                         span,
-                        callee: Box::new(expr),
+                        callee: expr.into(),
                         template,
-                    }.into());
+                    }
+                    .into());
                 }
                 _ => break,
             };

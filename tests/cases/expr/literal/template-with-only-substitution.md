@@ -21,28 +21,30 @@
             "Literal": {
               "span": "0:10",
               "literal": {
-                "Template": [
-                  {
-                    "Expr": {
-                      "Binary": {
-                        "span": "3:8",
-                        "operator": "Plus",
-                        "left": {
-                          "IdentRef": {
-                            "span": "3:4",
-                            "name": "a"
-                          }
-                        },
-                        "right": {
-                          "IdentRef": {
-                            "span": "7:8",
-                            "name": "a"
+                "Template": {
+                  "parts": [
+                    {
+                      "Expr": {
+                        "Binary": {
+                          "span": "3:8",
+                          "operator": "Plus",
+                          "left": {
+                            "IdentRef": {
+                              "span": "3:4",
+                              "name": "a"
+                            }
+                          },
+                          "right": {
+                            "IdentRef": {
+                              "span": "7:8",
+                              "name": "a"
+                            }
                           }
                         }
                       }
                     }
-                  }
-                ]
+                  ]
+                }
               }
             }
           }

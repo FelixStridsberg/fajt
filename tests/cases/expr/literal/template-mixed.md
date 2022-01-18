@@ -21,27 +21,29 @@
             "Literal": {
               "span": "0:20",
               "literal": {
-                "Template": [
-                  {
-                    "String": "start "
-                  },
-                  {
-                    "Expr": {
-                      "Literal": {
-                        "span": "9:14",
-                        "literal": {
-                          "String": {
-                            "value": "sub",
-                            "delimiter": "\""
+                "Template": {
+                  "parts": [
+                    {
+                      "String": "start "
+                    },
+                    {
+                      "Expr": {
+                        "Literal": {
+                          "span": "9:14",
+                          "literal": {
+                            "String": {
+                              "value": "sub",
+                              "delimiter": "\""
+                            }
                           }
                         }
                       }
+                    },
+                    {
+                      "String": " end"
                     }
-                  },
-                  {
-                    "String": " end"
-                  }
-                ]
+                  ]
+                }
               }
             }
           }
