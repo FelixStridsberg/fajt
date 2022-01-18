@@ -60,7 +60,7 @@ where
         let head_str = match head.value {
             TokenValue::Literal(Literal::Template(template)) => return Ok(template),
             TokenValue::TemplateHead(string) => string,
-            _ => unreachable!(),
+            _ => return err!(UnexpectedToken(head)),
         };
 
         let mut parts = vec![];
