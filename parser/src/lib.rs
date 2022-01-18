@@ -88,7 +88,7 @@ impl ContextModify {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Context {
     is_await: bool,
     is_yield: bool,
@@ -138,18 +138,6 @@ impl Context {
         }
 
         keyword_context
-    }
-}
-
-impl Default for Context {
-    fn default() -> Self {
-        Self {
-            is_await: false,
-            is_yield: false,
-            is_in: false,
-            is_strict: false,
-            is_default: false,
-        }
     }
 }
 

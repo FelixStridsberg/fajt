@@ -69,7 +69,7 @@ where
     /// Re-read `current` token with a specific state.
     pub fn reread_with_state(&mut self, state: <I as ReReadWithState<T>>::State) -> Result<(), E> {
         if let Some((_, token)) = self.current.as_ref() {
-            self.inner.rewind_before(&token);
+            self.inner.rewind_before(token);
 
             self.current = self.inner.read_with_state(state)?;
             self.next = self.inner.next()?;

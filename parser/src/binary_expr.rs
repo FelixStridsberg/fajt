@@ -205,7 +205,7 @@ where
         let span_start = self.position();
         let mut expr = next(self)?;
         loop {
-            let operator = self.current().map(|t| map_operator(t));
+            let operator = self.current().map(&map_operator);
 
             if let Ok(Some(operator)) = operator {
                 self.consume()?;
