@@ -1,7 +1,7 @@
 use crate::error::ErrorKind::{SyntaxError, UnexpectedIdent, UnexpectedToken};
 use crate::error::{Result, ThenTry};
 use crate::{ContextModify, Parser};
-use fajt_ast::unary_op;
+use fajt_ast::{ExprTaggedTemplate, unary_op};
 use fajt_ast::update_op;
 use fajt_ast::{assignment_op, ExprParenthesized};
 use fajt_ast::{
@@ -11,7 +11,7 @@ use fajt_ast::{
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
-use fajt_lexer::token::Token;
+use fajt_lexer::token::{Token, TokenValue};
 use fajt_lexer::token_matches;
 use fajt_lexer::{keyword, LexerState};
 
@@ -383,7 +383,15 @@ where
                         MemberObject::Expr(expr.into()),
                     )?;
                 }
-                // TODO CallExpression TemplateLiteral
+                token_matches!(ok: TokenValue::Literal(Literal::Template(_))) => {
+                    let template = self.parse_template_literal_parts()?;
+                    let span = self.span_from(span_start);
+                    return Ok(ExprTaggedTemplate {
+                        span,
+                        callee: Box::new(expr),
+                        template,
+                    }.into());
+                }
                 _ => break,
             };
         }
@@ -598,7 +606,7 @@ where
                 self.reader.reread_with_state(LexerState::regex_allowed())?;
                 self.parse_regexp_literal()?
             }
-            token_matches!(@template-head) => self.parse_template_literal()?,
+            token_matches!(@template-head) => self.parse_template_literal_expr()?,
             token_matches!(punct!("(")) => self.parse_parenthesized_expr()?,
             _ if self.is_identifier() => self.parse_identifier_reference()?,
             _ => return err!(UnexpectedToken(self.consume()?)),

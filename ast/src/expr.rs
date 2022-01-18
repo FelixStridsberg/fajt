@@ -23,6 +23,7 @@ ast_mapping! {
         OptionalMember(ExprOptionalMember),
         Parenthesized(ExprParenthesized),
         Sequence(ExprSequence),
+        TaggedTemplate(ExprTaggedTemplate),
         This(ExprThis),
         Unary(ExprUnary),
         Update(ExprUpdate),
@@ -427,5 +428,13 @@ ast_node! {
         Super,
         Import,
         Expr(Box<Expr>),
+    }
+}
+
+ast_struct! {
+    pub struct ExprTaggedTemplate {
+        pub span: Span,
+        pub callee: Box<Expr>,
+        pub template: Vec<TemplatePart>,
     }
 }

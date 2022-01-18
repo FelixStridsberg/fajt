@@ -56,6 +56,7 @@ generate_fold_and_visit! {
             OptionalMember
             Parenthesized
             Sequence
+            TaggedTemplate
             This
             Unary
             Update
@@ -479,6 +480,11 @@ generate_fold_and_visit! {
 
         ExportDefaultExpr: (enter: enter_export_default_expr, exit: exit_export_default_expr) {
             expr
+        }
+
+        ExprTaggedTemplate: (enter: enter_tagged_template_expr, exit: exit_tagged_template_expr) {
+            callee
+            template
         }
 
         ExportNamed: (enter: enter_export_named, exit: exit_export_named) {

@@ -42,13 +42,10 @@ where
         }
     }
 
-    /// Parses the `TemplateLiteral` goal symbol
-    /// We only parse literals with substitutions, non-substitution template literals are returned
-    /// as a literal token from lexer.
-    pub(super) fn parse_template_literal(&mut self) -> Result<Expr> {
-        let span_start = self.position();
+    pub(super) fn parse_template_literal_parts(&mut self) -> Result<Vec<TemplatePart>> {
         let head = self.consume()?;
         let head_str = match head.value {
+            TokenValue::Literal(Literal::Template(parts)) => return Ok(parts),
             TokenValue::TemplateHead(string) => string,
             _ => unreachable!(),
         };
@@ -80,6 +77,14 @@ where
                 _ => return err!(UnexpectedToken(token)),
             }
         }
+
+        Ok(parts)
+    }
+
+    /// Parses the `TemplateLiteral` goal symbol
+    pub(super) fn parse_template_literal_expr(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+        let parts = self.parse_template_literal_parts()?;
 
         let span = self.span_from(span_start);
         Ok(ExprLiteral {
