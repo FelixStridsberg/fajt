@@ -58,7 +58,9 @@ where
                 self.parse_yield_expr()
             }
             token_matches!(ok: keyword!("async")) => self.parse_assignment_expr_async(),
-            token_matches!(ok: punct!("(")) => self.parse_assignment_expr_open_parentheses(),
+            token_matches!(ok: punct!("(")) => {
+                self.parse_cover_parenthesized_and_arrow_parameters()
+            }
             _ if self.is_identifier()
                 && !self.followed_by_new_lined()
                 && self.peek_matches(punct!("=>")) =>
@@ -106,20 +108,8 @@ where
         }
     }
 
-    /// Parses the part of `AssignmentExpression` that start with the `(` punctuator.
-    fn parse_assignment_expr_open_parentheses(&mut self) -> Result<Expr> {
-        let span_start = self.position();
-
-        let after_token = self.token_after_parenthesis()?;
-        if token_matches!(after_token, opt: punct!("=>")) && !after_token.unwrap().first_on_line {
-            let parameters = self.parse_formal_parameters()?;
-            self.parse_arrow_function_expr(span_start, false, parameters)
-        } else {
-            self.parse_parenthesized_expr()
-        }
-    }
-
-    fn parse_parenthesized_expr(&mut self) -> Result<Expr> {
+    /// Parses the `ParenthesizedExpression` goal symbol.
+    pub(super) fn parse_parenthesized_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.consume_assert(punct!("("))?;
         let expr = self.parse_expr()?;
@@ -147,25 +137,8 @@ where
                 self.parse_arrow_function_expr(span_start, true, parameters)
             }
             token_matches!(opt: punct!("(")) => {
-                let span_start = self.position();
-
                 let async_ident = self.parse_identifier()?;
-                let after_token = self.token_after_parenthesis()?;
-
-                if token_matches!(after_token, opt: punct!("=>")) {
-                    let parameters = self.parse_formal_parameters()?;
-                    self.parse_async_arrow_function_expr(span_start, false, parameters)
-                } else {
-                    let (arguments_span, arguments) = self.parse_arguments()?;
-                    let span = self.span_from(span_start);
-                    Ok(ExprCall {
-                        span,
-                        callee: Callee::Expr(async_ident.into()),
-                        arguments_span,
-                        arguments,
-                    }
-                    .into())
-                }
+                self.parse_cover_call_or_async_arrow_head(async_ident)
             }
             _ if self.peek_is_identifier() => {
                 let span_start = self.position();
@@ -324,9 +297,7 @@ where
     pub(super) fn parse_left_hand_side_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let expr = match self.current() {
-            token_matches!(ok: keyword!("new")) if !self.peek_matches(punct!(".")) => {
-                self.parse_new_expr()
-            }
+            token_matches!(ok: keyword!("new")) => self.parse_new_expr(),
             token_matches!(ok: keyword!("super")) if self.peek_matches(punct!("(")) => {
                 self.parse_super_call_expr()
             }
@@ -452,33 +423,7 @@ where
     /// Parses the `MemberExpression` goal symbol.
     pub fn parse_member_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
-
-        let mut expr = if token_matches!(self.current(), ok: keyword!("new"))
-            && !self.peek_matches(punct!("."))
-        {
-            let span_start = self.position();
-            self.consume()?;
-
-            let callee = self.parse_member_expr()?.into();
-
-            let (arguments_span, arguments) = if self.current_matches(punct!("(")) {
-                self.parse_arguments()
-                    .map(|(span, args)| (Some(span), args))?
-            } else {
-                (None, Vec::new())
-            };
-
-            let span = self.span_from(span_start);
-            ExprNew {
-                span,
-                callee,
-                arguments_span,
-                arguments,
-            }
-            .into()
-        } else {
-            self.parse_member_expr_non_recursive()?
-        };
+        let mut expr = self.parse_member_expr_from_terminal()?;
 
         loop {
             match self.current() {
@@ -507,8 +452,8 @@ where
         Ok(expr)
     }
 
-    /// Parses the non recursive parts of `MemberExpressions`.
-    fn parse_member_expr_non_recursive(&mut self) -> Result<Expr> {
+    /// Parses the parts of `MemberExpressions` that can be decided from terminals.
+    fn parse_member_expr_from_terminal(&mut self) -> Result<Expr> {
         match self.current()? {
             token_matches!(keyword!("super")) => {
                 let span_start = self.position();
@@ -544,6 +489,28 @@ where
                     span,
                     meta: Ident::new("new", new_token.span),
                     property,
+                }
+                .into())
+            }
+            token_matches!(keyword!("new")) => {
+                let span_start = self.position();
+                self.consume()?;
+
+                let callee = self.parse_member_expr()?.into();
+
+                let (arguments_span, arguments) = if self.current_matches(punct!("(")) {
+                    self.parse_arguments()
+                        .map(|(span, args)| (Some(span), args))?
+                } else {
+                    (None, Vec::new())
+                };
+
+                let span = self.span_from(span_start);
+                Ok(ExprNew {
+                    span,
+                    callee,
+                    arguments_span,
+                    arguments,
                 }
                 .into())
             }
