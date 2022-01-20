@@ -445,11 +445,19 @@ where
 
     /// Parses the `NewExpression` goal symbol.
     fn parse_new_expr(&mut self) -> Result<Expr> {
-        if self.current_matches(keyword!("new")) && !self.current_matches(punct!(".")) {
+        // The `new MemberExpression` is parsed together with `MemberExpression`.
+        self.parse_member_expr()
+    }
+
+    /// Parses the `MemberExpression` goal symbol.
+    pub fn parse_member_expr(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+
+        if token_matches!(self.current(), ok: keyword!("new")) && !self.peek_matches(punct!(".")) {
             let span_start = self.position();
             self.consume()?;
 
-            let callee = self.parse_new_expr()?.into();
+            let callee = self.parse_member_expr()?.into();
 
             let (arguments_span, arguments) = if self.current_matches(punct!("(")) {
                 self.parse_arguments()
@@ -459,59 +467,38 @@ where
             };
 
             let span = self.span_from(span_start);
-            Ok(ExprNew {
+            return Ok(ExprNew {
                 span,
                 callee,
                 arguments_span,
                 arguments,
             }
-            .into())
-        } else {
-            self.parse_member_expr()
-        }
-    }
-
-    /// Parses the `Arguments` goal symbol.
-    pub(super) fn parse_arguments(&mut self) -> Result<(Span, Vec<Argument>)> {
-        let span_start = self.position();
-        self.consume_assert(punct!("("))?;
-
-        let mut arguments = Vec::new();
-
-        loop {
-            match self.current() {
-                token_matches!(ok: punct!(")")) => {
-                    self.consume()?;
-                    break;
-                }
-                token_matches!(ok: punct!("...")) => {
-                    self.consume()?;
-                    arguments.push(Argument::Spread(self.parse_assignment_expr()?));
-                    self.consume_parameter_delimiter()?;
-                }
-                _ => {
-                    arguments.push(Argument::Expr(self.parse_assignment_expr()?));
-                    self.consume_parameter_delimiter()?;
-                }
-            }
+            .into());
         }
 
-        let span = self.span_from(span_start);
-        Ok((span, arguments))
-    }
-
-    /// Parses the `MemberExpression` goal symbol.
-    /// NOTE: The `new MemberExpression Arguments` is parsed in `NewExpression`
-    pub fn parse_member_expr(&mut self) -> Result<Expr> {
-        let span_start = self.position();
         let mut expr = self.parse_member_expr_non_recursive()?;
 
         loop {
-            if token_matches!(self.current(), ok: punct!(".") | punct!("[")) {
-                expr =
-                    self.parse_member_expr_right_side(span_start, MemberObject::Expr(expr.into()))?;
-            } else {
-                break;
+            match self.current() {
+                token_matches!(ok: punct!(".") | punct!("[")) => {
+                    expr = self.parse_member_expr_right_side(
+                        span_start,
+                        MemberObject::Expr(expr.into()),
+                    )?;
+                }
+                token_matches!(
+                    ok: TokenValue::TemplateHead(_) | TokenValue::Literal(Literal::Template(_))
+                ) => {
+                    let template = self.parse_template_literal()?;
+                    let span = self.span_from(span_start);
+                    expr = ExprTaggedTemplate {
+                        span,
+                        callee: expr.into(),
+                        template,
+                    }
+                    .into();
+                }
+                _ => break,
             }
         }
 
@@ -580,6 +567,35 @@ where
             }
             _ => self.parse_primary_expr(),
         }
+    }
+
+    /// Parses the `Arguments` goal symbol.
+    pub(super) fn parse_arguments(&mut self) -> Result<(Span, Vec<Argument>)> {
+        let span_start = self.position();
+        self.consume_assert(punct!("("))?;
+
+        let mut arguments = Vec::new();
+
+        loop {
+            match self.current() {
+                token_matches!(ok: punct!(")")) => {
+                    self.consume()?;
+                    break;
+                }
+                token_matches!(ok: punct!("...")) => {
+                    self.consume()?;
+                    arguments.push(Argument::Spread(self.parse_assignment_expr()?));
+                    self.consume_parameter_delimiter()?;
+                }
+                _ => {
+                    arguments.push(Argument::Expr(self.parse_assignment_expr()?));
+                    self.consume_parameter_delimiter()?;
+                }
+            }
+        }
+
+        let span = self.span_from(span_start);
+        Ok((span, arguments))
     }
 
     /// Parses the `PrimaryExpression` goal symbol.
