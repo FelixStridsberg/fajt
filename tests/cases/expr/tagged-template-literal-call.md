@@ -1,47 +1,44 @@
 ### Source
 ```js
-a`1``2`;
+call()`template`;
 ```
 
 ### Output: minified
 ```js
-a`1``2`
+call()`template`
 ```
 
 ### Output: ast
 ```json
 {
   "Script": {
-    "span": "0:8",
+    "span": "0:17",
     "body": [
       {
         "Expr": {
-          "span": "0:8",
+          "span": "0:17",
           "expr": {
             "TaggedTemplate": {
-              "span": "0:7",
+              "span": "0:16",
               "callee": {
-                "TaggedTemplate": {
-                  "span": "0:4",
+                "Call": {
+                  "span": "0:6",
                   "callee": {
-                    "IdentRef": {
-                      "span": "0:1",
-                      "name": "a"
+                    "Expr": {
+                      "IdentRef": {
+                        "span": "0:4",
+                        "name": "call"
+                      }
                     }
                   },
-                  "template": {
-                    "parts": [
-                      {
-                        "String": "1"
-                      }
-                    ]
-                  }
+                  "arguments_span": "4:6",
+                  "arguments": []
                 }
               },
               "template": {
                 "parts": [
                   {
-                    "String": "2"
+                    "String": "template"
                   }
                 ]
               }

@@ -453,7 +453,9 @@ where
     pub fn parse_member_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
 
-        if token_matches!(self.current(), ok: keyword!("new")) && !self.peek_matches(punct!(".")) {
+        let mut expr = if token_matches!(self.current(), ok: keyword!("new"))
+            && !self.peek_matches(punct!("."))
+        {
             let span_start = self.position();
             self.consume()?;
 
@@ -467,16 +469,16 @@ where
             };
 
             let span = self.span_from(span_start);
-            return Ok(ExprNew {
+            ExprNew {
                 span,
                 callee,
                 arguments_span,
                 arguments,
             }
-            .into());
-        }
-
-        let mut expr = self.parse_member_expr_non_recursive()?;
+            .into()
+        } else {
+            self.parse_member_expr_non_recursive()?
+        };
 
         loop {
             match self.current() {
@@ -503,8 +505,6 @@ where
         }
 
         Ok(expr)
-
-        // TODO MemberExpression TemplateLiteral
     }
 
     /// Parses the non recursive parts of `MemberExpressions`.

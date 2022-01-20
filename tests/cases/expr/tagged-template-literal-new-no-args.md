@@ -1,50 +1,45 @@
 ### Source
 ```js
-a`1``2`;
+new fn`test`;
 ```
 
 ### Output: minified
 ```js
-a`1``2`
+new fn`test`
 ```
 
 ### Output: ast
 ```json
 {
   "Script": {
-    "span": "0:8",
+    "span": "0:13",
     "body": [
       {
         "Expr": {
-          "span": "0:8",
+          "span": "0:13",
           "expr": {
-            "TaggedTemplate": {
-              "span": "0:7",
+            "New": {
+              "span": "0:12",
               "callee": {
                 "TaggedTemplate": {
-                  "span": "0:4",
+                  "span": "4:12",
                   "callee": {
                     "IdentRef": {
-                      "span": "0:1",
-                      "name": "a"
+                      "span": "4:6",
+                      "name": "fn"
                     }
                   },
                   "template": {
                     "parts": [
                       {
-                        "String": "1"
+                        "String": "test"
                       }
                     ]
                   }
                 }
               },
-              "template": {
-                "parts": [
-                  {
-                    "String": "2"
-                  }
-                ]
-              }
+              "arguments_span": null,
+              "arguments": []
             }
           }
         }
