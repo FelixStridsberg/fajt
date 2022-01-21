@@ -29,6 +29,26 @@ use fajt_lexer::{token_matches, LexerState};
 use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 
+/// Similar trait to bool.then, but handles closures returning `Result`.
+pub trait ThenTry {
+    fn then_try<T, F>(self, f: F) -> Result<Option<T>>
+    where
+        F: FnOnce() -> Result<T>;
+}
+
+impl ThenTry for bool {
+    fn then_try<T, F>(self, f: F) -> Result<Option<T>>
+    where
+        F: FnOnce() -> Result<T>,
+    {
+        if self {
+            f().map(Some)
+        } else {
+            Ok(None)
+        }
+    }
+}
+
 pub fn parse_program(input: &str) -> Result<Program> {
     parse::<Program>(input, SourceType::Unknown)
 }

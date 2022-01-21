@@ -1,6 +1,6 @@
 use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
-use crate::error::{Result, ThenTry};
-use crate::{ContextModify, Parser};
+use crate::error::Result;
+use crate::{ContextModify, Parser, ThenTry};
 use fajt_ast::{
     CatchClause, SourceType, Stmt, StmtBlock, StmtBreak, StmtContinue, StmtDebugger, StmtEmpty,
     StmtExpr, StmtIf, StmtLabeled, StmtReturn, StmtSwitch, StmtThrow, StmtTry, StmtWith,

@@ -1,5 +1,5 @@
-use crate::error::{Result, ThenTry};
-use crate::Parser;
+use crate::error::Result;
+use crate::{Parser, ThenTry};
 use fajt_ast::{Stmt, StmtVariable, VariableDeclaration, VariableKind};
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::token::Token;

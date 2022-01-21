@@ -1,6 +1,6 @@
 use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
-use crate::error::{Result, ThenTry};
-use crate::Parser;
+use crate::error::Result;
+use crate::{Parser, ThenTry};
 use fajt_ast::{
     ArrayBinding, BindingElement, BindingPattern, Ident, NamedBinding, ObjectBinding,
     ObjectBindingProp, SingleNameBinding,

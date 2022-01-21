@@ -1,6 +1,6 @@
 use crate::error::ErrorKind::UnexpectedToken;
-use crate::error::{Result, ThenTry};
-use crate::{ContextModify, Parser};
+use crate::error::Result;
+use crate::{ContextModify, Parser, ThenTry};
 use fajt_ast::{
     DeclExport, DeclImport, ExportDecl, ExportDefaultDecl, ExportDefaultExpr, ExportNamed,
     ExportNamespace, Ident, LitString, NamedExport, NamedImport, Stmt,

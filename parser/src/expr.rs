@@ -1,6 +1,6 @@
 use crate::error::ErrorKind::{SyntaxError, UnexpectedIdent, UnexpectedToken};
-use crate::error::{Result, ThenTry};
-use crate::{ContextModify, Parser};
+use crate::error::Result;
+use crate::{ContextModify, Parser, ThenTry};
 use fajt_ast::update_op;
 use fajt_ast::{assignment_op, ExprParenthesized};
 use fajt_ast::{unary_op, ExprTaggedTemplate};

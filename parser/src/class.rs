@@ -1,5 +1,5 @@
-use crate::error::{Result, ThenTry};
-use crate::Parser;
+use crate::error::Result;
+use crate::{Parser, ThenTry};
 use fajt_ast::{ClassElement, DeclClass, Expr, ExprClass, Ident, Span, Stmt};
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
