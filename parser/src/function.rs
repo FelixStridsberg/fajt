@@ -15,7 +15,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
     I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
-    /// Parses the `ArrowFunction` goal symbol, but expects the parameters as input since that may
+    /// Parses the `ArrowFunction` production, but expects the parameters as input since that may
     /// be a non terminal before we know if it is an arrow function or parenthesized expression.
     pub(super) fn parse_arrow_function_expr(
         &mut self,
@@ -42,7 +42,7 @@ where
         .into())
     }
 
-    /// Parses the async version of `ArrowFunction` goal symbol, but expects the parameters as input
+    /// Parses the async version of `ArrowFunction` production, but expects the parameters as input
     /// since that may be a non terminal before we know if it is an arrow function or parenthesized
     /// expression.
     pub(super) fn parse_async_arrow_function_expr(
@@ -77,7 +77,7 @@ where
         .into())
     }
 
-    /// Parses the `ArrowParameters` goal symbol.
+    /// Parses the `ArrowParameters` production.
     /// Returns true in second tuple element if the parameters are a binding identifier without
     /// parentheses.
     pub(super) fn parse_arrow_identifier_argument(&mut self) -> Result<FormalParameters> {
@@ -95,7 +95,7 @@ where
         })
     }
 
-    /// Parses the `FunctionExpression` goal symbol.
+    /// Parses the `FunctionExpression` production.
     pub(super) fn parse_function_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.consume_assert(keyword!("function"))?;
@@ -105,7 +105,7 @@ where
             .parse_function_expr_content(span_start)
     }
 
-    /// Parses the `AsyncFunctionExpression` goal symbol.
+    /// Parses the `AsyncFunctionExpression` production.
     pub(super) fn parse_async_function_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.consume_assert(keyword!("async"))?;
@@ -137,7 +137,7 @@ where
         .into())
     }
 
-    /// Parses the `FunctionDeclaration` goal symbol.
+    /// Parses the `FunctionDeclaration` production.
     pub(super) fn parse_function_declaration(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("function"))?;
@@ -149,7 +149,7 @@ where
             .parse_function_decl_content(span_start, ident)
     }
 
-    /// Parses the `AsyncFunctionDeclaration` goal symbol.
+    /// Parses the `AsyncFunctionDeclaration` production.
     pub(super) fn parse_async_function_declaration(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("async"))?;
@@ -201,7 +201,7 @@ where
         }
     }
 
-    /// Parses the `FormalParameters` goal symbol.
+    /// Parses the `FormalParameters` production.
     pub(super) fn parse_formal_parameters(&mut self) -> Result<FormalParameters> {
         let span_start = self.position();
 
@@ -234,7 +234,7 @@ where
         })
     }
 
-    /// Parses the `FunctionBody` or `AsyncFunctionBody` goal symbol.
+    /// Parses the `FunctionBody` or `AsyncFunctionBody` production.
     pub(super) fn parse_function_body(&mut self) -> Result<Body> {
         let span_start = self.position();
         self.consume_assert(punct!("{"))?;

@@ -12,7 +12,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
     I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
-    /// Parses the `MethodDefinition` goal symbol.
+    /// Parses the `MethodDefinition` production.
     pub(super) fn parse_method_definition(&mut self) -> Result<MethodDefinition> {
         match self.current()? {
             token_matches!(punct!("*")) => self.parse_generator_method(),

@@ -20,7 +20,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
     I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
-    /// Parses the `Expression` goal symbol.
+    /// Parses the `Expression` production.
     pub(super) fn parse_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let expr = self.parse_assignment_expr()?;
@@ -50,7 +50,7 @@ where
         Ok(ExprSequence { span, expr }.into())
     }
 
-    /// Parses the `AssignmentExpression` goal symbol.
+    /// Parses the `AssignmentExpression` production.
     pub(super) fn parse_assignment_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         match self.current() {
@@ -108,7 +108,7 @@ where
         }
     }
 
-    /// Parses the `ParenthesizedExpression` goal symbol.
+    /// Parses the `ParenthesizedExpression` production.
     pub(super) fn parse_parenthesized_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.consume_assert(punct!("("))?;
@@ -150,7 +150,7 @@ where
         }
     }
 
-    /// Parses the `YieldExpression` goal symbol.
+    /// Parses the `YieldExpression` production.
     fn parse_yield_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.consume_assert(keyword!("yield"))?;
@@ -182,7 +182,7 @@ where
         .into())
     }
 
-    /// Parses the `ConditionalExpression` goal symbol.
+    /// Parses the `ConditionalExpression` production.
     fn parse_conditional_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let expr = self.parse_short_circuit_expr()?;
@@ -207,7 +207,7 @@ where
         }
     }
 
-    /// Parses the `UnaryExpression` goal symbol.
+    /// Parses the `UnaryExpression` production.
     pub(super) fn parse_unary_expr(&mut self) -> Result<Expr> {
         let operator = match self.current()? {
             token_matches!(punct!("+")) => Some(unary_op!("+")),
@@ -243,7 +243,7 @@ where
         }
     }
 
-    /// Parses the `UpdateExpression` goal symbol.
+    /// Parses the `UpdateExpression` production.
     fn parse_update_expr(&mut self) -> Result<Expr> {
         let prefix_operator = match self.current()? {
             token_matches!(punct!("++")) => Some(update_op!("++")),
@@ -292,8 +292,8 @@ where
         }
     }
 
-    /// Parses the `LeftHandSideExpression` goal symbol and non recursive parts of the
-    /// `CallExpression` goal symbol.
+    /// Parses the `LeftHandSideExpression` production and non recursive parts of the
+    /// `CallExpression` production.
     pub(super) fn parse_left_hand_side_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let expr = match self.current() {
@@ -313,8 +313,8 @@ where
         }?;
 
         if self.current_matches(punct!("?.")) {
-            // The NewExpression goal symbol handles nested news and is not included in the
-            // OptionalExpression goal symbol as a base for the chain.
+            // The NewExpression production handles nested news and is not included in the
+            // OptionalExpression production as a base for the chain.
             if expr.is_nested_new() {
                 return err!(SyntaxError(
                     "Invalid optional chain from new expression".to_owned(),
@@ -328,7 +328,7 @@ where
         }
     }
 
-    /// Parses the recursive parts of the `CallExpression` goal symbol.
+    /// Parses the recursive parts of the `CallExpression` production.
     fn parse_recursive_call_expression(
         &mut self,
         span_start: usize,
@@ -371,7 +371,7 @@ where
         Ok(expr)
     }
 
-    /// Parses the `SuperCall` goal symbol.
+    /// Parses the `SuperCall` production.
     fn parse_super_call_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.consume()?;
@@ -386,7 +386,7 @@ where
         .into())
     }
 
-    /// Parses the `ImportCall` goal symbol.
+    /// Parses the `ImportCall` production.
     fn parse_import_call_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.consume()?;
@@ -414,13 +414,13 @@ where
         Ok((span, vec![Argument::Expr(expr)]))
     }
 
-    /// Parses the `NewExpression` goal symbol.
+    /// Parses the `NewExpression` production.
     fn parse_new_expr(&mut self) -> Result<Expr> {
         // The `new MemberExpression` is parsed together with `MemberExpression`.
         self.parse_member_expr()
     }
 
-    /// Parses the `MemberExpression` goal symbol.
+    /// Parses the `MemberExpression` production.
     pub fn parse_member_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let mut expr = self.parse_member_expr_from_terminal()?;
@@ -536,7 +536,7 @@ where
         }
     }
 
-    /// Parses the `Arguments` goal symbol.
+    /// Parses the `Arguments` production.
     pub(super) fn parse_arguments(&mut self) -> Result<(Span, Vec<Argument>)> {
         let span_start = self.position();
         self.consume_assert(punct!("("))?;
@@ -565,7 +565,7 @@ where
         Ok((span, arguments))
     }
 
-    /// Parses the `PrimaryExpression` goal symbol.
+    /// Parses the `PrimaryExpression` production.
     fn parse_primary_expr(&mut self) -> Result<Expr> {
         Ok(match self.current()? {
             token_matches!(keyword!("this")) => self.parse_this_expr()?,
@@ -584,7 +584,7 @@ where
             }
             token_matches!(punct!("/")) => {
                 // The lexer do not account for regexp by default because it is ambiguous with other
-                // goal symbols. But if we find a '/' punctuator here it must be a misinterpreted
+                // productions. But if we find a '/' punctuator here it must be a misinterpreted
                 // regexp literal, so we re-read with current token with correct state and the lexer
                 // will produce the regexp literal for us to consume.
                 self.reader.reread_with_state(LexerState::regex_allowed())?;
@@ -597,7 +597,7 @@ where
         })
     }
 
-    /// Parses the `RegularExpressionLiteral` goal symbol.
+    /// Parses the `RegularExpressionLiteral` production.
     fn parse_regexp_literal(&mut self) -> Result<Expr> {
         let regexp = self.parse_literal()?;
         debug_assert!(matches!(
@@ -611,19 +611,19 @@ where
         Ok(regexp)
     }
 
-    /// Parses the `this` expression which is part of the `PrimaryExpression` goal symbol.
+    /// Parses the `this` expression which is part of the `PrimaryExpression` production.
     fn parse_this_expr(&mut self) -> Result<Expr> {
         let token = self.consume_assert(keyword!("this"))?;
         Ok(ExprThis::new(token.span).into())
     }
 
-    /// Parses the `IdentifierReference` goal symbol.
+    /// Parses the `IdentifierReference` production.
     fn parse_identifier_reference(&mut self) -> Result<Expr> {
         let ident = self.parse_identifier()?;
         Ok(ident.into())
     }
 
-    /// Parses the `Initializer` goal symbol.
+    /// Parses the `Initializer` production.
     pub(super) fn parse_initializer(&mut self) -> Result<Expr> {
         self.consume()?; // Skip =
         self.parse_assignment_expr()

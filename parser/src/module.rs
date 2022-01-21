@@ -16,7 +16,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
     I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
-    /// Parses the `ExportDeclaration` goal symbol.
+    /// Parses the `ExportDeclaration` production.
     pub(super) fn parse_export_declaration(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("export"))?;
@@ -110,7 +110,7 @@ where
         .into())
     }
 
-    /// Parses the `ImportDeclaration` goal symbol.
+    /// Parses the `ImportDeclaration` production.
     pub(super) fn parse_import_declaration(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("import"))?;
@@ -158,7 +158,7 @@ where
         .into())
     }
 
-    /// Parses the `ModuleSpecifier` goal symbol.
+    /// Parses the `ModuleSpecifier` production.
     fn parse_module_specifier(&mut self) -> Result<LitString> {
         let module_name = self
             .parse_literal()?
@@ -168,14 +168,14 @@ where
         Ok(module_name)
     }
 
-    /// Parses the `NameSpaceImport` goal symbol.
+    /// Parses the `NameSpaceImport` production.
     fn parse_namespace_import(&mut self) -> Result<Ident> {
         self.consume_assert(punct!("*"))?;
         self.consume_assert(keyword!("as"))?;
         self.parse_identifier()
     }
 
-    /// Parses the `NamedImports` goal symbol.
+    /// Parses the `NamedImports` production.
     fn parse_named_imports(&mut self) -> Result<Vec<NamedImport>> {
         self.consume_assert(punct!("{"))?;
 
@@ -193,7 +193,7 @@ where
         Ok(named_imports)
     }
 
-    /// Parses the `ImportSpecifier` goal symbol.
+    /// Parses the `ImportSpecifier` production.
     fn parse_import_specifier(&mut self) -> Result<NamedImport> {
         let span_start = self.position();
         let name = self.parse_identifier()?;
@@ -204,7 +204,7 @@ where
         Ok(NamedImport { span, name, alias })
     }
 
-    /// Parses the `NamedExports` goal symbol.
+    /// Parses the `NamedExports` production.
     fn parse_named_exports(&mut self) -> Result<Vec<NamedExport>> {
         self.consume_assert(punct!("{"))?;
 
@@ -221,7 +221,7 @@ where
 
         Ok(named_exports)
     }
-    /// Parses the `ExportSpecifier` goal symbol.
+    /// Parses the `ExportSpecifier` production.
     fn parse_export_specifier(&mut self) -> Result<NamedExport> {
         let span_start = self.position();
         let mut name = self.parse_identifier()?;

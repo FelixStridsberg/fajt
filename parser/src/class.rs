@@ -11,7 +11,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
     I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
-    /// Parses the `ClassDeclaration` goal symbol.
+    /// Parses the `ClassDeclaration` production.
     pub(super) fn parse_class_decl(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("class"))?;
@@ -35,7 +35,7 @@ where
         .into())
     }
 
-    /// Parses the `ClassExpression` goal symbol.
+    /// Parses the `ClassExpression` production.
     pub(super) fn parse_class_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.consume_assert(keyword!("class"))?;
@@ -55,7 +55,7 @@ where
         .into())
     }
 
-    /// Parses the `ClassTail` goal symbol, returns (ClassHeritage, ClassBody).
+    /// Parses the `ClassTail` production, returns (ClassHeritage, ClassBody).
     fn parse_class_tail(&mut self) -> Result<(Option<Box<Expr>>, Vec<ClassElement>)> {
         let super_class = self
             .maybe_consume(keyword!("extends"))?
@@ -65,7 +65,7 @@ where
         Ok((super_class, body))
     }
 
-    /// Parses the `ClassBody` goal symbol, including the { and } terminals.
+    /// Parses the `ClassBody` production, including the { and } terminals.
     fn parse_class_body(&mut self) -> Result<Vec<ClassElement>> {
         self.consume_assert(punct!("{"))?;
         let mut class_body = Vec::new();

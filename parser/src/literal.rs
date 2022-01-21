@@ -26,7 +26,7 @@ where
         .into())
     }
 
-    /// Parses the `Literal` goal symbol.
+    /// Parses the `Literal` production.
     pub(super) fn parse_literal(&mut self) -> Result<Expr> {
         let token = self.consume()?;
         debug_assert!(token_matches!(token, @literal));
@@ -42,7 +42,7 @@ where
         }
     }
 
-    /// Parses the `TemplateLiteral` goal symbol.
+    /// Parses the `TemplateLiteral` production.
     pub(super) fn parse_template_literal_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let template = self.parse_template_literal()?;
@@ -94,7 +94,7 @@ where
         Ok(LitTemplate { parts })
     }
 
-    /// Parses the `ArrayLiteral` goal symbol.
+    /// Parses the `ArrayLiteral` production.
     pub(super) fn parse_array_literal(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let token = self.consume()?;
@@ -133,7 +133,7 @@ where
         .into())
     }
 
-    /// Parses the `ObjectLiteral` goal symbol.
+    /// Parses the `ObjectLiteral` production.
     pub(super) fn parse_object_literal(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let token = self.consume()?;
@@ -158,7 +158,7 @@ where
         .into())
     }
 
-    /// Parses the `PropertyDefinition` goal symbol.
+    /// Parses the `PropertyDefinition` production.
     fn parse_property_definition(&mut self) -> Result<PropertyDefinition> {
         match self.current()? {
             token_matches!(punct!("...")) => {

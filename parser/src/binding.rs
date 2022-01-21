@@ -16,7 +16,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
     I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
-    /// Parses the `BindingPattern` goal symbol.
+    /// Parses the `BindingPattern` production.
     pub(super) fn parse_binding_pattern(&mut self) -> Result<BindingPattern> {
         Ok(match self.current()? {
             token_matches!(punct!("{")) => self.parse_object_binding_pattern()?,
@@ -26,7 +26,7 @@ where
         })
     }
 
-    /// Parses the `ObjectBindingPattern` goal symbol.
+    /// Parses the `ObjectBindingPattern` production.
     fn parse_object_binding_pattern(&mut self) -> Result<BindingPattern> {
         let span_start = self.position();
         self.consume_assert(punct!("{"))?;
@@ -62,7 +62,7 @@ where
         Ok(ObjectBinding { span, props, rest }.into())
     }
 
-    /// Parses the `SingleNameBinding` goal symbol.
+    /// Parses the `SingleNameBinding` production.
     fn parse_single_name_binding(&mut self) -> Result<SingleNameBinding> {
         let span_start = self.position();
 
@@ -79,7 +79,7 @@ where
         })
     }
 
-    /// Parses the `PropertyName: BindingElement` case of the `BindingProperty` goal symbol.
+    /// Parses the `PropertyName: BindingElement` case of the `BindingProperty` production.
     fn parse_named_binding(&mut self) -> Result<NamedBinding> {
         let span_start = self.position();
         let property = self.parse_property_name()?;
@@ -95,7 +95,7 @@ where
         })
     }
 
-    /// Parses the `ArrayBindingPattern` goal symbol.
+    /// Parses the `ArrayBindingPattern` production.
     fn parse_array_binding_pattern(&mut self) -> Result<BindingPattern> {
         let span_start = self.position();
         self.consume_assert(punct!("["))?;
@@ -143,7 +143,7 @@ where
         }
     }
 
-    /// Parses the `BindingElement` goal symbol.
+    /// Parses the `BindingElement` production.
     pub(super) fn parse_binding_element(&mut self) -> Result<BindingElement> {
         let span_start = self.position();
         let pattern = self.parse_binding_pattern()?;
@@ -159,13 +159,13 @@ where
         })
     }
 
-    /// Parses the `BindingRestElement` goal symbol.
+    /// Parses the `BindingRestElement` production.
     pub(super) fn parse_binding_rest_element(&mut self) -> Result<BindingPattern> {
         self.consume_assert(punct!("..."))?;
         self.parse_binding_pattern()
     }
 
-    /// Parses the `BindingIdentifier` goal symbol.
+    /// Parses the `BindingIdentifier` production.
     /// This also consumes the expected end punctuator.
     fn parse_rest_binding_ident(&mut self, expected_end: Punct) -> Result<Option<Ident>> {
         let ident = self.parse_identifier()?;

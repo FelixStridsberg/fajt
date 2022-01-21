@@ -14,7 +14,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
     I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
-    /// Parses the `ShortCircuitExpression` goal symbol.
+    /// Parses the `ShortCircuitExpression` production.
     pub(super) fn parse_short_circuit_expr(&mut self) -> Result<Expr> {
         self.parse_logical_expr(Self::parse_logical_or_expr, |token| {
             if token_matches!(token, punct!("??")) {
@@ -25,7 +25,7 @@ where
         })
     }
 
-    /// Parses the `LogicalORExpression` goal symbol.
+    /// Parses the `LogicalORExpression` production.
     fn parse_logical_or_expr(&mut self) -> Result<Expr> {
         self.parse_logical_expr(Self::parse_logical_and_expr, |token| {
             if token_matches!(token, punct!("||")) {
@@ -36,7 +36,7 @@ where
         })
     }
 
-    /// Parses the `LogicalANDExpression` goal symbol.
+    /// Parses the `LogicalANDExpression` production.
     fn parse_logical_and_expr(&mut self) -> Result<Expr> {
         self.parse_logical_expr(Self::parse_bitwise_or_expr, |token| {
             if token_matches!(token, punct!("&&")) {
@@ -47,7 +47,7 @@ where
         })
     }
 
-    /// Parses the `BitwiseORExpression` goal symbol.
+    /// Parses the `BitwiseORExpression` production.
     fn parse_bitwise_or_expr(&mut self) -> Result<Expr> {
         self.parse_binary_expr(Self::parse_bitwise_xor_expr, |token| {
             if token_matches!(token, punct!("|")) {
@@ -58,7 +58,7 @@ where
         })
     }
 
-    /// Parses the `BitwiseXORExpression` goal symbol.
+    /// Parses the `BitwiseXORExpression` production.
     fn parse_bitwise_xor_expr(&mut self) -> Result<Expr> {
         self.parse_binary_expr(Self::parse_bitwise_and_expr, |token| {
             if token_matches!(token, punct!("^")) {
@@ -69,7 +69,7 @@ where
         })
     }
 
-    /// Parses the `BitwiseANDExpression` goal symbol.
+    /// Parses the `BitwiseANDExpression` production.
     fn parse_bitwise_and_expr(&mut self) -> Result<Expr> {
         self.parse_binary_expr(Self::parse_equality_expr, |token| {
             if token_matches!(token, punct!("&")) {
@@ -80,7 +80,7 @@ where
         })
     }
 
-    /// Parses the `EqualityExpression` goal symbol.
+    /// Parses the `EqualityExpression` production.
     fn parse_equality_expr(&mut self) -> Result<Expr> {
         self.parse_binary_expr(Self::parse_relational_expr, |token| match token {
             token_matches!(punct!("==")) => Some(binary_op!("==")),
@@ -91,7 +91,7 @@ where
         })
     }
 
-    /// Parses the `RelationalExpression` goal symbol.
+    /// Parses the `RelationalExpression` production.
     fn parse_relational_expr(&mut self) -> Result<Expr> {
         let in_keyword_allowed = self.context.is_in;
         self.parse_binary_expr(Self::parse_shift_expr, |token| match token {
@@ -105,7 +105,7 @@ where
         })
     }
 
-    /// Parses the `ShiftExpression` goal symbol.
+    /// Parses the `ShiftExpression` production.
     fn parse_shift_expr(&mut self) -> Result<Expr> {
         self.parse_binary_expr(Self::parse_additive_expr, |token| match token {
             token_matches!(punct!("<<")) => Some(binary_op!("<<")),
@@ -115,7 +115,7 @@ where
         })
     }
 
-    /// Parses the `AdditiveExpression` goal symbol.
+    /// Parses the `AdditiveExpression` production.
     fn parse_additive_expr(&mut self) -> Result<Expr> {
         self.parse_binary_expr(Self::parse_multiplicative_expr, |token| match token {
             token_matches!(punct!("+")) => Some(binary_op!("+")),
@@ -124,7 +124,7 @@ where
         })
     }
 
-    /// Parses the `MultiplicativeExpression` goal symbol.
+    /// Parses the `MultiplicativeExpression` production.
     fn parse_multiplicative_expr(&mut self) -> Result<Expr> {
         self.parse_binary_expr(Self::parse_exponentiation_expr, |token| match token {
             token_matches!(punct!("*")) => Some(binary_op!("*")),
@@ -134,7 +134,7 @@ where
         })
     }
 
-    /// Parses the `ExponentiationExpression` goal symbol.
+    /// Parses the `ExponentiationExpression` production.
     fn parse_exponentiation_expr(&mut self) -> Result<Expr> {
         self.parse_binary_expr(Self::parse_unary_expr, |token| {
             if token_matches!(token, punct!("**")) {
@@ -145,10 +145,10 @@ where
         })
     }
 
-    /// All binary expressions are parsed the same way, they are broken up into multiple goal
-    /// symbols for precedence. This is the common parse method for all of them.
+    /// All binary expressions are parsed the same way, they are broken up into multiple productions
+    /// for precedence. This is the common parse method for all of them.
     ///
-    /// `next` is a method for retrieving the result of the _next_ goal symbol (i.e. right hand).
+    /// `next` is a method for retrieving the result of the _next_ production (i.e. right hand).
     /// `map_operator` is a function for mapping a token to a binary operator.
     #[inline]
     fn parse_binary_expr<F>(
@@ -170,10 +170,10 @@ where
         })
     }
 
-    /// All binary expressions are parsed the same way, they are broken up into multiple goal
-    /// symbols for precedence. This is the common parse method for all of them.
+    /// All binary expressions are parsed the same way, they are broken up into multiple productions
+    /// for precedence. This is the common parse method for all of them.
     ///
-    /// `next` is a method for retrieving the result of the _next_ goal symbol (i.e. right hand).
+    /// `next` is a method for retrieving the result of the _next_ production (i.e. right hand).
     /// `map_operator` is a function for mapping a token to a binary operator.
     #[inline]
     fn parse_logical_expr(

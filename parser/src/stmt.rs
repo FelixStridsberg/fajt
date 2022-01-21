@@ -78,7 +78,7 @@ where
     }
 
     /// Check if current position matches the start of an expression statement as specified in the
-    /// `ExpressionStatement` goal symbol.
+    /// `ExpressionStatement` production.
     fn is_expr_stmt(&self) -> Result<bool> {
         if matches!(
             self.current()?.value,
@@ -98,7 +98,7 @@ where
         Ok(true)
     }
 
-    /// Parses the `BlockStatement` goal symbol.
+    /// Parses the `BlockStatement` production.
     fn parse_block_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(punct!("{"))?;
@@ -117,7 +117,7 @@ where
         Ok(StmtBlock { span, statements }.into())
     }
 
-    /// Parses the `ExpressionStatement` gaol symbol.
+    /// Parses the `ExpressionStatement` production.
     fn parse_expr_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         let expr = self
@@ -130,7 +130,7 @@ where
         Ok(StmtExpr { span, expr }.into())
     }
 
-    /// Parses the `LabeledStatement` goal symbol.
+    /// Parses the `LabeledStatement` production.
     fn parse_labeled_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         let label = self.parse_identifier()?;
@@ -145,13 +145,13 @@ where
         .into())
     }
 
-    /// Parses the `EmptyStatement` goal symbol.
+    /// Parses the `EmptyStatement` production.
     fn parse_empty_stmt(&mut self) -> Result<Stmt> {
         let token = self.consume_assert(punct!(";"))?;
         Ok(StmtEmpty { span: token.span }.into())
     }
 
-    /// Parses the `BreakStatement` goal symbol.
+    /// Parses the `BreakStatement` production.
     fn parse_break_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("break"))?;
@@ -163,7 +163,7 @@ where
         Ok(StmtBreak { span, label }.into())
     }
 
-    /// Parses the `ContinueStatement` goal symbol.
+    /// Parses the `ContinueStatement` production.
     fn parse_continue_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("continue"))?;
@@ -175,7 +175,7 @@ where
         Ok(StmtContinue { span, label }.into())
     }
 
-    /// Parses the `ReturnStatement` goal symbol.
+    /// Parses the `ReturnStatement` production.
     fn parse_return_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("return"))?;
@@ -187,7 +187,7 @@ where
         Ok(StmtReturn { span, argument }.into())
     }
 
-    /// Parses the `ThrowStatement` goal symbol.
+    /// Parses the `ThrowStatement` production.
     fn parse_throw_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("throw"))?;
@@ -221,7 +221,7 @@ where
         }
     }
 
-    /// Parses the `DebuggerStatement` goal symbol.
+    /// Parses the `DebuggerStatement` production.
     fn parse_debugger_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
 
@@ -232,7 +232,7 @@ where
         Ok(StmtDebugger { span }.into())
     }
 
-    /// Parses the `IfStatement` goal symbol.
+    /// Parses the `IfStatement` production.
     fn parse_if_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("if"))?;
@@ -255,7 +255,7 @@ where
         .into())
     }
 
-    /// Parses the `WithStatement` goal symbol.
+    /// Parses the `WithStatement` production.
     fn parse_with_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("with"))?;
@@ -273,7 +273,7 @@ where
         .into())
     }
 
-    /// Parses the `TryStatement` goal symbol.
+    /// Parses the `TryStatement` production.
     fn parse_try_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(keyword!("try"))?;

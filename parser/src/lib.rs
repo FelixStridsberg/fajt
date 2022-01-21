@@ -335,7 +335,7 @@ where
         })
     }
 
-    /// Parses the `PropertyName` goal symbol.
+    /// Parses the `PropertyName` production.
     fn parse_property_name(&mut self) -> Result<PropertyName> {
         match self.current()? {
             token_matches!(@literal) => {

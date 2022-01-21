@@ -12,7 +12,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
     I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
-    /// Parses and resolves the `CoverParenthesizedExpressionAndArrowParameterList` goal symbol.
+    /// Parses and resolves the `CoverParenthesizedExpressionAndArrowParameterList` production.
     pub(super) fn parse_cover_parenthesized_and_arrow_parameters(&mut self) -> Result<Expr> {
         let span_start = self.position();
 
@@ -25,7 +25,7 @@ where
         }
     }
 
-    /// Parses and resolves the `CoverCallExpressionAndAsyncArrowHead` goal symbol.
+    /// Parses and resolves the `CoverCallExpressionAndAsyncArrowHead` production.
     pub(super) fn parse_cover_call_or_async_arrow_head(
         &mut self,
         async_ident: Ident,
@@ -51,7 +51,7 @@ where
     /// Assumes next token is start parenthesis, skips past matching closing parenthesis, reads
     /// token, then rewinds so next token is start parenthesis again.
     ///
-    /// We do this to figure out the "cover" goals that requires reading past parenthesis.
+    /// We do this to figure out the "cover" productions that requires reading past parenthesis.
     fn token_after_parenthesis(&mut self) -> Result<Option<Token>> {
         let start = self.consume_assert(punct!("("))?;
         self.skip_until_closing_parenthesis()?;
