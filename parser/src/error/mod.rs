@@ -6,24 +6,11 @@ use fajt_ast::{Ident, Span};
 use fajt_common::io::Error as CommonError;
 use fajt_lexer::error::Error as LexerError;
 
-#[cfg(debug_assertions)]
 #[macro_export]
 macro_rules! err {
-    ($expr:expr) => {
-        Err($crate::error::Error::with_debug(
-            $expr,
-            file!(),
-            (line!(), column!()),
-        ))
-    };
-}
-
-#[cfg(not(debug_assertions))]
-#[macro_export]
-macro_rules! err {
-    ($expr:expr) => {
-        Err($crate::error::Error::of($expr))
-    };
+    ($error_kind:expr) => {{
+        Err($crate::error::Error::of($error_kind))
+    }};
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -31,25 +18,20 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Debug, PartialEq)]
 pub struct Error {
     kind: ErrorKind,
-    file: Option<&'static str>,
-    location: Option<(u32, u32)>,
+}
+
+/// Keeps diagnostics about error location in parser for easy debugging.
+#[cfg(debug_assertions)]
+#[derive(Debug, PartialEq)]
+pub struct InternalDiagnostic {
+    pub file: &'static str,
+    pub location: (u32, u32),
 }
 
 impl Error {
     pub(crate) fn of(kind: ErrorKind) -> Self {
         Error {
             kind,
-            file: None,
-            location: None,
-        }
-    }
-
-    #[cfg(debug_assertions)]
-    pub(crate) fn with_debug(kind: ErrorKind, file: &'static str, location: (u32, u32)) -> Self {
-        Error {
-            kind,
-            file: Some(file),
-            location: Some(location),
         }
     }
 
@@ -76,10 +58,6 @@ impl fmt::Display for Error {
             ErrorKind::SyntaxError(msg, span) => write!(f, "{}:{:?}", msg, span)?,
             ErrorKind::UnexpectedToken(t) => write!(f, "Unexpected token: {:?}", t)?,
             ErrorKind::UnexpectedIdent(i) => write!(f, "Unexpected identifier: {:?}", i)?,
-        }
-
-        if let (Some(file), Some((row, col))) = (self.file, self.location) {
-            write!(f, " at {}:{}:{}", file, row, col)?;
         }
 
         Ok(())
