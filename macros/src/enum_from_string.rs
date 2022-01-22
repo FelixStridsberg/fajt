@@ -44,16 +44,22 @@ fn generate_to_str_impl(input: &DeriveInput, enum_data: &DataEnum) -> TokenStrea
         let variant_ident = &v.ident;
         let variant_string = variant_string(v);
         quote! {
-            #ident::#variant_ident => #variant_string.to_owned()
+            #ident::#variant_ident => #variant_string
         }
     });
 
     quote! {
-        impl std::string::ToString for #ident {
-            fn to_string(&self) -> String {
+        impl #ident {
+            pub fn as_str(&self) -> &str {
                 match self {
                     #(#match_branches,)*
                 }
+            }
+        }
+
+        impl std::string::ToString for #ident {
+            fn to_string(&self) -> String {
+                self.as_str().to_string()
             }
         }
     }

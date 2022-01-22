@@ -169,11 +169,11 @@ impl From<CommonError<LexerError>> for Error {
 }
 
 // TODO this can only be relied on for known values, etc. expected values
-fn token_value_to_string(token: &TokenValue) -> String {
+fn token_value_to_string(token: &TokenValue) -> &str {
     match token {
-        TokenValue::Keyword(keyword) => keyword.to_string(),
-        TokenValue::Identifier(ident) => ident.to_string(),
-        TokenValue::Punct(punct) => punct.to_string(),
+        TokenValue::Keyword(keyword) => keyword.as_str(),
+        TokenValue::Identifier(ident) => ident.as_str(),
+        TokenValue::Punct(punct) => punct.as_str(),
         _ => unreachable!(),
     }
 }
