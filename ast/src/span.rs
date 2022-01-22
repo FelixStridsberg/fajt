@@ -12,6 +12,13 @@ impl Span {
     pub fn new(start: usize, end: usize) -> Self {
         Self { start, end }
     }
+
+    pub fn translate(&self, offset: isize) -> Self {
+        Span {
+            start: (self.start as isize + offset) as usize,
+            end: (self.end as isize + offset) as usize,
+        }
+    }
 }
 
 impl Serialize for Span {

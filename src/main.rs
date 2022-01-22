@@ -1,5 +1,6 @@
 use clap::{App, Arg};
 use fajt_codegen::{generate_code, GeneratorContext};
+use fajt_parser::error::emitter::ErrorEmitter;
 use fajt_parser::parse_program;
 use std::fs::read_to_string;
 
@@ -10,8 +11,15 @@ struct Arguments {
 
 fn main() {
     let args = get_arguments();
-    let source = read_to_string(args.file_name).unwrap();
+    let source = read_to_string(&args.file_name).unwrap();
     let mut program = parse_program(&source);
+
+    if let Err(error) = program {
+        let mut stderr = std::io::stderr();
+        let mut emitter = ErrorEmitter::new(&args.file_name, &source, &mut stderr);
+        emitter.emit_error(&error).unwrap();
+        return;
+    }
 
     if let Some(ctx) = args.generator_context {
         let output = generate_code(program.as_mut().unwrap(), ctx);

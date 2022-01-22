@@ -1,4 +1,3 @@
-use crate::error::diagnostic::Diagnostic;
 use fajt_ast::{Ident, Span};
 use fajt_common::io::Error as CommonError;
 use fajt_lexer::error::Error as LexerError;
@@ -6,9 +5,8 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
 use std::{error, fmt};
 
-pub mod diagnostic;
+pub mod emitter;
 
-#[deprecated]
 #[macro_export]
 macro_rules! err {
     ($error_kind:expr) => {{
@@ -24,12 +22,10 @@ pub struct Error {
     pub diagnostic: Option<Diagnostic>,
 }
 
-/// Keeps diagnostics about error location in parser for easy debugging.
-#[cfg(debug_assertions)]
 #[derive(Debug, PartialEq)]
-pub struct InternalDiagnostic {
-    pub file: &'static str,
-    pub location: (u32, u32),
+pub struct Diagnostic {
+    pub label: String,
+    pub span: Span,
 }
 
 impl Error {
@@ -42,6 +38,14 @@ impl Error {
 
     pub fn kind(&self) -> &ErrorKind {
         &self.kind
+    }
+
+    pub fn get_span(&self) -> &Span {
+        match &self.kind {
+            ErrorKind::UnexpectedToken(t) => &t.span,
+            ErrorKind::UnexpectedIdent(t) => &t.span,
+            _ => todo!("Move span to error struct"),
+        }
     }
 }
 
@@ -61,7 +65,7 @@ impl fmt::Display for Error {
             ErrorKind::EndOfStream => write!(f, "End of file reached.")?,
             ErrorKind::LexerError(e) => write!(f, "Lexer error '{}'", e)?,
             ErrorKind::SyntaxError(msg, span) => write!(f, "{}:{:?}", msg, span)?,
-            ErrorKind::UnexpectedToken(t) => write!(f, "Unexpected token: {:?}", t)?,
+            ErrorKind::UnexpectedToken(_) => write!(f, "Syntax error: Unexpected token")?,
             ErrorKind::UnexpectedIdent(i) => write!(f, "Unexpected identifier: {:?}", i)?,
         }
 

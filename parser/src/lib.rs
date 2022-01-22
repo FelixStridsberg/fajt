@@ -26,9 +26,8 @@ use fajt_lexer::token::{KeywordContext, Token, TokenValue};
 use fajt_lexer::{punct, Lexer};
 use fajt_lexer::{token_matches, LexerState};
 
-use crate::error::diagnostic::Diagnostic;
 use crate::error::ErrorKind::UnexpectedToken;
-use crate::error::{Error, Result};
+use crate::error::{Diagnostic, Error, Result};
 
 /// Similar trait to bool.then, but handles closures returning `Result`.
 pub trait ThenTry {
@@ -417,21 +416,22 @@ where
 
     fn consume_list_delimiter(&mut self, list_end: &TokenValue) -> Result<()> {
         if !self.maybe_consume(&punct!(","))? && !self.current_matches(list_end) {
-            return self.unexpected_token_error(vec![&punct!(","), list_end]);
+            return self.unexpected_token_error(&punct!(","));
         }
 
         Ok(())
     }
 
-    fn unexpected_token_error(&mut self, expected: Vec<&TokenValue>) -> Result<()> {
+    fn unexpected_token_error(&mut self, expected: &TokenValue) -> Result<()> {
         let token = self.consume()?;
 
         // TODO token value to string.
         let diagnostic = Diagnostic {
             span: token.span.clone(),
-            message: format!(
-                "Unexpected token, found #offending#, expected {:?}",
-                expected
+            label: format!(
+                "Unexpected token, found `{}`, expected `{}`",
+                token.value.to_string(),
+                expected.to_string(),
             ),
         };
 

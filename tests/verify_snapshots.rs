@@ -53,7 +53,7 @@ extern crate fajt_testing;
 use fajt_ast::traverse::Traverse;
 use fajt_ast::{Expr, Program, SourceType, Stmt};
 use fajt_codegen::{generate_code, GeneratorContext};
-use fajt_parser::error::diagnostic::DiagnosticEmitter;
+use fajt_parser::error::emitter::ErrorEmitter;
 use fajt_parser::error::{ErrorKind, Result};
 use fajt_parser::{parse, Parse};
 use fajt_testing::markdown::{Markdown, MarkdownBlock};
@@ -61,6 +61,7 @@ use fajt_testing::{read_string, write_string};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use std::fmt::Debug;
+use std::io::Cursor;
 
 const SOURCE_SECTION: &str = "Source";
 const MINIFIED_SECTION: &str = "Output: minified";
@@ -90,8 +91,8 @@ where
     T: Parse + Serialize + DeserializeOwned + PartialEq + Debug + Traverse,
 {
     let mut regenerate_ast = false;
-    let mut regenerate_error = false;
     let mut regenerate_min = None;
+    let mut regenerate_error = None;
 
     let mut test = test;
     let source_block = test.get_block(SOURCE_SECTION).unwrap();
@@ -107,10 +108,13 @@ where
     }
 
     if let Some(error_section) = test.get_section(ERROR_SECTION) {
-        // if let Some(error_msg) = error_section.get_code() {
-        // } else {
-        regenerate_error = true;
-        // }
+        let error_msg = error_to_message(&result, source);
+
+        if let Some(expected_error_msg) = error_section.get_code() {
+            assert_eq!(error_msg, expected_error_msg, "Error message don't match.");
+        } else {
+            regenerate_error = Some(error_msg);
+        }
     }
 
     if result.is_ok() {
@@ -132,23 +136,8 @@ where
         }
     }
 
-    #[allow(unused_assignments)]
-    let mut error_output = None; // Just to make sure it lives until written
-    if regenerate_error {
-        if result.is_ok() {
-            panic!("Expected error but got {:?}", result);
-        }
-
-        let error = result.as_ref().unwrap_err();
-        if let Some(diagnostic) = &error.diagnostic {
-            let mut emitter = DiagnosticEmitter::new(source);
-            emitter.emit_diagnostic(diagnostic);
-            error_output = Some(emitter.into_string());
-            println!("{}", error_output.as_ref().unwrap());
-            test.set_block_content(ERROR_SECTION, "txt", error_output.as_ref().unwrap());
-        } else {
-            todo!()
-        }
+    if let Some(error_message) = regenerate_error.as_ref() {
+        test.set_block_content(ERROR_SECTION, "txt", error_message);
     }
 
     #[allow(unused_assignments)]
@@ -162,7 +151,7 @@ where
         test.set_block_content(MINIFIED_SECTION, "js", min);
     }
 
-    if regenerate_ast || regenerate_error || regenerate_min.is_some() {
+    if regenerate_ast || regenerate_min.is_some() || regenerate_error.is_some() {
         write_string(path.as_ref(), &test.to_string());
         panic!("Output generated. Verify and rerun test.");
     }
@@ -208,6 +197,23 @@ fn assert_minified_output(output_min: &String, expected_minified: &str) {
         expected_minified.trim(),
         "Minified output mismatch."
     );
+}
+
+fn error_to_message<T>(result: &Result<T>, source: &str) -> String
+where
+    T: Parse + Serialize + DeserializeOwned + PartialEq + Debug + Traverse,
+{
+    if result.is_ok() {
+        panic!("Expected error but got {:?}", result);
+    }
+
+    let error = result.as_ref().unwrap_err();
+
+    let mut cursor = Cursor::new(Vec::new());
+    let mut emitter = ErrorEmitter::new("test.js", source, &mut cursor);
+    emitter.emit_error(error).unwrap();
+
+    String::from_utf8(cursor.into_inner()).unwrap()
 }
 
 fn get_source_type(language: &str) -> SourceType {
