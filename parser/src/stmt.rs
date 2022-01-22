@@ -1,4 +1,3 @@
-use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::Result;
 use crate::{ContextModify, Error, Parser, ThenTry};
 use fajt_ast::{

@@ -55,7 +55,7 @@ use fajt_ast::traverse::Traverse;
 use fajt_ast::{Expr, Program, SourceType, Stmt};
 use fajt_codegen::{generate_code, GeneratorContext};
 use fajt_parser::error::emitter::ErrorEmitter;
-use fajt_parser::error::{ErrorKind, Result};
+use fajt_parser::error::Result;
 use fajt_parser::{parse, Parse};
 use fajt_testing::markdown::{Markdown, MarkdownBlock};
 use fajt_testing::{read_string, write_string};
@@ -98,7 +98,7 @@ where
     let mut test = test;
     let source_block = test.get_block(SOURCE_SECTION).unwrap();
     let source = source_block.contents;
-    let mut result = parse::<T>(&source, source_type);
+    let mut result = parse::<T>(source, source_type);
 
     if let Some(ast_section) = test.get_section(AST_SECTION) {
         if let Some(ast) = ast_section.get_code() {
@@ -163,7 +163,7 @@ where
     T: Parse + Serialize + DeserializeOwned + PartialEq + Debug,
 {
     if let Ok(result) = result {
-        let expected_expr: T = serde_json::from_str(&ast_json).unwrap();
+        let expected_expr: T = serde_json::from_str(ast_json).unwrap();
         assert_eq!(result, &expected_expr)
     } else {
         panic!("Tried to compare AST but got error result.");

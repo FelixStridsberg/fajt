@@ -17,18 +17,15 @@ mod module;
 mod stmt;
 mod variable;
 
-use std::cell::Cell;
-use std::rc::Rc;
-
+use crate::error::ErrorKind::UnexpectedToken;
+use crate::error::{Diagnostic, Error, Result};
 use fajt_ast::{Expr, Ident, LitString, Literal, Program, PropertyName, SourceType, Span, Stmt};
 use fajt_common::io::{PeekRead, PeekReader, ReReadWithState};
-use fajt_lexer::error::ErrorKind::ForbiddenIdentifier;
 use fajt_lexer::token::{KeywordContext, Token, TokenValue};
 use fajt_lexer::{punct, Lexer};
 use fajt_lexer::{token_matches, LexerState};
-
-use crate::error::ErrorKind::UnexpectedToken;
-use crate::error::{Diagnostic, Error, Result};
+use std::cell::Cell;
+use std::rc::Rc;
 
 /// Similar trait to bool.then, but handles closures returning `Result`.
 pub trait ThenTry {
@@ -324,7 +321,7 @@ where
     }
 
     fn maybe_consume(&mut self, value: &TokenValue) -> Result<bool> {
-        if self.current_matches(&value) {
+        if self.current_matches(value) {
             self.consume()?;
             Ok(true)
         } else {
