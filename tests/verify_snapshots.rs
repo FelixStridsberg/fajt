@@ -188,7 +188,7 @@ where
     }
 }
 
-fn assert_minified_output(output_min: &String, expected_minified: &str) {
+fn assert_minified_output(output_min: &str, expected_minified: &str) {
     assert_eq!(
         output_min.trim(),
         expected_minified.trim(),
@@ -234,11 +234,7 @@ fn result_to_string<T>(result: Result<T>) -> String
 where
     T: Parse + Serialize + Debug,
 {
-    if let Ok(result) = result {
-        serde_json::to_string_pretty(&result).unwrap()
-    } else {
-        serde_json::to_string_pretty(&result.unwrap_err().kind()).unwrap()
-    }
+    serde_json::to_string_pretty(result.as_ref().unwrap()).unwrap()
 }
 
 macro_rules! generate_test_cases {

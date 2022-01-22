@@ -312,10 +312,10 @@ where
         }
     }
 
-    fn consume_assert(&mut self, expected: &TokenValue) -> Result<Token> {
+    fn consume_assert(&mut self, expected: &'static TokenValue) -> Result<Token> {
         let token = self.consume()?;
         if &token.value != expected {
-            return Err(self.unexpected_token_error(token, expected));
+            return Err(Error::expected_other_token(token, expected));
         }
         Ok(token)
     }
@@ -426,7 +426,7 @@ where
     fn consume_list_delimiter(&mut self, list_end: &TokenValue) -> Result<()> {
         if !self.maybe_consume(&punct!(","))? && !self.current_matches(list_end) {
             let token = self.consume()?;
-            return Err(self.unexpected_token_error(token, &punct!(",")));
+            return Err(Error::expected_other_token(token, &punct!(",")));
         }
 
         Ok(())
@@ -438,21 +438,6 @@ where
             label: format!(
                 "Unexpected token, found `{}`, expected identifier",
                 token.value.to_string(),
-            ),
-        };
-
-        let mut error = Error::unexpected_token(token);
-        error.diagnostic = Some(diagnostic);
-        error
-    }
-
-    fn unexpected_token_error(&mut self, token: Token, expected: &TokenValue) -> Error {
-        let diagnostic = Diagnostic {
-            span: token.span.clone(),
-            label: format!(
-                "Unexpected token, found `{}`, expected `{}`",
-                token.value.to_string(),
-                expected.to_string(),
             ),
         };
 
