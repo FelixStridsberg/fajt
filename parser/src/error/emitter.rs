@@ -20,7 +20,7 @@ impl<'a, 'b, 'c, W: Write> ErrorEmitter<'a, 'b, 'c, W> {
     pub fn emit_error(&mut self, error: &Error) -> std::io::Result<()> {
         let span = &error.span;
         let line_span = self.get_line_boundaries(span);
-        let col_number = span.start - line_span.start;
+        let col_number = span.start - line_span.start + 1;
         let line_number = self.get_line_number(span);
 
         writeln!(self.out, "{}", error)?;

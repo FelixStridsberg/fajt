@@ -9,7 +9,7 @@ function fn() {
 ### Output: error
 ```txt
 Syntax error: Forbidden identifier `let`
- --> test.js:3:6
+ --> test.js:3:7
   |
 3 |   var let = 1;
   |       ^^^ `let` is not allowed as an identifier in this context

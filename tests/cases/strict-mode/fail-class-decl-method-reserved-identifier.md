@@ -12,7 +12,7 @@ class cls {
 ### Output: error
 ```txt
 Syntax error: Forbidden identifier `implements`
- --> test.js:3:8
+ --> test.js:3:9
   |
 3 |     var implements = 1;
   |         ^^^^^^^^^^ `implements` is not allowed as an identifier in this context
