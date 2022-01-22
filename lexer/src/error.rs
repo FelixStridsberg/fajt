@@ -35,6 +35,10 @@ impl Error {
         }
     }
 
+    pub fn span(&self) -> &Span {
+        &self.span
+    }
+
     pub fn kind(&self) -> &ErrorKind {
         &self.kind
     }

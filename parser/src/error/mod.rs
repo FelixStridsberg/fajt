@@ -1,4 +1,4 @@
-use crate::error::ErrorKind::{ForbiddenIdentifier, SyntaxError, UnexpectedIdent};
+use crate::error::ErrorKind::{EndOfStream, ForbiddenIdentifier, SyntaxError, UnexpectedIdent};
 use crate::UnexpectedToken;
 use fajt_ast::{Ident, Span};
 use fajt_common::io::Error as CommonError;
@@ -87,6 +87,14 @@ impl Error {
         }
     }
 
+    pub(crate) fn end_of_stream(pos: usize) -> Self {
+        Error {
+            kind: EndOfStream,
+            span: Span::new(pos, pos),
+            diagnostic: None,
+        }
+    }
+
     pub fn kind(&self) -> &ErrorKind {
         &self.kind
     }
@@ -144,15 +152,16 @@ impl fmt::Display for Error {
 impl error::Error for Error {}
 
 impl From<LexerError> for Error {
-    fn from(lexer_err: LexerError) -> Self {
-        Error::of(ErrorKind::LexerError(lexer_err), Span::empty()) // TODO Span::empty() should be real span
+    fn from(error: LexerError) -> Self {
+        let span = error.span().clone();
+        Error::lexer_error(error, span)
     }
 }
 
 impl From<CommonError<LexerError>> for Error {
     fn from(error: CommonError<LexerError>) -> Self {
         match error {
-            CommonError::EndOfStream(pos) => Error::of(ErrorKind::EndOfStream, Span::new(pos, pos)),
+            CommonError::EndOfStream(pos) => Error::end_of_stream(pos),
             CommonError::ReaderError(lexer_error) => lexer_error.into(),
         }
     }
