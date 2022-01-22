@@ -152,7 +152,7 @@ impl From<LexerError> for Error {
 impl From<CommonError<LexerError>> for Error {
     fn from(error: CommonError<LexerError>) -> Self {
         match error {
-            CommonError::EndOfStream => Error::of(ErrorKind::EndOfStream, Span::empty()),
+            CommonError::EndOfStream(pos) => Error::of(ErrorKind::EndOfStream, Span::new(pos, pos)),
             CommonError::ReaderError(lexer_error) => lexer_error.into(),
         }
     }

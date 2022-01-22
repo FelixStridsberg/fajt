@@ -7,5 +7,5 @@ a
 ### Output: error
 ```txt
 Syntax error: Unexpected end of input
- --> test.js:1:1
+ --> test.js:2:3
 ```

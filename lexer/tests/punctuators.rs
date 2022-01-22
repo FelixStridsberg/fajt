@@ -2,7 +2,6 @@ mod lib;
 
 use fajt_ast::Span;
 use fajt_lexer::error::Error;
-use fajt_lexer::error::ErrorKind::InvalidOrUnexpectedToken;
 use fajt_lexer::literal;
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
@@ -131,6 +130,6 @@ fn optional_chaining_exception() {
 fn two_dots() {
     assert_lexer!(
         input: "..",
-        error: Error::of(InvalidOrUnexpectedToken(Token::new(punct!("."), true, Span::new(0, 1))))
+        error: Error::invalid_or_unexpected_token(Token::new(punct!("."), true, Span::new(0, 1)))
     );
 }

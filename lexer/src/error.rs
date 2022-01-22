@@ -1,5 +1,5 @@
 use crate::token::Keyword;
-use crate::{InvalidOrUnexpectedToken, Token};
+use crate::{EndOfFile, InvalidOrUnexpectedToken, Token};
 use fajt_ast::Span;
 use fajt_common::io::Error as CommonError;
 use serde::{Deserialize, Serialize};
@@ -13,11 +13,10 @@ pub struct Error {
 }
 
 impl Error {
-    #[deprecated]
-    pub fn of(kind: ErrorKind) -> Self {
+    pub fn unexpected_end_of_file(pos: usize) -> Self {
         Error {
-            kind,
-            span: Span::empty(),
+            span: Span::new(pos, pos),
+            kind: EndOfFile,
         }
     }
 
@@ -64,7 +63,7 @@ impl error::Error for Error {}
 impl From<CommonError<()>> for Error {
     fn from(error: CommonError<()>) -> Self {
         match error {
-            CommonError::EndOfStream => Error::of(ErrorKind::EndOfFile),
+            CommonError::EndOfStream(pos) => Error::unexpected_end_of_file(pos),
             CommonError::ReaderError(_) => unreachable!(),
         }
     }

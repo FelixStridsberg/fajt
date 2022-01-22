@@ -5,7 +5,7 @@ use std::str::CharIndices;
 
 #[derive(Debug)]
 pub enum Error<E> {
-    EndOfStream,
+    EndOfStream(usize),
     ReaderError(E),
 }
 
@@ -114,7 +114,7 @@ where
         if let Some((_, current)) = self.current.as_ref() {
             Ok(current)
         } else {
-            Err(Error::EndOfStream)
+            Err(Error::EndOfStream(self.position))
         }
     }
 
@@ -142,7 +142,7 @@ where
             self.position = position + self.offset;
             Ok(item)
         } else {
-            Err(Error::EndOfStream)
+            Err(Error::EndOfStream(self.position))
         }
     }
 }
@@ -165,7 +165,7 @@ where
                         break;
                     }
                 }
-                Err(Error::EndOfStream) => {
+                Err(Error::EndOfStream(_)) => {
                     break;
                 }
                 Err(e) => {
