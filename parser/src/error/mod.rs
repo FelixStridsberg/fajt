@@ -36,7 +36,7 @@ impl Error {
 
     pub(crate) fn syntax_error(message: String, span: Span) -> Self {
         Error {
-            kind: SyntaxError(message, Span::empty()),
+            kind: SyntaxError(message),
             span,
             diagnostic: None,
         }
@@ -86,8 +86,8 @@ impl Error {
 pub enum ErrorKind {
     EndOfStream,
     LexerError(LexerError),
-    SyntaxError(String, Span),
-    UnexpectedToken(fajt_lexer::token::Token),
+    SyntaxError(String),
+    UnexpectedToken(Token),
     UnexpectedIdent(Ident),
     ForbiddenIdentifier(String),
 }
@@ -112,7 +112,7 @@ impl fmt::Display for Error {
         match &self.kind {
             ErrorKind::EndOfStream => write!(f, "Syntax error: Unexpected end of input")?,
             ErrorKind::LexerError(e) => write!(f, "Lexer error '{}'", e)?,
-            ErrorKind::SyntaxError(msg, _) => write!(f, "Syntax error: {}", msg)?,
+            ErrorKind::SyntaxError(msg) => write!(f, "Syntax error: {}", msg)?,
             ErrorKind::UnexpectedToken(token) => write!(
                 f,
                 "Syntax error: Unexpected token `{}`",
