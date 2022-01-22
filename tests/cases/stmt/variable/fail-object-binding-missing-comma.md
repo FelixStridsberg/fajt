@@ -3,15 +3,11 @@
 var { a b } = c;
 ```
 
-### Output: ast
-```json
-{
-  "UnexpectedToken": {
-    "value": {
-      "Identifier": "b"
-    },
-    "first_on_line": false,
-    "span": "8:9"
-  }
-}
+### Output: error
+```txt
+Syntax error: Unexpected token `b`
+ --> test.js:1:9
+  |
+1 | var { a b } = c;
+  |         ^ Unexpected token, found `b`, expected `,`
 ```

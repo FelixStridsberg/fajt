@@ -197,7 +197,10 @@ where
                 return Err(Error::unexpected_token(self.consume()?));
             }
             Ok(token) if token.first_on_line => {
-                return Err(Error::syntax_error("Illegal newline after throw".to_owned(), throw.span));
+                return Err(Error::syntax_error(
+                    "Illegal newline after throw".to_owned(),
+                    throw.span,
+                ));
             }
             _ => {}
         }

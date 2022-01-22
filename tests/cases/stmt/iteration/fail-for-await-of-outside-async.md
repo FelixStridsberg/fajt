@@ -5,15 +5,11 @@ function fn() {
 }
 ```
 
-### Output: ast
-```json
-{
-  "UnexpectedToken": {
-    "value": {
-      "Keyword": "Await"
-    },
-    "first_on_line": false,
-    "span": "22:27"
-  }
-}
+### Output: error
+```txt
+Syntax error: Unexpected token `await`
+ --> test.js:2:7
+  |
+2 |   for await (a of b) ;
+  |       ^^^^^ Unexpected token, found `await`, expected `(`
 ```

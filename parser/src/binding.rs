@@ -1,9 +1,9 @@
-use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
+use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
-use crate::{Parser, ThenTry};
+use crate::{Error, Parser, ThenTry};
 use fajt_ast::{
     ArrayBinding, BindingElement, BindingPattern, Ident, NamedBinding, ObjectBinding,
-    ObjectBindingProp, SingleNameBinding,
+    ObjectBindingProp, SingleNameBinding, Span,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::token::Punct::{BraceClose, BracketClose};
@@ -40,7 +40,6 @@ where
                     break;
                 }
                 token_matches!(punct!("...")) => {
-                    self.consume()?;
                     rest = self.parse_rest_binding_ident(BracketClose)?;
                     break;
                 }
@@ -49,11 +48,10 @@ where
 
                     self.consume_object_delimiter()?;
                 }
-                _ if self.is_identifier() => {
+                _ => {
                     props.push(ObjectBindingProp::Single(self.parse_single_name_binding()?));
                     self.consume_object_delimiter()?;
                 }
-                _ => return err!(UnexpectedToken(self.consume()?)),
             }
         }
 
@@ -113,7 +111,6 @@ where
                     elements.push(None);
                 }
                 token_matches!(punct!("...")) => {
-                    self.consume()?;
                     rest = self.parse_rest_binding_ident(BraceClose)?;
                     break;
                 }
@@ -167,6 +164,8 @@ where
     /// Parses the `BindingIdentifier` production.
     /// This also consumes the expected end punctuator.
     fn parse_rest_binding_ident(&mut self, expected_end: Punct) -> Result<Option<Ident>> {
+        let dots = self.consume_assert(&punct!("..."))?;
+
         let ident = self.parse_identifier()?;
         let end_token = self.consume()?;
 
@@ -176,9 +175,10 @@ where
             }
         }
 
-        err!(SyntaxError(
+        let span = Span::new(dots.span.start, ident.span.end);
+        Err(Error::syntax_error(
             "Rest element must be last element".to_owned(),
-            ident.span,
+            span,
         ))
     }
 }
