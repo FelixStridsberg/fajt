@@ -53,7 +53,7 @@ impl Error {
     pub(crate) fn unexpected_token(token: Token) -> Self {
         let span = token.span.clone();
         Error {
-            kind: UnexpectedToken(token, None),
+            kind: UnexpectedToken(token.value, None),
             span,
             diagnostic: None,
         }
@@ -62,7 +62,7 @@ impl Error {
     pub(crate) fn expected_other_token(token: Token, expected: &'static TokenValue) -> Self {
         let span = token.span.clone();
         Error {
-            kind: UnexpectedToken(token, Some(expected)),
+            kind: UnexpectedToken(token.value, Some(expected)),
             span,
             diagnostic: None,
         }
@@ -95,7 +95,7 @@ pub enum ErrorKind {
     EndOfStream,
     LexerError(LexerError),
     SyntaxError(String),
-    UnexpectedToken(Token, Option<&'static TokenValue>),
+    UnexpectedToken(TokenValue, Option<&'static TokenValue>),
     UnexpectedIdent(Ident),
     ForbiddenIdentifier(String),
 }
@@ -110,9 +110,9 @@ impl ErrorKind {
                 )
             }
             UnexpectedToken(_, None) => "Unexpected token".to_string(),
-            UnexpectedToken(token, Some(expected)) => format!(
+            UnexpectedToken(value, Some(expected)) => format!(
                 "Unexpected token, found `{}`, expected `{}`",
-                token.value.to_string(),
+                value.to_string(),
                 expected.to_string()
             ),
             _ => return None,
@@ -126,11 +126,9 @@ impl fmt::Display for Error {
             ErrorKind::EndOfStream => write!(f, "Syntax error: Unexpected end of input")?,
             ErrorKind::LexerError(e) => write!(f, "Lexer error '{}'", e)?,
             ErrorKind::SyntaxError(msg) => write!(f, "Syntax error: {}", msg)?,
-            ErrorKind::UnexpectedToken(token, _) => write!(
-                f,
-                "Syntax error: Unexpected token `{}`",
-                token.value.to_string()
-            )?,
+            ErrorKind::UnexpectedToken(value, _) => {
+                write!(f, "Syntax error: Unexpected token `{}`", value.to_string())?
+            }
             ErrorKind::UnexpectedIdent(ident) => {
                 write!(f, "Syntax Error: Unexpected identifier `{}`", ident.name)?
             }
