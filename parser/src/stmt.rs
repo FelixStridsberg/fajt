@@ -190,17 +190,14 @@ where
     /// Parses the `ThrowStatement` production.
     fn parse_throw_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        self.consume_assert(&keyword!("throw"))?;
+        let throw = self.consume_assert(&keyword!("throw"))?;
 
         match self.current() {
             token_matches!(ok: punct!(";")) | Err(_) => {
-                return err!(UnexpectedToken(self.consume()?))
+                return Err(Error::unexpected_token(self.consume()?));
             }
             Ok(token) if token.first_on_line => {
-                return err!(SyntaxError(
-                    "Unexpected newline after throw.".to_owned(),
-                    self.current()?.span.clone()
-                ))
+                return Err(Error::syntax_error("Illegal newline after throw".to_owned(), throw.span));
             }
             _ => {}
         }

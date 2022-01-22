@@ -4,12 +4,11 @@ throw
 a
 ```
 
-### Output: ast
-```json
-{
-  "SyntaxError": [
-    "Unexpected newline after throw.",
-    "6:7"
-  ]
-}
+### Output: error
+```txt
+Syntax error: Illegal newline after throw
+ --> test.js:1:1
+  |
+1 | throw
+  | ^^^^^ 
 ```
