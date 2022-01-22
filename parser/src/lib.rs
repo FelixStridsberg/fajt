@@ -343,7 +343,7 @@ where
                 let str = k.into_identifier_string(self.context.keyword_context())?;
                 Ident::new(str, token.span)
             }
-            _ => return err!(UnexpectedToken(token)),
+            _ => return Err(self.expected_identifier_error(token)),
         })
     }
 
@@ -416,16 +416,28 @@ where
 
     fn consume_list_delimiter(&mut self, list_end: &TokenValue) -> Result<()> {
         if !self.maybe_consume(&punct!(","))? && !self.current_matches(list_end) {
-            return self.unexpected_token_error(&punct!(","));
+            let token = self.consume()?;
+            return Err(self.unexpected_token_error(token, &punct!(",")));
         }
 
         Ok(())
     }
 
-    fn unexpected_token_error(&mut self, expected: &TokenValue) -> Result<()> {
-        let token = self.consume()?;
+    fn expected_identifier_error(&mut self, token: Token) -> Error {
+        let diagnostic = Diagnostic {
+            span: token.span.clone(),
+            label: format!(
+                "Unexpected token, found `{}`, expected identifier",
+                token.value.to_string(),
+            ),
+        };
 
-        // TODO token value to string.
+        let mut error = Error::of(UnexpectedToken(token));
+        error.diagnostic = Some(diagnostic);
+        error
+    }
+
+    fn unexpected_token_error(&mut self, token: Token, expected: &TokenValue) -> Error {
         let diagnostic = Diagnostic {
             span: token.span.clone(),
             label: format!(
@@ -437,8 +449,7 @@ where
 
         let mut error = Error::of(UnexpectedToken(token));
         error.diagnostic = Some(diagnostic);
-
-        Err(error)
+        error
     }
 }
 

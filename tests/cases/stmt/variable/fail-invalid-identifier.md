@@ -3,15 +3,11 @@
 var * = c;
 ```
 
-### Output: ast
-```json
-{
-  "UnexpectedToken": {
-    "value": {
-      "Punct": "Star"
-    },
-    "first_on_line": false,
-    "span": "4:5"
-  }
-}
+### Output: error
+```txt
+Syntax error: Unexpected token `*`
+ --> test.js:1:4
+  |
+1 | var * = c;
+  |     ^ Unexpected token, found `*`, expected identifier
 ```

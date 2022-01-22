@@ -21,8 +21,7 @@ where
         Ok(match self.current()? {
             token_matches!(punct!("{")) => self.parse_object_binding_pattern()?,
             token_matches!(punct!("[")) => self.parse_array_binding_pattern()?,
-            _ if self.is_identifier() => BindingPattern::Ident(self.parse_identifier()?),
-            _ => return err!(UnexpectedToken(self.consume()?)),
+            _ => BindingPattern::Ident(self.parse_identifier()?),
         })
     }
 
