@@ -95,6 +95,7 @@ impl ErrorKind {
                     keyword
                 )
             }
+            UnexpectedToken(_) => "Unexpected token".to_string(),
             _ => return None,
         })
     }

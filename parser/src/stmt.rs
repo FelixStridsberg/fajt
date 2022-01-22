@@ -1,6 +1,6 @@
 use crate::error::ErrorKind::{SyntaxError, UnexpectedToken};
 use crate::error::Result;
-use crate::{ContextModify, Parser, ThenTry};
+use crate::{ContextModify, Error, Parser, ThenTry};
 use fajt_ast::{
     CatchClause, SourceType, Stmt, StmtBlock, StmtBreak, StmtContinue, StmtDebugger, StmtEmpty,
     StmtExpr, StmtIf, StmtLabeled, StmtReturn, StmtSwitch, StmtThrow, StmtTry, StmtWith,
@@ -394,7 +394,7 @@ where
     /// auto inserted.
     pub(super) fn consume_optional_semicolon(&mut self) -> Result<()> {
         if !self.maybe_consume(&punct!(";"))? && !self.valid_auto_semicolon()? {
-            err!(UnexpectedToken(self.consume()?))
+            Err(Error::unexpected_token(self.consume()?))
         } else {
             Ok(())
         }
