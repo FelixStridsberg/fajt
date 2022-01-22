@@ -432,7 +432,7 @@ where
             ),
         };
 
-        let mut error = Error::of(UnexpectedToken(token));
+        let mut error = Error::unexpected_token(token);
         error.diagnostic = Some(diagnostic);
         error
     }
@@ -447,7 +447,7 @@ where
             ),
         };
 
-        let mut error = Error::of(UnexpectedToken(token));
+        let mut error = Error::unexpected_token(token);
         error.diagnostic = Some(diagnostic);
         error
     }

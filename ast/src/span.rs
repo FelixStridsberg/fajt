@@ -9,6 +9,10 @@ pub struct Span {
 }
 
 impl Span {
+    pub fn empty() -> Self {
+        Self::new(0, 0)
+    }
+
     pub fn new(start: usize, end: usize) -> Self {
         Self { start, end }
     }
