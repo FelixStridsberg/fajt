@@ -115,12 +115,12 @@ impl ErrorKind {
             UnexpectedToken(_, None) => "Unexpected token".to_string(),
             UnexpectedToken(token, Some(expected)) => format!(
                 "Unexpected token, found `{}`, expected `{}`",
-                token.to_string(),
-                expected.to_string()
+                token_value_to_string(token), // TODO
+                token_value_to_string(expected),
             ),
             ExpectedIdentifier(token) => format!(
                 "Unexpected token, found `{}`, expected identifier",
-                token.to_string(),
+                token_value_to_string(token),
             ),
             _ => return None,
         })
@@ -133,9 +133,11 @@ impl fmt::Display for Error {
             ErrorKind::EndOfStream => write!(f, "Syntax error: Unexpected end of input")?,
             ErrorKind::LexerError(e) => write!(f, "Lexer error '{}'", e)?,
             ErrorKind::SyntaxError(msg) => write!(f, "Syntax error: {}", msg)?,
-            ErrorKind::ExpectedIdentifier(token) | ErrorKind::UnexpectedToken(token, _) => {
-                write!(f, "Syntax error: Unexpected token `{}`", token.to_string())?
-            }
+            ErrorKind::ExpectedIdentifier(token) | ErrorKind::UnexpectedToken(token, _) => write!(
+                f,
+                "Syntax error: Unexpected token `{}`",
+                token_value_to_string(token)
+            )?,
             ErrorKind::UnexpectedIdent(ident) => {
                 write!(f, "Syntax Error: Unexpected identifier `{}`", ident.name)?
             }
@@ -163,5 +165,15 @@ impl From<CommonError<LexerError>> for Error {
             CommonError::EndOfStream(pos) => Error::end_of_stream(pos),
             CommonError::ReaderError(lexer_error) => lexer_error.into(),
         }
+    }
+}
+
+// TODO this can only be relied on for known values, etc. expected values
+fn token_value_to_string(token: &TokenValue) -> String {
+    match token {
+        TokenValue::Keyword(keyword) => keyword.to_string(),
+        TokenValue::Identifier(ident) => ident.to_string(),
+        TokenValue::Punct(punct) => punct.to_string(),
+        _ => unreachable!(),
     }
 }

@@ -339,17 +339,6 @@ pub enum TokenValue {
     TemplateTail(String),
 }
 
-impl ToString for TokenValue {
-    fn to_string(&self) -> String {
-        match self {
-            TokenValue::Keyword(keyword) => keyword.to_string(),
-            TokenValue::Identifier(ident) => ident.to_string(),
-            TokenValue::Punct(punct) => punct.to_string(),
-            _ => todo!(),
-        }
-    }
-}
-
 #[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
 pub struct Token {
     pub value: TokenValue,
