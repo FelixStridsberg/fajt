@@ -1,5 +1,5 @@
 use crate::token::Keyword;
-use crate::{EndOfFile, InvalidOrUnexpectedToken, Token};
+use crate::{EndOfStream, InvalidOrUnexpectedToken, Token};
 use fajt_ast::Span;
 use fajt_common::io::Error as CommonError;
 use serde::{Deserialize, Serialize};
@@ -12,11 +12,19 @@ pub struct Error {
     kind: ErrorKind,
 }
 
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[non_exhaustive]
+pub enum ErrorKind {
+    InvalidOrUnexpectedToken(Token),
+    ForbiddenIdentifier(Keyword),
+    EndOfStream,
+}
+
 impl Error {
-    pub fn unexpected_end_of_file(pos: usize) -> Self {
+    pub fn unexpected_end_of_stream(pos: usize) -> Self {
         Error {
             span: Span::new(pos, pos),
-            kind: EndOfFile,
+            kind: EndOfStream,
         }
     }
 
@@ -32,18 +40,10 @@ impl Error {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-#[non_exhaustive]
-pub enum ErrorKind {
-    InvalidOrUnexpectedToken(Token),
-    ForbiddenIdentifier(Keyword),
-    EndOfFile,
-}
-
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match &self.kind {
-            ErrorKind::EndOfFile => write!(f, "End of file reached."),
+            ErrorKind::EndOfStream => write!(f, "Unexpected end of stream"),
             ErrorKind::InvalidOrUnexpectedToken(t) => {
                 write!(f, "Invalid or unexpected token {:?}", t)
             }
@@ -63,7 +63,7 @@ impl error::Error for Error {}
 impl From<CommonError<()>> for Error {
     fn from(error: CommonError<()>) -> Self {
         match error {
-            CommonError::EndOfStream(pos) => Error::unexpected_end_of_file(pos),
+            CommonError::EndOfStream(pos) => Error::unexpected_end_of_stream(pos),
             CommonError::ReaderError(_) => unreachable!(),
         }
     }

@@ -11,7 +11,7 @@ pub mod token;
 
 use crate::code_point::CodePoint;
 use crate::error::Error;
-use crate::error::ErrorKind::{EndOfFile, InvalidOrUnexpectedToken};
+use crate::error::ErrorKind::{EndOfStream, InvalidOrUnexpectedToken};
 use crate::token::Token;
 use crate::token::TokenValue;
 use fajt_ast::Base::{Binary, Hex, Octal};
@@ -88,7 +88,7 @@ impl<'a> Lexer<'a> {
             match self.read() {
                 Ok(token) => tokens.push(token),
                 Err(e) => {
-                    if *e.kind() != EndOfFile {
+                    if *e.kind() != EndOfStream {
                         return Err(e);
                     }
                     break;
@@ -541,7 +541,7 @@ impl PeekRead<Token> for Lexer<'_> {
         match self.read() {
             Ok(t) => Ok(Some((t.span.end, t))),
             Err(e) => {
-                if *e.kind() == EndOfFile {
+                if *e.kind() == EndOfStream {
                     return Ok(None);
                 }
                 Err(e)
