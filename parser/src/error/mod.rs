@@ -65,7 +65,11 @@ impl fmt::Display for Error {
             ErrorKind::EndOfStream => write!(f, "End of file reached.")?,
             ErrorKind::LexerError(e) => write!(f, "Lexer error '{}'", e)?,
             ErrorKind::SyntaxError(msg, span) => write!(f, "{}:{:?}", msg, span)?,
-            ErrorKind::UnexpectedToken(_) => write!(f, "Syntax error: Unexpected token")?,
+            ErrorKind::UnexpectedToken(token) => write!(
+                f,
+                "Syntax error: Unexpected token `{}`",
+                token.value.to_string()
+            )?,
             ErrorKind::UnexpectedIdent(i) => write!(f, "Unexpected identifier: {:?}", i)?,
         }
 
