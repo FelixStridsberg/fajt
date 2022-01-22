@@ -1,6 +1,5 @@
-use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
-use crate::{ContextModify, Parser, ThenTry};
+use crate::{ContextModify, Error, Parser, ThenTry};
 use fajt_ast::{
     ForInit, Stmt, StmtDoWhile, StmtFor, StmtForIn, StmtForOf, StmtVariable, StmtWhile,
     VariableKind,
@@ -78,7 +77,7 @@ where
             token_matches!(ok: keyword!("in")) if init.is_some() => {
                 self.parse_for_in(span_start, init.unwrap())
             }
-            _ => return err!(UnexpectedToken(self.consume()?)),
+            _ => Err(Error::unexpected_token(self.consume()?)),
         }
     }
 
@@ -130,7 +129,7 @@ where
 
         let init = self.parse_for_first_argument()?;
         if init.is_none() {
-            return err!(UnexpectedToken(self.consume()?));
+            return Err(Error::unexpected_token(self.consume()?));
         }
 
         self.parse_for_of(span_start, init.unwrap(), true)

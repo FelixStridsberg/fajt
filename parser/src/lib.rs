@@ -376,7 +376,7 @@ where
                     TokenValue::Literal(Literal::Number(number)) => {
                         Ok(PropertyName::Number(number))
                     }
-                    _ => err!(UnexpectedToken(token)),
+                    _ => Err(Error::unexpected_token(token)),
                 }
             }
             token_matches!(punct!("[")) => {
@@ -386,7 +386,7 @@ where
                 Ok(PropertyName::Computed(expr))
             }
             _ if self.is_identifier() => Ok(PropertyName::Ident(self.parse_identifier()?)),
-            _ => err!(UnexpectedToken(self.consume()?)),
+            _ => Err(Error::unexpected_token(self.consume()?)),
         }
     }
 

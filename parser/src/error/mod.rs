@@ -10,17 +10,6 @@ use std::{error, fmt};
 
 pub mod emitter;
 
-#[deprecated]
-#[macro_export]
-macro_rules! err {
-    ($error_kind:expr) => {{
-        Err($crate::error::Error::of(
-            $error_kind,
-            fajt_ast::Span::empty(),
-        ))
-    }};
-}
-
 pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug, PartialEq)]
@@ -37,14 +26,6 @@ pub struct Diagnostic {
 }
 
 impl Error {
-    pub(crate) fn of(kind: ErrorKind, span: Span) -> Self {
-        Error {
-            kind,
-            span,
-            diagnostic: None,
-        }
-    }
-
     pub(crate) fn lexer_error(error: LexerError, span: Span) -> Self {
         Error {
             kind: ErrorKind::LexerError(error),

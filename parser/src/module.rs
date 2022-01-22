@@ -1,6 +1,5 @@
-use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
-use crate::{ContextModify, Parser, ThenTry};
+use crate::{ContextModify, Error, Parser, ThenTry};
 use fajt_ast::{
     DeclExport, DeclImport, ExportDecl, ExportDefaultDecl, ExportDefaultExpr, ExportNamed,
     ExportNamespace, Ident, LitString, NamedExport, NamedImport, Stmt,
@@ -33,7 +32,7 @@ where
                 self.parse_declaration_export(span_start)
             }
             token_matches!(ok: keyword!("default")) => self.parse_default_export(span_start),
-            _ => err!(UnexpectedToken(self.consume()?)),
+            _ => Err(Error::unexpected_token(self.consume()?)),
         }
     }
 
@@ -136,7 +135,7 @@ where
                 match self.current() {
                     token_matches!(ok: punct!("*")) => (None, Some(self.parse_namespace_import()?)),
                     token_matches!(ok: punct!("{")) => (Some(self.parse_named_imports()?), None),
-                    _ => return err!(UnexpectedToken(self.consume()?)),
+                    _ => return Err(Error::unexpected_token(self.consume()?)),
                 }
             } else {
                 (None, None)

@@ -1,4 +1,3 @@
-use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 use crate::{Error, Parser, ThenTry};
 use fajt_ast::{
@@ -118,7 +117,7 @@ where
                     elements.push(Some(self.parse_binding_element()?));
                     self.consume_array_delimiter()?;
                 }
-                _ => return err!(UnexpectedToken(self.consume()?)),
+                _ => return Err(Error::unexpected_token(self.consume()?)),
             }
         }
 

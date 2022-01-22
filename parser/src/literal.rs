@@ -1,6 +1,5 @@
-use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
-use crate::Parser;
+use crate::{Error, Parser};
 use fajt_ast::{
     ArrayElement, Expr, ExprLiteral, LitArray, LitObject, LitTemplate, Literal, MethodKind,
     NamedProperty, PropertyDefinition, TemplatePart,
@@ -60,7 +59,7 @@ where
         let head_str = match head.value {
             TokenValue::Literal(Literal::Template(template)) => return Ok(template),
             TokenValue::TemplateHead(string) => string,
-            _ => return err!(UnexpectedToken(head)),
+            _ => return Err(Error::unexpected_token(head)),
         };
 
         let mut parts = vec![];
@@ -87,7 +86,7 @@ where
                     }
                     break;
                 }
-                _ => return err!(UnexpectedToken(token)),
+                _ => return Err(Error::unexpected_token(token)),
             }
         }
 
