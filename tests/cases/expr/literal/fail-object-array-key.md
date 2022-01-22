@@ -3,15 +3,11 @@
 { [a, b, c]: 'a' }
 ```
 
-### Output: ast
-```json
-{
-  "UnexpectedToken": {
-    "value": {
-      "Punct": "Comma"
-    },
-    "first_on_line": false,
-    "span": "4:5"
-  }
-}
+### Output: error
+```txt
+Syntax error: Unexpected token `,`
+ --> test.js:1:5
+  |
+1 | { [a, b, c]: 'a' }
+  |     ^ Unexpected token, found `,`, expected `]`
 ```

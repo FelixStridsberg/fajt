@@ -307,10 +307,10 @@ where
         }
     }
 
-    fn consume_assert(&mut self, value: &TokenValue) -> Result<Token> {
+    fn consume_assert(&mut self, expected: &TokenValue) -> Result<Token> {
         let token = self.consume()?;
-        if &token.value != value {
-            return err!(UnexpectedToken(token));
+        if &token.value != expected {
+            return Err(self.unexpected_token_error(token, expected));
         }
         Ok(token)
     }

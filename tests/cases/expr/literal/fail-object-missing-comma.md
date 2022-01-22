@@ -3,15 +3,11 @@
 { a b }
 ```
 
-### Output: ast
-```json
-{
-  "UnexpectedToken": {
-    "value": {
-      "Identifier": "b"
-    },
-    "first_on_line": false,
-    "span": "4:5"
-  }
-}
+### Output: error
+```txt
+Syntax error: Unexpected token `b`
+ --> test.js:1:5
+  |
+1 | { a b }
+  |     ^ Unexpected token, found `b`, expected `,`
 ```

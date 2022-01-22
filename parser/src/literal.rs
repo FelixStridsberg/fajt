@@ -192,11 +192,10 @@ where
                 Ok(PropertyDefinition::Method(method))
             }
             // TODO CoverInitializedName
-            _ if self.is_identifier() => {
+            _ => {
                 let ident = self.parse_identifier()?;
                 Ok(PropertyDefinition::IdentRef(ident))
             }
-            _ => return err!(UnexpectedToken(self.consume()?)),
         }
     }
 
