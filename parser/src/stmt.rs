@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::{ContextModify, Error, Parser, ThenTry};
+use crate::{Error, Parser, ThenTry};
 use fajt_ast::{
     CatchClause, SourceType, Stmt, StmtBlock, StmtBreak, StmtContinue, StmtDebugger, StmtEmpty,
     StmtExpr, StmtIf, StmtLabeled, StmtReturn, StmtSwitch, StmtThrow, StmtTry, StmtWith,
@@ -42,7 +42,7 @@ where
                 self.parse_async_function_declaration()?
             }
             token_matches!(keyword!("class")) => self
-                .with_context(ContextModify::new().set_strict(true))
+                .with_context(self.context.with_strict(true))
                 .parse_class_decl()?,
             token_matches!(keyword!("import")) => {
                 if self.source_type() == SourceType::Script {
@@ -70,7 +70,7 @@ where
                 self.parse_labeled_stmt()?
             }
             _ if self.is_expr_stmt()? => self
-                .with_context(ContextModify::new().set_in(true))
+                .with_context(self.context.with_in(true))
                 .parse_expr_stmt()?,
             t => unimplemented!("Invalid statement error handling {:?}", t),
         })
@@ -119,9 +119,7 @@ where
     /// Parses the `ExpressionStatement` production.
     fn parse_expr_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        let expr = self
-            .with_context(ContextModify::new().set_in(true))
-            .parse_expr()?;
+        let expr = self.with_context(self.context.with_in(true)).parse_expr()?;
 
         self.consume_optional_semicolon()?;
 

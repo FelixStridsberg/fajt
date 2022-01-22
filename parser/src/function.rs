@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::{ContextModify, Parser};
+use crate::Parser;
 use fajt_ast::{
     ArrowFunctionBody, BindingElement, Body, DeclFunction, Expr, ExprArrowFunction, ExprFunction,
     FormalParameters, Ident, Span, Stmt,
@@ -55,12 +55,12 @@ where
 
         let body = if self.current_matches(&punct!("{")) {
             ArrowFunctionBody::Body(
-                self.with_context(ContextModify::new().set_await(true))
+                self.with_context(self.context.with_await(true))
                     .parse_function_body()?,
             )
         } else {
             ArrowFunctionBody::Expr(
-                self.with_context(ContextModify::new().set_await(true))
+                self.with_context(self.context.with_await(true))
                     .parse_assignment_expr()?
                     .into(),
             )
@@ -101,7 +101,7 @@ where
         self.consume_assert(&keyword!("function"))?;
 
         let generator = self.maybe_consume(&punct!("*"))?;
-        self.with_context(ContextModify::new().set_yield(generator).set_await(false))
+        self.with_context(self.context.with_yield(generator).with_await(false))
             .parse_function_expr_content(span_start)
     }
 
@@ -114,7 +114,8 @@ where
         debug_assert!(!function_token.first_on_line);
 
         let generator = self.maybe_consume(&punct!("*"))?;
-        self.with_context(ContextModify::new().set_yield(generator).set_await(true))
+
+        self.with_context(self.context.with_yield(generator).with_await(true))
             .parse_function_expr_content(span_start)
     }
 
@@ -145,7 +146,7 @@ where
         let generator = self.maybe_consume(&punct!("*"))?;
         let ident = self.parse_function_identifier()?;
 
-        self.with_context(ContextModify::new().set_yield(generator).set_await(false))
+        self.with_context(self.context.with_yield(generator).with_await(false))
             .parse_function_decl_content(span_start, ident)
     }
 
@@ -160,7 +161,7 @@ where
         let generator = self.maybe_consume(&punct!("*"))?;
         let ident = self.parse_function_identifier()?;
 
-        self.with_context(ContextModify::new().set_yield(generator).set_await(true))
+        self.with_context(self.context.with_yield(generator).with_await(true))
             .parse_function_decl_content(span_start, ident)
     }
 
@@ -242,7 +243,7 @@ where
         let directives = self.parse_directive_prologue()?;
         let statements =
             if self.context.is_strict || directives.iter().any(|s| s.value == "use strict") {
-                self.with_context(ContextModify::default().set_strict(true))
+                self.with_context(self.context.with_strict(true))
                     .parse_function_body_stmt_list()?
             } else {
                 self.parse_function_body_stmt_list()?

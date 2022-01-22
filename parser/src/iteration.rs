@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::{ContextModify, Error, Parser, ThenTry};
+use crate::{Error, Parser, ThenTry};
 use fajt_ast::{
     ForInit, Stmt, StmtDoWhile, StmtFor, StmtForIn, StmtForOf, StmtVariable, StmtWhile,
     VariableKind,
@@ -106,9 +106,7 @@ where
 
         self.consume_assert(&keyword!("in"))?;
 
-        let right = self
-            .with_context(ContextModify::new().set_in(true))
-            .parse_expr()?;
+        let right = self.with_context(self.context.with_in(true)).parse_expr()?;
 
         self.consume_assert(&punct!(")"))?;
 
@@ -145,9 +143,7 @@ where
 
         self.consume_assert(&keyword!("of"))?;
 
-        let right = self
-            .with_context(ContextModify::new().set_in(true))
-            .parse_expr()?;
+        let right = self.with_context(self.context.with_in(true)).parse_expr()?;
 
         self.consume_assert(&punct!(")"))?;
 
@@ -175,7 +171,7 @@ where
         if let Some(kind) = variable_kind {
             self.consume()?; // var, let, const
             let declarations = self
-                .with_context(ContextModify::new().set_in(false))
+                .with_context(self.context.with_in(false))
                 .parse_variable_declarations()?;
 
             let span = self.span_from(span_start);
@@ -189,7 +185,7 @@ where
         Ok(match self.current()? {
             _ if self.current_matches(&punct!(";")) => None,
             _ => Some(ForInit::Expr(
-                self.with_context(ContextModify::new().set_in(false))
+                self.with_context(self.context.with_in(false))
                     .parse_expr()?,
             )),
         })

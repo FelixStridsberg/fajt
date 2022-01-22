@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::{ContextModify, Parser};
+use crate::Parser;
 use fajt_ast::{MethodDefinition, MethodKind, PropertyName};
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
@@ -33,7 +33,7 @@ where
         let span_start = self.position();
         self.consume()?;
         let name = self.parse_property_name()?;
-        self.with_context(ContextModify::new().set_yield(true).set_await(false))
+        self.with_context(self.context.with_yield(true).with_await(false))
             .parse_method(span_start, name, MethodKind::Method)
     }
 
@@ -50,7 +50,7 @@ where
 
         let generator = self.maybe_consume(&punct!("*"))?;
         let name = self.parse_property_name()?;
-        self.with_context(ContextModify::new().set_yield(generator).set_await(true))
+        self.with_context(self.context.with_yield(generator).with_await(true))
             .parse_method(span_start, name, MethodKind::Method)
     }
 

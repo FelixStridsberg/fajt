@@ -59,52 +59,6 @@ where
     Parser::parse::<T>(&mut reader, source_type)
 }
 
-#[derive(Default)]
-pub struct ContextModify {
-    is_await: Option<bool>,
-    is_yield: Option<bool>,
-    is_in: Option<bool>,
-    is_strict: Option<bool>,
-    is_default: Option<bool>,
-}
-
-impl ContextModify {
-    pub fn new() -> Self {
-        Self {
-            is_await: None,
-            is_yield: None,
-            is_in: None,
-            is_strict: None,
-            is_default: None,
-        }
-    }
-
-    pub fn set_yield(&mut self, value: bool) -> &mut Self {
-        self.is_yield = Some(value);
-        self
-    }
-
-    pub fn set_await(&mut self, value: bool) -> &mut Self {
-        self.is_await = Some(value);
-        self
-    }
-
-    pub fn set_in(&mut self, value: bool) -> &mut Self {
-        self.is_in = Some(value);
-        self
-    }
-
-    pub fn set_strict(&mut self, value: bool) -> &mut Self {
-        self.is_strict = Some(value);
-        self
-    }
-
-    pub fn set_default(&mut self, value: bool) -> &mut Self {
-        self.is_default = Some(value);
-        self
-    }
-}
-
 #[derive(Clone, Default)]
 pub struct Context {
     is_await: bool,
@@ -114,31 +68,23 @@ pub struct Context {
     is_default: bool,
 }
 
+macro_rules! modifier {
+    ($fn_name:ident:$field_name:ident) => {
+        pub fn $fn_name(&self, $field_name: bool) -> Self {
+            Context {
+                $field_name,
+                ..(*self)
+            }
+        }
+    };
+}
+
 impl Context {
-    pub fn modify(&mut self, modify: &ContextModify) -> Self {
-        let mut context = self.clone();
-        if let Some(is_await) = modify.is_await {
-            context.is_await = is_await;
-        }
-
-        if let Some(is_yield) = modify.is_yield {
-            context.is_yield = is_yield;
-        }
-
-        if let Some(is_in) = modify.is_in {
-            context.is_in = is_in;
-        }
-
-        if let Some(is_strict) = modify.is_strict {
-            context.is_strict = is_strict;
-        }
-
-        if let Some(is_default) = modify.is_default {
-            context.is_default = is_default;
-        }
-
-        context
-    }
+    modifier!(with_await: is_await);
+    modifier!(with_yield: is_yield);
+    modifier!(with_in: is_in);
+    modifier!(with_strict: is_strict);
+    modifier!(with_default: is_default);
 
     fn keyword_context(&self) -> KeywordContext {
         let mut keyword_context = KeywordContext::empty();
@@ -172,7 +118,7 @@ impl Parse for Expr {
         I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
     {
         parser
-            .with_context(ContextModify::new().set_in(true))
+            .with_context(Context::default().with_in(true))
             .parse_expr()
     }
 }
@@ -269,17 +215,9 @@ where
         Span::new(start, self.reader.position())
     }
 
-    pub fn with_context(&mut self, modify: &ContextModify) -> Parser<'_, I> {
+    pub fn with_context(&mut self, context: Context) -> Parser<'_, I> {
         Parser {
-            context: self.context.modify(modify),
-            reader: self.reader,
-            source_type: self.source_type.clone(),
-        }
-    }
-
-    pub fn with_default_context(&mut self) -> Parser<'_, I> {
-        Parser {
-            context: Context::default(),
+            context,
             reader: self.reader,
             source_type: self.source_type.clone(),
         }

@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::{ContextModify, Error, Parser, ThenTry};
+use crate::{Context, Error, Parser, ThenTry};
 use fajt_ast::update_op;
 use fajt_ast::{assignment_op, ExprParenthesized};
 use fajt_ast::{unary_op, ExprTaggedTemplate};
@@ -573,7 +573,7 @@ where
             token_matches!(punct!("{")) => self.parse_object_literal()?,
             token_matches!(keyword!("function")) => self.parse_function_expr()?,
             token_matches!(keyword!("class")) => self
-                .with_context(ContextModify::new().set_strict(true))
+                .with_context(self.context.with_strict(true))
                 .parse_class_expr()?,
             token_matches!(keyword!("async")) if !self.followed_by_new_lined() => {
                 self.parse_async_function_expr()?
@@ -592,7 +592,7 @@ where
                 // To avoid errors like "unexpected token `.`, expected identifier" as default
                 // errors, only parse the identifier if it may be a identifier in any context
                 // otherwise fall back to generic unexpected token.
-                if self.with_default_context().is_identifier() {
+                if self.with_context(Context::default()).is_identifier() {
                     self.parse_identifier_reference()?
                 } else {
                     return Err(Error::unexpected_token(self.consume()?));

@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::{ContextModify, Error, Parser, ThenTry};
+use crate::{Error, Parser, ThenTry};
 use fajt_ast::{
     DeclExport, DeclImport, ExportDecl, ExportDefaultDecl, ExportDefaultExpr, ExportNamed,
     ExportNamespace, Ident, LitString, NamedExport, NamedImport, Stmt,
@@ -40,10 +40,10 @@ where
         self.consume_assert(&keyword!("default"))?;
         match self.current()? {
             token_matches!(keyword!("class")) | token_matches!(keyword!("function")) => self
-                .with_context(ContextModify::new().set_default(true))
+                .with_context(self.context.with_default(true))
                 .parse_declaration_default_export(span_start),
             token_matches!(keyword!("async")) if self.peek_matches(&keyword!("function")) => self
-                .with_context(ContextModify::new().set_default(true))
+                .with_context(self.context.with_default(true))
                 .parse_declaration_default_export(span_start),
             _ => {
                 let expr = self.parse_assignment_expr()?;
