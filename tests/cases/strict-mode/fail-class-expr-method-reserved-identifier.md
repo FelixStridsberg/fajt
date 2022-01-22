@@ -9,15 +9,11 @@ var cls = class {
 }
 ```
 
-### Output: ast
-```json
-{
-  "UnexpectedToken": {
-    "value": {
-      "Keyword": "Implements"
-    },
-    "first_on_line": false,
-    "span": "40:50"
-  }
-}
+### Output: error
+```txt
+Syntax error: Forbidden identifier `implements`
+ --> test.js:3:8
+  |
+3 |     var implements = 1;
+  |         ^^^^^^^^^^ `implements` is not allowed as an identifier in this context
 ```

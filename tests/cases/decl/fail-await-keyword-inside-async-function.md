@@ -3,15 +3,11 @@
 async function fn() { var await = 1 }
 ```
 
-### Output: ast
-```json
-{
-  "UnexpectedToken": {
-    "value": {
-      "Keyword": "Await"
-    },
-    "first_on_line": false,
-    "span": "26:31"
-  }
-}
+### Output: error
+```txt
+Syntax error: Forbidden identifier `await`
+ --> test.js:1:26
+  |
+1 | async function fn() { var await = 1 }
+  |                           ^^^^^ `await` is not allowed as an identifier in this context
 ```

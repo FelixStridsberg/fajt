@@ -22,6 +22,7 @@ use std::rc::Rc;
 
 use fajt_ast::{Expr, Ident, LitString, Literal, Program, PropertyName, SourceType, Span, Stmt};
 use fajt_common::io::{PeekRead, PeekReader, ReReadWithState};
+use fajt_lexer::error::ErrorKind::ForbiddenIdentifier;
 use fajt_lexer::token::{KeywordContext, Token, TokenValue};
 use fajt_lexer::{punct, Lexer};
 use fajt_lexer::{token_matches, LexerState};
@@ -340,8 +341,16 @@ where
         Ok(match token.value {
             TokenValue::Identifier(s) => Ident::new(s, token.span),
             TokenValue::Keyword(k) => {
-                let str = k.into_identifier_string(self.context.keyword_context())?;
-                Ident::new(str, token.span)
+                match k.into_identifier_string(self.context.keyword_context()) {
+                    Ok(str) => Ident::new(str, token.span),
+                    Err(lexer_error) => {
+                        return if let ForbiddenIdentifier(keyword) = lexer_error.kind() {
+                            Err(Error::forbidden_identifier(keyword.to_string(), token.span))
+                        } else {
+                            Err(Error::lexer_error(lexer_error, token.span))
+                        }
+                    }
+                }
             }
             _ => return Err(self.expected_identifier_error(token)),
         })

@@ -6,15 +6,11 @@ function fn() {
 }
 ```
 
-### Output: ast
-```json
-{
-  "UnexpectedToken": {
-    "value": {
-      "Keyword": "Let"
-    },
-    "first_on_line": false,
-    "span": "38:41"
-  }
-}
+### Output: error
+```txt
+Syntax error: Forbidden identifier `let`
+ --> test.js:3:6
+  |
+3 |   var let = 1;
+  |       ^^^ `let` is not allowed as an identifier in this context
 ```

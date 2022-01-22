@@ -6,15 +6,11 @@ const fn = () => {
 }
 ```
 
-### Output: ast
-```json
-{
-  "UnexpectedToken": {
-    "value": {
-      "Keyword": "Static"
-    },
-    "first_on_line": false,
-    "span": "41:47"
-  }
-}
+### Output: error
+```txt
+Syntax error: Forbidden identifier `static`
+ --> test.js:3:6
+  |
+3 |   var static = 1;
+  |       ^^^^^^ `static` is not allowed as an identifier in this context
 ```

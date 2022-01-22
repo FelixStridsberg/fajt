@@ -1,12 +1,12 @@
+use crate::error::ErrorKind::ForbiddenIdentifier;
+use crate::UnexpectedToken;
 use fajt_ast::{Ident, Span};
 use fajt_common::io::Error as CommonError;
 use fajt_lexer::error::Error as LexerError;
+use fajt_lexer::token::Token;
 use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
 use std::{error, fmt};
-use fajt_lexer::token::Token;
-use fajt_lexer::token_matches;
-use crate::UnexpectedToken;
 
 pub mod emitter;
 
@@ -14,7 +14,10 @@ pub mod emitter;
 #[macro_export]
 macro_rules! err {
     ($error_kind:expr) => {{
-        Err($crate::error::Error::of($error_kind, fajt_ast::Span::empty()))
+        Err($crate::error::Error::of(
+            $error_kind,
+            fajt_ast::Span::empty(),
+        ))
     }};
 }
 
@@ -42,6 +45,14 @@ impl Error {
         }
     }
 
+    pub(crate) fn lexer_error(error: LexerError, span: Span) -> Self {
+        Error {
+            kind: ErrorKind::LexerError(error),
+            span,
+            diagnostic: None,
+        }
+    }
+
     pub(crate) fn unexpected_token(token: Token) -> Self {
         let span = token.span.clone();
         Error {
@@ -51,16 +62,16 @@ impl Error {
         }
     }
 
-    pub fn kind(&self) -> &ErrorKind {
-        &self.kind
+    pub(crate) fn forbidden_identifier(identifier: String, span: Span) -> Self {
+        Error {
+            kind: ForbiddenIdentifier(identifier),
+            span,
+            diagnostic: None,
+        }
     }
 
-    pub fn get_span(&self) -> &Span {
-        match &self.kind {
-            ErrorKind::UnexpectedToken(t) => &t.span,
-            ErrorKind::UnexpectedIdent(t) => &t.span,
-            _ => todo!("Move span to error struct"),
-        }
+    pub fn kind(&self) -> &ErrorKind {
+        &self.kind
     }
 }
 
@@ -72,6 +83,21 @@ pub enum ErrorKind {
     SyntaxError(String, Span),
     UnexpectedToken(fajt_lexer::token::Token),
     UnexpectedIdent(Ident),
+    ForbiddenIdentifier(String),
+}
+
+impl ErrorKind {
+    fn get_description(&self) -> Option<String> {
+        Some(match self {
+            ForbiddenIdentifier(keyword) => {
+                format!(
+                    "`{}` is not allowed as an identifier in this context",
+                    keyword
+                )
+            }
+            _ => return None,
+        })
+    }
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
@@ -92,6 +118,9 @@ impl fmt::Display for Error {
                 token.value.to_string()
             )?,
             ErrorKind::UnexpectedIdent(i) => write!(f, "Unexpected identifier: {:?}", i)?,
+            ErrorKind::ForbiddenIdentifier(identifier) => {
+                write!(f, "Syntax error: Forbidden identifier `{}`", identifier)?
+            }
         }
 
         Ok(())
