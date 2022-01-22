@@ -1,5 +1,6 @@
 use crate::token::Keyword;
-use crate::Token;
+use crate::{InvalidOrUnexpectedToken, Token};
+use fajt_ast::Span;
 use fajt_common::io::Error as CommonError;
 use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
@@ -7,12 +8,24 @@ use std::{error, fmt};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Error {
+    span: Span,
     kind: ErrorKind,
 }
 
 impl Error {
+    #[deprecated]
     pub fn of(kind: ErrorKind) -> Self {
-        Error { kind }
+        Error {
+            kind,
+            span: Span::empty(),
+        }
+    }
+
+    pub fn invalid_or_unexpected_token(token: Token) -> Self {
+        Error {
+            span: token.span.clone(),
+            kind: InvalidOrUnexpectedToken(token),
+        }
     }
 
     pub fn kind(&self) -> &ErrorKind {

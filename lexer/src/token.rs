@@ -1,4 +1,3 @@
-use crate::error::{Error, ErrorKind};
 use fajt_ast::{Literal, Span};
 use fajt_macros::FromString;
 use serde::{Deserialize, Serialize};
@@ -126,18 +125,8 @@ pub enum Keyword {
 }
 
 impl Keyword {
-    /// Tries to turn a keyword into an identifier string.
-    /// Succeeds only if that keyword is not reserved in the provided context.
-    pub fn into_identifier_string(self, ctx: KeywordContext) -> Result<String, Error> {
-        if self.is_allows_as_identifier(ctx) {
-            Ok(self.to_string())
-        } else {
-            Err(Error::of(ErrorKind::ForbiddenIdentifier(self)))
-        }
-    }
-
     /// True if the keyword is allowed to be an identifier in the context provided.
-    pub fn is_allows_as_identifier(&self, ctx: KeywordContext) -> bool {
+    pub fn is_allowed_as_identifier(&self, ctx: KeywordContext) -> bool {
         match self {
             Self::As
             | Self::Async
@@ -380,41 +369,21 @@ impl Token {
 
 #[cfg(test)]
 mod tests {
-    use crate::error::{Error, ErrorKind};
     use crate::token::{Keyword, KeywordContext};
 
     #[test]
     fn keyword_into_identifier() {
-        let identifier = Keyword::Async
-            .into_identifier_string(KeywordContext::empty())
-            .unwrap();
-        assert_eq!(identifier, "async");
+        assert!(Keyword::Async.is_allowed_as_identifier(KeywordContext::empty()));
     }
 
     #[test]
     fn keyword_into_identifier_context() {
-        let identifier = Keyword::Yield
-            .into_identifier_string(KeywordContext::empty())
-            .unwrap();
-        assert_eq!(identifier, "yield");
-
-        let error = Keyword::Yield
-            .into_identifier_string(KeywordContext::YIELD)
-            .unwrap_err();
-        assert_eq!(
-            error,
-            Error::of(ErrorKind::ForbiddenIdentifier(Keyword::Yield))
-        );
+        assert!(Keyword::Yield.is_allowed_as_identifier(KeywordContext::empty()));
+        assert!(!Keyword::Yield.is_allowed_as_identifier(KeywordContext::YIELD));
     }
 
     #[test]
     fn reserved_word_into_identifier() {
-        let error = Keyword::Function
-            .into_identifier_string(KeywordContext::empty())
-            .unwrap_err();
-        assert_eq!(
-            error,
-            Error::of(ErrorKind::ForbiddenIdentifier(Keyword::Function))
-        );
+        assert!(!Keyword::Function.is_allowed_as_identifier(KeywordContext::empty()));
     }
 }

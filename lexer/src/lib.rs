@@ -202,7 +202,7 @@ impl<'a> Lexer<'a> {
                     } else {
                         let end = self.reader.position();
                         let error_token = Token::new(punct!("."), new_line, (start, end));
-                        return Err(Error::of(InvalidOrUnexpectedToken(error_token)));
+                        return Err(Error::invalid_or_unexpected_token(error_token));
                     }
                 } else {
                     produce!(self, 1, punct!("."))

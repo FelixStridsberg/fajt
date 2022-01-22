@@ -348,16 +348,11 @@ where
         let token = self.consume()?;
         Ok(match token.value {
             TokenValue::Identifier(s) => Ident::new(s, token.span),
-            TokenValue::Keyword(k) => {
-                match k.into_identifier_string(self.context.keyword_context()) {
-                    Ok(str) => Ident::new(str, token.span),
-                    Err(lexer_error) => {
-                        return if let ForbiddenIdentifier(keyword) = lexer_error.kind() {
-                            Err(Error::forbidden_identifier(keyword.to_string(), token.span))
-                        } else {
-                            Err(Error::lexer_error(lexer_error, token.span))
-                        }
-                    }
+            TokenValue::Keyword(keyword) => {
+                if keyword.is_allowed_as_identifier(self.context.keyword_context()) {
+                    Ident::new(keyword.to_string(), token.span)
+                } else {
+                    return Err(Error::forbidden_identifier(keyword.to_string(), token.span));
                 }
             }
             _ => return Err(self.expected_identifier_error(token)),
@@ -479,7 +474,7 @@ fn is_identifier(token: Option<&Token>, keyword_context: KeywordContext) -> bool
         Some(Token {
             value: TokenValue::Keyword(keyword),
             ..
-        }) => keyword.is_allows_as_identifier(keyword_context),
+        }) => keyword.is_allowed_as_identifier(keyword_context),
         _ => false,
     }
 }
