@@ -7,15 +7,11 @@ class cls {
 }
 ```
 
-### Output: ast
-```json
-{
-  "UnexpectedToken": {
-    "value": {
-      "Keyword": "Yield"
-    },
-    "first_on_line": true,
-    "span": "30:35"
-  }
-}
+### Output: error
+```txt
+Syntax error: Forbidden identifier `yield`
+ --> test.js:3:5
+  |
+3 |     yield
+  |     ^^^^^ `yield` is not allowed as an identifier in this context
 ```
