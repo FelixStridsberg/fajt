@@ -3,12 +3,11 @@
 super;
 ```
 
-### Output: ast
-```json
-{
-  "SyntaxError": [
-    "'super' keyword not expected here",
-    "0:5"
-  ]
-}
+### Output: error
+```txt
+Syntax error: `super` keyword not expected here
+ --> test.js:1:1
+  |
+1 | super;
+  | ^^^^^ 
 ```

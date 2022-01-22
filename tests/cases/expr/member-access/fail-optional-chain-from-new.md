@@ -6,12 +6,11 @@ because only nested `new` are `NewExpression`, non nested `new` are `MemberExpre
 new new a()?.b
 ```
 
-### Output: ast
-```json
-{
-  "SyntaxError": [
-    "Invalid optional chain from new expression",
-    "11:13"
-  ]
-}
+### Output: error
+```txt
+Syntax error: Unexpected token `?.`
+ --> test.js:1:12
+  |
+1 | new new a()?.b
+  |            ^^ Unexpected token
 ```

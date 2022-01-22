@@ -67,8 +67,8 @@ impl<'a, 'b, 'c, W: Write> ErrorEmitter<'a, 'b, 'c, W> {
         writeln!(
             self.out,
             "{:<pad$}| {:<err_offset$}{:^<err_mark$} {}",
-            " ",
-            " ",
+            "",
+            "",
             "^",
             label,
             pad = padding,

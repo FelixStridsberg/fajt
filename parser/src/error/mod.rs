@@ -1,4 +1,4 @@
-use crate::error::ErrorKind::{ForbiddenIdentifier, UnexpectedIdent};
+use crate::error::ErrorKind::{ForbiddenIdentifier, SyntaxError, UnexpectedIdent};
 use crate::UnexpectedToken;
 use fajt_ast::{Ident, Span};
 use fajt_common::io::Error as CommonError;
@@ -48,6 +48,14 @@ impl Error {
     pub(crate) fn lexer_error(error: LexerError, span: Span) -> Self {
         Error {
             kind: ErrorKind::LexerError(error),
+            span,
+            diagnostic: None,
+        }
+    }
+
+    pub(crate) fn syntax_error(message: String, span: Span) -> Self {
+        Error {
+            kind: SyntaxError(message, Span::empty()),
             span,
             diagnostic: None,
         }
@@ -110,18 +118,12 @@ impl ErrorKind {
     }
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-#[non_exhaustive]
-pub struct SyntaxError {
-    span: Span,
-}
-
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match &self.kind {
             ErrorKind::EndOfStream => write!(f, "End of file reached.")?,
             ErrorKind::LexerError(e) => write!(f, "Lexer error '{}'", e)?,
-            ErrorKind::SyntaxError(msg, span) => write!(f, "{}:{:?}", msg, span)?,
+            ErrorKind::SyntaxError(msg, _) => write!(f, "Syntax error: {}", msg)?,
             ErrorKind::UnexpectedToken(token) => write!(
                 f,
                 "Syntax error: Unexpected token `{}`",

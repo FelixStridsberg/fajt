@@ -316,10 +316,7 @@ where
             // The NewExpression production handles nested news and is not included in the
             // OptionalExpression production as a base for the chain.
             if expr.is_nested_new() {
-                return err!(SyntaxError(
-                    "Invalid optional chain from new expression".to_owned(),
-                    self.current().unwrap().span.clone()
-                ));
+                return Err(Error::unexpected_token(self.consume()?));
             }
 
             self.parse_optional_expr(span_start, expr)
@@ -461,9 +458,9 @@ where
 
                 if !token_matches!(self.current(), ok: punct!(".") | punct!("[")) {
                     let span = self.span_from(span_start);
-                    return err!(SyntaxError(
-                        "'super' keyword not expected here".to_string(),
-                        span
+                    return Err(Error::syntax_error(
+                        "`super` keyword not expected here".to_string(),
+                        span,
                     ));
                 }
 
