@@ -15,3 +15,10 @@
   }
 }
 ```
+
+### Output: error
+```txt
+  |
+2 | [a b]
+  |    ^ Unexpected token, found #offending#, expected [Punct(Comma), Punct(BraceClose)]
+```

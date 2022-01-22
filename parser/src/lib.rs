@@ -26,8 +26,9 @@ use fajt_lexer::token::{KeywordContext, Token, TokenValue};
 use fajt_lexer::{punct, Lexer};
 use fajt_lexer::{token_matches, LexerState};
 
+use crate::error::diagnostic::Diagnostic;
 use crate::error::ErrorKind::UnexpectedToken;
-use crate::error::Result;
+use crate::error::{Error, Result};
 
 /// Similar trait to bool.then, but handles closures returning `Result`.
 pub trait ThenTry {
@@ -403,23 +404,41 @@ where
     }
 
     fn consume_array_delimiter(&mut self) -> Result<()> {
-        self.consume_list_delimiter(punct!("]"))
+        self.consume_list_delimiter(&punct!("]"))
     }
 
     fn consume_object_delimiter(&mut self) -> Result<()> {
-        self.consume_list_delimiter(punct!("}"))
+        self.consume_list_delimiter(&punct!("}"))
     }
 
     fn consume_parameter_delimiter(&mut self) -> Result<()> {
-        self.consume_list_delimiter(punct!(")"))
+        self.consume_list_delimiter(&punct!(")"))
     }
 
-    fn consume_list_delimiter(&mut self, list_end: TokenValue) -> Result<()> {
-        if !self.maybe_consume(&punct!(","))? && !self.current_matches(&list_end) {
-            return err!(UnexpectedToken(self.consume()?));
+    fn consume_list_delimiter(&mut self, list_end: &TokenValue) -> Result<()> {
+        if !self.maybe_consume(&punct!(","))? && !self.current_matches(list_end) {
+            return self.unexpected_token_error(vec![&punct!(","), list_end]);
         }
 
         Ok(())
+    }
+
+    fn unexpected_token_error(&mut self, expected: Vec<&TokenValue>) -> Result<()> {
+        let token = self.consume()?;
+
+        // TODO token value to string.
+        let diagnostic = Diagnostic {
+            span: token.span.clone(),
+            message: format!(
+                "Unexpected token, found #offending#, expected {:?}",
+                expected
+            ),
+        };
+
+        let mut error = Error::of(UnexpectedToken(token));
+        error.diagnostic = Some(diagnostic);
+
+        Err(error)
     }
 }
 

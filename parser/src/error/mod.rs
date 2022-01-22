@@ -1,11 +1,14 @@
+use crate::error::diagnostic::Diagnostic;
+use fajt_ast::{Ident, Span};
+use fajt_common::io::Error as CommonError;
+use fajt_lexer::error::Error as LexerError;
 use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
 use std::{error, fmt};
 
-use fajt_ast::{Ident, Span};
-use fajt_common::io::Error as CommonError;
-use fajt_lexer::error::Error as LexerError;
+pub mod diagnostic;
 
+#[deprecated]
 #[macro_export]
 macro_rules! err {
     ($error_kind:expr) => {{
@@ -18,6 +21,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Debug, PartialEq)]
 pub struct Error {
     kind: ErrorKind,
+    pub diagnostic: Option<Diagnostic>,
 }
 
 /// Keeps diagnostics about error location in parser for easy debugging.
@@ -30,7 +34,10 @@ pub struct InternalDiagnostic {
 
 impl Error {
     pub(crate) fn of(kind: ErrorKind) -> Self {
-        Error { kind }
+        Error {
+            kind,
+            diagnostic: None,
+        }
     }
 
     pub fn kind(&self) -> &ErrorKind {

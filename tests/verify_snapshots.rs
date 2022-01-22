@@ -53,6 +53,7 @@ extern crate fajt_testing;
 use fajt_ast::traverse::Traverse;
 use fajt_ast::{Expr, Program, SourceType, Stmt};
 use fajt_codegen::{generate_code, GeneratorContext};
+use fajt_parser::error::diagnostic::DiagnosticEmitter;
 use fajt_parser::error::{ErrorKind, Result};
 use fajt_parser::{parse, Parse};
 use fajt_testing::markdown::{Markdown, MarkdownBlock};
@@ -64,6 +65,7 @@ use std::fmt::Debug;
 const SOURCE_SECTION: &str = "Source";
 const MINIFIED_SECTION: &str = "Output: minified";
 const AST_SECTION: &str = "Output: ast";
+const ERROR_SECTION: &str = "Output: error";
 
 // This runs for each .md file in the ./cases folder.
 fn run_test(path: &str) {
@@ -88,6 +90,7 @@ where
     T: Parse + Serialize + DeserializeOwned + PartialEq + Debug + Traverse,
 {
     let mut regenerate_ast = false;
+    let mut regenerate_error = false;
     let mut regenerate_min = None;
 
     let mut test = test;
@@ -101,6 +104,13 @@ where
         } else {
             regenerate_ast = true;
         }
+    }
+
+    if let Some(error_section) = test.get_section(ERROR_SECTION) {
+        // if let Some(error_msg) = error_section.get_code() {
+        // } else {
+        regenerate_error = true;
+        // }
     }
 
     if result.is_ok() {
@@ -123,6 +133,25 @@ where
     }
 
     #[allow(unused_assignments)]
+    let mut error_output = None; // Just to make sure it lives until written
+    if regenerate_error {
+        if result.is_ok() {
+            panic!("Expected error but got {:?}", result);
+        }
+
+        let error = result.as_ref().unwrap_err();
+        if let Some(diagnostic) = &error.diagnostic {
+            let mut emitter = DiagnosticEmitter::new(source);
+            emitter.emit_diagnostic(diagnostic);
+            error_output = Some(emitter.into_string());
+            println!("{}", error_output.as_ref().unwrap());
+            test.set_block_content(ERROR_SECTION, "txt", error_output.as_ref().unwrap());
+        } else {
+            todo!()
+        }
+    }
+
+    #[allow(unused_assignments)]
     let mut ast_output = None; // Just to make sure it lives until written
     if regenerate_ast {
         ast_output = Some(result_to_string(result));
@@ -133,7 +162,7 @@ where
         test.set_block_content(MINIFIED_SECTION, "js", min);
     }
 
-    if regenerate_ast || regenerate_min.is_some() {
+    if regenerate_ast || regenerate_error || regenerate_min.is_some() {
         write_string(path.as_ref(), &test.to_string());
         panic!("Output generated. Verify and rerun test.");
     }
