@@ -1,4 +1,4 @@
-use crate::error::ErrorKind::ForbiddenIdentifier;
+use crate::error::ErrorKind::{ForbiddenIdentifier, UnexpectedIdent};
 use crate::UnexpectedToken;
 use fajt_ast::{Ident, Span};
 use fajt_common::io::Error as CommonError;
@@ -48,6 +48,15 @@ impl Error {
     pub(crate) fn lexer_error(error: LexerError, span: Span) -> Self {
         Error {
             kind: ErrorKind::LexerError(error),
+            span,
+            diagnostic: None,
+        }
+    }
+
+    pub(crate) fn unexpected_identifier(ident: Ident) -> Self {
+        let span = ident.span.clone();
+        Error {
+            kind: UnexpectedIdent(ident),
             span,
             diagnostic: None,
         }
@@ -118,7 +127,9 @@ impl fmt::Display for Error {
                 "Syntax error: Unexpected token `{}`",
                 token.value.to_string()
             )?,
-            ErrorKind::UnexpectedIdent(i) => write!(f, "Unexpected identifier: {:?}", i)?,
+            ErrorKind::UnexpectedIdent(ident) => {
+                write!(f, "Syntax Error: Unexpected identifier `{}`", ident.name)?
+            }
             ErrorKind::ForbiddenIdentifier(identifier) => {
                 write!(f, "Syntax error: Forbidden identifier `{}`", identifier)?
             }

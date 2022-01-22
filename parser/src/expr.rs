@@ -1,6 +1,6 @@
 use crate::error::ErrorKind::{SyntaxError, UnexpectedIdent, UnexpectedToken};
 use crate::error::Result;
-use crate::{ContextModify, Parser, ThenTry};
+use crate::{ContextModify, Error, Parser, ThenTry};
 use fajt_ast::update_op;
 use fajt_ast::{assignment_op, ExprParenthesized};
 use fajt_ast::{unary_op, ExprTaggedTemplate};
@@ -481,7 +481,7 @@ where
 
                 let property = self.parse_identifier()?;
                 if property.name != "target" {
-                    return err!(UnexpectedIdent(property));
+                    return Err(Error::unexpected_identifier(property));
                 }
 
                 let span = self.span_from(span_start);
@@ -521,7 +521,7 @@ where
 
                 let property = self.parse_identifier()?;
                 if property.name != "meta" {
-                    return err!(UnexpectedIdent(property));
+                    return Err(Error::unexpected_identifier(property));
                 }
 
                 let span = self.span_from(span_start);
