@@ -47,9 +47,9 @@ where
                 .parse_class_decl()?,
             token_matches!(keyword!("import")) => {
                 if self.source_type() == SourceType::Script {
-                    return err!(SyntaxError(
-                        "'import' cannot appear in a 'script' source.".to_owned(),
-                        self.current()?.span.clone()
+                    return Err(Error::syntax_error(
+                        "Cannot use `import` statement outside a module".to_owned(),
+                        self.current()?.span.clone(),
                     ));
                 }
 
@@ -58,9 +58,9 @@ where
             }
             token_matches!(keyword!("export")) => {
                 if self.source_type() == SourceType::Script {
-                    return err!(SyntaxError(
-                        "'export' cannot appear in a 'script' source.".to_owned(),
-                        self.current()?.span.clone()
+                    return Err(Error::syntax_error(
+                        "Cannot use `export` statement outside a module".to_owned(),
+                        self.current()?.span.clone(),
                     ));
                 }
 

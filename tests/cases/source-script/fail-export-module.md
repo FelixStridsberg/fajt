@@ -3,12 +3,11 @@
 import 'module'
 ```
 
-### Output: ast
-```json
-{
-  "SyntaxError": [
-    "'import' cannot appear in a 'script' source.",
-    "0:6"
-  ]
-}
+### Output: error
+```txt
+Syntax error: Cannot use `import` statement outside a module
+ --> test.js:1:1
+  |
+1 | import 'module'
+  | ^^^^^^ 
 ```

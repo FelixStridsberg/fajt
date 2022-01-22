@@ -3,12 +3,11 @@
 export 'module'
 ```
 
-### Output: ast
-```json
-{
-  "SyntaxError": [
-    "'export' cannot appear in a 'script' source.",
-    "0:6"
-  ]
-}
+### Output: error
+```txt
+Syntax error: Cannot use `export` statement outside a module
+ --> test.js:1:1
+  |
+1 | export 'module'
+  | ^^^^^^ 
 ```
