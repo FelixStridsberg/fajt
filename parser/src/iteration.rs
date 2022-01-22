@@ -18,17 +18,17 @@ where
 {
     pub(super) fn parse_do_while_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        self.consume_assert(keyword!("do"))?;
+        self.consume_assert(&keyword!("do"))?;
 
         let body = self.parse_stmt()?;
 
-        self.consume_assert(keyword!("while"))?;
-        self.consume_assert(punct!("("))?;
+        self.consume_assert(&keyword!("while"))?;
+        self.consume_assert(&punct!("("))?;
 
         let test = self.parse_expr()?;
 
-        self.consume_assert(punct!(")"))?;
-        self.maybe_consume(punct!(";"))?;
+        self.consume_assert(&punct!(")"))?;
+        self.maybe_consume(&punct!(";"))?;
 
         let span = self.span_from(span_start);
         Ok(StmtDoWhile {
@@ -41,12 +41,12 @@ where
 
     pub(super) fn parse_while_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        self.consume_assert(keyword!("while"))?;
-        self.consume_assert(punct!("("))?;
+        self.consume_assert(&keyword!("while"))?;
+        self.consume_assert(&punct!("("))?;
 
         let test = self.parse_expr()?;
 
-        self.consume_assert(punct!(")"))?;
+        self.consume_assert(&punct!(")"))?;
 
         let body = self.parse_stmt()?;
 
@@ -61,13 +61,13 @@ where
 
     pub(super) fn parse_for_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        self.consume_assert(keyword!("for"))?;
+        self.consume_assert(&keyword!("for"))?;
 
-        if self.context.is_await && self.current_matches(keyword!("await")) {
+        if self.context.is_await && self.current_matches(&keyword!("await")) {
             return self.parse_for_await_of(span_start);
         }
 
-        self.consume_assert(punct!("("))?;
+        self.consume_assert(&punct!("("))?;
 
         let init = self.parse_for_first_argument()?;
         match self.current() {
@@ -83,12 +83,12 @@ where
     }
 
     fn parse_plain_for(&mut self, span_start: usize, init: Option<ForInit>) -> Result<Stmt> {
-        self.consume_assert(punct!(";"))?;
+        self.consume_assert(&punct!(";"))?;
 
-        let test = (!self.current_matches(punct!(";"))).then_try(|| self.parse_expr())?;
-        self.consume_assert(punct!(";"))?;
-        let update = (!self.current_matches(punct!(")"))).then_try(|| self.parse_expr())?;
-        self.consume_assert(punct!(")"))?;
+        let test = (!self.current_matches(&punct!(";"))).then_try(|| self.parse_expr())?;
+        self.consume_assert(&punct!(";"))?;
+        let update = (!self.current_matches(&punct!(")"))).then_try(|| self.parse_expr())?;
+        self.consume_assert(&punct!(")"))?;
 
         let body = self.parse_stmt()?;
         let span = self.span_from(span_start);
@@ -105,13 +105,13 @@ where
     fn parse_for_in(&mut self, span_start: usize, left: ForInit) -> Result<Stmt> {
         // TODO verify that `left` is a valid LeftHandSideExpression if not declaration.
 
-        self.consume_assert(keyword!("in"))?;
+        self.consume_assert(&keyword!("in"))?;
 
         let right = self
             .with_context(ContextModify::new().set_in(true))
             .parse_expr()?;
 
-        self.consume_assert(punct!(")"))?;
+        self.consume_assert(&punct!(")"))?;
 
         let body = self.parse_stmt()?;
         let span = self.span_from(span_start);
@@ -126,7 +126,7 @@ where
 
     fn parse_for_await_of(&mut self, span_start: usize) -> Result<Stmt> {
         self.consume()?;
-        self.consume_assert(punct!("("))?;
+        self.consume_assert(&punct!("("))?;
 
         let init = self.parse_for_first_argument()?;
         if init.is_none() {
@@ -144,13 +144,13 @@ where
     ) -> Result<Stmt> {
         // TODO verify that `left` is a valid LeftHandSideExpression if not declaration.
 
-        self.consume_assert(keyword!("of"))?;
+        self.consume_assert(&keyword!("of"))?;
 
         let right = self
             .with_context(ContextModify::new().set_in(true))
             .parse_expr()?;
 
-        self.consume_assert(punct!(")"))?;
+        self.consume_assert(&punct!(")"))?;
 
         let body = self.parse_stmt()?;
         let span = self.span_from(span_start);
@@ -188,7 +188,7 @@ where
         }
 
         Ok(match self.current()? {
-            _ if self.current_matches(punct!(";")) => None,
+            _ if self.current_matches(&punct!(";")) => None,
             _ => Some(ForInit::Expr(
                 self.with_context(ContextModify::new().set_in(false))
                     .parse_expr()?,

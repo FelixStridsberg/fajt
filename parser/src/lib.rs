@@ -280,9 +280,9 @@ where
         }
     }
 
-    fn current_matches(&self, value: TokenValue) -> bool {
+    fn current_matches(&self, value: &TokenValue) -> bool {
         if let Ok(token) = self.current() {
-            token.value == value
+            &token.value == value
         } else {
             false
         }
@@ -298,24 +298,24 @@ where
         )
     }
 
-    fn peek_matches(&self, value: TokenValue) -> bool {
+    fn peek_matches(&self, value: &TokenValue) -> bool {
         if let Some(token) = self.peek() {
-            token.value == value
+            &token.value == value
         } else {
             false
         }
     }
 
-    fn consume_assert(&mut self, value: TokenValue) -> Result<Token> {
+    fn consume_assert(&mut self, value: &TokenValue) -> Result<Token> {
         let token = self.consume()?;
-        if token.value != value {
+        if &token.value != value {
             return err!(UnexpectedToken(token));
         }
         Ok(token)
     }
 
-    fn maybe_consume(&mut self, value: TokenValue) -> Result<bool> {
-        if self.current_matches(value) {
+    fn maybe_consume(&mut self, value: &TokenValue) -> Result<bool> {
+        if self.current_matches(&value) {
             self.consume()?;
             Ok(true)
         } else {
@@ -373,7 +373,7 @@ where
             token_matches!(punct!("[")) => {
                 self.consume()?;
                 let expr = self.parse_assignment_expr()?;
-                self.consume_assert(punct!("]"))?;
+                self.consume_assert(&punct!("]"))?;
                 Ok(PropertyName::Computed(expr))
             }
             _ if self.is_identifier() => Ok(PropertyName::Ident(self.parse_identifier()?)),
@@ -415,7 +415,7 @@ where
     }
 
     fn consume_list_delimiter(&mut self, list_end: TokenValue) -> Result<()> {
-        if !self.maybe_consume(punct!(","))? && !self.current_matches(list_end) {
+        if !self.maybe_consume(&punct!(","))? && !self.current_matches(&list_end) {
             return err!(UnexpectedToken(self.consume()?));
         }
 

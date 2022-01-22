@@ -36,7 +36,7 @@ where
         loop {
             match self.current() {
                 token_matches!(ok: punct!("?.")) => {
-                    if self.peek_matches(punct!("(")) {
+                    if self.peek_matches(&punct!("(")) {
                         object = self.parse_optional_call_expr(span_start, object)?;
                     } else {
                         object = self.parse_optional_member_expr(span_start, object)?;
@@ -56,7 +56,7 @@ where
     }
 
     fn parse_optional_call_expr(&mut self, span_start: usize, callee: Expr) -> Result<Expr> {
-        let optional = self.maybe_consume(punct!("?."))?;
+        let optional = self.maybe_consume(&punct!("?."))?;
         let (arguments_span, arguments) = self.parse_arguments()?;
         let span = self.span_from(span_start);
 
@@ -71,7 +71,7 @@ where
     }
 
     fn parse_optional_member_expr(&mut self, span_start: usize, object: Expr) -> Result<Expr> {
-        let optional = self.current_matches(punct!("?."));
+        let optional = self.current_matches(&punct!("?."));
         let property = self.parse_optional_member_property()?;
         let span = self.span_from(span_start);
 
@@ -86,7 +86,7 @@ where
 
     fn parse_optional_member_property(&mut self) -> Result<MemberProperty> {
         match self.current() {
-            token_matches!(ok: punct!("?.")) if self.peek_matches(punct!("[")) => {
+            token_matches!(ok: punct!("?.")) if self.peek_matches(&punct!("[")) => {
                 self.consume()?;
                 let property = self.parse_computed_property()?;
                 Ok(MemberProperty::Expr(property.into()))
@@ -120,9 +120,9 @@ where
     }
 
     fn parse_computed_property(&mut self) -> Result<Expr> {
-        self.consume_assert(punct!("["))?;
+        self.consume_assert(&punct!("["))?;
         let expr = self.parse_expr()?;
-        self.consume_assert(punct!("]"))?;
+        self.consume_assert(&punct!("]"))?;
 
         Ok(expr)
     }

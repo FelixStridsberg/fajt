@@ -29,7 +29,7 @@ where
     /// Parses the `ObjectBindingPattern` production.
     fn parse_object_binding_pattern(&mut self) -> Result<BindingPattern> {
         let span_start = self.position();
-        self.consume_assert(punct!("{"))?;
+        self.consume_assert(&punct!("{"))?;
 
         let mut props = Vec::new();
 
@@ -45,7 +45,7 @@ where
                     rest = self.parse_rest_binding_ident(BracketClose)?;
                     break;
                 }
-                _ if self.peek_matches(punct!(":")) => {
+                _ if self.peek_matches(&punct!(":")) => {
                     props.push(ObjectBindingProp::Named(self.parse_named_binding()?));
 
                     self.consume_object_delimiter()?;
@@ -68,7 +68,7 @@ where
 
         let ident = self.parse_identifier()?;
         let initializer = self
-            .current_matches(punct!("="))
+            .current_matches(&punct!("="))
             .then_try(|| self.parse_initializer())?;
 
         let span = self.span_from(span_start);
@@ -83,7 +83,7 @@ where
     fn parse_named_binding(&mut self) -> Result<NamedBinding> {
         let span_start = self.position();
         let property = self.parse_property_name()?;
-        self.consume_assert(punct!(":"))?;
+        self.consume_assert(&punct!(":"))?;
 
         let binding = self.parse_binding_element()?;
 
@@ -98,7 +98,7 @@ where
     /// Parses the `ArrayBindingPattern` production.
     fn parse_array_binding_pattern(&mut self) -> Result<BindingPattern> {
         let span_start = self.position();
-        self.consume_assert(punct!("["))?;
+        self.consume_assert(&punct!("["))?;
 
         let mut elements = Vec::new();
 
@@ -148,7 +148,7 @@ where
         let span_start = self.position();
         let pattern = self.parse_binding_pattern()?;
         let initializer = self
-            .current_matches(punct!("="))
+            .current_matches(&punct!("="))
             .then_try(|| self.parse_initializer())?;
 
         let span = self.span_from(span_start);
@@ -161,7 +161,7 @@ where
 
     /// Parses the `BindingRestElement` production.
     pub(super) fn parse_binding_rest_element(&mut self) -> Result<BindingPattern> {
-        self.consume_assert(punct!("..."))?;
+        self.consume_assert(&punct!("..."))?;
         self.parse_binding_pattern()
     }
 

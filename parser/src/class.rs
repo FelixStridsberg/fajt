@@ -14,9 +14,9 @@ where
     /// Parses the `ClassDeclaration` production.
     pub(super) fn parse_class_decl(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        self.consume_assert(keyword!("class"))?;
+        self.consume_assert(&keyword!("class"))?;
 
-        let identifier = if self.context.is_default && self.current_matches(punct!("{")) {
+        let identifier = if self.context.is_default && self.current_matches(&punct!("{")) {
             let current = self.current().unwrap();
             Ident::new("", Span::new(current.span.start, current.span.start))
         } else {
@@ -38,7 +38,7 @@ where
     /// Parses the `ClassExpression` production.
     pub(super) fn parse_class_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        self.consume_assert(keyword!("class"))?;
+        self.consume_assert(&keyword!("class"))?;
 
         let identifier = self
             .is_identifier()
@@ -58,7 +58,7 @@ where
     /// Parses the `ClassTail` production, returns (ClassHeritage, ClassBody).
     fn parse_class_tail(&mut self) -> Result<(Option<Box<Expr>>, Vec<ClassElement>)> {
         let super_class = self
-            .maybe_consume(keyword!("extends"))?
+            .maybe_consume(&keyword!("extends"))?
             .then_try(|| self.parse_left_hand_side_expr().map(Box::new))?;
 
         let body = self.parse_class_body()?;
@@ -67,11 +67,11 @@ where
 
     /// Parses the `ClassBody` production, including the { and } terminals.
     fn parse_class_body(&mut self) -> Result<Vec<ClassElement>> {
-        self.consume_assert(punct!("{"))?;
+        self.consume_assert(&punct!("{"))?;
         let mut class_body = Vec::new();
 
         loop {
-            if self.current_matches(punct!("}")) {
+            if self.current_matches(&punct!("}")) {
                 self.consume()?;
                 break;
             }

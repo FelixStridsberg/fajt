@@ -30,9 +30,7 @@ pub struct InternalDiagnostic {
 
 impl Error {
     pub(crate) fn of(kind: ErrorKind) -> Self {
-        Error {
-            kind,
-        }
+        Error { kind }
     }
 
     pub fn kind(&self) -> &ErrorKind {

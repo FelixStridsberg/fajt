@@ -53,7 +53,7 @@ where
     ///
     /// We do this to figure out the "cover" productions that requires reading past parenthesis.
     fn token_after_parenthesis(&mut self) -> Result<Option<Token>> {
-        let start = self.consume_assert(punct!("("))?;
+        let start = self.consume_assert(&punct!("("))?;
         self.skip_until_closing_parenthesis()?;
 
         let token = self.consume().ok();

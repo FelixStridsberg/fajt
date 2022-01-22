@@ -23,9 +23,9 @@ where
         binding_parameter: bool,
         parameters: FormalParameters,
     ) -> Result<Expr> {
-        self.consume_assert(punct!("=>"))?;
+        self.consume_assert(&punct!("=>"))?;
 
-        let body = if self.current_matches(punct!("{")) {
+        let body = if self.current_matches(&punct!("{")) {
             ArrowFunctionBody::Body(self.parse_function_body()?)
         } else {
             ArrowFunctionBody::Expr(self.parse_assignment_expr()?.into())
@@ -51,9 +51,9 @@ where
         binding_parameter: bool,
         parameters: FormalParameters,
     ) -> Result<Expr> {
-        self.consume_assert(punct!("=>"))?;
+        self.consume_assert(&punct!("=>"))?;
 
-        let body = if self.current_matches(punct!("{")) {
+        let body = if self.current_matches(&punct!("{")) {
             ArrowFunctionBody::Body(
                 self.with_context(ContextModify::new().set_await(true))
                     .parse_function_body()?,
@@ -98,9 +98,9 @@ where
     /// Parses the `FunctionExpression` production.
     pub(super) fn parse_function_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        self.consume_assert(keyword!("function"))?;
+        self.consume_assert(&keyword!("function"))?;
 
-        let generator = self.maybe_consume(punct!("*"))?;
+        let generator = self.maybe_consume(&punct!("*"))?;
         self.with_context(ContextModify::new().set_yield(generator).set_await(false))
             .parse_function_expr_content(span_start)
     }
@@ -108,12 +108,12 @@ where
     /// Parses the `AsyncFunctionExpression` production.
     pub(super) fn parse_async_function_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        self.consume_assert(keyword!("async"))?;
+        self.consume_assert(&keyword!("async"))?;
 
-        let function_token = self.consume_assert(keyword!("function"))?;
+        let function_token = self.consume_assert(&keyword!("function"))?;
         debug_assert!(!function_token.first_on_line);
 
-        let generator = self.maybe_consume(punct!("*"))?;
+        let generator = self.maybe_consume(&punct!("*"))?;
         self.with_context(ContextModify::new().set_yield(generator).set_await(true))
             .parse_function_expr_content(span_start)
     }
@@ -140,9 +140,9 @@ where
     /// Parses the `FunctionDeclaration` production.
     pub(super) fn parse_function_declaration(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        self.consume_assert(keyword!("function"))?;
+        self.consume_assert(&keyword!("function"))?;
 
-        let generator = self.maybe_consume(punct!("*"))?;
+        let generator = self.maybe_consume(&punct!("*"))?;
         let ident = self.parse_function_identifier()?;
 
         self.with_context(ContextModify::new().set_yield(generator).set_await(false))
@@ -152,12 +152,12 @@ where
     /// Parses the `AsyncFunctionDeclaration` production.
     pub(super) fn parse_async_function_declaration(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        self.consume_assert(keyword!("async"))?;
+        self.consume_assert(&keyword!("async"))?;
 
-        let function_token = self.consume_assert(keyword!("function"))?;
+        let function_token = self.consume_assert(&keyword!("function"))?;
         debug_assert!(!function_token.first_on_line);
 
-        let generator = self.maybe_consume(punct!("*"))?;
+        let generator = self.maybe_consume(&punct!("*"))?;
         let ident = self.parse_function_identifier()?;
 
         self.with_context(ContextModify::new().set_yield(generator).set_await(true))
@@ -190,7 +190,7 @@ where
     /// empty/non existent.
     fn parse_function_identifier(&mut self) -> Result<Ident> {
         // In `default` context the identifier is optional.
-        if self.context.is_default && self.current_matches(punct!("(")) {
+        if self.context.is_default && self.current_matches(&punct!("(")) {
             let current = self.current().unwrap();
             Ok(Ident::new(
                 "",
@@ -205,7 +205,7 @@ where
     pub(super) fn parse_formal_parameters(&mut self) -> Result<FormalParameters> {
         let span_start = self.position();
 
-        self.consume_assert(punct!("("))?;
+        self.consume_assert(&punct!("("))?;
 
         let mut parameters = Vec::new();
         let mut rest = None;
@@ -237,7 +237,7 @@ where
     /// Parses the `FunctionBody` or `AsyncFunctionBody` production.
     pub(super) fn parse_function_body(&mut self) -> Result<Body> {
         let span_start = self.position();
-        self.consume_assert(punct!("{"))?;
+        self.consume_assert(&punct!("{"))?;
 
         let directives = self.parse_directive_prologue()?;
         let statements =
@@ -259,7 +259,7 @@ where
     fn parse_function_body_stmt_list(&mut self) -> Result<Vec<Stmt>> {
         let mut statements = Vec::new();
         loop {
-            if self.maybe_consume(punct!("}"))? {
+            if self.maybe_consume(&punct!("}"))? {
                 break;
             }
 

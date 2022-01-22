@@ -39,7 +39,7 @@ where
             token_matches!(keyword!("for")) => self.parse_for_stmt()?,
             token_matches!(keyword!("switch")) => self.parse_switch_stmt()?,
             token_matches!(keyword!("function")) => self.parse_function_declaration()?,
-            token_matches!(keyword!("async")) if self.peek_matches(keyword!("function")) => {
+            token_matches!(keyword!("async")) if self.peek_matches(&keyword!("function")) => {
                 self.parse_async_function_declaration()?
             }
             token_matches!(keyword!("class")) => self
@@ -67,7 +67,7 @@ where
                 self.set_source_type(SourceType::Module);
                 self.parse_export_declaration()?
             }
-            _ if self.is_identifier() && self.peek_matches(punct!(":")) => {
+            _ if self.is_identifier() && self.peek_matches(&punct!(":")) => {
                 self.parse_labeled_stmt()?
             }
             _ if self.is_expr_stmt()? => self
@@ -87,11 +87,11 @@ where
             return Ok(false);
         }
 
-        if self.current_matches(keyword!("let")) && self.peek_matches(punct!("[")) {
+        if self.current_matches(&keyword!("let")) && self.peek_matches(&punct!("[")) {
             return Ok(false);
         }
 
-        if self.current_matches(keyword!("async")) && self.peek_matches(keyword!("function")) {
+        if self.current_matches(&keyword!("async")) && self.peek_matches(&keyword!("function")) {
             return Ok(self.followed_by_new_lined());
         }
 
@@ -101,11 +101,11 @@ where
     /// Parses the `BlockStatement` production.
     fn parse_block_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        self.consume_assert(punct!("{"))?;
+        self.consume_assert(&punct!("{"))?;
 
         let mut statements = Vec::new();
         loop {
-            if self.maybe_consume(punct!("}"))? {
+            if self.maybe_consume(&punct!("}"))? {
                 break;
             } else {
                 let statement = self.parse_stmt()?;
@@ -134,7 +134,7 @@ where
     fn parse_labeled_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         let label = self.parse_identifier()?;
-        self.consume_assert(punct!(":"))?;
+        self.consume_assert(&punct!(":"))?;
         let body = self.parse_stmt()?;
         let span = self.span_from(span_start);
         Ok(StmtLabeled {
@@ -147,17 +147,17 @@ where
 
     /// Parses the `EmptyStatement` production.
     fn parse_empty_stmt(&mut self) -> Result<Stmt> {
-        let token = self.consume_assert(punct!(";"))?;
+        let token = self.consume_assert(&punct!(";"))?;
         Ok(StmtEmpty { span: token.span }.into())
     }
 
     /// Parses the `BreakStatement` production.
     fn parse_break_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        self.consume_assert(keyword!("break"))?;
+        self.consume_assert(&keyword!("break"))?;
 
         let label = self.stmt_not_ended().then_try(|| self.parse_identifier())?;
-        self.maybe_consume(punct!(";"))?;
+        self.maybe_consume(&punct!(";"))?;
 
         let span = self.span_from(span_start);
         Ok(StmtBreak { span, label }.into())
@@ -166,10 +166,10 @@ where
     /// Parses the `ContinueStatement` production.
     fn parse_continue_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        self.consume_assert(keyword!("continue"))?;
+        self.consume_assert(&keyword!("continue"))?;
 
         let label = self.stmt_not_ended().then_try(|| self.parse_identifier())?;
-        self.maybe_consume(punct!(";"))?;
+        self.maybe_consume(&punct!(";"))?;
 
         let span = self.span_from(span_start);
         Ok(StmtContinue { span, label }.into())
@@ -178,10 +178,10 @@ where
     /// Parses the `ReturnStatement` production.
     fn parse_return_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        self.consume_assert(keyword!("return"))?;
+        self.consume_assert(&keyword!("return"))?;
 
         let argument = self.stmt_not_ended().then_try(|| self.parse_expr())?;
-        self.maybe_consume(punct!(";"))?;
+        self.maybe_consume(&punct!(";"))?;
 
         let span = self.span_from(span_start);
         Ok(StmtReturn { span, argument }.into())
@@ -190,7 +190,7 @@ where
     /// Parses the `ThrowStatement` production.
     fn parse_throw_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        self.consume_assert(keyword!("throw"))?;
+        self.consume_assert(&keyword!("throw"))?;
 
         match self.current() {
             token_matches!(ok: punct!(";")) | Err(_) => {
@@ -206,7 +206,7 @@ where
         }
 
         let argument = self.parse_expr()?;
-        self.maybe_consume(punct!(";"))?;
+        self.maybe_consume(&punct!(";"))?;
 
         let span = self.span_from(span_start);
         Ok(StmtThrow { span, argument }.into())
@@ -225,8 +225,8 @@ where
     fn parse_debugger_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
 
-        self.consume_assert(keyword!("debugger"))?;
-        self.maybe_consume(punct!(";"))?;
+        self.consume_assert(&keyword!("debugger"))?;
+        self.maybe_consume(&punct!(";"))?;
 
         let span = self.span_from(span_start);
         Ok(StmtDebugger { span }.into())
@@ -235,14 +235,14 @@ where
     /// Parses the `IfStatement` production.
     fn parse_if_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        self.consume_assert(keyword!("if"))?;
-        self.consume_assert(punct!("("))?;
+        self.consume_assert(&keyword!("if"))?;
+        self.consume_assert(&punct!("("))?;
         let condition = self.parse_expr()?;
-        self.consume_assert(punct!(")"))?;
+        self.consume_assert(&punct!(")"))?;
 
         let consequent = self.parse_stmt()?;
         let alternate = self
-            .maybe_consume(keyword!("else"))?
+            .maybe_consume(&keyword!("else"))?
             .then_try(|| self.parse_stmt().map(Box::new))?;
 
         let span = self.span_from(span_start);
@@ -258,10 +258,10 @@ where
     /// Parses the `WithStatement` production.
     fn parse_with_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        self.consume_assert(keyword!("with"))?;
-        self.consume_assert(punct!("("))?;
+        self.consume_assert(&keyword!("with"))?;
+        self.consume_assert(&punct!("("))?;
         let object = self.parse_expr()?;
-        self.consume_assert(punct!(")"))?;
+        self.consume_assert(&punct!(")"))?;
 
         let body = self.parse_stmt()?;
         let span = self.span_from(span_start);
@@ -276,14 +276,14 @@ where
     /// Parses the `TryStatement` production.
     fn parse_try_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        self.consume_assert(keyword!("try"))?;
+        self.consume_assert(&keyword!("try"))?;
 
         let block = self.parse_block_stmt()?.unwrap_block_stmt();
         let handler = self
-            .current_matches(keyword!("catch"))
+            .current_matches(&keyword!("catch"))
             .then_try(|| self.parse_catch_clause())?;
         let finalizer = self
-            .maybe_consume(keyword!("finally"))?
+            .maybe_consume(&keyword!("finally"))?
             .then_try(|| Ok(self.parse_block_stmt()?.unwrap_block_stmt()))?;
 
         let span = self.span_from(span_start);
@@ -298,11 +298,11 @@ where
 
     fn parse_catch_clause(&mut self) -> Result<CatchClause> {
         let span_start = self.position();
-        self.consume_assert(keyword!("catch"))?;
+        self.consume_assert(&keyword!("catch"))?;
 
-        let parameter = self.maybe_consume(punct!("("))?.then_try(|| {
+        let parameter = self.maybe_consume(&punct!("("))?.then_try(|| {
             let pattern = self.parse_binding_pattern()?;
-            self.consume_assert(punct!(")"))?;
+            self.consume_assert(&punct!(")"))?;
             Ok(pattern)
         })?;
 
@@ -318,11 +318,11 @@ where
 
     fn parse_switch_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        self.consume_assert(keyword!("switch"))?;
-        self.consume_assert(punct!("("))?;
+        self.consume_assert(&keyword!("switch"))?;
+        self.consume_assert(&punct!("("))?;
 
         let discriminant = self.parse_expr()?;
-        self.consume_assert(punct!(")"))?;
+        self.consume_assert(&punct!(")"))?;
 
         let cases = self.parse_switch_cases()?;
 
@@ -336,31 +336,31 @@ where
     }
 
     fn parse_switch_cases(&mut self) -> Result<Vec<SwitchCase>> {
-        self.consume_assert(punct!("{"))?;
+        self.consume_assert(&punct!("{"))?;
 
         let mut cases = Vec::new();
         loop {
-            if self.current_matches(punct!("}")) {
+            if self.current_matches(&punct!("}")) {
                 break;
             }
 
             cases.push(self.parse_switch_case()?);
         }
 
-        self.consume_assert(punct!("}"))?;
+        self.consume_assert(&punct!("}"))?;
 
         Ok(cases)
     }
 
     fn parse_switch_case(&mut self) -> Result<SwitchCase> {
         let span_start = self.position();
-        let test = if self.maybe_consume(keyword!("case"))? {
+        let test = if self.maybe_consume(&keyword!("case"))? {
             let test = self.parse_expr()?;
-            self.consume_assert(punct!(":"))?;
+            self.consume_assert(&punct!(":"))?;
             Some(test)
         } else {
-            self.consume_assert(keyword!("default"))?;
-            self.consume_assert(punct!(":"))?;
+            self.consume_assert(&keyword!("default"))?;
+            self.consume_assert(&punct!(":"))?;
             None
         };
 
@@ -393,7 +393,7 @@ where
     /// Consumes semicolon if exists, returns error if no semicolon exists and no semicolon can be
     /// auto inserted.
     pub(super) fn consume_optional_semicolon(&mut self) -> Result<()> {
-        if !self.maybe_consume(punct!(";"))? && !self.valid_auto_semicolon()? {
+        if !self.maybe_consume(&punct!(";"))? && !self.valid_auto_semicolon()? {
             err!(UnexpectedToken(self.consume()?))
         } else {
             Ok(())
@@ -403,7 +403,7 @@ where
     /// Check if it is valid to insert semicolon before the current token.
     fn valid_auto_semicolon(&self) -> Result<bool> {
         Ok(self.is_end()
-            || self.current_matches(punct!("}"))
+            || self.current_matches(&punct!("}"))
             || self
                 .reader
                 .current()

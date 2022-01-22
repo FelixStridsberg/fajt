@@ -166,12 +166,12 @@ where
                 let expr = self.parse_assignment_expr()?;
                 Ok(PropertyDefinition::Spread(expr))
             }
-            _ if self.peek_matches(punct!(":")) => Ok(self.parse_named_property_definition()?),
+            _ if self.peek_matches(&punct!(":")) => Ok(self.parse_named_property_definition()?),
             token_matches!(punct!("[")) => {
                 let span_start = self.position();
                 let name = self.parse_property_name()?;
 
-                if self.maybe_consume(punct!(":"))? {
+                if self.maybe_consume(&punct!(":"))? {
                     let value = self.parse_assignment_expr()?;
                     let span = self.span_from(span_start);
                     return Ok(PropertyDefinition::Named(NamedProperty {
@@ -203,9 +203,9 @@ where
     pub fn is_object_method_definition(&self) -> bool {
         match self.current() {
             token_matches!(ok: punct!("*") | punct!("[")) => true,
-            token_matches!(ok: keyword!("async")) if !self.peek_matches(punct!(":")) => true,
+            token_matches!(ok: keyword!("async")) if !self.peek_matches(&punct!(":")) => true,
             token_matches!(ok: keyword!("get") | keyword!("set")) => true,
-            _ => self.peek_matches(punct!("(")),
+            _ => self.peek_matches(&punct!("(")),
         }
     }
 
@@ -213,7 +213,7 @@ where
         let span_start = self.position();
 
         let name = self.parse_property_name()?;
-        self.consume_assert(punct!(":"))?;
+        self.consume_assert(&punct!(":"))?;
         let value = self.parse_assignment_expr()?;
 
         let span = self.span_from(span_start);

@@ -48,7 +48,7 @@ where
         let span_start = self.position();
         self.consume()?;
 
-        let generator = self.maybe_consume(punct!("*"))?;
+        let generator = self.maybe_consume(&punct!("*"))?;
         let name = self.parse_property_name()?;
         self.with_context(ContextModify::new().set_yield(generator).set_await(true))
             .parse_method(span_start, name, MethodKind::Method)

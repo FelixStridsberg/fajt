@@ -25,7 +25,7 @@ where
         let span_start = self.position();
         let expr = self.parse_assignment_expr()?;
 
-        if self.current_matches(punct!(",")) {
+        if self.current_matches(&punct!(",")) {
             return self.parse_expr_sequence(span_start, expr);
         }
 
@@ -38,7 +38,7 @@ where
         expr.push(initial_expr);
 
         loop {
-            if self.current_matches(punct!(",")) {
+            if self.current_matches(&punct!(",")) {
                 self.consume()?;
                 expr.push(self.parse_assignment_expr()?);
             } else {
@@ -63,7 +63,7 @@ where
             }
             _ if self.is_identifier()
                 && !self.followed_by_new_lined()
-                && self.peek_matches(punct!("=>")) =>
+                && self.peek_matches(&punct!("=>")) =>
             {
                 let span_start = self.position();
                 let parameters = self.parse_arrow_identifier_argument()?;
@@ -111,9 +111,9 @@ where
     /// Parses the `ParenthesizedExpression` production.
     pub(super) fn parse_parenthesized_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        self.consume_assert(punct!("("))?;
+        self.consume_assert(&punct!("("))?;
         let expr = self.parse_expr()?;
-        self.consume_assert(punct!(")"))?;
+        self.consume_assert(&punct!(")"))?;
 
         let span = self.span_from(span_start);
         Ok(ExprParenthesized {
@@ -153,7 +153,7 @@ where
     /// Parses the `YieldExpression` production.
     fn parse_yield_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        self.consume_assert(keyword!("yield"))?;
+        self.consume_assert(&keyword!("yield"))?;
 
         if self.is_end() {
             let span = self.span_from(span_start);
@@ -187,11 +187,11 @@ where
         let span_start = self.position();
         let expr = self.parse_short_circuit_expr()?;
 
-        if self.current_matches(punct!("?")) {
+        if self.current_matches(&punct!("?")) {
             self.consume()?;
             let consequent = self.parse_assignment_expr()?;
 
-            self.consume_assert(punct!(":"))?;
+            self.consume_assert(&punct!(":"))?;
 
             let alternate = self.parse_assignment_expr()?;
             let span = self.span_from(span_start);
@@ -298,10 +298,10 @@ where
         let span_start = self.position();
         let expr = match self.current() {
             token_matches!(ok: keyword!("new")) => self.parse_new_expr(),
-            token_matches!(ok: keyword!("super")) if self.peek_matches(punct!("(")) => {
+            token_matches!(ok: keyword!("super")) if self.peek_matches(&punct!("(")) => {
                 self.parse_super_call_expr()
             }
-            token_matches!(ok: keyword!("import")) if self.peek_matches(punct!("(")) => {
+            token_matches!(ok: keyword!("import")) if self.peek_matches(&punct!("(")) => {
                 self.parse_import_call_expr()
             }
             _ => {
@@ -312,7 +312,7 @@ where
             }
         }?;
 
-        if self.current_matches(punct!("?.")) {
+        if self.current_matches(&punct!("?.")) {
             // The NewExpression production handles nested news and is not included in the
             // OptionalExpression production as a base for the chain.
             if expr.is_nested_new() {
@@ -406,9 +406,9 @@ where
     fn parse_import_argument(&mut self) -> Result<(Span, Vec<Argument>)> {
         let span_start = self.position();
 
-        self.consume_assert(punct!("("))?;
+        self.consume_assert(&punct!("("))?;
         let expr = self.parse_assignment_expr()?;
-        self.consume_assert(punct!(")"))?;
+        self.consume_assert(&punct!(")"))?;
 
         let span = self.span_from(span_start);
         Ok((span, vec![Argument::Expr(expr)]))
@@ -474,7 +474,7 @@ where
                     }),
                 )
             }
-            token_matches!(keyword!("new")) if self.peek_matches(punct!(".")) => {
+            token_matches!(keyword!("new")) if self.peek_matches(&punct!(".")) => {
                 let span_start = self.position();
                 let new_token = self.consume()?;
                 self.consume()?; // .
@@ -498,7 +498,7 @@ where
 
                 let callee = self.parse_member_expr()?.into();
 
-                let (arguments_span, arguments) = if self.current_matches(punct!("(")) {
+                let (arguments_span, arguments) = if self.current_matches(&punct!("(")) {
                     self.parse_arguments()
                         .map(|(span, args)| (Some(span), args))?
                 } else {
@@ -514,7 +514,7 @@ where
                 }
                 .into())
             }
-            token_matches!(keyword!("import")) if self.peek_matches(punct!(".")) => {
+            token_matches!(keyword!("import")) if self.peek_matches(&punct!(".")) => {
                 let span_start = self.position();
                 let import_token = self.consume()?;
                 self.consume()?; // .
@@ -539,7 +539,7 @@ where
     /// Parses the `Arguments` production.
     pub(super) fn parse_arguments(&mut self) -> Result<(Span, Vec<Argument>)> {
         let span_start = self.position();
-        self.consume_assert(punct!("("))?;
+        self.consume_assert(&punct!("("))?;
 
         let mut arguments = Vec::new();
 
@@ -613,7 +613,7 @@ where
 
     /// Parses the `this` expression which is part of the `PrimaryExpression` production.
     fn parse_this_expr(&mut self) -> Result<Expr> {
-        let token = self.consume_assert(keyword!("this"))?;
+        let token = self.consume_assert(&keyword!("this"))?;
         Ok(ExprThis::new(token.span).into())
     }
 
