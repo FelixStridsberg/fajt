@@ -1,3 +1,4 @@
+use crate::error::ErrorKind;
 use crate::Error;
 use fajt_ast::Span;
 use std::io::Write;
@@ -36,7 +37,9 @@ impl<'a, 'b, 'c, W: Write> ErrorEmitter<'a, 'b, 'c, W> {
             error.kind.get_description().unwrap_or_default()
         };
 
-        self.emit_diagnostic(error, &label, line_number, line_span)?;
+        if error.kind != ErrorKind::EndOfStream {
+            self.emit_diagnostic(error, &label, line_number, line_span)?;
+        }
 
         Ok(())
     }

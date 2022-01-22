@@ -6,15 +6,11 @@ function* () {
 }
 ```
 
-### Output: ast
-```json
-{
-  "UnexpectedToken": {
-    "value": {
-      "Punct": "Star"
-    },
-    "first_on_line": true,
-    "span": "29:30"
-  }
-}
+### Output: error
+```txt
+Syntax error: Unexpected token `*`
+ --> test.js:3:5
+  |
+3 |     *a
+  |     ^ Unexpected token
 ```

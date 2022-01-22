@@ -47,6 +47,7 @@
 //! - `source:unknown`
 //!
 
+extern crate core;
 extern crate fajt_macros;
 extern crate fajt_testing;
 
@@ -165,11 +166,7 @@ where
         let expected_expr: T = serde_json::from_str(&ast_json).unwrap();
         assert_eq!(result, &expected_expr)
     } else {
-        let error = result.as_ref().unwrap_err();
-        println!("Error: {:?}", error);
-
-        let expected_error: ErrorKind = serde_json::from_str(&ast_json).unwrap();
-        assert_eq!(error.kind(), &expected_error)
+        panic!("Tried to compare AST but got error result.");
     }
 }
 

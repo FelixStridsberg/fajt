@@ -3,15 +3,11 @@
 class {}
 ```
 
-### Output: ast
-```json
-{
-  "UnexpectedToken": {
-    "value": {
-      "Punct": "BracketOpen"
-    },
-    "first_on_line": false,
-    "span": "6:7"
-  }
-}
+### Output: error
+```txt
+Syntax error: Unexpected token `{`
+ --> test.js:1:7
+  |
+1 | class {}
+  |       ^ Unexpected token, found `{`, expected identifier
 ```

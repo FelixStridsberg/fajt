@@ -281,6 +281,14 @@ where
         }
     }
 
+    pub fn with_default_context(&mut self) -> Parser<'_, I> {
+        Parser {
+            context: Context::default(),
+            reader: self.reader,
+            source_type: self.source_type.clone(),
+        }
+    }
+
     fn current_matches(&self, value: &TokenValue) -> bool {
         if let Ok(token) = self.current() {
             &token.value == value

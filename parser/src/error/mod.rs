@@ -121,7 +121,7 @@ impl ErrorKind {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match &self.kind {
-            ErrorKind::EndOfStream => write!(f, "End of file reached.")?,
+            ErrorKind::EndOfStream => write!(f, "Syntax error: Unexpected end of input")?,
             ErrorKind::LexerError(e) => write!(f, "Lexer error '{}'", e)?,
             ErrorKind::SyntaxError(msg, _) => write!(f, "Syntax error: {}", msg)?,
             ErrorKind::UnexpectedToken(token) => write!(
@@ -145,7 +145,7 @@ impl error::Error for Error {}
 
 impl From<LexerError> for Error {
     fn from(lexer_err: LexerError) -> Self {
-        Error::of(ErrorKind::LexerError(lexer_err), Span::empty())
+        Error::of(ErrorKind::LexerError(lexer_err), Span::empty()) // TODO Span::empty() should be real span
     }
 }
 
