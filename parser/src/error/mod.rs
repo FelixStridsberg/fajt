@@ -103,41 +103,19 @@ pub enum ErrorKind {
     ForbiddenIdentifier(String),
 }
 
-impl ErrorKind {
-    fn get_description(&self) -> Option<String> {
-        Some(match self {
-            ForbiddenIdentifier(keyword) => {
-                format!(
-                    "`{}` is not allowed as an identifier in this context",
-                    keyword
-                )
-            }
-            UnexpectedToken(_, None) => "Unexpected token".to_string(),
-            UnexpectedToken(token, Some(expected)) => format!(
-                "Unexpected token, found `{}`, expected `{}`",
-                token_value_to_string(token), // TODO
-                token_value_to_string(expected),
-            ),
-            ExpectedIdentifier(token) => format!(
-                "Unexpected token, found `{}`, expected identifier",
-                token_value_to_string(token),
-            ),
-            _ => return None,
-        })
-    }
-}
-
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match &self.kind {
             ErrorKind::EndOfStream => write!(f, "Syntax error: Unexpected end of input")?,
             ErrorKind::LexerError(e) => write!(f, "Lexer error '{}'", e)?,
             ErrorKind::SyntaxError(msg) => write!(f, "Syntax error: {}", msg)?,
-            ErrorKind::ExpectedIdentifier(token) | ErrorKind::UnexpectedToken(token, _) => write!(
-                f,
-                "Syntax error: Unexpected token `{}`",
-                token_value_to_string(token)
-            )?,
+            ErrorKind::ExpectedIdentifier(expected) | ErrorKind::UnexpectedToken(expected, _) => {
+                write!(
+                    f,
+                    "Syntax error: Unexpected token `{}`",
+                    expected_token_to_string(expected)
+                )?
+            }
             ErrorKind::UnexpectedIdent(ident) => {
                 write!(f, "Syntax Error: Unexpected identifier `{}`", ident.name)?
             }
@@ -168,8 +146,7 @@ impl From<CommonError<LexerError>> for Error {
     }
 }
 
-// TODO this can only be relied on for known values, etc. expected values
-fn token_value_to_string(token: &TokenValue) -> &str {
+fn expected_token_to_string(token: &TokenValue) -> &str {
     match token {
         TokenValue::Keyword(keyword) => keyword.as_str(),
         TokenValue::Identifier(ident) => ident.as_str(),

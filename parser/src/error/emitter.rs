@@ -1,4 +1,4 @@
-use crate::error::ErrorKind;
+use crate::error::{expected_token_to_string, ErrorKind};
 use crate::Error;
 use fajt_ast::Span;
 use std::io::Write;
@@ -32,7 +32,7 @@ impl<'a, 'b, 'c, W: Write> ErrorEmitter<'a, 'b, 'c, W> {
         )?;
 
         if error.kind != ErrorKind::EndOfStream {
-            let label = error.kind.get_description().unwrap_or_default();
+            let label = self.get_kind_description(error);
             self.emit_diagnostic(error, &label, line_number, line_span)?;
         }
 
@@ -92,5 +92,30 @@ impl<'a, 'b, 'c, W: Write> ErrorEmitter<'a, 'b, 'c, W> {
             .unwrap_or(self.source.len());
 
         Span::new(start, end)
+    }
+
+    fn get_kind_description(&self, error: &Error) -> String {
+        match &error.kind {
+            ErrorKind::ForbiddenIdentifier(keyword) => {
+                format!(
+                    "`{}` is not allowed as an identifier in this context",
+                    keyword
+                )
+            }
+            ErrorKind::UnexpectedToken(_, None) => "Unexpected token".to_string(),
+            ErrorKind::UnexpectedToken(_, Some(expected)) => {
+                let token_value = &self.source[error.span.start..error.span.end];
+                format!(
+                    "Unexpected token, found `{}`, expected `{}`",
+                    token_value,
+                    expected_token_to_string(expected),
+                )
+            }
+            ErrorKind::ExpectedIdentifier(expected) => format!(
+                "Unexpected token, found `{}`, expected identifier",
+                expected_token_to_string(expected),
+            ),
+            _ => String::new(),
+        }
     }
 }
