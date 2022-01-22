@@ -1,5 +1,7 @@
-use crate::error::ErrorKind::{EndOfStream, ForbiddenIdentifier, SyntaxError, UnexpectedIdent};
-use crate::UnexpectedToken;
+use crate::error::ErrorKind::{
+    EndOfStream, ExpectedIdentifier, ForbiddenIdentifier, SyntaxError, UnexpectedIdent,
+    UnexpectedToken,
+};
 use fajt_ast::{Ident, Span};
 use fajt_common::io::Error as CommonError;
 use fajt_lexer::error::Error as LexerError;
@@ -15,7 +17,6 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub struct Error {
     kind: ErrorKind,
     span: Span,
-    pub diagnostic: Option<Diagnostic>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -29,7 +30,6 @@ impl Error {
         Error {
             kind: ErrorKind::LexerError(error),
             span,
-            diagnostic: None,
         }
     }
 
@@ -37,7 +37,6 @@ impl Error {
         Error {
             kind: SyntaxError(message),
             span,
-            diagnostic: None,
         }
     }
 
@@ -46,7 +45,6 @@ impl Error {
         Error {
             kind: UnexpectedIdent(ident),
             span,
-            diagnostic: None,
         }
     }
 
@@ -55,7 +53,6 @@ impl Error {
         Error {
             kind: UnexpectedToken(token.value, None),
             span,
-            diagnostic: None,
         }
     }
 
@@ -64,7 +61,14 @@ impl Error {
         Error {
             kind: UnexpectedToken(token.value, Some(expected)),
             span,
-            diagnostic: None,
+        }
+    }
+
+    pub(crate) fn expected_ident(token: Token) -> Self {
+        let span = token.span.clone();
+        Error {
+            kind: ExpectedIdentifier(token.value),
+            span,
         }
     }
 
@@ -72,7 +76,6 @@ impl Error {
         Error {
             kind: ForbiddenIdentifier(identifier),
             span,
-            diagnostic: None,
         }
     }
 
@@ -80,7 +83,6 @@ impl Error {
         Error {
             kind: EndOfStream,
             span: Span::new(pos, pos),
-            diagnostic: None,
         }
     }
 
@@ -95,6 +97,7 @@ pub enum ErrorKind {
     EndOfStream,
     LexerError(LexerError),
     SyntaxError(String),
+    ExpectedIdentifier(TokenValue),
     UnexpectedToken(TokenValue, Option<&'static TokenValue>),
     UnexpectedIdent(Ident),
     ForbiddenIdentifier(String),
@@ -110,10 +113,14 @@ impl ErrorKind {
                 )
             }
             UnexpectedToken(_, None) => "Unexpected token".to_string(),
-            UnexpectedToken(value, Some(expected)) => format!(
+            UnexpectedToken(token, Some(expected)) => format!(
                 "Unexpected token, found `{}`, expected `{}`",
-                value.to_string(),
+                token.to_string(),
                 expected.to_string()
+            ),
+            ExpectedIdentifier(token) => format!(
+                "Unexpected token, found `{}`, expected identifier",
+                token.to_string(),
             ),
             _ => return None,
         })
@@ -126,8 +133,8 @@ impl fmt::Display for Error {
             ErrorKind::EndOfStream => write!(f, "Syntax error: Unexpected end of input")?,
             ErrorKind::LexerError(e) => write!(f, "Lexer error '{}'", e)?,
             ErrorKind::SyntaxError(msg) => write!(f, "Syntax error: {}", msg)?,
-            ErrorKind::UnexpectedToken(value, _) => {
-                write!(f, "Syntax error: Unexpected token `{}`", value.to_string())?
+            ErrorKind::ExpectedIdentifier(token) | ErrorKind::UnexpectedToken(token, _) => {
+                write!(f, "Syntax error: Unexpected token `{}`", token.to_string())?
             }
             ErrorKind::UnexpectedIdent(ident) => {
                 write!(f, "Syntax Error: Unexpected identifier `{}`", ident.name)?

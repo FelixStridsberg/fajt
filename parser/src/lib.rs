@@ -17,8 +17,7 @@ mod module;
 mod stmt;
 mod variable;
 
-use crate::error::ErrorKind::UnexpectedToken;
-use crate::error::{Diagnostic, Error, Result};
+use crate::error::{Error, Result};
 use fajt_ast::{Expr, Ident, LitString, Literal, Program, PropertyName, SourceType, Span, Stmt};
 use fajt_common::io::{PeekRead, PeekReader, ReReadWithState};
 use fajt_lexer::token::{KeywordContext, Token, TokenValue};
@@ -352,7 +351,7 @@ where
                     return Err(Error::forbidden_identifier(keyword.to_string(), token.span));
                 }
             }
-            _ => return Err(self.expected_identifier_error(token)),
+            _ => return Err(Error::expected_ident(token)),
         })
     }
 
@@ -430,20 +429,6 @@ where
         }
 
         Ok(())
-    }
-
-    fn expected_identifier_error(&mut self, token: Token) -> Error {
-        let diagnostic = Diagnostic {
-            span: token.span.clone(),
-            label: format!(
-                "Unexpected token, found `{}`, expected identifier",
-                token.value.to_string(),
-            ),
-        };
-
-        let mut error = Error::unexpected_token(token);
-        error.diagnostic = Some(diagnostic);
-        error
     }
 }
 

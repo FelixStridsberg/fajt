@@ -31,13 +31,9 @@ impl<'a, 'b, 'c, W: Write> ErrorEmitter<'a, 'b, 'c, W> {
             self.filename, line_number, col_number
         )?;
 
-        let label = if let Some(diagnostic) = error.diagnostic.as_ref() {
-            diagnostic.label.to_string() // TODO
-        } else {
-            error.kind.get_description().unwrap_or_default()
-        };
 
         if error.kind != ErrorKind::EndOfStream {
+            let label = error.kind.get_description().unwrap_or_default();
             self.emit_diagnostic(error, &label, line_number, line_span)?;
         }
 
