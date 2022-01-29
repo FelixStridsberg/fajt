@@ -108,12 +108,12 @@ impl<'a, 'b, 'c, W: Write> ErrorEmitter<'a, 'b, 'c, W> {
                 format!(
                     "Unexpected token, found `{}`, expected `{}`",
                     token_value,
-                    expected_token_to_string(expected),
+                    expected_token_to_string(expected).unwrap_or_default(),
                 )
             }
             ErrorKind::ExpectedIdentifier(expected) => format!(
                 "Unexpected token, found `{}`, expected identifier",
-                expected_token_to_string(expected),
+                expected_token_to_string(expected).unwrap_or_default(),
             ),
             _ => String::new(),
         }

@@ -109,12 +109,12 @@ impl fmt::Display for Error {
             ErrorKind::EndOfStream => write!(f, "Syntax error: Unexpected end of input")?,
             ErrorKind::LexerError(e) => write!(f, "Lexer error '{}'", e)?,
             ErrorKind::SyntaxError(msg) => write!(f, "Syntax error: {}", msg)?,
-            ErrorKind::ExpectedIdentifier(expected) | ErrorKind::UnexpectedToken(expected, _) => {
-                write!(
-                    f,
-                    "Syntax error: Unexpected token `{}`",
-                    expected_token_to_string(expected)
-                )?
+            ErrorKind::ExpectedIdentifier(token) | ErrorKind::UnexpectedToken(token, _) => {
+                if let Some(token_str) = expected_token_to_string(token) {
+                    write!(f, "Syntax error: Unexpected token `{}`", token_str)?
+                } else {
+                    write!(f, "Syntax error: Unexpected token")?
+                }
             }
             ErrorKind::UnexpectedIdent(ident) => {
                 write!(f, "Syntax Error: Unexpected identifier `{}`", ident.name)?
@@ -146,11 +146,12 @@ impl From<CommonError<LexerError>> for Error {
     }
 }
 
-fn expected_token_to_string(token: &TokenValue) -> &str {
-    match token {
+// TODO Unexpected string, Unexpected number, etc?
+fn expected_token_to_string(token: &TokenValue) -> Option<&str> {
+    Some(match token {
         TokenValue::Keyword(keyword) => keyword.as_str(),
         TokenValue::Identifier(ident) => ident.as_str(),
         TokenValue::Punct(punct) => punct.as_str(),
-        _ => unreachable!(),
-    }
+        _ => return None,
+    })
 }
