@@ -1,16 +1,14 @@
 ### Source
 ```js
-function fn() {
-  "use strict";
-  eval = true;
-}
+"use strict";
+eval = true;
 ```
 
 ### Output: error
 ```txt
 Syntax error: Unexpected `eval` or `arguments` in strict mode
- --> test.js:3:3
+ --> test.js:2:1
   |
-3 |   eval = true;
-  |   ^^^^ 
+2 | eval = true;
+  | ^^^^ 
 ```

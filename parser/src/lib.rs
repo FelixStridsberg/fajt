@@ -146,14 +146,13 @@ impl Parse for Program {
         let span_start = parser.position();
 
         let directives = parser.parse_directive_prologue()?;
-        let mut body = Vec::new();
-        loop {
-            if parser.reader.is_end() {
-                break;
-            }
+        let strict_mode = directives.iter().any(|s| s.value == "use strict");
 
-            body.push(parser.parse_stmt()?);
-        }
+        let body = if strict_mode {
+            parser.with_context(parser.context.with_strict(true)).parse_all_stmts()?
+        } else {
+            parser.parse_all_stmts()?
+        };
 
         let span = parser.span_from(span_start);
         let stmt_list = StmtList {

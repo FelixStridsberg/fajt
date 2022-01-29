@@ -16,6 +16,19 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
     I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
+    pub(super) fn parse_all_stmts(&mut self) -> Result<Vec<Stmt>> {
+        let mut stmts = Vec::new();
+        loop {
+            if self.reader.is_end() {
+                break;
+            }
+
+            stmts.push(self.parse_stmt()?);
+        }
+
+        Ok(stmts)
+    }
+
     // Parses statements, we handle declarations as statements as well since they appear in the same
     // contexts.
     pub(super) fn parse_stmt(&mut self) -> Result<Stmt> {
