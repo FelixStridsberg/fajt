@@ -71,7 +71,6 @@ where
             _ => {
                 let expr = self.parse_conditional_expr()?;
 
-                // TODO assignment left side must be LeftHandSideExpression
                 let assignment_operator = match self.current() {
                     token_matches!(ok: punct!("=")) => Some(assignment_op!("=")),
                     token_matches!(ok: punct!("*=")) => Some(assignment_op!("*=")),
@@ -90,6 +89,8 @@ where
                 };
 
                 if let Some(operator) = assignment_operator {
+                    self.semantics.validate_left_side_expr(&expr, &operator)?;
+
                     self.consume()?; // consume the operator
                     let right = self.parse_assignment_expr()?;
                     let span = self.span_from(span_start);
