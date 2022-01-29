@@ -13,6 +13,7 @@ import*as ns from'module'
 {
   "Module": {
     "span": "0:29",
+    "directives": [],
     "body": [
       {
         "ImportDecl": {

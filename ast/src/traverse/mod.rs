@@ -401,6 +401,7 @@ generate_fold_and_visit! {
         }
 
         StmtList<Stmt>: (enter: enter_stmt_list, exit: exit_stmt_list) {
+            directives
             body
         }
 

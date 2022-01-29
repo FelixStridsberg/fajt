@@ -13,6 +13,7 @@ import abc from'module'
 {
   "Module": {
     "span": "0:25",
+    "directives": [],
     "body": [
       {
         "ImportDecl": {

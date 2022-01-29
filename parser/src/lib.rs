@@ -20,7 +20,9 @@ mod variable;
 
 use crate::error::{Error, Result};
 use crate::static_semantics::StaticSemantics;
-use fajt_ast::{Expr, Ident, LitString, Literal, Program, PropertyName, SourceType, Span, Stmt};
+use fajt_ast::{
+    Expr, Ident, LitString, Literal, Program, PropertyName, SourceType, Span, Stmt, StmtList,
+};
 use fajt_common::io::{PeekRead, PeekReader, ReReadWithState};
 use fajt_lexer::token::{KeywordContext, Token, TokenValue};
 use fajt_lexer::{punct, Lexer};
@@ -141,6 +143,9 @@ impl Parse for Program {
         I: PeekRead<Token, Error = fajt_lexer::error::Error>,
         I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
     {
+        let span_start = parser.position();
+
+        let directives = parser.parse_directive_prologue()?;
         let mut body = Vec::new();
         loop {
             if parser.reader.is_end() {
@@ -149,7 +154,15 @@ impl Parse for Program {
 
             body.push(parser.parse_stmt()?);
         }
-        Ok(Program::from_body(parser.source_type.get(), body))
+
+        let span = parser.span_from(span_start);
+        let stmt_list = StmtList {
+            span,
+            directives,
+            body,
+        };
+
+        Ok(Program::new(parser.source_type.get(), stmt_list))
     }
 }
 

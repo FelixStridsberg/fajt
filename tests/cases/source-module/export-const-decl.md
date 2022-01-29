@@ -15,6 +15,7 @@ export let a=1,b=2,c
 {
   "Module": {
     "span": "0:49",
+    "directives": [],
     "body": [
       {
         "ExportDecl": {

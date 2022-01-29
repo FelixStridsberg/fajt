@@ -14,6 +14,7 @@ async();async(a,b);
 {
   "Script": {
     "span": "0:21",
+    "directives": [],
     "body": [
       {
         "Expr": {

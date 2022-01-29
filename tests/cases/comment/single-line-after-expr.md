@@ -13,6 +13,7 @@ var a=1
 {
   "Script": {
     "span": "0:10",
+    "directives": [],
     "body": [
       {
         "Variable": {

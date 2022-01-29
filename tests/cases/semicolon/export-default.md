@@ -21,6 +21,7 @@ export default class cls {};
 {
   "Module": {
     "span": "0:402",
+    "directives": [],
     "body": [
       {
         "ExportDecl": {

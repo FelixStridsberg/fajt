@@ -9,6 +9,7 @@ b // Comment
 {
   "Script": {
     "span": "0:14",
+    "directives": [],
     "body": [
       {
         "Expr": {

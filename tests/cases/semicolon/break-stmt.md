@@ -9,6 +9,7 @@ break;
 {
   "Script": {
     "span": "0:12",
+    "directives": [],
     "body": [
       {
         "Break": {

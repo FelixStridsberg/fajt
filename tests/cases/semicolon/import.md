@@ -17,6 +17,7 @@ import'module';import def from'module';import*as ns from"module";import{}from'mo
 {
   "Module": {
     "span": "0:127",
+    "directives": [],
     "body": [
       {
         "ImportDecl": {

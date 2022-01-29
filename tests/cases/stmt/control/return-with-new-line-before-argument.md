@@ -14,6 +14,7 @@ return;a
 {
   "Script": {
     "span": "0:8",
+    "directives": [],
     "body": [
       {
         "Return": {

@@ -14,6 +14,7 @@ break;a
 {
   "Script": {
     "span": "0:7",
+    "directives": [],
     "body": [
       {
         "Break": {

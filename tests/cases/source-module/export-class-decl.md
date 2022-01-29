@@ -13,6 +13,7 @@ export class cls{}
 {
   "Module": {
     "span": "0:19",
+    "directives": [],
     "body": [
       {
         "ExportDecl": {

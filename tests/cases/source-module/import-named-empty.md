@@ -13,6 +13,7 @@ import{}from'module'
 {
   "Module": {
     "span": "0:24",
+    "directives": [],
     "body": [
       {
         "ImportDecl": {

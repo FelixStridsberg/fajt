@@ -27,6 +27,7 @@ export class name {};
 {
   "Module": {
     "span": "0:417",
+    "directives": [],
     "body": [
       {
         "ExportDecl": {

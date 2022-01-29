@@ -13,6 +13,7 @@ export*as alias from'other-module'
 {
   "Module": {
     "span": "0:37",
+    "directives": [],
     "body": [
       {
         "ExportDecl": {

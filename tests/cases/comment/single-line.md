@@ -13,6 +13,7 @@
 {
   "Script": {
     "span": "0:0",
+    "directives": [],
     "body": []
   }
 }

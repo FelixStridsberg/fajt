@@ -13,6 +13,7 @@
 {
   "Script": {
     "span": "0:26",
+    "directives": [],
     "body": [
       {
         "Expr": {

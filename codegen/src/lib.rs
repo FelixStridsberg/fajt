@@ -382,6 +382,16 @@ impl Visitor for CodeGenerator<'_> {
         }
     }
 
+    fn enter_stmt_list(&mut self, node: &mut StmtList<Stmt>) -> bool {
+        for directive in &mut node.directives {
+            directive.traverse(self);
+            self.char(';');
+            self.new_line();
+        }
+        node.body.traverse(self);
+        false
+    }
+
     fn enter_block_stmt(&mut self, node: &mut StmtBlock) -> bool {
         self.start_block();
         node.statements.traverse(&mut self.with_indent());

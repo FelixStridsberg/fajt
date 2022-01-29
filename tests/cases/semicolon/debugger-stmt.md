@@ -9,6 +9,7 @@ debugger;
 {
   "Script": {
     "span": "0:18",
+    "directives": [],
     "body": [
       {
         "Debugger": {

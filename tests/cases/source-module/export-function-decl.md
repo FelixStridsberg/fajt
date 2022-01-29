@@ -13,6 +13,7 @@ export function fn(){}
 {
   "Module": {
     "span": "0:23",
+    "directives": [],
     "body": [
       {
         "ExportDecl": {

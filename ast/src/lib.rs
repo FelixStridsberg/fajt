@@ -34,6 +34,7 @@ pub trait Spanned {
 #[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
 pub struct StmtList<T> {
     pub span: Span,
+    pub directives: Vec<LitString>,
     pub body: Vec<T>,
 }
 
@@ -44,15 +45,11 @@ pub enum Program {
 }
 
 impl Program {
-    pub fn from_body(source_type: SourceType, body: Vec<Stmt>) -> Self {
-        let span_start = body.first().map(|s| s.span().start).unwrap_or(0);
-        let span_end = body.last().map(|s| s.span().end).unwrap_or(0);
-        let span = Span::new(span_start, span_end);
-
+    pub fn new(source_type: SourceType, stmt_list: StmtList<Stmt>) -> Self {
         if source_type == SourceType::Module {
-            Program::Module(StmtList { span, body })
+            Program::Module(stmt_list)
         } else {
-            Program::Script(StmtList { span, body })
+            Program::Script(stmt_list)
         }
     }
 

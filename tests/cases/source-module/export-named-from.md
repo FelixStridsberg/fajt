@@ -13,6 +13,7 @@ export{a,b as c}from'other-module'
 {
   "Module": {
     "span": "0:41",
+    "directives": [],
     "body": [
       {
         "ExportDecl": {

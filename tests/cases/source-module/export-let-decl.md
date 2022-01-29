@@ -15,6 +15,7 @@ export const a=1,b=2,c
 {
   "Module": {
     "span": "0:55",
+    "directives": [],
     "body": [
       {
         "ExportDecl": {

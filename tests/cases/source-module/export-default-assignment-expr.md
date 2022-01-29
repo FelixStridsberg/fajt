@@ -13,6 +13,7 @@ export default 1+10
 {
   "Module": {
     "span": "0:22",
+    "directives": [],
     "body": [
       {
         "ExportDecl": {

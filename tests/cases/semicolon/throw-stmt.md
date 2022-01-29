@@ -9,6 +9,7 @@ throw a;
 {
   "Script": {
     "span": "0:16",
+    "directives": [],
     "body": [
       {
         "Throw": {

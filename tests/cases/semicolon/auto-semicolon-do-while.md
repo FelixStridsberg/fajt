@@ -8,6 +8,7 @@ do ; while(a) b
 {
   "Script": {
     "span": "0:15",
+    "directives": [],
     "body": [
       {
         "DoWhile": {

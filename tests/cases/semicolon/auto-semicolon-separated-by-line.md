@@ -9,6 +9,7 @@ b
 {
   "Script": {
     "span": "0:3",
+    "directives": [],
     "body": [
       {
         "Expr": {

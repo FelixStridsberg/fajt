@@ -13,6 +13,7 @@ export default async function fn(){}
 {
   "Module": {
     "span": "0:37",
+    "directives": [],
     "body": [
       {
         "ExportDecl": {

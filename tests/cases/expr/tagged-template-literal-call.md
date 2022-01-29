@@ -13,6 +13,7 @@ call()`template`
 {
   "Script": {
     "span": "0:17",
+    "directives": [],
     "body": [
       {
         "Expr": {

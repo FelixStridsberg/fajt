@@ -13,6 +13,7 @@ new fn()`test`
 {
   "Script": {
     "span": "0:15",
+    "directives": [],
     "body": [
       {
         "Expr": {

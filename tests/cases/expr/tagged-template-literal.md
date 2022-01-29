@@ -13,6 +13,7 @@ a`template`
 {
   "Script": {
     "span": "0:12",
+    "directives": [],
     "body": [
       {
         "Expr": {

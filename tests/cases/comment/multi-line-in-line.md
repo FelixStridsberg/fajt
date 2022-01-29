@@ -13,6 +13,7 @@ throw"error"
 {
   "Script": {
     "span": "13:40",
+    "directives": [],
     "body": [
       {
         "Throw": {

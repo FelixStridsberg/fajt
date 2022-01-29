@@ -13,6 +13,7 @@ call()`1``2`
 {
   "Script": {
     "span": "0:13",
+    "directives": [],
     "body": [
       {
         "Expr": {
