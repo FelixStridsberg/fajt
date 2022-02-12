@@ -273,13 +273,13 @@ where
 
         let span_start = self.position();
         let argument = self.parse_left_hand_side_expr()?;
-        let suffix_operator = match self.current() {
+        let postfix_operator = match self.current() {
             token_matches!(ok: punct!("++")) => Some(update_op!("++")),
             token_matches!(ok: punct!("--")) => Some(update_op!("--")),
             _ => None,
         };
 
-        if let Some(operator) = suffix_operator {
+        if let Some(operator) = postfix_operator {
             if self.current()?.first_on_line {
                 return Ok(argument);
             }
