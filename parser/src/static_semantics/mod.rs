@@ -1,6 +1,9 @@
 use crate::error::Result;
 use crate::{Context, Error};
-use fajt_ast::{ArrayElement, AssignmentOperator, Expr, ExprLiteral, LitArray, Literal, Spanned};
+use fajt_ast::{
+    ArrayElement, AssignmentOperator, Expr, ExprLiteral, LitArray, LitObject, Literal,
+    PropertyDefinition, Spanned,
+};
 
 pub struct StaticSemantics {
     context: Context,
@@ -26,11 +29,10 @@ impl StaticSemantics {
                     return self.validate_array_literal_cover_assignment(array);
                 }
                 Expr::Literal(ExprLiteral {
-                    literal: Literal::Object(_),
+                    literal: Literal::Object(object),
                     ..
                 }) => {
-                    todo!("Object literal");
-                    //return;
+                    return self.validate_object_literal_cover_assignment(object);
                 }
                 _ => {}
             }
@@ -74,6 +76,26 @@ impl StaticSemantics {
             }
 
             if let ArrayElement::Spread(spread) = element {
+                return Err(Error::syntax_error(
+                    "Rest element must be last element".to_owned(),
+                    spread.span().clone(),
+                ));
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Validates that `ObjectLiteral` covers `ObjectAssignment`.
+    fn validate_object_literal_cover_assignment(&self, object: &LitObject) -> Result<()> {
+        let mut props = object.props.iter().peekable();
+
+        while let Some(prop) = props.next() {
+            if props.peek().is_none() {
+                break;
+            }
+
+            if let PropertyDefinition::Spread(spread) = prop {
                 return Err(Error::syntax_error(
                     "Rest element must be last element".to_owned(),
                     spread.span().clone(),
