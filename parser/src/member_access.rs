@@ -39,6 +39,11 @@ where
                     if self.peek_matches(&punct!("(")) {
                         object = self.parse_optional_call_expr(span_start, object)?;
                     } else {
+                        if let Some(token) = self.peek() {
+                            self.semantics
+                                .validate_no_template_in_optional_chain(token)?;
+                        }
+
                         object = self.parse_optional_member_expr(span_start, object)?;
                     }
                 }
@@ -48,7 +53,14 @@ where
                 token_matches!(ok: punct!("(")) => {
                     object = self.parse_optional_call_expr(span_start, object)?;
                 }
-                _ => break,
+                token => {
+                    if let Ok(token) = token {
+                        self.semantics
+                            .validate_no_template_in_optional_chain(token)?;
+                    }
+
+                    break;
+                }
             }
         }
 

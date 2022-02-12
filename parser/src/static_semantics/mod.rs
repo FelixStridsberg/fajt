@@ -4,6 +4,7 @@ use fajt_ast::{
     ArrayElement, AssignmentOperator, Expr, ExprLiteral, LitArray, LitObject, Literal,
     PropertyDefinition, Spanned,
 };
+use fajt_lexer::token::{Token, TokenValue};
 
 pub struct StaticSemantics {
     context: Context,
@@ -77,6 +78,21 @@ impl StaticSemantics {
                 "Invalid update expression argument".to_owned(),
                 argument.span().clone(),
             ));
+        }
+
+        Ok(())
+    }
+
+    /// Validates token is not a template string during parsing of optional chain.
+    pub(crate) fn validate_no_template_in_optional_chain(&self, token: &Token) -> Result<()> {
+        match token.value {
+            TokenValue::TemplateHead(_) | TokenValue::Literal(Literal::Template(_)) => {
+                return Err(Error::syntax_error(
+                    "Invalid tagged template on optional chain".to_owned(),
+                    token.span.clone(),
+                ));
+            }
+            _ => {}
         }
 
         Ok(())
