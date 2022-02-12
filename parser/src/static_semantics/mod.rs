@@ -15,7 +15,7 @@ impl StaticSemantics {
     }
 
     /// Validates if expr is allowed as left-hand side for the given operator.
-    pub fn validate_left_side_expr(
+    pub(crate) fn validate_left_side_expr(
         &self,
         expr: &Expr,
         operator: &AssignmentOperator,
@@ -65,6 +65,18 @@ impl StaticSemantics {
                 return self.validate_delete_argument(parenthesized.expression.as_ref());
             }
             _ => {}
+        }
+
+        Ok(())
+    }
+
+    /// Validates the argument of prefix or postfix update expression.
+    pub(crate) fn validate_update_expression_argument(&self, argument: &Expr) -> Result<()> {
+        if !self.is_assignment_target_type_simple(argument)? {
+            return Err(Error::syntax_error(
+                "Invalid update expression argument".to_owned(),
+                argument.span().clone(),
+            ));
         }
 
         Ok(())

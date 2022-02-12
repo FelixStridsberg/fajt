@@ -259,13 +259,17 @@ where
         if let Some(operator) = prefix_operator {
             let span_start = self.position();
             self.consume()?;
-            let argument = self.parse_unary_expr()?.into();
+            let argument = self.parse_unary_expr()?;
+
+            self.semantics
+                .validate_update_expression_argument(&argument)?;
+
             let span = self.span_from(span_start);
             return Ok(ExprUpdate {
                 span,
                 operator,
                 prefix: true,
-                argument,
+                argument: argument.into(),
             }
             .into());
         }
@@ -282,6 +286,9 @@ where
             if self.current()?.first_on_line {
                 return Ok(argument);
             }
+
+            self.semantics
+                .validate_update_expression_argument(&argument)?;
 
             self.consume()?;
             let span = self.span_from(span_start);
