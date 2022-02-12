@@ -1,6 +1,6 @@
 use crate::error::Result;
 use crate::{Context, Error};
-use fajt_ast::{AssignmentOperator, Expr, ExprLiteral, Literal, Spanned};
+use fajt_ast::{ArrayElement, AssignmentOperator, Expr, ExprLiteral, LitArray, Literal, Spanned};
 
 pub struct StaticSemantics {
     context: Context,
@@ -20,11 +20,10 @@ impl StaticSemantics {
         if operator == &AssignmentOperator::Assign {
             match expr {
                 Expr::Literal(ExprLiteral {
-                    literal: Literal::Array(_),
+                    literal: Literal::Array(array),
                     ..
                 }) => {
-                    todo!("Array literal");
-                    //return;
+                    return self.validate_array_literal_cover_assignment(array);
                 }
                 Expr::Literal(ExprLiteral {
                     literal: Literal::Object(_),
@@ -63,5 +62,25 @@ impl StaticSemantics {
             Expr::Member(_) => true,
             _ => false,
         })
+    }
+
+    /// Validates that `ArrayLiteral` covers `ArrayAssignment`.
+    fn validate_array_literal_cover_assignment(&self, array: &LitArray) -> Result<()> {
+        let mut elements = array.elements.iter().peekable();
+
+        while let Some(element) = elements.next() {
+            if elements.peek().is_none() {
+                break;
+            }
+
+            if let ArrayElement::Spread(spread) = element {
+                return Err(Error::syntax_error(
+                    "Rest element must be last element".to_owned(),
+                    spread.span().clone(),
+                ));
+            }
+        }
+
+        Ok(())
     }
 }

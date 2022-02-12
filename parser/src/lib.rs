@@ -149,7 +149,9 @@ impl Parse for Program {
         let strict_mode = directives.iter().any(|s| s.value == "use strict");
 
         let body = if strict_mode {
-            parser.with_context(parser.context.with_strict(true)).parse_all_stmts()?
+            parser
+                .with_context(parser.context.with_strict(true))
+                .parse_all_stmts()?
         } else {
             parser.parse_all_stmts()?
         };
