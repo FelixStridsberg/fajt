@@ -86,7 +86,7 @@ where
                 };
 
                 if let Some(operator) = assignment_operator {
-                    self.semantics.validate_left_side_expr(&expr, &operator)?;
+                    self.validate_left_side_expr(&expr, &operator)?;
 
                     self.consume()?; // consume the operator
                     let right = self.parse_assignment_expr()?;
@@ -230,7 +230,7 @@ where
             let argument = self.parse_unary_expr()?;
 
             if operator == unary_op!("delete") {
-                self.semantics.validate_delete_argument(&argument)?;
+                self.validate_delete_argument(&argument)?;
             }
 
             let span = self.span_from(span_start);
@@ -258,8 +258,7 @@ where
             self.consume()?;
             let argument = self.parse_unary_expr()?;
 
-            self.semantics
-                .validate_update_expression_argument(&argument)?;
+            self.validate_update_expression_argument(&argument)?;
 
             let span = self.span_from(span_start);
             return Ok(ExprUpdate {
@@ -284,8 +283,7 @@ where
                 return Ok(argument);
             }
 
-            self.semantics
-                .validate_update_expression_argument(&argument)?;
+            self.validate_update_expression_argument(&argument)?;
 
             self.consume()?;
             let span = self.span_from(span_start);

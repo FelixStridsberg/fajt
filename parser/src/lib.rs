@@ -7,6 +7,7 @@ mod binary_expr;
 mod binding;
 mod class;
 mod cover;
+mod early_error;
 mod expr;
 mod function;
 mod iteration;
@@ -14,12 +15,10 @@ mod literal;
 mod member_access;
 mod method;
 mod module;
-mod static_semantics;
 mod stmt;
 mod variable;
 
 use crate::error::{Error, Result};
-use crate::static_semantics::StaticSemantics;
 use fajt_ast::{
     Expr, Ident, LitString, Literal, Program, PropertyName, SourceType, Span, Stmt, StmtList,
 };
@@ -172,7 +171,6 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
 {
     context: Context,
-    semantics: StaticSemantics,
     reader: &'a mut PeekReader<Token, I>,
     source_type: Rc<Cell<SourceType>>,
 }
@@ -185,7 +183,6 @@ where
     pub fn new(reader: &'a mut PeekReader<Token, I>, source_type: SourceType) -> Result<Self> {
         Ok(Parser {
             context: Context::default(),
-            semantics: StaticSemantics::with_context(Context::default()),
             reader,
             source_type: Rc::new(Cell::new(source_type)),
         })
@@ -235,8 +232,7 @@ where
 
     pub fn with_context(&mut self, context: Context) -> Parser<'_, I> {
         Parser {
-            context: context.clone(),
-            semantics: StaticSemantics::with_context(context),
+            context,
             reader: self.reader,
             source_type: self.source_type.clone(),
         }

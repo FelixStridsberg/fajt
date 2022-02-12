@@ -1,10 +1,10 @@
 use crate::error::Result;
-use crate::Parser;
+use crate::{Error, Parser};
 use fajt_ast::{
-    Expr, ExprMember, ExprOptionalCall, ExprOptionalMember, MemberObject, MemberProperty,
+    Expr, ExprMember, ExprOptionalCall, ExprOptionalMember, Literal, MemberObject, MemberProperty,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
-use fajt_lexer::token::Token;
+use fajt_lexer::token::{Token, TokenValue};
 use fajt_lexer::token_matches;
 use fajt_lexer::{punct, LexerState};
 
@@ -40,8 +40,7 @@ where
                         object = self.parse_optional_call_expr(span_start, object)?;
                     } else {
                         if let Some(token) = self.peek() {
-                            self.semantics
-                                .validate_no_template_in_optional_chain(token)?;
+                            self.validate_no_template_in_optional_chain(token)?;
                         }
 
                         object = self.parse_optional_member_expr(span_start, object)?;
@@ -55,8 +54,7 @@ where
                 }
                 token => {
                     if let Ok(token) = token {
-                        self.semantics
-                            .validate_no_template_in_optional_chain(token)?;
+                        self.validate_no_template_in_optional_chain(token)?;
                     }
 
                     break;
@@ -65,6 +63,21 @@ where
         }
 
         Ok(object)
+    }
+
+    /// Early error on template string during parsing of optional chain.
+    pub(crate) fn validate_no_template_in_optional_chain(&self, token: &Token) -> Result<()> {
+        match token.value {
+            TokenValue::TemplateHead(_) | TokenValue::Literal(Literal::Template(_)) => {
+                return Err(Error::syntax_error(
+                    "Invalid tagged template on optional chain".to_owned(),
+                    token.span.clone(),
+                ));
+            }
+            _ => {}
+        }
+
+        Ok(())
     }
 
     fn parse_optional_call_expr(&mut self, span_start: usize, callee: Expr) -> Result<Expr> {
