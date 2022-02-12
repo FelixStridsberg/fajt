@@ -48,6 +48,28 @@ impl StaticSemantics {
         Ok(())
     }
 
+    /// Validates argument of delete unary expression.
+    pub(crate) fn validate_delete_argument(&self, argument: &Expr) -> Result<()> {
+        if !self.context.is_strict {
+            return Ok(());
+        }
+
+        match argument {
+            Expr::IdentRef(ident) => {
+                return Err(Error::syntax_error(
+                    "Delete of an unqualified identifier in strict mode".to_owned(),
+                    ident.span.clone(),
+                ));
+            }
+            Expr::Parenthesized(parenthesized) => {
+                return self.validate_delete_argument(parenthesized.expression.as_ref());
+            }
+            _ => {}
+        }
+
+        Ok(())
+    }
+
     /// Returns true if `AssignmentTargetType` for `expr` is simple.
     fn is_assignment_target_type_simple(&self, expr: &Expr) -> Result<bool> {
         Ok(match expr {

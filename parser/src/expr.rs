@@ -230,12 +230,17 @@ where
         if let Some(operator) = operator {
             let span_start = self.position();
             self.consume()?;
-            let argument = self.parse_unary_expr()?.into();
+            let argument = self.parse_unary_expr()?;
+
+            if operator == unary_op!("delete") {
+                self.semantics.validate_delete_argument(&argument)?;
+            }
+
             let span = self.span_from(span_start);
             Ok(ExprUnary {
                 span,
                 operator,
-                argument,
+                argument: argument.into(),
             }
             .into())
         } else {
