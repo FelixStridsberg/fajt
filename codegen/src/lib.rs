@@ -1108,7 +1108,7 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_array_element(&mut self, node: &mut ArrayElement) -> bool {
         match node {
-            ArrayElement::None => false,
+            ArrayElement::Elision => false,
             ArrayElement::Expr(_) => true,
             ArrayElement::Spread(_) => {
                 self.string("...");

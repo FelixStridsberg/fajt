@@ -24,7 +24,7 @@
               }
             }
           },
-          "None",
+          "Elision",
           {
             "Expr": {
               "IdentRef": {

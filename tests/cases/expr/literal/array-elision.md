@@ -16,7 +16,7 @@
     "literal": {
       "Array": {
         "elements": [
-          "None"
+          "Elision"
         ]
       }
     }

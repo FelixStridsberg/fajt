@@ -108,7 +108,7 @@ where
                 }
                 token_matches!(punct!(",")) => {
                     self.consume()?;
-                    elements.push(ArrayElement::None);
+                    elements.push(ArrayElement::Elision);
                 }
                 token_matches!(punct!("...")) => {
                     self.consume()?;

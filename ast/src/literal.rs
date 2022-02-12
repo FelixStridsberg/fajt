@@ -51,7 +51,7 @@ ast_node! {
 
 ast_node! {
     pub enum ArrayElement {
-        None,
+        Elision,
         Expr(Expr),
         Spread(Expr),
     }
