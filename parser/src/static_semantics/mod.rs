@@ -91,15 +91,20 @@ impl StaticSemantics {
         let mut props = object.props.iter().peekable();
 
         while let Some(prop) = props.next() {
-            if props.peek().is_none() {
-                break;
+            if let PropertyDefinition::Method(method) = prop {
+                return Err(Error::syntax_error(
+                    "Invalid destructuring assignment target".to_owned(),
+                    method.span.clone(),
+                ));
             }
 
-            if let PropertyDefinition::Spread(spread) = prop {
-                return Err(Error::syntax_error(
-                    "Rest element must be last element".to_owned(),
-                    spread.span().clone(),
-                ));
+            if props.peek().is_some() {
+                if let PropertyDefinition::Spread(spread) = prop {
+                    return Err(Error::syntax_error(
+                        "Rest element must be last element".to_owned(),
+                        spread.span().clone(),
+                    ));
+                }
             }
         }
 
