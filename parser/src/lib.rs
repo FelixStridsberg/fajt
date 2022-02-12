@@ -339,7 +339,7 @@ where
                 self.consume()?;
                 let expr = self.parse_assignment_expr()?;
                 self.consume_assert(&punct!("]"))?;
-                Ok(PropertyName::Computed(expr))
+                Ok(PropertyName::Computed(expr.into()))
             }
             _ if self.is_identifier() => Ok(PropertyName::Ident(self.parse_identifier()?)),
             _ => Err(Error::unexpected_token(self.consume()?)),

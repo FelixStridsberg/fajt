@@ -52,7 +52,7 @@ ast_node! {
         Ident(Ident),
         String(LitString),
         Number(LitNumber),
-        Computed(Expr),
+        Computed(Box<Expr>),
     }
 }
 
