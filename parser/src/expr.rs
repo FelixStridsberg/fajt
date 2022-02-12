@@ -57,9 +57,6 @@ where
                 self.parse_yield_expr()
             }
             token_matches!(ok: keyword!("async")) => self.parse_assignment_expr_async(),
-            token_matches!(ok: punct!("(")) => {
-                self.parse_cover_parenthesized_and_arrow_parameters()
-            }
             _ if self.is_identifier()
                 && !self.followed_by_new_lined()
                 && self.peek_matches(&punct!("=>")) =>
@@ -600,7 +597,7 @@ where
                 self.parse_regexp_literal()?
             }
             token_matches!(@template-head) => self.parse_template_literal_expr()?,
-            token_matches!(punct!("(")) => self.parse_parenthesized_expr()?,
+            token_matches!(punct!("(")) => self.parse_cover_parenthesized_and_arrow_parameters()?,
             _ => {
                 // To avoid errors like "unexpected token `.`, expected identifier" as default
                 // errors, only parse the identifier if it may be a identifier in any context
