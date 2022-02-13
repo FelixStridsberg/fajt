@@ -44,7 +44,7 @@ impl Expr {
         if let Expr::IdentRef(ident) = self {
             ident
         } else {
-            panic!("Tried to unwrap {:?} as a ident ref", self);
+            panic!("Tried to unwrap {self:?} as a ident ref");
         }
     }
 
@@ -52,7 +52,7 @@ impl Expr {
         if let Expr::Literal(literal) = self {
             literal
         } else {
-            panic!("Tried to unwrap {:?} as a literal expression", self);
+            panic!("Tried to unwrap {self:?} as a literal expression");
         }
     }
 }

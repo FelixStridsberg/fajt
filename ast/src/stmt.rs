@@ -35,7 +35,7 @@ impl Stmt {
         if let Stmt::Block(block) = self {
             block
         } else {
-            panic!("Tried to unwrap {:?} as a block statement", self);
+            panic!("Tried to unwrap {self:?} as a block statement");
         }
     }
 
@@ -43,7 +43,7 @@ impl Stmt {
         if let Stmt::Expr(expr) = self {
             expr
         } else {
-            panic!("Tried to unwrap {:?} as an expression statement", self);
+            panic!("Tried to unwrap {self:?} as an expression statement");
         }
     }
 }

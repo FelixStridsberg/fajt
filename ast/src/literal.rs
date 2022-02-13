@@ -25,7 +25,7 @@ impl Literal {
         if let Literal::String(string) = self {
             string
         } else {
-            panic!("Tried to unwrap {:?} as a string literal", self);
+            panic!("Tried to unwrap {self:?} as a string literal");
         }
     }
 }

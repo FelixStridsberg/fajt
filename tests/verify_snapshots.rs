@@ -201,7 +201,7 @@ where
     T: Parse + Serialize + DeserializeOwned + PartialEq + Debug + Traverse,
 {
     if result.is_ok() {
-        panic!("Expected error but got {:?}", result);
+        panic!("Expected error but got {result:?}");
     }
 
     let error = result.as_ref().unwrap_err();
