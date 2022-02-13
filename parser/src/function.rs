@@ -120,8 +120,13 @@ where
 
         let generator = self.maybe_consume(&punct!("*"))?;
 
-        self.with_context(self.context.with_yield(generator).with_await(true))
-            .parse_function_expr_content(span_start)
+        self.with_context(
+            self.context
+                .with_yield(generator)
+                .with_await(true)
+                .with_super_call_allowed(false),
+        )
+        .parse_function_expr_content(span_start)
     }
 
     /// Parses the parts from the optional identifier and forward for async/non-async
@@ -171,8 +176,13 @@ where
         let generator = self.maybe_consume(&punct!("*"))?;
         let ident = self.parse_function_identifier()?;
 
-        self.with_context(self.context.with_yield(generator).with_await(true))
-            .parse_function_decl_content(span_start, ident)
+        self.with_context(
+            self.context
+                .with_yield(generator)
+                .with_await(true)
+                .with_super_call_allowed(false),
+        )
+        .parse_function_decl_content(span_start, ident)
     }
 
     /// Parses the parts after the identifier and forward async/non-async function/generator
