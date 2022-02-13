@@ -105,6 +105,7 @@ where
             self.context
                 .with_yield(generator)
                 .with_await(false)
+                .with_in_method(false)
                 .with_super_call_allowed(false),
         )
         .parse_function_expr_content(span_start)
@@ -124,6 +125,7 @@ where
             self.context
                 .with_yield(generator)
                 .with_await(true)
+                .with_in_method(false)
                 .with_super_call_allowed(false),
         )
         .parse_function_expr_content(span_start)
@@ -160,6 +162,7 @@ where
             self.context
                 .with_yield(generator)
                 .with_await(false)
+                .with_in_method(false)
                 .with_super_call_allowed(false),
         )
         .parse_function_decl_content(span_start, ident)
@@ -180,6 +183,7 @@ where
             self.context
                 .with_yield(generator)
                 .with_await(true)
+                .with_in_method(false)
                 .with_super_call_allowed(false),
         )
         .parse_function_decl_content(span_start, ident)

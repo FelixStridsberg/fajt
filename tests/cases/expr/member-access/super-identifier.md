@@ -1,27 +1,74 @@
 ### Source
-```js parse:expr
-super.b
+TODO bad formatting
+
+```js parse:expr check-format:no
+{
+    method() {
+        super.b
+    }
+}
 ```
 
 ### Output: minified
 ```js
-super.b
+{method(){super.b}}
 ```
 
 ### Output: ast
 ```json
 {
-  "Member": {
-    "span": "0:7",
-    "object": {
-      "Super": {
-        "span": "0:5"
-      }
-    },
-    "property": {
-      "Ident": {
-        "span": "6:7",
-        "name": "b"
+  "Literal": {
+    "span": "0:40",
+    "literal": {
+      "Object": {
+        "props": [
+          {
+            "Method": {
+              "span": "6:38",
+              "name": {
+                "Ident": {
+                  "span": "6:12",
+                  "name": "method"
+                }
+              },
+              "kind": "Method",
+              "parameters": {
+                "span": "12:14",
+                "bindings": [],
+                "rest": null
+              },
+              "body": {
+                "span": "15:38",
+                "directives": [],
+                "statements": [
+                  {
+                    "Expr": {
+                      "span": "25:32",
+                      "expr": {
+                        "Member": {
+                          "span": "25:32",
+                          "object": {
+                            "Super": {
+                              "span": "25:30"
+                            }
+                          },
+                          "property": {
+                            "Ident": {
+                              "span": "31:32",
+                              "name": "b"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "generator": false,
+              "asynchronous": false
+            }
+          }
+        ]
       }
     }
   }

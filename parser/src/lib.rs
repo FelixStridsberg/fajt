@@ -70,6 +70,7 @@ pub struct Context {
     is_strict: bool,
     is_default: bool,
 
+    in_method: bool,
     super_call_allowed: bool,
 }
 
@@ -90,6 +91,8 @@ impl Context {
     modifier!(with_in: is_in);
     modifier!(with_strict: is_strict);
     modifier!(with_default: is_default);
+
+    modifier!(with_in_method: in_method);
     modifier!(with_super_call_allowed: super_call_allowed);
 
     fn keyword_context(&self) -> KeywordContext {

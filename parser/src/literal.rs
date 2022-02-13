@@ -188,7 +188,11 @@ where
             }
             _ if self.is_object_method_definition() => {
                 let method = self
-                    .with_context(self.context.with_super_call_allowed(false))
+                    .with_context(
+                        self.context
+                            .with_in_method(true)
+                            .with_super_call_allowed(false),
+                    )
                     .parse_method_definition()?;
                 Ok(PropertyDefinition::Method(method))
             }

@@ -79,11 +79,17 @@ where
 
             let element: ClassElement =
                 if has_super && self.current_matches_identifier("constructor") {
-                    self.with_context(self.context.with_super_call_allowed(true))
+                    self.with_context(
+                        self.context
+                            .with_in_method(true)
+                            .with_super_call_allowed(true),
+                    )
+                    .parse_method_definition()?
+                    .into()
+                } else {
+                    self.with_context(self.context.with_in_method(true))
                         .parse_method_definition()?
                         .into()
-                } else {
-                    self.parse_method_definition()?.into()
                 };
 
             class_body.push(element);

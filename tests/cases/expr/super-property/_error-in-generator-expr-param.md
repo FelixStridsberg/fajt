@@ -8,3 +8,10 @@ class Test extends Test2 {
 ```
 
 ### Output: error
+```txt
+Syntax error: `super` property access only valid inside methods
+ --> test.js:3:34
+  |
+3 |         const a = function* (b = super.a) {};
+  |                                  ^^^^^ 
+```

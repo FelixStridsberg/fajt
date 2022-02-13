@@ -10,3 +10,10 @@ class Test extends Test2 {
 ```
 
 ### Output: error
+```txt
+Syntax error: `super` property access only valid inside methods
+ --> test.js:4:13
+  |
+4 |             super.a;
+  |             ^^^^^ 
+```

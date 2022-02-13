@@ -479,6 +479,14 @@ where
                     ));
                 }
 
+                if !self.context.in_method {
+                    let span = self.span_from(span_start);
+                    return Err(Error::syntax_error(
+                        "`super` property access only valid inside methods".to_string(),
+                        span,
+                    ));
+                }
+
                 self.parse_member_expr_right_side(
                     span_start,
                     MemberObject::Super(Super {
