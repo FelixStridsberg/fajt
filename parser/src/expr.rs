@@ -381,6 +381,14 @@ where
         self.consume()?;
         let (arguments_span, arguments) = self.parse_arguments()?;
         let span = self.span_from(span_start);
+
+        if !self.context.super_call_allowed {
+            return Err(Error::syntax_error(
+                "super() now allowed here".to_owned(),
+                span,
+            ));
+        }
+
         Ok(ExprCall {
             span,
             callee: Callee::Super,

@@ -187,7 +187,9 @@ where
                 )?))
             }
             _ if self.is_object_method_definition() => {
-                let method = self.parse_method_definition()?;
+                let method = self
+                    .with_context(self.context.with_super_call_allowed(false))
+                    .parse_method_definition()?;
                 Ok(PropertyDefinition::Method(method))
             }
             // TODO CoverInitializedName

@@ -61,12 +61,13 @@ where
             .maybe_consume(&keyword!("extends"))?
             .then_try(|| self.parse_left_hand_side_expr().map(Box::new))?;
 
-        let body = self.parse_class_body()?;
+        let has_super = super_class.is_some();
+        let body = self.parse_class_body(has_super)?;
         Ok((super_class, body))
     }
 
     /// Parses the `ClassBody` production, including the { and } terminals.
-    fn parse_class_body(&mut self) -> Result<Vec<ClassElement>> {
+    fn parse_class_body(&mut self, has_super: bool) -> Result<Vec<ClassElement>> {
         self.consume_assert(&punct!("{"))?;
         let mut class_body = Vec::new();
 
@@ -76,7 +77,15 @@ where
                 break;
             }
 
-            let element: ClassElement = self.parse_method_definition()?.into();
+            let element: ClassElement =
+                if has_super && self.current_matches_identifier("constructor") {
+                    self.with_context(self.context.with_super_call_allowed(true))
+                        .parse_method_definition()?
+                        .into()
+                } else {
+                    self.parse_method_definition()?.into()
+                };
+
             class_body.push(element);
         }
 

@@ -69,6 +69,8 @@ pub struct Context {
     is_in: bool,
     is_strict: bool,
     is_default: bool,
+
+    super_call_allowed: bool,
 }
 
 macro_rules! modifier {
@@ -88,6 +90,7 @@ impl Context {
     modifier!(with_in: is_in);
     modifier!(with_strict: is_strict);
     modifier!(with_default: is_default);
+    modifier!(with_super_call_allowed: super_call_allowed);
 
     fn keyword_context(&self) -> KeywordContext {
         let mut keyword_context = KeywordContext::empty();
@@ -254,6 +257,18 @@ where
                 ..
             })
         )
+    }
+
+    fn current_matches_identifier(&self, value: &str) -> bool {
+        if let Ok(Token {
+            value: TokenValue::Identifier(identifier),
+            ..
+        }) = self.current()
+        {
+            value == identifier
+        } else {
+            false
+        }
     }
 
     fn peek_matches(&self, value: &TokenValue) -> bool {
