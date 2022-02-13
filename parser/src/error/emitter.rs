@@ -97,17 +97,13 @@ impl<'a, 'b, 'c, W: Write> ErrorEmitter<'a, 'b, 'c, W> {
     fn get_kind_description(&self, error: &Error) -> String {
         match &error.kind {
             ErrorKind::ForbiddenIdentifier(keyword) => {
-                format!(
-                    "`{}` is not allowed as an identifier in this context",
-                    keyword
-                )
+                format!("`{keyword}` is not allowed as an identifier in this context")
             }
             ErrorKind::UnexpectedToken(_, None) => "Unexpected token".to_string(),
             ErrorKind::UnexpectedToken(_, Some(expected)) => {
                 let token_value = &self.source[error.span.start..error.span.end];
                 format!(
-                    "Unexpected token, found `{}`, expected `{}`",
-                    token_value,
+                    "Unexpected token, found `{token_value}`, expected `{}`",
                     expected_token_to_string(expected).unwrap_or_default(),
                 )
             }

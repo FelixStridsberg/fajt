@@ -23,9 +23,9 @@ fn main() {
 
     if let Some(ctx) = args.generator_context {
         let output = generate_code(program.as_mut().unwrap(), ctx);
-        println!("{}", output);
+        println!("{output}");
     } else {
-        println!("{:#?}", program);
+        println!("{program:#?}");
     }
 }
 

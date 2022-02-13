@@ -48,11 +48,11 @@ impl<'de> Deserialize<'de> for Span {
                 formatter.write_str("struct Span")
             }
 
-            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+            fn visit_str<E>(self, str: &str) -> Result<Self::Value, E>
             where
                 E: serde::de::Error,
             {
-                let mut parts = v.split(':');
+                let mut parts = str.split(':');
                 if let (Some(start), Some(end)) = (parts.next(), parts.next()) {
                     Ok(Span {
                         start: start.parse().unwrap(),
@@ -60,8 +60,7 @@ impl<'de> Deserialize<'de> for Span {
                     })
                 } else {
                     Err(serde::de::Error::custom(format!(
-                        "{} is not a valid span.",
-                        v
+                        "{str} is not a valid span."
                     )))
                 }
             }

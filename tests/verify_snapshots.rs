@@ -71,7 +71,7 @@ const ERROR_SECTION: &str = "Output: error";
 
 // This runs for each .md file in the ./cases folder.
 fn run_test(path: &str) {
-    println!("Running: {}", path);
+    println!("Running: {path}");
 
     let data = read_string(path.as_ref());
     let test = Markdown::from_string(&data);

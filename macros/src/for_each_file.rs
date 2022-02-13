@@ -73,7 +73,7 @@ fn find_files(path: &Path, directory_path: &str) -> Vec<File> {
             let dir_prefix = if directory_path.is_empty() {
                 relative_path
             } else {
-                format!("{}{}", directory_path, relative_path)
+                format!("{directory_path}{relative_path}")
             };
 
             let mut nested_files = find_files(&entry.path(), &dir_prefix);
@@ -96,7 +96,7 @@ fn to_file(entry: &DirEntry, relative_path: &str) -> File {
         .unwrap();
 
     File {
-        relative_path: format!("{}{}", relative_path, name),
+        relative_path: format!("{relative_path}{name}"),
         path,
         extension,
     }
