@@ -256,6 +256,18 @@ impl CodeGenerator<'_> {
         }
     }
 
+    fn without_align(&mut self) -> CodeGenerator<'_> {
+        CodeGenerator {
+            data: self.data,
+            skip_next_separation: self.skip_next_separation,
+            index: self.index.clone(),
+            ctx: GeneratorContext {
+                align: None,
+                ..self.ctx
+            },
+        }
+    }
+
     /// Remove last char in output if match `char`.
     fn remove_last(&mut self, char: char) -> bool {
         if let Some(removed) = self.data.pop() {
@@ -1102,7 +1114,15 @@ impl Visitor for CodeGenerator<'_> {
 
     fn enter_variable_declaration(&mut self, node: &mut VariableDeclaration) -> bool {
         node.pattern.traverse(self);
-        self.initializer(&mut node.initializer);
+
+        if matches!(
+            node.initializer,
+            Some(Expr::ArrowFunction(_) | Expr::Function(_))
+        ) {
+            self.without_align().initializer(&mut node.initializer);
+        } else {
+            self.initializer(&mut node.initializer);
+        }
         false
     }
 

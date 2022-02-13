@@ -1,7 +1,5 @@
 ### Source
-TODO format error
-
-```js check-format:no
+```js
 class Test extends Test2 {
     constructor() {
         const a = () => {
