@@ -7,23 +7,23 @@ macro_rules! token_matches {
     ($token:expr, @literal) => {
         token_matches!($token, $crate::token::TokenValue::Literal(_))
     };
-    ($token:expr, $($value:pat)|+) => {
-        matches!($token, $( $crate::token::Token { value: $value, .. } )|+)
+    ($token:expr, $value:pat) => {
+        matches!($token, $crate::token::Token { value: $value, .. })
     };
-    ($token:expr, opt: $($value:pat)|+) => {
-        token_matches!($token, $( $value )|+, wrap: Some)
+    ($token:expr, opt: $value:pat) => {
+        token_matches!($token, $value, wrap: Some)
     };
-    ($token:expr, ok: $($value:pat)|+) => {
-        token_matches!($token, $( $value )|+, wrap: Ok)
+    ($token:expr, ok: $value:pat) => {
+        token_matches!($token, $value, wrap: Ok)
     };
-    ($token:expr, $($value:pat)|+, wrap: $wrap:path) => {
+    ($token:expr, $value:pat, wrap: $wrap:path) => {
          matches!(
             $token,
-            $( $wrap($crate::token::Token { value: $value, .. }) )|+
+            $wrap($crate::token::Token { value: $value, .. })
         );
     };
-    ($($value:pat)|+) => {
-        $crate::token::Token { value: $( $value )|+, .. }
+    ($value:pat) => {
+        $crate::token::Token { value: $value, .. }
     };
     (@literal) => {
         token_matches!($crate::token::TokenValue::Literal(_))
@@ -31,11 +31,11 @@ macro_rules! token_matches {
     (@template-head) => {
         token_matches!($crate::token::TokenValue::TemplateHead(_))
     };
-    (opt: $($value:pat)|+) => {
-        Some($crate::token::Token { value: $( $value )|+, .. })
+    (opt: $value:pat) => {
+        Some($crate::token::Token { value: $value, .. })
     };
-    (ok: $($value:pat)|+) => {
-        Ok($crate::token::Token { value: $( $value )|+, .. })
+    (ok: $value:pat) => {
+        Ok($crate::token::Token { value: $value, .. })
     };
 }
 
