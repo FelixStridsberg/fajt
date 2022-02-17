@@ -17,10 +17,7 @@ macro_rules! token_matches {
         token_matches!($token, $value, wrap: Ok)
     };
     ($token:expr, $value:pat, wrap: $wrap:path) => {
-         matches!(
-            $token,
-            $wrap($crate::token::Token { value: $value, .. })
-        );
+        matches!($token, $wrap($crate::token::Token { value: $value, .. }));
     };
     ($value:pat) => {
         $crate::token::Token { value: $value, .. }
@@ -161,19 +158,19 @@ impl Keyword {
 /// ```
 /// # #[macro_use]
 /// # extern crate fajt_lexer;
-/// # use fajt_lexer::token::{TokenValue, Punct};
+/// # use fajt_lexer::token::{TokenValue, Punctuator};
 /// # fn main() {
-/// assert_eq!(punct!("["), TokenValue::Punct(Punct::BraceOpen))
+/// assert_eq!(punct!("["), TokenValue::Punctuator(Punctuator::BraceOpen))
 /// # }
 /// ```
 #[derive(Debug, PartialOrd, PartialEq, FromString, Clone, Serialize, Deserialize)]
 #[from_string_macro("punct")]
 #[from_string_macro_rules(
     ($variant:ident) => {
-        $crate::token::TokenValue::Punct($crate::token::Punct::$variant)
+        $crate::token::TokenValue::Punctuator($crate::token::Punctuator::$variant)
     };
 )]
-pub enum Punct {
+pub enum Punctuator {
     #[from_string("(")]
     ParenOpen,
     #[from_string(")")]
@@ -332,7 +329,7 @@ macro_rules! literal(
 pub enum TokenValue {
     Keyword(Keyword),
     Identifier(String),
-    Punct(Punct),
+    Punctuator(Punctuator),
     Literal(Literal),
     TemplateHead(String),
     TemplateMiddle(String),

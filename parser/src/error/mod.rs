@@ -151,7 +151,7 @@ fn expected_token_to_string(token: &TokenValue) -> Option<&str> {
     Some(match token {
         TokenValue::Keyword(keyword) => keyword.as_str(),
         TokenValue::Identifier(ident) => ident.as_str(),
-        TokenValue::Punct(punct) => punct.as_str(),
+        TokenValue::Punctuator(punct) => punct.as_str(),
         _ => return None,
     })
 }

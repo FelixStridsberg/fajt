@@ -5,8 +5,8 @@ use fajt_ast::{
     ObjectBindingProp, SingleNameBinding, Span,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
-use fajt_lexer::token::Punct::{BraceClose, BracketClose};
-use fajt_lexer::token::{Punct, Token, TokenValue};
+use fajt_lexer::token::Punctuator::{BraceClose, BracketClose};
+use fajt_lexer::token::{Punctuator, Token, TokenValue};
 use fajt_lexer::token_matches;
 use fajt_lexer::{punct, LexerState};
 
@@ -162,13 +162,13 @@ where
 
     /// Parses the `BindingIdentifier` production.
     /// This also consumes the expected end punctuator.
-    fn parse_rest_binding_ident(&mut self, expected_end: Punct) -> Result<Option<Ident>> {
+    fn parse_rest_binding_ident(&mut self, expected_end: Punctuator) -> Result<Option<Ident>> {
         let dots = self.consume_assert(&punct!("..."))?;
 
         let ident = self.parse_identifier()?;
         let end_token = self.consume()?;
 
-        if let TokenValue::Punct(p) = end_token.value {
+        if let TokenValue::Punctuator(p) = end_token.value {
             if p == expected_end {
                 return Ok(Some(ident));
             }
