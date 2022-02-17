@@ -8,7 +8,7 @@ The goal of this project is to provide:
 - basic [code generation]
 
 
-[lexer]: ./lexer/README.md
-[parser]: ./parser/README.md
-[AST]: ./ast/README.md
-[code generation]: ./codegen/README.md
+[lexer]: ./lexer
+[parser]: ./parser
+[AST]: ./ast
+[code generation]: ./codegen

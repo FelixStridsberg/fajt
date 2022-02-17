@@ -19,8 +19,8 @@ Note that some productions that are on the same level are combined in the same f
 be parsed unambiguously in isolation.
 
 
-[lexer]: ../lexer/README.md
-[AST]: ../ast/README.md
+[lexer]: ../lexer
+[AST]: ../ast
 [static semantic]: https://262.ecma-international.org/12.0/#sec-static-semantic-rules
 [early errors]: https://262.ecma-international.org/12.0/#early-error
 [recursive descent parser]: https://en.wikipedia.org/wiki/Recursive_descent_parser

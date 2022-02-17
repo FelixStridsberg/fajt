@@ -26,7 +26,7 @@ These tokens can then be [parsed] into an [AST].
 
 [code points]: https://262.ecma-international.org/12.0/#sec-ecmascript-language-source-code
 [tokens]: https://262.ecma-international.org/12.0/#sec-ecmascript-language-source-code
-[parsed]: ../parser/README.md
-[ast]: ../ast/README.md
+[parsed]: ../parser
+[ast]: ../ast
 [11 ECMAScript Language: Source Code]: https://262.ecma-international.org/12.0/#sec-ecmascript-language-source-code
 [12 ECMAScript Language: Lexical Grammar]: https://262.ecma-international.org/12.0/#sec-ecmascript-language-lexical-grammar
