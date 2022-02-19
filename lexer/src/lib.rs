@@ -383,6 +383,7 @@ impl<'a> Lexer<'a> {
         Ok(TokenValue::Literal(Literal::Regexp(result)))
     }
 
+    /// Consumes from reader and push to `result` until an unescaped `delimiter` is reached.
     fn read_until_not_escaped(&mut self, delimiter: char, result: &mut String) -> Result<()> {
         let mut escape = false;
         loop {
@@ -468,6 +469,7 @@ impl<'a> Lexer<'a> {
     }
 }
 
+#[derive(Default)]
 pub struct LexerState {
     regex_allowed: bool,
     inside_template: bool,
@@ -485,15 +487,6 @@ impl LexerState {
         LexerState {
             inside_template: true,
             ..Self::default()
-        }
-    }
-}
-
-impl Default for LexerState {
-    fn default() -> Self {
-        LexerState {
-            regex_allowed: false,
-            inside_template: false,
         }
     }
 }
@@ -517,11 +510,42 @@ impl ReReadWithState<Token> for Lexer<'_> {
     type Error = error::Error;
     type State = LexerState;
 
+    /// Rewind reader to before `token`, `token` must have been previously read from this lexer.
     fn rewind_before(&mut self, token: &Token) {
         self.seek(SeekFrom::Start(token.span.start as u64)).unwrap();
         self.override_first_on_line = token.first_on_line;
     }
 
+    /// Read one token with a different lexer state.
+    ///
+    /// The ECMAScript lexer have different contexts that cannot be determined from the lexical
+    /// grammar alone.
+    ///
+    /// # Example:
+    /// ```js
+    /// a = b
+    /// /c/g
+    /// ```
+    ///
+    /// Would by default result in:
+    /// ```txt
+    /// Identifier("a")
+    /// Punctuator("=")
+    /// Identifier("b")
+    /// Punctuator("/")
+    /// Identifier("c")
+    /// Punctuator("/")
+    /// Punctuator("g")
+    /// ```
+    ///
+    /// but when the parser encounters a `/` in a context where regexp is allowed it will rewind
+    /// and re-read with regexp state set in the lexer, with the following result:
+    /// ```txt
+    /// Identifier("a")
+    /// Punctuator("=")
+    /// Identifier("b")
+    /// Literal(Regexp("/c/g"))
+    /// ```
     fn read_with_state(
         &mut self,
         mut state: LexerState,
