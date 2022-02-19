@@ -49,33 +49,49 @@ impl ThenTry for bool {
     }
 }
 
-pub fn parse_program(input: &str) -> Result<Program> {
-    parse::<Program>(input, SourceType::Unknown)
+/// Parse source into `Program` when the type of the source is unknown.
+pub fn parse_program(source: &str) -> Result<Program> {
+    parse::<Program>(source, SourceType::Unknown)
 }
 
-pub fn parse<T>(input: &str, source_type: SourceType) -> Result<T>
+/// Parse source into `Program` when type of source is known.
+pub fn parse<T>(source: &str, source_type: SourceType) -> Result<T>
 where
     T: Parse,
 {
-    let lexer = Lexer::new(input).unwrap();
+    let lexer = Lexer::new(source).unwrap();
     let mut reader = fajt_common::io::PeekReader::new(lexer).unwrap();
     Parser::parse::<T>(&mut reader, source_type)
 }
 
+/// Context of the parser.
 #[derive(Clone, Default)]
 pub struct Context {
+    /// `Await` production parameter.
     is_await: bool,
+
+    /// `Yield` production parameter.
     is_yield: bool,
+
+    /// `In` production parameter.
     is_in: bool,
+
+    /// `Strict` production parameter.
     is_strict: bool,
+
+    /// `Default` production parameter.
     is_default: bool,
 
+    /// `true` if we are inside a method and not a function.
     in_method: bool,
+
+    /// `true` if we are in a context where `super()`-call is allowed.
     super_call_allowed: bool,
 }
 
 macro_rules! modifier {
     ($fn_name:ident:$field_name:ident) => {
+        #[doc = concat!("Returns a new context with specified `", stringify!($field_name), "` value.")]
         pub fn $fn_name(&self, $field_name: bool) -> Self {
             Context {
                 $field_name,
