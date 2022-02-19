@@ -114,12 +114,12 @@ where
                     self.consume()?;
                     let expr = self.parse_assignment_expr()?;
                     elements.push(ArrayElement::Spread(expr));
-                    self.consume_array_delimiter()?;
+                    self.consume_list_delimiter(&punct!("]"))?;
                 }
                 _ => {
                     let expr = self.parse_assignment_expr()?;
                     elements.push(ArrayElement::Expr(expr));
-                    self.consume_array_delimiter()?;
+                    self.consume_list_delimiter(&punct!("]"))?;
                 }
             }
         }
@@ -146,7 +146,7 @@ where
             }
 
             props.push(self.parse_property_definition()?);
-            self.consume_object_delimiter()?;
+            self.consume_list_delimiter(&punct!("}"))?;
         }
 
         let span = self.span_from(span_start);

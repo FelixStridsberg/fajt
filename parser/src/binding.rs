@@ -45,11 +45,11 @@ where
                 _ if self.peek_matches(&punct!(":")) => {
                     props.push(ObjectBindingProp::Named(self.parse_named_binding()?));
 
-                    self.consume_object_delimiter()?;
+                    self.consume_list_delimiter(&punct!("}"))?;
                 }
                 _ => {
                     props.push(ObjectBindingProp::Single(self.parse_single_name_binding()?));
-                    self.consume_object_delimiter()?;
+                    self.consume_list_delimiter(&punct!("}"))?;
                 }
             }
         }
@@ -115,7 +115,7 @@ where
                 }
                 _ if self.is_binding_element()? => {
                     elements.push(Some(self.parse_binding_element()?));
-                    self.consume_array_delimiter()?;
+                    self.consume_list_delimiter(&punct!("]"))?;
                 }
                 _ => return Err(Error::unexpected_token(self.consume()?)),
             }

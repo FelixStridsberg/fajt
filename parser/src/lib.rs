@@ -248,10 +248,12 @@ where
             .unwrap_or_else(|_| self.reader.position())
     }
 
+    /// Returns a `Span` that ends at current position and starts from `start`.
     fn span_from(&self, start: usize) -> Span {
         Span::new(start, self.reader.position())
     }
 
+    /// Returns a new parser at current position with different context.
     pub fn with_context(&mut self, context: Context) -> Parser<'_, I> {
         Parser {
             context,
@@ -260,6 +262,7 @@ where
         }
     }
 
+    /// Returns `true` if current token matches `value`.
     fn current_matches(&self, value: &TokenValue) -> bool {
         if let Ok(token) = self.current() {
             &token.value == value
@@ -268,6 +271,7 @@ where
         }
     }
 
+    /// Returns `true` if current token is a string literal.
     fn current_matches_string_literal(&self) -> bool {
         matches!(
             self.current(),
@@ -278,6 +282,7 @@ where
         )
     }
 
+    /// Returns `true` if current token is an identifier with name that matches `value`.
     fn current_matches_identifier(&self, value: &str) -> bool {
         if let Ok(Token {
             value: TokenValue::Identifier(identifier),
@@ -290,6 +295,7 @@ where
         }
     }
 
+    /// Returns `true` if next token matches `value`.
     fn peek_matches(&self, value: &TokenValue) -> bool {
         if let Some(token) = self.peek() {
             &token.value == value
@@ -298,6 +304,7 @@ where
         }
     }
 
+    /// Consumes current token. Returns error if consumed token do not match `expected`.
     fn consume_assert(&mut self, expected: &'static TokenValue) -> Result<Token> {
         let token = self.consume()?;
         if &token.value != expected {
@@ -306,6 +313,7 @@ where
         Ok(token)
     }
 
+    /// Consumes current token if it matches `value`. Returns `true` if current token was consumed.
     fn maybe_consume(&mut self, value: &TokenValue) -> Result<bool> {
         if self.current_matches(value) {
             self.consume()?;
@@ -315,18 +323,23 @@ where
         }
     }
 
+    /// Returns `true` if current token is followed by new line.
     fn followed_by_new_lined(&self) -> bool {
         self.peek().map_or(false, |t| t.first_on_line)
     }
 
+    /// Returns `true` if next token could be parsed to a valid identifier.
     fn peek_is_identifier(&self) -> bool {
         is_identifier(self.peek(), self.context.keyword_context())
     }
 
+    /// Returns `true` if current token could be parsed to a valid identifier.
     fn is_identifier(&self) -> bool {
         is_identifier(self.current().ok(), self.context.keyword_context())
     }
 
+    /// Tries to parse an identifier from current token, either directly from a `Identifier` token
+    /// or from `Keyword` if the keyword is allowed in current context.
     fn parse_identifier(&mut self) -> Result<Ident> {
         let token = self.consume()?;
         Ok(match token.value {
@@ -339,14 +352,6 @@ where
                 }
             }
             _ => return Err(Error::expected_ident(token)),
-        })
-    }
-
-    fn parse_optional_identifier(&mut self) -> Result<Option<Ident>> {
-        Ok(if self.is_identifier() {
-            Some(self.parse_identifier()?)
-        } else {
-            None
         })
     }
 
@@ -397,18 +402,8 @@ where
         Ok(directives)
     }
 
-    fn consume_array_delimiter(&mut self) -> Result<()> {
-        self.consume_list_delimiter(&punct!("]"))
-    }
-
-    fn consume_object_delimiter(&mut self) -> Result<()> {
-        self.consume_list_delimiter(&punct!("}"))
-    }
-
-    fn consume_parameter_delimiter(&mut self) -> Result<()> {
-        self.consume_list_delimiter(&punct!(")"))
-    }
-
+    /// Consumes current token if current token is `,`.
+    /// Returns `Err` if current token is neither `,` nor `list_end`.
     fn consume_list_delimiter(&mut self, list_end: &TokenValue) -> Result<()> {
         if !self.maybe_consume(&punct!(","))? && !self.current_matches(list_end) {
             let token = self.consume()?;
@@ -419,6 +414,7 @@ where
     }
 }
 
+/// Returns `true` if provided `token` could be parsed to a valid identifier.
 fn is_identifier(token: Option<&Token>, keyword_context: KeywordContext) -> bool {
     match token {
         Some(Token {

@@ -572,11 +572,11 @@ where
                 token_matches!(ok: punct!("...")) => {
                     self.consume()?;
                     arguments.push(Argument::Spread(self.parse_assignment_expr()?));
-                    self.consume_parameter_delimiter()?;
+                    self.consume_list_delimiter(&punct!(")"))?;
                 }
                 _ => {
                     arguments.push(Argument::Expr(self.parse_assignment_expr()?));
-                    self.consume_parameter_delimiter()?;
+                    self.consume_list_delimiter(&punct!(")"))?;
                 }
             }
         }

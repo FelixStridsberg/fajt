@@ -186,7 +186,7 @@ where
             }
 
             named_imports.push(self.parse_import_specifier()?);
-            self.consume_object_delimiter()?;
+            self.consume_list_delimiter(&punct!("}"))?;
         }
 
         Ok(named_imports)
@@ -215,7 +215,7 @@ where
             }
 
             named_exports.push(self.parse_export_specifier()?);
-            self.consume_object_delimiter()?;
+            self.consume_list_delimiter(&punct!("}"))?;
         }
 
         Ok(named_exports)

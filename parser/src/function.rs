@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::Parser;
+use crate::{Parser, ThenTry};
 use fajt_ast::{
     ArrowFunctionBody, BindingElement, Body, DeclFunction, Expr, ExprArrowFunction, ExprFunction,
     FormalParameters, Ident, Span, Stmt,
@@ -134,7 +134,7 @@ where
     /// Parses the parts from the optional identifier and forward for async/non-async
     /// function/generator expressions, assumes context is set correctly.
     fn parse_function_expr_content(&mut self, span_start: usize) -> Result<Expr> {
-        let identifier = self.parse_optional_identifier()?;
+        let identifier = self.is_identifier().then_try(|| self.parse_identifier())?;
         let parameters = self.parse_formal_parameters()?;
         let body = self.parse_function_body()?;
 
@@ -242,11 +242,11 @@ where
                 }
                 token_matches!(punct!("...")) => {
                     rest = Some(self.parse_binding_rest_element()?);
-                    self.consume_parameter_delimiter()?;
+                    self.consume_list_delimiter(&punct!(")"))?;
                 }
                 _ => {
                     parameters.push(self.parse_binding_element()?);
-                    self.consume_parameter_delimiter()?;
+                    self.consume_list_delimiter(&punct!(")"))?;
                 }
             }
         }
