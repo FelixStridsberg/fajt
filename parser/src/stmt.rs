@@ -234,15 +234,6 @@ where
         .into())
     }
 
-    /// True if the current token is not preceded by a line feed or is a semi colon.
-    fn stmt_not_ended(&self) -> bool {
-        match self.current() {
-            token_matches!(ok: punct!(";")) | Err(_) => false,
-            Ok(token) if token.first_on_line => false,
-            _ => true,
-        }
-    }
-
     /// Parses the `DebuggerStatement` production.
     fn parse_debugger_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();

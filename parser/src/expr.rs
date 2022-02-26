@@ -152,7 +152,7 @@ where
         let span_start = self.position();
         self.consume_assert(&keyword!("yield"))?;
 
-        if self.is_end() {
+        if self.is_end() || !self.stmt_not_ended() {
             let span = self.span_from(span_start);
             return Ok(ExprYield {
                 span,
@@ -162,18 +162,12 @@ where
             .into());
         }
 
-        let next_token = self.current()?;
-        let has_argument = !next_token.first_on_line && !token_matches!(next_token, punct!(";"));
-        let delegate = has_argument && token_matches!(next_token, punct!("*"));
-        if delegate {
-            self.consume()?;
-        }
-
-        let argument = has_argument.then_try(|| Ok(Box::new(self.parse_assignment_expr()?)))?;
+        let delegate = self.maybe_consume(&punct!("*"))?;
+        let argument = self.parse_assignment_expr()?;
         let span = self.span_from(span_start);
         Ok(ExprYield {
             span,
-            argument,
+            argument: Some(Box::new(argument)),
             delegate,
         }
         .into())
