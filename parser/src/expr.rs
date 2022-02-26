@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::{Context, Error, Parser, ThenTry};
+use crate::{Context, Error, Parser};
 use fajt_ast::{assignment_op, AssignmentOperator, ExprParenthesized, Spanned, UnaryOperator};
 use fajt_ast::{unary_op, ExprTaggedTemplate};
 use fajt_ast::{update_op, UpdateOperator};
@@ -61,9 +61,7 @@ where
                 && !self.followed_by_new_line()
                 && self.peek_matches(&punct!("=>")) =>
             {
-                let span_start = self.position();
-                let parameters = self.parse_arrow_identifier_argument()?;
-                self.parse_arrow_function_expr(span_start, true, parameters)
+                self.parse_arrow_function_expr()
             }
             _ => {
                 let expr = self.parse_conditional_expr()?;
@@ -137,11 +135,7 @@ where
     /// 4. `async(a)` // Function call where `async` is an identifier and not a keyword.
     fn parse_assignment_expr_async(&mut self) -> Result<Expr> {
         match self.peek() {
-            token_matches!(opt: punct!("=>")) => {
-                let span_start = self.position();
-                let parameters = self.parse_arrow_identifier_argument()?;
-                self.parse_arrow_function_expr(span_start, true, parameters)
-            }
+            token_matches!(opt: punct!("=>")) => self.parse_arrow_function_expr(),
             token_matches!(opt: punct!("(")) => {
                 let async_ident = self.parse_identifier()?;
                 self.parse_cover_call_or_async_arrow_head(async_ident)

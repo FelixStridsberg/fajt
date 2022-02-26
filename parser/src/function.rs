@@ -15,14 +15,16 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
     I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
-    /// Parses the `ArrowFunction` production, but expects the parameters as input since that may
-    /// be a non terminal before we know if it is an arrow function or parenthesized expression.
-    pub(super) fn parse_arrow_function_expr(
-        &mut self,
-        span_start: usize,
-        binding_parameter: bool,
-        parameters: FormalParameters,
-    ) -> Result<Expr> {
+    /// Parses the `ArrowFunction` production.
+    pub(super) fn parse_arrow_function_expr(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+
+        let (binding_parameter, parameters) = if self.is_identifier() {
+            (true, self.parse_arrow_identifier_argument()?)
+        } else {
+            (false, self.parse_formal_parameters()?)
+        };
+
         self.consume_assert(&punct!("=>"))?;
 
         let body = if self.current_matches(&punct!("{")) {

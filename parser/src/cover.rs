@@ -14,12 +14,9 @@ where
 {
     /// Parses and resolves the `CoverParenthesizedExpressionAndArrowParameterList` production.
     pub(super) fn parse_cover_parenthesized_and_arrow_parameters(&mut self) -> Result<Expr> {
-        let span_start = self.position();
-
         let after_token = self.token_after_parenthesis()?;
         if token_matches!(after_token, opt: punct!("=>")) && !after_token.unwrap().first_on_line {
-            let parameters = self.parse_formal_parameters()?;
-            self.parse_arrow_function_expr(span_start, false, parameters)
+            self.parse_arrow_function_expr()
         } else {
             self.parse_parenthesized_expr()
         }
