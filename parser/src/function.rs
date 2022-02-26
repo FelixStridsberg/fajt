@@ -19,19 +19,10 @@ where
     pub(super) fn parse_arrow_function_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
 
-        let (binding_parameter, parameters) = if self.is_identifier() {
-            (true, self.parse_arrow_identifier_argument()?)
-        } else {
-            (false, self.parse_formal_parameters()?)
-        };
-
+        let (binding_parameter, parameters) = self.parse_arrow_function_parameters()?;
         self.consume_assert(&punct!("=>"))?;
 
-        let body = if self.current_matches(&punct!("{")) {
-            ArrowFunctionBody::Body(self.parse_function_body()?)
-        } else {
-            ArrowFunctionBody::Expr(self.parse_assignment_expr()?.into())
-        };
+        let body = self.parse_concise_body()?;
 
         let span = self.span_from(span_start);
         Ok(ExprArrowFunction {
@@ -42,6 +33,16 @@ where
             body,
         }
         .into())
+    }
+
+    fn parse_arrow_function_parameters(&mut self) -> Result<(bool, FormalParameters)> {
+        let (binding_parameter, parameters) = if self.is_identifier() {
+            (true, self.parse_arrow_identifier_argument()?)
+        } else {
+            (false, self.parse_formal_parameters()?)
+        };
+
+        Ok((binding_parameter, parameters))
     }
 
     /// Parses the async version of `ArrowFunction` production, but expects the parameters as input
@@ -55,18 +56,9 @@ where
     ) -> Result<Expr> {
         self.consume_assert(&punct!("=>"))?;
 
-        let body = if self.current_matches(&punct!("{")) {
-            ArrowFunctionBody::Body(
-                self.with_context(self.context.with_await(true))
-                    .parse_function_body()?,
-            )
-        } else {
-            ArrowFunctionBody::Expr(
-                self.with_context(self.context.with_await(true))
-                    .parse_assignment_expr()?
-                    .into(),
-            )
-        };
+        let body = self
+            .with_context(self.context.with_await(true))
+            .parse_concise_body()?;
 
         let span = self.span_from(span_start);
         Ok(ExprArrowFunction {
@@ -77,6 +69,17 @@ where
             body,
         }
         .into())
+    }
+
+    /// Parses the `ConciseBody` production.
+    fn parse_concise_body(&mut self) -> Result<ArrowFunctionBody> {
+        if self.current_matches(&punct!("{")) {
+            Ok(ArrowFunctionBody::Body(self.parse_function_body()?))
+        } else {
+            Ok(ArrowFunctionBody::Expr(
+                self.parse_assignment_expr()?.into(),
+            ))
+        }
     }
 
     /// Parses the `ArrowParameters` production.

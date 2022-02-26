@@ -308,6 +308,7 @@ where
     fn consume_assert(&mut self, expected: &'static TokenValue) -> Result<Token> {
         let token = self.consume()?;
         if &token.value != expected {
+            println!("WT: {:?} != {:?}", token.value, expected);
             return Err(Error::expected_other_token(token, expected));
         }
         Ok(token)
