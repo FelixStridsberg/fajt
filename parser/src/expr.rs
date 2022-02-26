@@ -254,19 +254,19 @@ where
             return self.parse_prefix_update_expr(span_start, operator);
         }
 
-        let argument = self.parse_left_hand_side_expr()?;
+        let expr = self.parse_left_hand_side_expr()?;
 
         // New line is not allowed between argument and postfix update operator.
         // If current token is first on line, we are not parsing postfix update expression.
         if self.first_on_line() {
-            return Ok(argument);
+            return Ok(expr);
         }
 
         let postfix_operator = self.parse_optional_update_operator()?;
         if let Some(operator) = postfix_operator {
-            self.parse_postfix_update_expr(argument, operator)
+            self.parse_postfix_update_expr(expr, operator)
         } else {
-            Ok(argument)
+            Ok(expr)
         }
     }
 
