@@ -60,6 +60,6 @@ ast_struct! {
     pub struct BindingElement {
         pub span: Span,
         pub pattern: BindingPattern,
-        pub initializer: Option<Expr>,
+        pub initializer: Option<Box<Expr>>,
     }
 }

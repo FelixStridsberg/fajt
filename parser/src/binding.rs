@@ -150,7 +150,7 @@ where
         Ok(BindingElement {
             span,
             pattern,
-            initializer,
+            initializer: initializer.map(Box::new),
         })
     }
 
