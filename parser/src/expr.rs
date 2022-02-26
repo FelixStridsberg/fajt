@@ -1,6 +1,6 @@
 use crate::error::Result;
 use crate::{Context, Error, Parser, ThenTry};
-use fajt_ast::{assignment_op, ExprParenthesized, Spanned, UnaryOperator};
+use fajt_ast::{assignment_op, AssignmentOperator, ExprParenthesized, Spanned, UnaryOperator};
 use fajt_ast::{unary_op, ExprTaggedTemplate};
 use fajt_ast::{update_op, UpdateOperator};
 use fajt_ast::{
@@ -68,27 +68,10 @@ where
             _ => {
                 let expr = self.parse_conditional_expr()?;
 
-                let assignment_operator = match self.current() {
-                    token_matches!(ok: punct!("=")) => Some(assignment_op!("=")),
-                    token_matches!(ok: punct!("*=")) => Some(assignment_op!("*=")),
-                    token_matches!(ok: punct!("/=")) => Some(assignment_op!("/=")),
-                    token_matches!(ok: punct!("%=")) => Some(assignment_op!("%=")),
-                    token_matches!(ok: punct!("+=")) => Some(assignment_op!("+=")),
-                    token_matches!(ok: punct!("-=")) => Some(assignment_op!("-=")),
-                    token_matches!(ok: punct!("<<=")) => Some(assignment_op!("<<=")),
-                    token_matches!(ok: punct!(">>=")) => Some(assignment_op!(">>=")),
-                    token_matches!(ok: punct!(">>>=")) => Some(assignment_op!(">>>=")),
-                    token_matches!(ok: punct!("&=")) => Some(assignment_op!("&=")),
-                    token_matches!(ok: punct!("^=")) => Some(assignment_op!("^=")),
-                    token_matches!(ok: punct!("|=")) => Some(assignment_op!("|=")),
-                    token_matches!(ok: punct!("**=")) => Some(assignment_op!("**=")),
-                    _ => None,
-                };
-
+                let assignment_operator = self.parse_optional_assignment_operator()?;
                 if let Some(operator) = assignment_operator {
                     self.validate_left_side_expr(&expr, &operator)?;
 
-                    self.consume()?; // consume the operator
                     let right = self.parse_assignment_expr()?;
                     let span = self.span_from(span_start);
                     Ok(ExprAssignment {
@@ -105,9 +88,35 @@ where
         }
     }
 
+    pub fn parse_optional_assignment_operator(&mut self) -> Result<Option<AssignmentOperator>> {
+        let operator = match self.current() {
+            token_matches!(ok: punct!("=")) => Some(assignment_op!("=")),
+            token_matches!(ok: punct!("*=")) => Some(assignment_op!("*=")),
+            token_matches!(ok: punct!("/=")) => Some(assignment_op!("/=")),
+            token_matches!(ok: punct!("%=")) => Some(assignment_op!("%=")),
+            token_matches!(ok: punct!("+=")) => Some(assignment_op!("+=")),
+            token_matches!(ok: punct!("-=")) => Some(assignment_op!("-=")),
+            token_matches!(ok: punct!("<<=")) => Some(assignment_op!("<<=")),
+            token_matches!(ok: punct!(">>=")) => Some(assignment_op!(">>=")),
+            token_matches!(ok: punct!(">>>=")) => Some(assignment_op!(">>>=")),
+            token_matches!(ok: punct!("&=")) => Some(assignment_op!("&=")),
+            token_matches!(ok: punct!("^=")) => Some(assignment_op!("^=")),
+            token_matches!(ok: punct!("|=")) => Some(assignment_op!("|=")),
+            token_matches!(ok: punct!("**=")) => Some(assignment_op!("**=")),
+            _ => None,
+        };
+
+        if operator.is_some() {
+            self.consume()?;
+        }
+
+        Ok(operator)
+    }
+
     /// Parses the `ParenthesizedExpression` production.
     pub(super) fn parse_parenthesized_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
+
         self.consume_assert(&punct!("("))?;
         let expr = self.parse_expr()?;
         self.consume_assert(&punct!(")"))?;
