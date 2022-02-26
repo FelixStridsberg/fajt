@@ -30,22 +30,33 @@ where
         &mut self,
         async_ident: Ident,
     ) -> Result<Expr> {
-        let span_start = async_ident.span.start;
         let after_token = self.token_after_parenthesis()?;
         if token_matches!(after_token, opt: punct!("=>")) {
-            let parameters = self.parse_formal_parameters()?;
-            self.parse_async_arrow_function_expr(span_start, false, parameters)
+            self.parse_covered_async_arrow_function(async_ident)
         } else {
-            let (arguments_span, arguments) = self.parse_arguments()?;
-            let span = self.span_from(span_start);
-            Ok(ExprCall {
-                span,
-                callee: Callee::Expr(Box::new(async_ident.into())),
-                arguments_span,
-                arguments,
-            }
-            .into())
+            self.parse_covered_call_expression(async_ident)
         }
+    }
+
+    /// Parses the `ArrowFunction` covered by `CoverCallExpressionAndAsyncArrowHead`.
+    fn parse_covered_async_arrow_function(&mut self, async_ident: Ident) -> Result<Expr> {
+        let span_start = async_ident.span.start;
+        let parameters = self.parse_formal_parameters()?;
+        self.parse_async_arrow_function_expr(span_start, false, parameters)
+    }
+
+    /// Parses the `CallExpression` covered by `CoverCallExpressionAndAsyncArrowHead`.
+    fn parse_covered_call_expression(&mut self, async_ident: Ident) -> Result<Expr> {
+        let span_start = async_ident.span.start;
+        let (arguments_span, arguments) = self.parse_arguments()?;
+        let span = self.span_from(span_start);
+        Ok(ExprCall {
+            span,
+            callee: Callee::Expr(Box::new(async_ident.into())),
+            arguments_span,
+            arguments,
+        }
+        .into())
     }
 
     /// Assumes next token is start parenthesis, skips past matching closing parenthesis, reads
