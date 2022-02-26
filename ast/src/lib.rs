@@ -79,4 +79,8 @@ impl Ident {
             span: span.into(),
         }
     }
+
+    pub fn dummy(position: usize) -> Self {
+        Self::new("", Span::new(position, position))
+    }
 }

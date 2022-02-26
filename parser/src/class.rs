@@ -1,6 +1,6 @@
 use crate::error::Result;
 use crate::{Parser, ThenTry};
-use fajt_ast::{ClassElement, DeclClass, Expr, ExprClass, Ident, Span, Stmt};
+use fajt_ast::{ClassElement, DeclClass, Expr, ExprClass, Ident, Stmt};
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
@@ -16,13 +16,7 @@ where
         let span_start = self.position();
         self.consume_assert(&keyword!("class"))?;
 
-        let identifier = if self.context.is_default && self.current_matches(&punct!("{")) {
-            let current = self.current().unwrap();
-            Ident::new("", Span::new(current.span.start, current.span.start))
-        } else {
-            self.parse_identifier()?
-        };
-
+        let identifier = self.parse_optional_class_identifier()?;
         let (super_class, body) = self.parse_class_tail()?;
 
         let span = self.span_from(span_start);
@@ -33,6 +27,16 @@ where
             body,
         }
         .into())
+    }
+
+    /// Parses optional class identifier, returns dummy if identifier is optional and missing.
+    fn parse_optional_class_identifier(&mut self) -> Result<Ident> {
+        if self.context.is_default && self.current_matches(&punct!("{")) {
+            let current = self.current().unwrap();
+            Ok(Ident::dummy(current.span.start))
+        } else {
+            self.parse_identifier()
+        }
     }
 
     /// Parses the `ClassExpression` production.
