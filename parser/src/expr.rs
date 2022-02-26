@@ -1,6 +1,6 @@
 use crate::error::Result;
 use crate::{Context, Error, Parser, ThenTry};
-use fajt_ast::{assignment_op, ExprParenthesized, Spanned};
+use fajt_ast::{assignment_op, ExprParenthesized, Spanned, UnaryOperator};
 use fajt_ast::{unary_op, ExprTaggedTemplate};
 use fajt_ast::{update_op, UpdateOperator};
 use fajt_ast::{
@@ -206,6 +206,33 @@ where
 
     /// Parses the `UnaryExpression` production.
     pub(super) fn parse_unary_expr(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+        let operator = self.parse_optional_unary_operator()?;
+        if let Some(operator) = operator {
+            let argument = self.parse_unary_expr()?;
+
+            if operator == unary_op!("delete") {
+                self.validate_delete_argument(&argument)?;
+            }
+
+            let span = self.span_from(span_start);
+            return Ok(ExprUnary {
+                span,
+                operator,
+                argument: Box::new(argument),
+            }
+            .into());
+        }
+
+        if self.context.is_await && token_matches!(self.current()?, keyword!("await")) {
+            self.parse_await_expr()
+        } else {
+            self.parse_update_expr()
+        }
+    }
+
+    /// Parses optional unary operator.
+    fn parse_optional_unary_operator(&mut self) -> Result<Option<UnaryOperator>> {
         let operator = match self.current()? {
             token_matches!(punct!("+")) => Some(unary_op!("+")),
             token_matches!(punct!("-")) => Some(unary_op!("-")),
@@ -214,35 +241,25 @@ where
             token_matches!(keyword!("delete")) => Some(unary_op!("delete")),
             token_matches!(keyword!("void")) => Some(unary_op!("void")),
             token_matches!(keyword!("typeof")) => Some(unary_op!("typeof")),
-            token_matches!(keyword!("await")) if self.context.is_await => {
-                let span_start = self.position();
-                self.consume()?;
-                let argument = self.parse_unary_expr()?.into();
-                let span = self.span_from(span_start);
-                return Ok(ExprAwait { span, argument }.into());
-            }
             _ => None,
         };
 
-        if let Some(operator) = operator {
-            let span_start = self.position();
+        if operator.is_some() {
             self.consume()?;
-            let argument = self.parse_unary_expr()?;
-
-            if operator == unary_op!("delete") {
-                self.validate_delete_argument(&argument)?;
-            }
-
-            let span = self.span_from(span_start);
-            Ok(ExprUnary {
-                span,
-                operator,
-                argument: Box::new(argument),
-            }
-            .into())
-        } else {
-            self.parse_update_expr()
         }
+
+        Ok(operator)
+    }
+
+    /// Parses the `AwaitExpression` production.
+    fn parse_await_expr(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+        self.consume_assert(&keyword!("await"))?;
+
+        let argument = self.parse_unary_expr()?.into();
+
+        let span = self.span_from(span_start);
+        Ok(ExprAwait { span, argument }.into())
     }
 
     /// Parses the `UpdateExpression` production.
