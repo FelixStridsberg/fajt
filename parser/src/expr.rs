@@ -249,20 +249,7 @@ where
     fn parse_update_expr(&mut self) -> Result<Expr> {
         let prefix_operator = self.parse_optional_update_operator()?;
         if let Some(operator) = prefix_operator {
-            let span_start = self.position();
-            self.consume()?;
-            let argument = self.parse_unary_expr()?;
-
-            self.validate_update_expression_argument(&argument)?;
-
-            let span = self.span_from(span_start);
-            return Ok(ExprUpdate {
-                span,
-                operator,
-                prefix: true,
-                argument: Box::new(argument),
-            }
-            .into());
+            return self.parse_prefix_update_expr(operator);
         }
 
         let span_start = self.position();
@@ -288,6 +275,24 @@ where
         } else {
             Ok(argument)
         }
+    }
+
+    /// Parses the `++/-- UnaryExpression` of the `UpdateExpression` production.
+    fn parse_prefix_update_expr(&mut self, operator: UpdateOperator) -> Result<Expr> {
+        let span_start = self.position();
+        self.consume()?;
+
+        let argument = self.parse_unary_expr()?;
+        self.validate_update_expression_argument(&argument)?;
+
+        let span = self.span_from(span_start);
+        Ok(ExprUpdate {
+            span,
+            operator,
+            prefix: true,
+            argument: Box::new(argument),
+        }
+        .into())
     }
 
     /// Parses the prefix or postfix operator of an update expression.
