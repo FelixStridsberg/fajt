@@ -31,6 +31,12 @@ ast_mapping! {
     }
 }
 
+#[test]
+fn size_of_expr() {
+    // To avoid unexpected increase in node size.
+    assert_eq!(std::mem::size_of::<Expr>(), 184);
+}
+
 impl Expr {
     pub fn is_nested_new(&self) -> bool {
         if let Expr::New(expr) = &self {
