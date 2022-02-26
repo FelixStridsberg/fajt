@@ -304,7 +304,7 @@ where
     pub(super) fn parse_left_hand_side_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let expr = match self.current() {
-            token_matches!(ok: keyword!("new")) => self.parse_new_expr(),
+            token_matches!(ok: keyword!("new")) => self.parse_new_or_member_expr(),
             token_matches!(ok: keyword!("super")) if self.peek_matches(&punct!("(")) => {
                 self.parse_super_call_expr()
             }
@@ -313,7 +313,7 @@ where
             }
             _ => {
                 let span_start = self.position();
-                let expr = self.parse_member_expr()?;
+                let expr = self.parse_new_or_member_expr()?;
                 let call_expr = self.parse_recursive_call_expression(span_start, expr)?;
                 Ok(call_expr)
             }
@@ -426,14 +426,8 @@ where
         Ok((span, vec![Argument::Expr(expr)]))
     }
 
-    /// Parses the `NewExpression` production.
-    fn parse_new_expr(&mut self) -> Result<Expr> {
-        // The `new MemberExpression` is parsed together with `MemberExpression`.
-        self.parse_member_expr()
-    }
-
-    /// Parses the `MemberExpression` production.
-    pub fn parse_member_expr(&mut self) -> Result<Expr> {
+    /// Parses the `MemberExpression` and `NewExpression` productions.
+    pub fn parse_new_or_member_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let mut expr = self.parse_member_expr_from_terminal()?;
 
@@ -467,72 +461,13 @@ where
     /// Parses the parts of `MemberExpressions` that can be decided from terminals.
     fn parse_member_expr_from_terminal(&mut self) -> Result<Expr> {
         match self.current()? {
-            token_matches!(keyword!("super")) => {
-                let span_start = self.position();
-                let super_token = self.consume()?;
-
-                if !token_matches!(self.current(), ok: punct!(".") | punct!("[")) {
-                    let span = self.span_from(span_start);
-                    return Err(Error::syntax_error(
-                        "`super` keyword not expected here".to_string(),
-                        span,
-                    ));
-                }
-
-                if !self.context.in_method {
-                    let span = self.span_from(span_start);
-                    return Err(Error::syntax_error(
-                        "`super` property access only valid inside methods".to_string(),
-                        span,
-                    ));
-                }
-
-                self.parse_member_expr_right_side(
-                    span_start,
-                    MemberObject::Super(Super {
-                        span: super_token.span,
-                    }),
-                )
-            }
-            token_matches!(keyword!("new")) if self.peek_matches(&punct!(".")) => {
-                let span_start = self.position();
-                let new_token = self.consume()?;
-                self.consume()?; // .
-
-                let property = self.parse_identifier()?;
-                if property.name != "target" {
-                    return Err(Error::unexpected_identifier(property));
-                }
-
-                let span = self.span_from(span_start);
-                Ok(ExprMetaProperty {
-                    span,
-                    meta: Ident::new("new", new_token.span),
-                    property,
-                }
-                .into())
-            }
+            token_matches!(keyword!("super")) => self.parse_super_property(),
             token_matches!(keyword!("new")) => {
-                let span_start = self.position();
-                self.consume()?;
-
-                let callee = Box::new(self.parse_member_expr()?);
-
-                let (arguments_span, arguments) = if self.current_matches(&punct!("(")) {
-                    self.parse_arguments()
-                        .map(|(span, args)| (Some(span), args))?
+                if self.peek_matches(&punct!(".")) {
+                    self.parse_new_target()
                 } else {
-                    (None, Vec::new())
-                };
-
-                let span = self.span_from(span_start);
-                Ok(ExprNew {
-                    span,
-                    callee,
-                    arguments_span,
-                    arguments,
+                    self.parse_new_expr()
                 }
-                .into())
             }
             token_matches!(keyword!("import")) if self.peek_matches(&punct!(".")) => {
                 let span_start = self.position();
@@ -554,6 +489,73 @@ where
             }
             _ => self.parse_primary_expr(),
         }
+    }
+
+    /// Parses the `new NewExpression` production.
+    fn parse_new_expr(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+        self.consume()?;
+
+        let callee = self.parse_new_or_member_expr()?;
+        let (arguments_span, arguments) = self.parse_optional_arguments()?;
+
+        let span = self.span_from(span_start);
+        Ok(ExprNew {
+            span,
+            callee: Box::new(callee),
+            arguments_span,
+            arguments,
+        }
+        .into())
+    }
+
+    /// Parses the `SuperProperty` production.
+    fn parse_super_property(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+        let super_token = self.consume()?;
+
+        if !token_matches!(self.current(), ok: punct!(".") | punct!("[")) {
+            let span = self.span_from(span_start);
+            return Err(Error::syntax_error(
+                "`super` keyword not expected here".to_string(),
+                span,
+            ));
+        }
+
+        if !self.context.in_method {
+            let span = self.span_from(span_start);
+            return Err(Error::syntax_error(
+                "`super` property access only valid inside methods".to_string(),
+                span,
+            ));
+        }
+
+        self.parse_member_expr_right_side(
+            span_start,
+            MemberObject::Super(Super {
+                span: super_token.span,
+            }),
+        )
+    }
+
+    /// Parses the `NewTarget` production.
+    fn parse_new_target(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+        let new_token = self.consume()?;
+        self.consume()?; // .
+
+        let property = self.parse_identifier()?;
+        if property.name != "target" {
+            return Err(Error::unexpected_identifier(property));
+        }
+
+        let span = self.span_from(span_start);
+        Ok(ExprMetaProperty {
+            span,
+            meta: Ident::new("new", new_token.span),
+            property,
+        }
+        .into())
     }
 
     /// Parses the `Arguments` production.
@@ -583,6 +585,16 @@ where
 
         let span = self.span_from(span_start);
         Ok((span, arguments))
+    }
+
+    /// Parses arguments where optional.
+    pub(super) fn parse_optional_arguments(&mut self) -> Result<(Option<Span>, Vec<Argument>)> {
+        if self.current_matches(&punct!("(")) {
+            self.parse_arguments()
+                .map(|(span, args)| (Some(span), args))
+        } else {
+            Ok((None, Vec::new()))
+        }
     }
 
     /// Parses the `PrimaryExpression` production.
