@@ -77,24 +77,20 @@ where
                 break;
             }
 
-            let element: ClassElement =
-                if has_super && self.current_matches_identifier("constructor") {
-                    self.with_context(
-                        self.context
-                            .with_in_method(true)
-                            .with_super_call_allowed(true),
-                    )
-                    .parse_method_definition()?
-                    .into()
-                } else {
-                    self.with_context(self.context.with_in_method(true))
-                        .parse_method_definition()?
-                        .into()
-                };
-
-            class_body.push(element);
+            class_body.push(self.parse_class_element(has_super)?);
         }
 
         Ok(class_body)
+    }
+
+    /// Parses the `ClassElement` production.
+    fn parse_class_element(&mut self, has_super: bool) -> Result<ClassElement> {
+        let super_call_allowed = has_super && self.current_matches_identifier("constructor");
+        let context = self
+            .context
+            .with_in_method(true)
+            .with_super_call_allowed(super_call_allowed);
+
+        Ok(self.with_context(context).parse_method_definition()?.into())
     }
 }
