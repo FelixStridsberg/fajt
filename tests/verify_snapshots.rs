@@ -166,7 +166,7 @@ where
         let expected_expr: T = serde_json::from_str(ast_json).unwrap();
         assert_eq!(result, &expected_expr)
     } else {
-        panic!("Tried to compare AST but got error result.");
+        panic!("Tried to compare AST but got error result. {:?}", result);
     }
 }
 
