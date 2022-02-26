@@ -207,28 +207,38 @@ where
     /// Parses the `UnaryExpression` production.
     pub(super) fn parse_unary_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        let operator = self.parse_optional_unary_operator()?;
-        if let Some(operator) = operator {
-            let argument = self.parse_unary_expr()?;
 
-            if operator == unary_op!("delete") {
-                self.validate_delete_argument(&argument)?;
-            }
-
-            let span = self.span_from(span_start);
-            return Ok(ExprUnary {
-                span,
-                operator,
-                argument: Box::new(argument),
-            }
-            .into());
+        let unary_operator = self.parse_optional_unary_operator()?;
+        if let Some(operator) = unary_operator {
+            return self.parse_unary_expr_with_operator(span_start, operator);
         }
 
         if self.context.is_await && token_matches!(self.current()?, keyword!("await")) {
-            self.parse_await_expr()
-        } else {
-            self.parse_update_expr()
+            return self.parse_await_expr()
         }
+
+        self.parse_update_expr()
+    }
+
+    /// Parses a unary expression when operator is already consumed.
+    fn parse_unary_expr_with_operator(
+        &mut self,
+        span_start: usize,
+        operator: UnaryOperator,
+    ) -> Result<Expr> {
+        let argument = self.parse_unary_expr()?;
+
+        if operator == unary_op!("delete") {
+            self.validate_delete_argument(&argument)?;
+        }
+
+        let span = self.span_from(span_start);
+        Ok(ExprUnary {
+            span,
+            operator,
+            argument: Box::new(argument),
+        }
+        .into())
     }
 
     /// Parses optional unary operator.
