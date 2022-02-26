@@ -137,7 +137,11 @@ where
         self.consume_optional_semicolon()?;
 
         let span = self.span_from(span_start);
-        Ok(StmtExpr { span, expr }.into())
+        Ok(StmtExpr {
+            span,
+            expr: Box::new(expr),
+        }
+        .into())
     }
 
     /// Parses the `LabeledStatement` production.
@@ -194,7 +198,11 @@ where
         self.maybe_consume(&punct!(";"))?;
 
         let span = self.span_from(span_start);
-        Ok(StmtReturn { span, argument }.into())
+        Ok(StmtReturn {
+            span,
+            argument: argument.map(Box::new),
+        }
+        .into())
     }
 
     /// Parses the `ThrowStatement` production.
@@ -219,7 +227,11 @@ where
         self.maybe_consume(&punct!(";"))?;
 
         let span = self.span_from(span_start);
-        Ok(StmtThrow { span, argument }.into())
+        Ok(StmtThrow {
+            span,
+            argument: Box::new(argument),
+        }
+        .into())
     }
 
     /// True if the current token is not preceded by a line feed or is a semi colon.
@@ -258,8 +270,8 @@ where
         let span = self.span_from(span_start);
         Ok(StmtIf {
             span,
-            condition,
-            consequent: consequent.into(),
+            condition: Box::new(condition),
+            consequent: Box::new(consequent),
             alternate,
         }
         .into())
@@ -277,8 +289,8 @@ where
         let span = self.span_from(span_start);
         Ok(StmtWith {
             span,
-            object,
-            body: body.into(),
+            object: Box::new(object),
+            body: Box::new(body),
         }
         .into())
     }
@@ -339,7 +351,7 @@ where
         let span = self.span_from(span_start);
         Ok(StmtSwitch {
             span,
-            discriminant,
+            discriminant: Box::new(discriminant),
             cases,
         }
         .into())

@@ -30,6 +30,12 @@ ast_mapping! {
     }
 }
 
+#[test]
+fn size_of_stmt() {
+    // To avoid unexpected increase in node size.
+    assert_eq!(std::mem::size_of::<Stmt>(), 264);
+}
+
 impl Stmt {
     pub fn unwrap_block_stmt(self) -> StmtBlock {
         if let Stmt::Block(block) = self {
@@ -51,7 +57,7 @@ impl Stmt {
 ast_struct! {
     pub struct StmtExpr {
         pub span: Span,
-        pub expr: Expr,
+        pub expr: Box<Expr>,
     }
 }
 
@@ -140,7 +146,7 @@ ast_node! {
 ast_struct! {
     pub struct StmtReturn {
         pub span: Span,
-        pub argument: Option<Expr>,
+        pub argument: Option<Box<Expr>>,
     }
 }
 
@@ -161,7 +167,7 @@ ast_struct! {
 ast_struct! {
     pub struct StmtThrow {
         pub span: Span,
-        pub argument: Expr,
+        pub argument: Box<Expr>,
     }
 }
 
@@ -174,7 +180,7 @@ ast_struct! {
 ast_struct! {
     pub struct StmtIf {
         pub span: Span,
-        pub condition: Expr,
+        pub condition: Box<Expr>,
         pub consequent: Box<Stmt>,
         pub alternate: Option<Box<Stmt>>,
     }
@@ -183,7 +189,7 @@ ast_struct! {
 ast_struct! {
     pub struct StmtWith {
         pub span: Span,
-        pub object: Expr,
+        pub object: Box<Expr>,
         pub body: Box<Stmt>,
     }
 }
@@ -208,7 +214,7 @@ ast_struct! {
 ast_struct! {
     pub struct StmtSwitch {
         pub span: Span,
-        pub discriminant: Expr,
+        pub discriminant: Box<Expr>,
         pub cases: Vec<SwitchCase>,
     }
 }
@@ -225,14 +231,14 @@ ast_struct! {
     pub struct StmtDoWhile {
         pub span: Span,
         pub body: Box<Stmt>,
-        pub test: Expr,
+        pub test: Box<Expr>,
     }
 }
 
 ast_struct! {
     pub struct StmtWhile {
         pub span: Span,
-        pub test: Expr,
+        pub test: Box<Expr>,
         pub body: Box<Stmt>,
     }
 }
@@ -240,9 +246,9 @@ ast_struct! {
 ast_struct! {
     pub struct StmtFor {
         pub span: Span,
-        pub init: Option<ForInit>,
-        pub test: Option<Expr>,
-        pub update: Option<Expr>,
+        pub init: Option<Box<ForInit>>,
+        pub test: Option<Box<Expr>>,
+        pub update: Option<Box<Expr>>,
         pub body: Box<Stmt>,
     }
 }
@@ -250,8 +256,8 @@ ast_struct! {
 ast_struct! {
     pub struct StmtForIn {
         pub span: Span,
-        pub left: ForInit,
-        pub right: Expr,
+        pub left: Box<ForInit>,
+        pub right: Box<Expr>,
         pub body: Box<Stmt>,
     }
 }
@@ -259,8 +265,8 @@ ast_struct! {
 ast_struct! {
     pub struct StmtForOf {
         pub span: Span,
-        pub left: ForInit,
-        pub right: Expr,
+        pub left: Box<ForInit>,
+        pub right: Box<Expr>,
         pub body: Box<Stmt>,
         pub asynchronous: bool,
     }

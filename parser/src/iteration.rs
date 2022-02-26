@@ -33,7 +33,7 @@ where
         Ok(StmtDoWhile {
             span,
             body: body.into(),
-            test,
+            test: Box::new(test),
         }
         .into())
     }
@@ -52,7 +52,7 @@ where
         let span = self.span_from(span_start);
         Ok(StmtWhile {
             span,
-            test,
+            test: Box::new(test),
             body: body.into(),
         }
         .into())
@@ -93,9 +93,9 @@ where
         let span = self.span_from(span_start);
         Ok(StmtFor {
             span,
-            init,
-            test,
-            update,
+            init: init.map(Box::new),
+            test: test.map(Box::new),
+            update: update.map(Box::new),
             body: body.into(),
         }
         .into())
@@ -114,8 +114,8 @@ where
         let span = self.span_from(span_start);
         Ok(StmtForIn {
             span,
-            left,
-            right,
+            left: Box::new(left),
+            right: Box::new(right),
             body: body.into(),
         }
         .into())
@@ -151,9 +151,9 @@ where
         let span = self.span_from(span_start);
         Ok(StmtForOf {
             span,
-            left,
-            right,
-            body: body.into(),
+            left: Box::new(left),
+            right: Box::new(right),
+            body: Box::new(body),
             asynchronous,
         }
         .into())

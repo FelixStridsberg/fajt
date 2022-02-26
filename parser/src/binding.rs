@@ -71,7 +71,7 @@ where
         Ok(SingleNameBinding {
             span,
             ident,
-            initializer,
+            initializer: initializer.map(Box::new),
         })
     }
 

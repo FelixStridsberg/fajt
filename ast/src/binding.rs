@@ -35,7 +35,7 @@ ast_struct! {
     pub struct SingleNameBinding {
         pub span: Span,
         pub ident: Ident,
-        pub initializer: Option<Expr>,
+        pub initializer: Option<Box<Expr>>,
     }
 }
 
