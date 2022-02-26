@@ -340,18 +340,14 @@ where
     ) -> Result<Expr> {
         let mut expr = previous_expr;
         loop {
-            match self.current() {
-                token_matches!(ok: punct!("(")) => {
-                    expr = self.parse_call_expr(span_start, expr)?;
-                }
+            expr = match self.current() {
+                token_matches!(ok: punct!("(")) => self.parse_call_expr(span_start, expr)?,
                 token_matches!(ok: punct!(".") | punct!("[")) => {
-                    expr = self.parse_member_expr_right_side(
-                        span_start,
-                        MemberObject::Expr(Box::new(expr)),
-                    )?;
+                    let left = MemberObject::Expr(Box::new(expr));
+                    self.parse_member_expr_right_side(span_start, left)?
                 }
                 token_matches!(ok: TokenValue::Literal(Literal::Template(_))) => {
-                    expr = self.parse_tagged_template(span_start, expr)?;
+                    self.parse_tagged_template(span_start, expr)?
                 }
                 _ => break,
             };
@@ -430,14 +426,12 @@ where
         let mut expr = self.parse_member_expr_from_terminal()?;
 
         loop {
-            match self.current() {
+            expr = match self.current() {
                 token_matches!(ok: punct!(".") | punct!("[")) => {
                     let left = MemberObject::Expr(Box::new(expr));
-                    expr = self.parse_member_expr_right_side(span_start, left)?;
+                    self.parse_member_expr_right_side(span_start, left)?
                 }
-                Ok(token_matches!(@template)) => {
-                    expr = self.parse_tagged_template(span_start, expr)?;
-                }
+                Ok(token_matches!(@template)) => self.parse_tagged_template(span_start, expr)?,
                 _ => break,
             }
         }
