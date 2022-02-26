@@ -94,8 +94,8 @@ where
                     Ok(ExprAssignment {
                         span,
                         operator,
-                        left: expr.into(),
-                        right: right.into(),
+                        left: Box::new(expr),
+                        right: Box::new(right),
                     }
                     .into())
                 } else {
@@ -115,7 +115,7 @@ where
         let span = self.span_from(span_start);
         Ok(ExprParenthesized {
             span,
-            expression: expr.into(),
+            expression: Box::new(expr),
         }
         .into())
     }
@@ -194,9 +194,9 @@ where
             let span = self.span_from(span_start);
             Ok(ExprConditional {
                 span,
-                condition: expr.into(),
-                consequent: consequent.into(),
-                alternate: alternate.into(),
+                condition: Box::new(expr),
+                consequent: Box::new(consequent),
+                alternate: Box::new(alternate),
             }
             .into())
         } else {
@@ -237,7 +237,7 @@ where
             Ok(ExprUnary {
                 span,
                 operator,
-                argument: argument.into(),
+                argument: Box::new(argument),
             }
             .into())
         } else {
@@ -265,7 +265,7 @@ where
                 span,
                 operator,
                 prefix: true,
-                argument: argument.into(),
+                argument: Box::new(argument),
             }
             .into());
         }
@@ -291,7 +291,7 @@ where
                 span,
                 operator,
                 prefix: false,
-                argument: argument.into(),
+                argument: Box::new(argument),
             }
             .into())
         } else {
@@ -346,7 +346,7 @@ where
                     let span = self.span_from(span_start);
                     expr = ExprCall {
                         span,
-                        callee: Callee::Expr(expr.into()),
+                        callee: Callee::Expr(Box::new(expr)),
                         arguments_span,
                         arguments,
                     }
@@ -355,7 +355,7 @@ where
                 token_matches!(ok: punct!(".") | punct!("[")) => {
                     expr = self.parse_member_expr_right_side(
                         span_start,
-                        MemberObject::Expr(expr.into()),
+                        MemberObject::Expr(Box::new(expr)),
                     )?;
                 }
                 token_matches!(ok: TokenValue::Literal(Literal::Template(_))) => {
@@ -363,7 +363,7 @@ where
                     let span = self.span_from(span_start);
                     expr = ExprTaggedTemplate {
                         span,
-                        callee: expr.into(),
+                        callee: Box::new(expr),
                         template,
                     }
                     .into();
@@ -442,7 +442,7 @@ where
                 token_matches!(ok: punct!(".") | punct!("[")) => {
                     expr = self.parse_member_expr_right_side(
                         span_start,
-                        MemberObject::Expr(expr.into()),
+                        MemberObject::Expr(Box::new(expr)),
                     )?;
                 }
                 token_matches!(
@@ -452,7 +452,7 @@ where
                     let span = self.span_from(span_start);
                     expr = ExprTaggedTemplate {
                         span,
-                        callee: expr.into(),
+                        callee: Box::new(expr),
                         template,
                     }
                     .into();
@@ -516,7 +516,7 @@ where
                 let span_start = self.position();
                 self.consume()?;
 
-                let callee = self.parse_member_expr()?.into();
+                let callee = Box::new(self.parse_member_expr()?);
 
                 let (arguments_span, arguments) = if self.current_matches(&punct!("(")) {
                     self.parse_arguments()

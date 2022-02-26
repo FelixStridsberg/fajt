@@ -36,12 +36,6 @@ macro_rules! ast_mapping_impl {
                 Self::$variant(f)
             }
         }
-
-        impl From<$member> for Box<$enum_name> {
-            fn from(f: $member) -> Self {
-                Box::new($enum_name::$variant(f))
-            }
-        }
     };
 }
 

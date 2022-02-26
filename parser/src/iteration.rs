@@ -32,7 +32,7 @@ where
         let span = self.span_from(span_start);
         Ok(StmtDoWhile {
             span,
-            body: body.into(),
+            body: Box::new(body),
             test: Box::new(test),
         }
         .into())
@@ -53,7 +53,7 @@ where
         Ok(StmtWhile {
             span,
             test: Box::new(test),
-            body: body.into(),
+            body: Box::new(body),
         }
         .into())
     }
@@ -96,7 +96,7 @@ where
             init,
             test: test.map(Box::new),
             update: update.map(Box::new),
-            body: body.into(),
+            body: Box::new(body),
         }
         .into())
     }
@@ -116,7 +116,7 @@ where
             span,
             left,
             right: Box::new(right),
-            body: body.into(),
+            body: Box::new(body),
         }
         .into())
     }

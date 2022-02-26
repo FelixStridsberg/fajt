@@ -40,7 +40,7 @@ where
             let span = self.span_from(span_start);
             Ok(ExprCall {
                 span,
-                callee: Callee::Expr(async_ident.into()),
+                callee: Callee::Expr(Box::new(async_ident.into())),
                 arguments_span,
                 arguments,
             }
