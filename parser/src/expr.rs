@@ -1,8 +1,8 @@
 use crate::error::Result;
 use crate::{Context, Error, Parser, ThenTry};
-use fajt_ast::update_op;
 use fajt_ast::{assignment_op, ExprParenthesized};
 use fajt_ast::{unary_op, ExprTaggedTemplate};
+use fajt_ast::{update_op, UpdateOperator};
 use fajt_ast::{
     Argument, Callee, Expr, ExprAssignment, ExprAwait, ExprCall, ExprConditional, ExprLiteral,
     ExprMetaProperty, ExprNew, ExprSequence, ExprThis, ExprUnary, ExprUpdate, ExprYield, Ident,
@@ -247,12 +247,7 @@ where
 
     /// Parses the `UpdateExpression` production.
     fn parse_update_expr(&mut self) -> Result<Expr> {
-        let prefix_operator = match self.current()? {
-            token_matches!(punct!("++")) => Some(update_op!("++")),
-            token_matches!(punct!("--")) => Some(update_op!("--")),
-            _ => None,
-        };
-
+        let prefix_operator = self.parse_optional_update_operator()?;
         if let Some(operator) = prefix_operator {
             let span_start = self.position();
             self.consume()?;
@@ -272,12 +267,8 @@ where
 
         let span_start = self.position();
         let argument = self.parse_left_hand_side_expr()?;
-        let postfix_operator = match self.current() {
-            token_matches!(ok: punct!("++")) => Some(update_op!("++")),
-            token_matches!(ok: punct!("--")) => Some(update_op!("--")),
-            _ => None,
-        };
 
+        let postfix_operator = self.parse_optional_update_operator()?;
         if let Some(operator) = postfix_operator {
             if self.current()?.first_on_line {
                 return Ok(argument);
@@ -297,6 +288,15 @@ where
         } else {
             Ok(argument)
         }
+    }
+
+    /// Parses the prefix or postfix operator of an update expression.
+    fn parse_optional_update_operator(&mut self) -> Result<Option<UpdateOperator>> {
+        Ok(match self.current() {
+            token_matches!(ok: punct!("++")) => Some(update_op!("++")),
+            token_matches!(ok: punct!("--")) => Some(update_op!("--")),
+            _ => None,
+        })
     }
 
     /// Parses the `LeftHandSideExpression` production and non recursive parts of the
