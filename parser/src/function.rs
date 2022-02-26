@@ -17,41 +17,35 @@ where
 {
     /// Parses the `ArrowFunction` production.
     pub(super) fn parse_arrow_function_expr(&mut self) -> Result<Expr> {
+        let asynchronous = false;
         let span_start = self.position();
-
-        let (binding_parameter, parameters) = self.parse_arrow_function_parameters()?;
-        self.consume_assert(&punct!("=>"))?;
-
-        let body = self.parse_concise_body()?;
-
-        let span = self.span_from(span_start);
-        Ok(ExprArrowFunction {
-            span,
-            asynchronous: false,
-            binding_parameter,
-            parameters,
-            body,
-        }
-        .into())
+        self.parse_arrow_function(span_start, asynchronous)
     }
 
     /// Parses the async version of `ArrowFunction` production.
     pub(super) fn parse_async_arrow_function_expr(&mut self) -> Result<Expr> {
+        let asynchronous = true;
         let span_start = self.position();
         self.consume_assert(&keyword!("async"))?;
+        self.parse_arrow_function(span_start, asynchronous)
+    }
 
+    pub(super) fn parse_arrow_function(
+        &mut self,
+        span_start: usize,
+        asynchronous: bool,
+    ) -> Result<Expr> {
         let (binding_parameter, parameters) = self.parse_arrow_function_parameters()?;
-
         self.consume_assert(&punct!("=>"))?;
 
         let body = self
-            .with_context(self.context.with_await(true))
+            .with_context(self.context.with_await(asynchronous))
             .parse_concise_body()?;
 
         let span = self.span_from(span_start);
         Ok(ExprArrowFunction {
             span,
-            asynchronous: true,
+            asynchronous,
             binding_parameter,
             parameters,
             body,
