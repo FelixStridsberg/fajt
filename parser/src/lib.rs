@@ -328,6 +328,11 @@ where
         self.peek().map_or(false, |t| t.first_on_line)
     }
 
+    /// Returns `true` if current token is followed by new line.
+    fn first_on_line(&self) -> bool {
+        self.current().map_or(false, |t| t.first_on_line)
+    }
+
     /// Returns `true` if next token could be parsed to a valid identifier.
     fn peek_is_identifier(&self) -> bool {
         is_identifier(self.peek(), self.context.keyword_context())

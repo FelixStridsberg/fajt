@@ -1,6 +1,6 @@
 use crate::error::Result;
 use crate::{Context, Error, Parser, ThenTry};
-use fajt_ast::{assignment_op, ExprParenthesized};
+use fajt_ast::{assignment_op, ExprParenthesized, Spanned};
 use fajt_ast::{unary_op, ExprTaggedTemplate};
 use fajt_ast::{update_op, UpdateOperator};
 use fajt_ast::{
@@ -247,41 +247,35 @@ where
 
     /// Parses the `UpdateExpression` production.
     fn parse_update_expr(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+
         let prefix_operator = self.parse_optional_update_operator()?;
         if let Some(operator) = prefix_operator {
-            return self.parse_prefix_update_expr(operator);
+            return self.parse_prefix_update_expr(span_start, operator);
         }
 
-        let span_start = self.position();
         let argument = self.parse_left_hand_side_expr()?;
+
+        // New line is not allowed between argument and postfix update operator.
+        // If current token is first on line, we are not parsing postfix update expression.
+        if self.first_on_line() {
+            return Ok(argument);
+        }
 
         let postfix_operator = self.parse_optional_update_operator()?;
         if let Some(operator) = postfix_operator {
-            if self.current()?.first_on_line {
-                return Ok(argument);
-            }
-
-            self.validate_update_expression_argument(&argument)?;
-
-            self.consume()?;
-            let span = self.span_from(span_start);
-            Ok(ExprUpdate {
-                span,
-                operator,
-                prefix: false,
-                argument: Box::new(argument),
-            }
-            .into())
+            self.parse_postfix_update_expr(argument, operator)
         } else {
             Ok(argument)
         }
     }
 
     /// Parses the `++/-- UnaryExpression` of the `UpdateExpression` production.
-    fn parse_prefix_update_expr(&mut self, operator: UpdateOperator) -> Result<Expr> {
-        let span_start = self.position();
-        self.consume()?;
-
+    fn parse_prefix_update_expr(
+        &mut self,
+        span_start: usize,
+        operator: UpdateOperator,
+    ) -> Result<Expr> {
         let argument = self.parse_unary_expr()?;
         self.validate_update_expression_argument(&argument)?;
 
@@ -295,13 +289,37 @@ where
         .into())
     }
 
+    /// Parses the `UnaryExpression ++/--` of the `UpdateExpression` production.
+    fn parse_postfix_update_expr(
+        &mut self,
+        argument: Expr,
+        operator: UpdateOperator,
+    ) -> Result<Expr> {
+        self.validate_update_expression_argument(&argument)?;
+
+        let span = self.span_from(argument.span().start);
+        Ok(ExprUpdate {
+            span,
+            operator,
+            prefix: false,
+            argument: Box::new(argument),
+        }
+        .into())
+    }
+
     /// Parses the prefix or postfix operator of an update expression.
     fn parse_optional_update_operator(&mut self) -> Result<Option<UpdateOperator>> {
-        Ok(match self.current() {
+        let operator = match self.current() {
             token_matches!(ok: punct!("++")) => Some(update_op!("++")),
             token_matches!(ok: punct!("--")) => Some(update_op!("--")),
             _ => None,
-        })
+        };
+
+        if operator.is_some() {
+            self.consume()?;
+        }
+
+        Ok(operator)
     }
 
     /// Parses the `LeftHandSideExpression` production and non recursive parts of the
