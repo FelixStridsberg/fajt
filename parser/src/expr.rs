@@ -68,7 +68,7 @@ where
             _ => {
                 let expr = self.parse_conditional_expr()?;
 
-                let assignment_operator = self.parse_optional_assignment_operator()?;
+                let assignment_operator = self.parse_optional_assignment_operator();
                 if let Some(operator) = assignment_operator {
                     self.validate_left_side_expr(&expr, &operator)?;
 
@@ -88,7 +88,7 @@ where
         }
     }
 
-    pub fn parse_optional_assignment_operator(&mut self) -> Result<Option<AssignmentOperator>> {
+    pub fn parse_optional_assignment_operator(&mut self) -> Option<AssignmentOperator> {
         let operator = match self.current() {
             token_matches!(ok: punct!("=")) => Some(assignment_op!("=")),
             token_matches!(ok: punct!("*=")) => Some(assignment_op!("*=")),
@@ -107,10 +107,10 @@ where
         };
 
         if operator.is_some() {
-            self.consume()?;
+            self.consume().unwrap();
         }
 
-        Ok(operator)
+        operator
     }
 
     /// Parses the `ParenthesizedExpression` production.
@@ -211,7 +211,7 @@ where
     pub(super) fn parse_unary_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
 
-        let unary_operator = self.parse_optional_unary_operator()?;
+        let unary_operator = self.parse_optional_unary_operator();
         if let Some(operator) = unary_operator {
             return self.parse_unary_expr_with_operator(span_start, operator);
         }
@@ -245,23 +245,23 @@ where
     }
 
     /// Parses optional unary operator.
-    fn parse_optional_unary_operator(&mut self) -> Result<Option<UnaryOperator>> {
-        let operator = match self.current()? {
-            token_matches!(punct!("+")) => Some(unary_op!("+")),
-            token_matches!(punct!("-")) => Some(unary_op!("-")),
-            token_matches!(punct!("~")) => Some(unary_op!("~")),
-            token_matches!(punct!("!")) => Some(unary_op!("!")),
-            token_matches!(keyword!("delete")) => Some(unary_op!("delete")),
-            token_matches!(keyword!("void")) => Some(unary_op!("void")),
-            token_matches!(keyword!("typeof")) => Some(unary_op!("typeof")),
+    fn parse_optional_unary_operator(&mut self) -> Option<UnaryOperator> {
+        let operator = match self.current() {
+            token_matches!(ok: punct!("+")) => Some(unary_op!("+")),
+            token_matches!(ok: punct!("-")) => Some(unary_op!("-")),
+            token_matches!(ok: punct!("~")) => Some(unary_op!("~")),
+            token_matches!(ok: punct!("!")) => Some(unary_op!("!")),
+            token_matches!(ok: keyword!("delete")) => Some(unary_op!("delete")),
+            token_matches!(ok: keyword!("void")) => Some(unary_op!("void")),
+            token_matches!(ok: keyword!("typeof")) => Some(unary_op!("typeof")),
             _ => None,
         };
 
         if operator.is_some() {
-            self.consume()?;
+            self.consume().unwrap();
         }
 
-        Ok(operator)
+        operator
     }
 
     /// Parses the `AwaitExpression` production.
@@ -279,7 +279,7 @@ where
     fn parse_update_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
 
-        let prefix_operator = self.parse_optional_update_operator()?;
+        let prefix_operator = self.parse_optional_update_operator();
         if let Some(operator) = prefix_operator {
             return self.parse_prefix_update_expr(span_start, operator);
         }
@@ -292,7 +292,7 @@ where
             return Ok(expr);
         }
 
-        let postfix_operator = self.parse_optional_update_operator()?;
+        let postfix_operator = self.parse_optional_update_operator();
         if let Some(operator) = postfix_operator {
             self.parse_postfix_update_expr(expr, operator)
         } else {
@@ -338,7 +338,7 @@ where
     }
 
     /// Parses the prefix or postfix operator of an update expression.
-    fn parse_optional_update_operator(&mut self) -> Result<Option<UpdateOperator>> {
+    fn parse_optional_update_operator(&mut self) -> Option<UpdateOperator> {
         let operator = match self.current() {
             token_matches!(ok: punct!("++")) => Some(update_op!("++")),
             token_matches!(ok: punct!("--")) => Some(update_op!("--")),
@@ -346,10 +346,10 @@ where
         };
 
         if operator.is_some() {
-            self.consume()?;
+            self.consume().unwrap();
         }
 
-        Ok(operator)
+        operator
     }
 
     /// Parses the `LeftHandSideExpression` production and non recursive parts of the
