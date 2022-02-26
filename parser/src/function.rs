@@ -35,10 +35,11 @@ where
         .into())
     }
 
-    /// Parses the async version of `ArrowFunction` production, but expects the parameters as input
-    /// since that may be a non terminal before we know if it is an arrow function or parenthesized
-    /// expression.
-    pub(super) fn parse_async_arrow_function_expr(&mut self, span_start: usize) -> Result<Expr> {
+    /// Parses the async version of `ArrowFunction` production.
+    pub(super) fn parse_async_arrow_function_expr(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+        self.consume_assert(&keyword!("async"))?;
+
         let (binding_parameter, parameters) = self.parse_arrow_function_parameters()?;
 
         self.consume_assert(&punct!("=>"))?;

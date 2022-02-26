@@ -1,6 +1,6 @@
 use crate::error::Result;
 use crate::Parser;
-use fajt_ast::{Expr, Ident};
+use fajt_ast::Expr;
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
@@ -26,17 +26,10 @@ where
     pub(super) fn parse_cover_call_or_async_arrow_head(&mut self) -> Result<Expr> {
         let after_token = self.token_after_parenthesis()?;
         if token_matches!(after_token, opt: punct!("=>")) {
-            let async_ident = self.parse_identifier()?;
-            self.parse_covered_async_arrow_function(async_ident)
+            self.parse_async_arrow_function_expr()
         } else {
             self.parse_covered_call_expression()
         }
-    }
-
-    /// Parses the `ArrowFunction` covered by `CoverCallExpressionAndAsyncArrowHead`.
-    fn parse_covered_async_arrow_function(&mut self, async_ident: Ident) -> Result<Expr> {
-        let span_start = async_ident.span.start;
-        self.parse_async_arrow_function_expr(span_start)
     }
 
     /// Parses the `CallExpression` covered by `CoverCallExpressionAndAsyncArrowHead`.

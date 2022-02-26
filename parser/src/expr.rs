@@ -137,11 +137,7 @@ where
         match self.peek() {
             token_matches!(opt: punct!("=>")) => self.parse_arrow_function_expr(),
             token_matches!(opt: punct!("(")) => self.parse_cover_call_or_async_arrow_head(),
-            _ if self.peek_is_identifier() => {
-                let span_start = self.position();
-                self.consume()?;
-                self.parse_async_arrow_function_expr(span_start)
-            }
+            _ if self.peek_is_identifier() => self.parse_async_arrow_function_expr(),
             _ => self.parse_conditional_expr(),
         }
     }
