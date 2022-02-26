@@ -136,10 +136,7 @@ where
     fn parse_assignment_expr_async(&mut self) -> Result<Expr> {
         match self.peek() {
             token_matches!(opt: punct!("=>")) => self.parse_arrow_function_expr(),
-            token_matches!(opt: punct!("(")) => {
-                let async_ident = self.parse_identifier()?;
-                self.parse_cover_call_or_async_arrow_head(async_ident)
-            }
+            token_matches!(opt: punct!("(")) => self.parse_cover_call_or_async_arrow_head(),
             _ if self.peek_is_identifier() => {
                 let span_start = self.position();
                 self.consume()?;
@@ -402,7 +399,7 @@ where
     }
 
     /// Parses the `CallExpression Arguments` of the `CallExpression` production.
-    fn parse_call_expr(&mut self, span_start: usize, callee: Expr) -> Result<Expr> {
+    pub(super) fn parse_call_expr(&mut self, span_start: usize, callee: Expr) -> Result<Expr> {
         let (arguments_span, arguments) = self.parse_arguments()?;
         let span = self.span_from(span_start);
         Ok(ExprCall {

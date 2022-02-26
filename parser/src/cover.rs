@@ -1,6 +1,6 @@
 use crate::error::Result;
 use crate::Parser;
-use fajt_ast::{Callee, Expr, ExprCall, Ident};
+use fajt_ast::{Expr, Ident};
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
@@ -23,15 +23,13 @@ where
     }
 
     /// Parses and resolves the `CoverCallExpressionAndAsyncArrowHead` production.
-    pub(super) fn parse_cover_call_or_async_arrow_head(
-        &mut self,
-        async_ident: Ident,
-    ) -> Result<Expr> {
+    pub(super) fn parse_cover_call_or_async_arrow_head(&mut self) -> Result<Expr> {
         let after_token = self.token_after_parenthesis()?;
         if token_matches!(after_token, opt: punct!("=>")) {
+            let async_ident = self.parse_identifier()?;
             self.parse_covered_async_arrow_function(async_ident)
         } else {
-            self.parse_covered_call_expression(async_ident)
+            self.parse_covered_call_expression()
         }
     }
 
@@ -42,17 +40,10 @@ where
     }
 
     /// Parses the `CallExpression` covered by `CoverCallExpressionAndAsyncArrowHead`.
-    fn parse_covered_call_expression(&mut self, async_ident: Ident) -> Result<Expr> {
-        let span_start = async_ident.span.start;
-        let (arguments_span, arguments) = self.parse_arguments()?;
-        let span = self.span_from(span_start);
-        Ok(ExprCall {
-            span,
-            callee: Callee::Expr(Box::new(async_ident.into())),
-            arguments_span,
-            arguments,
-        }
-        .into())
+    fn parse_covered_call_expression(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+        let async_ident = self.parse_identifier()?;
+        self.parse_call_expr(span_start, async_ident.into())
     }
 
     /// Assumes next token is start parenthesis, skips past matching closing parenthesis, reads
@@ -60,8 +51,15 @@ where
     ///
     /// We do this to figure out the "cover" productions that requires reading past parenthesis.
     fn token_after_parenthesis(&mut self) -> Result<Option<Token>> {
-        let start = self.consume_assert(&punct!("("))?;
-        self.skip_until_closing_parenthesis()?;
+        let start = self.consume()?;
+        let depth = if token_matches!(start, punct!("(")) {
+            // TODO simplify this
+            1
+        } else {
+            0
+        };
+
+        self.skip_until_closing_parenthesis(depth)?;
 
         let token = self.consume().ok();
 
@@ -69,8 +67,7 @@ where
         Ok(token)
     }
 
-    fn skip_until_closing_parenthesis(&mut self) -> Result<()> {
-        let mut depth = 1;
+    fn skip_until_closing_parenthesis(&mut self, mut depth: usize) -> Result<()> {
         loop {
             let token = self.consume()?;
             match &token {
