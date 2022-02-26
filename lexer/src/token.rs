@@ -25,6 +25,12 @@ macro_rules! token_matches {
     (@literal) => {
         token_matches!($crate::token::TokenValue::Literal(_))
     };
+    (@template) => {
+        token_matches!(
+            $crate::token::TokenValue::TemplateHead(_)
+                | $crate::token::TokenValue::Literal(fajt_ast::Literal::Template(_))
+        )
+    };
     (@template-head) => {
         token_matches!($crate::token::TokenValue::TemplateHead(_))
     };

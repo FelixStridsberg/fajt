@@ -434,28 +434,29 @@ where
         loop {
             match self.current() {
                 token_matches!(ok: punct!(".") | punct!("[")) => {
-                    expr = self.parse_member_expr_right_side(
-                        span_start,
-                        MemberObject::Expr(Box::new(expr)),
-                    )?;
+                    let left = MemberObject::Expr(Box::new(expr));
+                    expr = self.parse_member_expr_right_side(span_start, left)?;
                 }
-                token_matches!(
-                    ok: TokenValue::TemplateHead(_) | TokenValue::Literal(Literal::Template(_))
-                ) => {
-                    let template = self.parse_template_literal()?;
-                    let span = self.span_from(span_start);
-                    expr = ExprTaggedTemplate {
-                        span,
-                        callee: Box::new(expr),
-                        template,
-                    }
-                    .into();
+                Ok(token_matches!(@template)) => {
+                    expr = self.parse_tagged_template(span_start, expr)?;
                 }
                 _ => break,
             }
         }
 
         Ok(expr)
+    }
+
+    /// Parses the `MemberExpression TemplateLiteral` part of the `MemberExpression` production.
+    fn parse_tagged_template(&mut self, span_start: usize, callee: Expr) -> Result<Expr> {
+        let template = self.parse_template_literal()?;
+        let span = self.span_from(span_start);
+        Ok(ExprTaggedTemplate {
+            span,
+            callee: Box::new(callee),
+            template,
+        }
+        .into())
     }
 
     /// Parses the parts of `MemberExpressions` that can be decided from terminals.
