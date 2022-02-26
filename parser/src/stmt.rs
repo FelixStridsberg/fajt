@@ -104,7 +104,7 @@ where
         }
 
         if self.current_matches(&keyword!("async")) && self.peek_matches(&keyword!("function")) {
-            return Ok(self.followed_by_new_lined());
+            return Ok(self.followed_by_new_line());
         }
 
         Ok(true)

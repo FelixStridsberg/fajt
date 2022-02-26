@@ -324,7 +324,7 @@ where
     }
 
     /// Returns `true` if current token is followed by new line.
-    fn followed_by_new_lined(&self) -> bool {
+    fn followed_by_new_line(&self) -> bool {
         self.peek().map_or(false, |t| t.first_on_line)
     }
 

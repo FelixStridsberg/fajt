@@ -18,7 +18,7 @@ where
             token_matches!(punct!("*")) => self.parse_generator_method(),
             token_matches!(keyword!("get")) => self.parse_getter_or_setter(MethodKind::Get),
             token_matches!(keyword!("set")) => self.parse_getter_or_setter(MethodKind::Set),
-            token_matches!(keyword!("async")) if !self.followed_by_new_lined() => {
+            token_matches!(keyword!("async")) if !self.followed_by_new_line() => {
                 self.parse_async_method()
             }
             _ => {

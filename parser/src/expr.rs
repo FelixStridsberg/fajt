@@ -58,7 +58,7 @@ where
             }
             token_matches!(ok: keyword!("async")) => self.parse_assignment_expr_async(),
             _ if self.is_identifier()
-                && !self.followed_by_new_lined()
+                && !self.followed_by_new_line()
                 && self.peek_matches(&punct!("=>")) =>
             {
                 let span_start = self.position();
@@ -633,7 +633,7 @@ where
             token_matches!(keyword!("class")) => self
                 .with_context(self.context.with_strict(true))
                 .parse_class_expr()?,
-            token_matches!(keyword!("async")) if !self.followed_by_new_lined() => {
+            token_matches!(keyword!("async")) if !self.followed_by_new_line() => {
                 self.parse_async_function_expr()?
             }
             token_matches!(punct!("/")) => {
