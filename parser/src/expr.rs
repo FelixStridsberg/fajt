@@ -372,7 +372,8 @@ where
     /// Parses the `SuperCall` production.
     fn parse_super_call_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        self.consume()?;
+        self.consume_assert(&keyword!("super"))?;
+
         let (arguments_span, arguments) = self.parse_arguments()?;
         let span = self.span_from(span_start);
 
