@@ -255,7 +255,7 @@ where
         Ok(FormalParameters {
             span,
             bindings: parameters,
-            rest,
+            rest: rest.map(Box::new),
         })
     }
 

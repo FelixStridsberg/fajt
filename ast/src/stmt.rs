@@ -33,7 +33,7 @@ ast_mapping! {
 #[test]
 fn size_of_stmt() {
     // To avoid unexpected increase in node size.
-    assert_eq!(std::mem::size_of::<Stmt>(), 264);
+    assert_eq!(std::mem::size_of::<Stmt>(), 184);
 }
 
 impl Stmt {
@@ -85,7 +85,7 @@ ast_struct! {
     pub struct FormalParameters {
         pub span: Span,
         pub bindings: Vec<BindingElement>,
-        pub rest: Option<BindingPattern>,
+        pub rest: Option<Box<BindingPattern>>,
     }
 }
 
@@ -198,7 +198,7 @@ ast_struct! {
     pub struct StmtTry {
         pub span: Span,
         pub block: StmtBlock,
-        pub handler: Option<CatchClause>,
+        pub handler: Option<Box<CatchClause>>,
         pub finalizer: Option<StmtBlock>,
     }
 }

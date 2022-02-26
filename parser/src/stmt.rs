@@ -312,7 +312,7 @@ where
         Ok(StmtTry {
             span,
             block,
-            handler,
+            handler: handler.map(Box::new),
             finalizer,
         }
         .into())
