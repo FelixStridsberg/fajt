@@ -214,7 +214,7 @@ where
         }
 
         if self.context.is_await && token_matches!(self.current()?, keyword!("await")) {
-            return self.parse_await_expr()
+            return self.parse_await_expr();
         }
 
         self.parse_update_expr()
@@ -613,27 +613,25 @@ where
         self.consume_assert(&punct!("("))?;
 
         let mut arguments = Vec::new();
-
         loop {
-            match self.current() {
-                token_matches!(ok: punct!(")")) => {
-                    self.consume()?;
-                    break;
-                }
-                token_matches!(ok: punct!("...")) => {
-                    self.consume()?;
-                    arguments.push(Argument::Spread(self.parse_assignment_expr()?));
-                    self.consume_list_delimiter(&punct!(")"))?;
-                }
-                _ => {
-                    arguments.push(Argument::Expr(self.parse_assignment_expr()?));
-                    self.consume_list_delimiter(&punct!(")"))?;
-                }
+            if self.maybe_consume(&punct!(")"))? {
+                break;
             }
+
+            arguments.push(self.parse_argument()?);
+            self.consume_list_delimiter(&punct!(")"))?;
         }
 
         let span = self.span_from(span_start);
         Ok((span, arguments))
+    }
+
+    fn parse_argument(&mut self) -> Result<Argument> {
+        Ok(if self.maybe_consume(&punct!("..."))? {
+            Argument::Spread(self.parse_assignment_expr()?)
+        } else {
+            Argument::Expr(self.parse_assignment_expr()?)
+        })
     }
 
     /// Parses arguments where optional.
