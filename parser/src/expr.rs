@@ -342,15 +342,7 @@ where
         loop {
             match self.current() {
                 token_matches!(ok: punct!("(")) => {
-                    let (arguments_span, arguments) = self.parse_arguments()?;
-                    let span = self.span_from(span_start);
-                    expr = ExprCall {
-                        span,
-                        callee: Callee::Expr(Box::new(expr)),
-                        arguments_span,
-                        arguments,
-                    }
-                    .into();
+                    expr = self.parse_call_expr(span_start, expr)?;
                 }
                 token_matches!(ok: punct!(".") | punct!("[")) => {
                     expr = self.parse_member_expr_right_side(
@@ -359,20 +351,26 @@ where
                     )?;
                 }
                 token_matches!(ok: TokenValue::Literal(Literal::Template(_))) => {
-                    let template = self.parse_template_literal()?;
-                    let span = self.span_from(span_start);
-                    expr = ExprTaggedTemplate {
-                        span,
-                        callee: Box::new(expr),
-                        template,
-                    }
-                    .into();
+                    expr = self.parse_tagged_template(span_start, expr)?;
                 }
                 _ => break,
             };
         }
 
         Ok(expr)
+    }
+
+    /// Parses the `CallExpression Arguments` of the `CallExpression` production.
+    fn parse_call_expr(&mut self, span_start: usize, callee: Expr) -> Result<Expr> {
+        let (arguments_span, arguments) = self.parse_arguments()?;
+        let span = self.span_from(span_start);
+        Ok(ExprCall {
+            span,
+            callee: Callee::Expr(Box::new(callee)),
+            arguments_span,
+            arguments,
+        }
+        .into())
     }
 
     /// Parses the `SuperCall` production.
@@ -447,7 +445,7 @@ where
         Ok(expr)
     }
 
-    /// Parses the `MemberExpression TemplateLiteral` part of the `MemberExpression` production.
+    /// Parses a tagged template.
     fn parse_tagged_template(&mut self, span_start: usize, callee: Expr) -> Result<Expr> {
         let template = self.parse_template_literal()?;
         let span = self.span_from(span_start);
