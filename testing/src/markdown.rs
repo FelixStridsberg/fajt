@@ -22,8 +22,7 @@ impl<'a> Markdown<'a> {
 
     pub fn get_block(&self, section_name: &str) -> Option<&MarkdownBlock> {
         self.get_section(section_name)
-            .map(|section| section.block.as_ref())
-            .flatten()
+            .and_then(|section| section.block.as_ref())
     }
 
     pub fn get_block_content(&self, section_name: &str) -> Option<&str> {

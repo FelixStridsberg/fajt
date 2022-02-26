@@ -74,6 +74,7 @@ macro_rules! generate_fold_and_visit {
         }
 
         // Trace visitor for easy debugging
+        #[derive(Default)]
         pub struct TraceVisitor {
             pub visits: Vec<&'static str>,
         }

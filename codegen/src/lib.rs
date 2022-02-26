@@ -37,6 +37,12 @@ impl GeneratorContext {
     }
 }
 
+impl Default for GeneratorContext {
+    fn default() -> Self {
+        GeneratorContext::new()
+    }
+}
+
 struct Index {
     last_new_line: Cell<usize>,
     last_block_start: Cell<usize>,
