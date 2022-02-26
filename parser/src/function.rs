@@ -35,25 +35,12 @@ where
         .into())
     }
 
-    fn parse_arrow_function_parameters(&mut self) -> Result<(bool, FormalParameters)> {
-        let (binding_parameter, parameters) = if self.is_identifier() {
-            (true, self.parse_arrow_identifier_argument()?)
-        } else {
-            (false, self.parse_formal_parameters()?)
-        };
-
-        Ok((binding_parameter, parameters))
-    }
-
     /// Parses the async version of `ArrowFunction` production, but expects the parameters as input
     /// since that may be a non terminal before we know if it is an arrow function or parenthesized
     /// expression.
-    pub(super) fn parse_async_arrow_function_expr(
-        &mut self,
-        span_start: usize,
-        binding_parameter: bool,
-        parameters: FormalParameters,
-    ) -> Result<Expr> {
+    pub(super) fn parse_async_arrow_function_expr(&mut self, span_start: usize) -> Result<Expr> {
+        let (binding_parameter, parameters) = self.parse_arrow_function_parameters()?;
+
         self.consume_assert(&punct!("=>"))?;
 
         let body = self
@@ -69,6 +56,18 @@ where
             body,
         }
         .into())
+    }
+
+    /// Parses the `ArrowParameters` production. First item in the tuple is `true` if parameters are
+    /// a `BindingIdentifier`.
+    fn parse_arrow_function_parameters(&mut self) -> Result<(bool, FormalParameters)> {
+        let (binding_parameter, parameters) = if self.is_identifier() {
+            (true, self.parse_arrow_identifier_argument()?)
+        } else {
+            (false, self.parse_formal_parameters()?)
+        };
+
+        Ok((binding_parameter, parameters))
     }
 
     /// Parses the `ConciseBody` production.

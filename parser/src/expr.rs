@@ -143,8 +143,7 @@ where
             _ if self.peek_is_identifier() => {
                 let span_start = self.position();
                 self.consume()?;
-                let parameters = self.parse_arrow_identifier_argument()?;
-                self.parse_async_arrow_function_expr(span_start, true, parameters)
+                self.parse_async_arrow_function_expr(span_start)
             }
             _ => self.parse_conditional_expr(),
         }

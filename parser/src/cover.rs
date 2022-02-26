@@ -38,8 +38,7 @@ where
     /// Parses the `ArrowFunction` covered by `CoverCallExpressionAndAsyncArrowHead`.
     fn parse_covered_async_arrow_function(&mut self, async_ident: Ident) -> Result<Expr> {
         let span_start = async_ident.span.start;
-        let parameters = self.parse_formal_parameters()?;
-        self.parse_async_arrow_function_expr(span_start, false, parameters)
+        self.parse_async_arrow_function_expr(span_start)
     }
 
     /// Parses the `CallExpression` covered by `CoverCallExpressionAndAsyncArrowHead`.
