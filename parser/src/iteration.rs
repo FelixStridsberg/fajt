@@ -93,7 +93,7 @@ where
         let span = self.span_from(span_start);
         Ok(StmtFor {
             span,
-            init: init.map(Box::new),
+            init,
             test: test.map(Box::new),
             update: update.map(Box::new),
             body: body.into(),
@@ -114,7 +114,7 @@ where
         let span = self.span_from(span_start);
         Ok(StmtForIn {
             span,
-            left: Box::new(left),
+            left,
             right: Box::new(right),
             body: body.into(),
         }
@@ -151,7 +151,7 @@ where
         let span = self.span_from(span_start);
         Ok(StmtForOf {
             span,
-            left: Box::new(left),
+            left,
             right: Box::new(right),
             body: Box::new(body),
             asynchronous,
@@ -184,10 +184,10 @@ where
 
         Ok(match self.current()? {
             _ if self.current_matches(&punct!(";")) => None,
-            _ => Some(ForInit::Expr(
+            _ => Some(ForInit::Expr(Box::new(
                 self.with_context(self.context.with_in(false))
                     .parse_expr()?,
-            )),
+            ))),
         })
     }
 }

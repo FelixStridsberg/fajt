@@ -246,7 +246,7 @@ ast_struct! {
 ast_struct! {
     pub struct StmtFor {
         pub span: Span,
-        pub init: Option<Box<ForInit>>,
+        pub init: Option<ForInit>,
         pub test: Option<Box<Expr>>,
         pub update: Option<Box<Expr>>,
         pub body: Box<Stmt>,
@@ -256,7 +256,7 @@ ast_struct! {
 ast_struct! {
     pub struct StmtForIn {
         pub span: Span,
-        pub left: Box<ForInit>,
+        pub left: ForInit,
         pub right: Box<Expr>,
         pub body: Box<Stmt>,
     }
@@ -265,7 +265,7 @@ ast_struct! {
 ast_struct! {
     pub struct StmtForOf {
         pub span: Span,
-        pub left: Box<ForInit>,
+        pub left: ForInit,
         pub right: Box<Expr>,
         pub body: Box<Stmt>,
         pub asynchronous: bool,
@@ -274,7 +274,7 @@ ast_struct! {
 
 ast_node! {
     pub enum ForInit {
-        Expr(Expr),
+        Expr(Box<Expr>),
         Declaration(StmtVariable),
     }
 }
