@@ -244,7 +244,6 @@ where
         .into())
     }
 
-    /// Parses optional unary operator.
     fn parse_optional_unary_operator(&mut self) -> Option<UnaryOperator> {
         let operator = match self.current() {
             token_matches!(ok: punct!("+")) => Some(unary_op!("+")),
