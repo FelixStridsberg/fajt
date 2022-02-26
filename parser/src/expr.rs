@@ -470,22 +470,7 @@ where
                 }
             }
             token_matches!(keyword!("import")) if self.peek_matches(&punct!(".")) => {
-                let span_start = self.position();
-                let import_token = self.consume()?;
-                self.consume()?; // .
-
-                let property = self.parse_identifier()?;
-                if property.name != "meta" {
-                    return Err(Error::unexpected_identifier(property));
-                }
-
-                let span = self.span_from(span_start);
-                Ok(ExprMetaProperty {
-                    span,
-                    meta: Ident::new("import", import_token.span),
-                    property,
-                }
-                .into())
+                self.parse_import_meta()
             }
             _ => self.parse_primary_expr(),
         }
@@ -536,6 +521,26 @@ where
                 span: super_token.span,
             }),
         )
+    }
+
+    /// Parses the `ImportMeta` production.
+    fn parse_import_meta(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+        let import_token = self.consume()?;
+        self.consume()?; // .
+
+        let property = self.parse_identifier()?;
+        if property.name != "meta" {
+            return Err(Error::unexpected_identifier(property));
+        }
+
+        let span = self.span_from(span_start);
+        Ok(ExprMetaProperty {
+            span,
+            meta: Ident::new("import", import_token.span),
+            property,
+        }
+        .into())
     }
 
     /// Parses the `NewTarget` production.
