@@ -70,6 +70,12 @@ where
         self.consume_assert(&punct!("("))?;
 
         let init = self.parse_optional_for_init()?;
+
+        // Only for-of loops are allowed to be asynchronous.
+        if asynchronous && !self.current_matches(&keyword!("of")) {
+            return Err(Error::unexpected_token(self.consume()?));
+        }
+
         if init.is_none() || self.current_matches(&punct!(";")) {
             return self.parse_for(span_start, init);
         }
