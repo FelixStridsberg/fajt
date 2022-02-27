@@ -1,8 +1,8 @@
 use crate::error::Result;
 use crate::{Error, Parser, ThenTry};
 use fajt_ast::{
-    ForInit, Stmt, StmtDoWhile, StmtFor, StmtForIn, StmtForOf, StmtVariable, StmtWhile,
-    VariableKind,
+    AssignmentOperator, ForInit, Stmt, StmtDoWhile, StmtFor, StmtForIn, StmtForOf, StmtVariable,
+    StmtWhile, VariableKind,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
@@ -112,7 +112,9 @@ where
     }
 
     fn parse_for_in(&mut self, span_start: usize, left: ForInit) -> Result<Stmt> {
-        // TODO verify that `left` is a valid LeftHandSideExpression if not declaration.
+        if let ForInit::Expr(expr) = &left {
+            self.validate_left_side_expr(expr, &AssignmentOperator::Assign)?;
+        }
 
         self.consume_assert(&keyword!("in"))?;
 
