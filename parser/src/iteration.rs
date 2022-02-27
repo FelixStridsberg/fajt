@@ -68,7 +68,7 @@ where
 
         self.consume_assert(&punct!("("))?;
 
-        let init = self.parse_for_first_argument()?;
+        let init = self.parse_optional_for_init()?;
         match self.current() {
             token_matches!(ok: punct!(";")) => self.parse_plain_for(span_start, init),
             token_matches!(ok: keyword!("of")) if init.is_some() => {
@@ -125,7 +125,7 @@ where
         self.consume()?;
         self.consume_assert(&punct!("("))?;
 
-        let init = self.parse_for_first_argument()?;
+        let init = self.parse_optional_for_init()?;
         if init.is_none() {
             return Err(Error::unexpected_token(self.consume()?));
         }
@@ -159,8 +159,44 @@ where
         .into())
     }
 
-    pub(super) fn parse_for_first_argument(&mut self) -> Result<Option<ForInit>> {
+    pub(super) fn parse_optional_for_init(&mut self) -> Result<Option<ForInit>> {
         let span_start = self.position();
+
+        if self.current_matches(&punct!(";")) {
+            return Ok(None);
+        }
+
+        let variable_kind = self.parse_optional_variable_kind()?;
+        if let Some(kind) = variable_kind {
+            return Ok(Some(
+                self.parse_for_init_variable_declarations(span_start, kind)?,
+            ));
+        }
+
+        Ok(Some(ForInit::Expr(Box::new(
+            self.with_context(self.context.with_in(false))
+                .parse_expr()?,
+        ))))
+    }
+
+    fn parse_for_init_variable_declarations(
+        &mut self,
+        span_start: usize,
+        kind: VariableKind,
+    ) -> Result<ForInit> {
+        let declarations = self
+            .with_context(self.context.with_in(false))
+            .parse_variable_declarations()?;
+
+        let span = self.span_from(span_start);
+        Ok(ForInit::Declaration(StmtVariable {
+            span,
+            kind,
+            declarations,
+        }))
+    }
+
+    fn parse_optional_variable_kind(&mut self) -> Result<Option<VariableKind>> {
         let variable_kind = match self.current()? {
             token_matches!(keyword!("var")) => Some(VariableKind::Var),
             token_matches!(keyword!("let")) => Some(VariableKind::Let),
@@ -168,26 +204,10 @@ where
             _ => None,
         };
 
-        if let Some(kind) = variable_kind {
-            self.consume()?; // var, let, const
-            let declarations = self
-                .with_context(self.context.with_in(false))
-                .parse_variable_declarations()?;
-
-            let span = self.span_from(span_start);
-            return Ok(Some(ForInit::Declaration(StmtVariable {
-                span,
-                kind,
-                declarations,
-            })));
+        if variable_kind.is_some() {
+            self.consume()?;
         }
 
-        Ok(match self.current()? {
-            _ if self.current_matches(&punct!(";")) => None,
-            _ => Some(ForInit::Expr(Box::new(
-                self.with_context(self.context.with_in(false))
-                    .parse_expr()?,
-            ))),
-        })
+        Ok(variable_kind)
     }
 }
