@@ -15,6 +15,7 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
     I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
+    /// Parses the `DoWhileStatement` production.
     pub(super) fn parse_do_while_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(&keyword!("do"))?;
@@ -38,6 +39,7 @@ where
         .into())
     }
 
+    /// Parses the `WhileStatement` production.
     pub(super) fn parse_while_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(&keyword!("while"))?;
@@ -58,34 +60,34 @@ where
         .into())
     }
 
+    /// Parses the `ForStatement` production.
     pub(super) fn parse_for_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(&keyword!("for"))?;
 
-        if self.context.is_await && self.current_matches(&keyword!("await")) {
-            return self.parse_for_await_of(span_start);
-        }
+        let asynchronous = self.context.is_await && self.maybe_consume(&keyword!("await"))?;
 
         self.consume_assert(&punct!("("))?;
 
         let init = self.parse_optional_for_init()?;
-        match self.current() {
-            token_matches!(ok: punct!(";")) => self.parse_plain_for(span_start, init),
-            token_matches!(ok: keyword!("of")) if init.is_some() => {
-                self.parse_for_of(span_start, init.unwrap(), false)
-            }
-            token_matches!(ok: keyword!("in")) if init.is_some() => {
-                self.parse_for_in(span_start, init.unwrap())
-            }
-            _ => Err(Error::unexpected_token(self.consume()?)),
+        if init.is_none() || self.current_matches(&punct!(";")) {
+            return self.parse_for(span_start, init);
         }
+
+        if self.current_matches(&keyword!("of")) {
+            return self.parse_for_of(span_start, init.unwrap(), asynchronous);
+        }
+
+        self.parse_for_in(span_start, init.unwrap())
     }
 
-    fn parse_plain_for(&mut self, span_start: usize, init: Option<ForInit>) -> Result<Stmt> {
+    /// Parses a standard for loop, i.e. not for in/for of.
+    fn parse_for(&mut self, span_start: usize, init: Option<ForInit>) -> Result<Stmt> {
         self.consume_assert(&punct!(";"))?;
 
         let test = (!self.current_matches(&punct!(";"))).then_try(|| self.parse_expr())?;
         self.consume_assert(&punct!(";"))?;
+
         let update = (!self.current_matches(&punct!(")"))).then_try(|| self.parse_expr())?;
         self.consume_assert(&punct!(")"))?;
 
@@ -119,18 +121,6 @@ where
             body: Box::new(body),
         }
         .into())
-    }
-
-    fn parse_for_await_of(&mut self, span_start: usize) -> Result<Stmt> {
-        self.consume()?;
-        self.consume_assert(&punct!("("))?;
-
-        let init = self.parse_optional_for_init()?;
-        if init.is_none() {
-            return Err(Error::unexpected_token(self.consume()?));
-        }
-
-        self.parse_for_of(span_start, init.unwrap(), true)
     }
 
     fn parse_for_of(
