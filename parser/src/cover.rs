@@ -39,38 +39,33 @@ where
         self.parse_call_expr(span_start, async_ident.into())
     }
 
-    /// Assumes next token is start parenthesis, skips past matching closing parenthesis, reads
-    /// token, then rewinds so next token is start parenthesis again.
-    ///
-    /// We do this to figure out the "cover" productions that requires reading past parenthesis.
+    /// Skips all tokens until next closing parenthesis and current nesting level, rewinds to
+    /// current position and returns the token after the closing parenthesis.
     fn token_after_parenthesis(&mut self) -> Result<Option<Token>> {
-        let start = self.consume()?;
-        let depth = if token_matches!(start, punct!("(")) {
-            // TODO simplify this
-            1
-        } else {
-            0
-        };
+        let start = self.current()?.clone();
 
-        self.skip_until_closing_parenthesis(depth)?;
-
+        self.skip_until_closing_parenthesis()?;
         let token = self.consume().ok();
 
         self.reader.rewind_to(&start)?;
         Ok(token)
     }
 
-    fn skip_until_closing_parenthesis(&mut self, mut depth: usize) -> Result<()> {
+    /// Skip to next closing parenthesis at current nesting level. Will skip tokens, if any, before
+    /// starting parenthesis.
+    fn skip_until_closing_parenthesis(&mut self) -> Result<()> {
+        let mut depth = 0;
         loop {
             let token = self.consume()?;
             match &token {
                 token_matches!(punct!("(")) => depth += 1,
-                token_matches!(punct!(")")) => depth -= 1,
+                token_matches!(punct!(")")) => {
+                    depth -= 1;
+                    if depth == 0 {
+                        break;
+                    }
+                }
                 _ => {}
-            }
-
-            if depth == 0 {
-                break;
             }
         }
 

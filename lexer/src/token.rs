@@ -64,7 +64,7 @@ bitflags! {
 /// assert_eq!(keyword!("const"), TokenValue::Keyword(Keyword::Const))
 /// # }
 /// ```
-#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, FromString, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, FromString, Serialize, Deserialize)]
 #[from_string_macro("keyword")]
 #[from_string_macro_rules(
     ($variant:ident) => {
@@ -331,7 +331,7 @@ macro_rules! literal(
     }
 );
 
-#[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialOrd, PartialEq, Serialize, Deserialize)]
 pub enum TokenValue {
     Keyword(Keyword),
     Identifier(String),
@@ -342,7 +342,7 @@ pub enum TokenValue {
     TemplateTail(String),
 }
 
-#[derive(Debug, PartialOrd, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialOrd, PartialEq, Serialize, Deserialize)]
 pub struct Token {
     pub value: TokenValue,
     pub first_on_line: bool,

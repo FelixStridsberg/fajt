@@ -70,7 +70,7 @@ macro_rules! ast_node {
         pub $( ($visibility:ident) )? $struct_or_enum:ident $name:ident $($rest:tt)*
     ) => {
         $(#[$meta])*
-        #[derive(Debug, PartialOrd, PartialEq)]
+        #[derive(Debug, Clone, PartialOrd, PartialEq)]
         #[derive(serde::Serialize, serde::Deserialize)]
         pub $( ($visibility) )? $struct_or_enum $name $($rest)*
     }
