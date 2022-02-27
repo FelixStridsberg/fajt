@@ -68,22 +68,47 @@ where
 
                 let assignment_operator = self.parse_optional_assignment_operator();
                 if let Some(operator) = assignment_operator {
-                    self.validate_left_side_expr(&expr, &operator)?;
-
-                    let right = self.parse_assignment_expr()?;
-                    let span = self.span_from(span_start);
-                    Ok(ExprAssignment {
-                        span,
-                        operator,
-                        left: Box::new(expr),
-                        right: Box::new(right),
-                    }
-                    .into())
+                    self.parse_assignment(span_start, expr, operator)
                 } else {
                     Ok(expr)
                 }
             }
         }
+    }
+
+    /// Parses the part of `AssignmentExpression` that starts with the `async` keyword.
+    /// Examples:
+    /// 1. `async => {}` // Non async arrow function with the name async.
+    /// 2. `async a => {}` // Async arrow function without parameter parentheses.
+    /// 3. `async(a) => {}` // Async arrow function with parentheses.
+    /// 4. `async(a)` // Function call where `async` is an identifier and not a keyword.
+    fn parse_assignment_expr_async(&mut self) -> Result<Expr> {
+        match self.peek() {
+            token_matches!(opt: punct!("=>")) => self.parse_arrow_function_expr(),
+            token_matches!(opt: punct!("(")) => self.parse_cover_call_or_async_arrow_head(),
+            _ if self.peek_is_identifier() => self.parse_async_arrow_function_expr(),
+            _ => self.parse_conditional_expr(),
+        }
+    }
+
+    /// Parses the part of `AssignmentExpression` that is an assignment.
+    fn parse_assignment(
+        &mut self,
+        span_start: usize,
+        left: Expr,
+        operator: AssignmentOperator,
+    ) -> Result<Expr> {
+        self.validate_left_side_expr(&left, &operator)?;
+
+        let right = self.parse_assignment_expr()?;
+        let span = self.span_from(span_start);
+        Ok(ExprAssignment {
+            span,
+            operator,
+            left: Box::new(left),
+            right: Box::new(right),
+        }
+        .into())
     }
 
     pub fn parse_optional_assignment_operator(&mut self) -> Option<AssignmentOperator> {
@@ -125,21 +150,6 @@ where
             expression: Box::new(expr),
         }
         .into())
-    }
-
-    /// Parses the part of `AssignmentExpression` that starts with the `async` keyword.
-    /// Note that most of the complexity comes because of the ambiguity between:
-    /// 1. `async => {}` // Non async arrow function with the name async.
-    /// 2. `async a => {}` // Async arrow function without parameter parentheses.
-    /// 3. `async(a) => {}` // Async arrow function with parentheses.
-    /// 4. `async(a)` // Function call where `async` is an identifier and not a keyword.
-    fn parse_assignment_expr_async(&mut self) -> Result<Expr> {
-        match self.peek() {
-            token_matches!(opt: punct!("=>")) => self.parse_arrow_function_expr(),
-            token_matches!(opt: punct!("(")) => self.parse_cover_call_or_async_arrow_head(),
-            _ if self.peek_is_identifier() => self.parse_async_arrow_function_expr(),
-            _ => self.parse_conditional_expr(),
-        }
     }
 
     /// Parses the `YieldExpression` production.
