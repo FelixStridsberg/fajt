@@ -52,6 +52,7 @@ where
         .into())
     }
 
+    /// Parses the `Template` production.
     pub(super) fn parse_template_literal(&mut self) -> Result<LitTemplate> {
         if token_matches!(self.current()?, @literal) {
             return self.parse_non_substitution_template();
@@ -99,6 +100,7 @@ where
         }
     }
 
+    /// Parses the `TemplateHead` production.
     fn parse_template_literal_head_string(&mut self) -> Result<String> {
         let head = self.consume()?;
         match head.value {
