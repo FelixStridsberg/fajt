@@ -96,16 +96,15 @@ where
     /// Parses the `ArrayLiteral` production.
     pub(super) fn parse_array_literal(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        let token = self.consume()?;
-        debug_assert!(token_matches!(token, punct!("[")));
+        self.consume_assert(&punct!("["))?;
 
         let mut elements = Vec::new();
         loop {
+            if self.maybe_consume(&punct!("]"))? {
+                break;
+            }
+
             match self.current()? {
-                token_matches!(punct!("]")) => {
-                    self.consume()?;
-                    break;
-                }
                 token_matches!(punct!(",")) => {
                     self.consume()?;
                     elements.push(ArrayElement::Elision);
@@ -135,13 +134,11 @@ where
     /// Parses the `ObjectLiteral` production.
     pub(super) fn parse_object_literal(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        let token = self.consume()?;
-        debug_assert!(token_matches!(token, punct!("{")));
+        self.consume_assert(&punct!("{"))?;
 
         let mut props = Vec::new();
         loop {
-            if token_matches!(self.current()?, punct!("}")) {
-                self.consume()?;
+            if self.maybe_consume(&punct!("}"))? {
                 break;
             }
 
