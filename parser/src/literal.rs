@@ -2,7 +2,7 @@ use crate::error::Result;
 use crate::{Error, Parser};
 use fajt_ast::{
     ArrayElement, Expr, ExprLiteral, LitArray, LitObject, LitTemplate, Literal, MethodKind,
-    NamedProperty, PropertyDefinition, TemplatePart,
+    NamedProperty, PropertyDefinition, PropertyName, TemplatePart,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
@@ -185,27 +185,12 @@ where
                 let expr = self.parse_assignment_expr()?;
                 Ok(PropertyDefinition::Spread(expr))
             }
-            _ if self.peek_matches(&punct!(":")) => Ok(self.parse_named_property_definition()?),
-            token_matches!(punct!("[")) => {
+            _ if self.peek_matches(&punct!(":")) => {
                 let span_start = self.position();
                 let name = self.parse_property_name()?;
-
-                if self.maybe_consume(&punct!(":"))? {
-                    let value = self.parse_assignment_expr()?;
-                    let span = self.span_from(span_start);
-                    return Ok(PropertyDefinition::Named(NamedProperty {
-                        span,
-                        name,
-                        value,
-                    }));
-                }
-
-                Ok(PropertyDefinition::Method(self.parse_method(
-                    span_start,
-                    name,
-                    MethodKind::Method,
-                )?))
+                self.parse_named_property_definition(span_start, name)
             }
+            token_matches!(punct!("[")) => self.parse_property_definition_with_computed_name(),
             _ if self.is_object_method_definition() => {
                 let method = self
                     .with_context(
@@ -224,19 +209,23 @@ where
         }
     }
 
-    pub fn is_object_method_definition(&self) -> bool {
-        match self.current() {
-            token_matches!(ok: punct!("*") | punct!("[")) => true,
-            token_matches!(ok: keyword!("async")) if !self.peek_matches(&punct!(":")) => true,
-            token_matches!(ok: keyword!("get") | keyword!("set")) => true,
-            _ => self.peek_matches(&punct!("(")),
+    fn parse_property_definition_with_computed_name(&mut self) -> Result<PropertyDefinition> {
+        let span_start = self.position();
+        let name = self.parse_property_name()?;
+
+        if self.current_matches(&punct!(":")) {
+            self.parse_named_property_definition(span_start, name)
+        } else {
+            self.parse_method(span_start, name, MethodKind::Method)
+                .map(PropertyDefinition::Method)
         }
     }
 
-    fn parse_named_property_definition(&mut self) -> Result<PropertyDefinition> {
-        let span_start = self.position();
-
-        let name = self.parse_property_name()?;
+    fn parse_named_property_definition(
+        &mut self,
+        span_start: usize,
+        name: PropertyName,
+    ) -> Result<PropertyDefinition> {
         self.consume_assert(&punct!(":"))?;
         let value = self.parse_assignment_expr()?;
 
@@ -246,5 +235,14 @@ where
             name,
             value,
         }))
+    }
+
+    pub fn is_object_method_definition(&self) -> bool {
+        match self.current() {
+            token_matches!(ok: punct!("*") | punct!("[")) => true,
+            token_matches!(ok: keyword!("async")) if !self.peek_matches(&punct!(":")) => true,
+            token_matches!(ok: keyword!("get") | keyword!("set")) => true,
+            _ => self.peek_matches(&punct!("(")),
+        }
     }
 }
