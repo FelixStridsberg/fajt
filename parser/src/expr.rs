@@ -37,8 +37,7 @@ where
         expr.push(initial_expr);
 
         loop {
-            if self.current_matches(&punct!(",")) {
-                self.consume()?;
+            if self.maybe_consume(&punct!(","))? {
                 expr.push(self.parse_assignment_expr()?);
             } else {
                 break;
@@ -57,9 +56,7 @@ where
                 self.parse_yield_expr()
             }
             token_matches!(ok: keyword!("async")) => self.parse_assignment_expr_async(),
-            _ if self.is_identifier()
-                && self.peek_matches(&punct!("=>")) =>
-            {
+            _ if self.is_identifier() && self.peek_matches(&punct!("=>")) => {
                 self.parse_arrow_function_expr()
             }
             _ => {
