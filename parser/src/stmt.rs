@@ -248,6 +248,7 @@ where
     /// Parses the `IfStatement` production.
     fn parse_if_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
+
         self.consume_assert(&keyword!("if"))?;
         self.consume_assert(&punct!("("))?;
         let condition = self.parse_expr()?;
@@ -256,14 +257,14 @@ where
         let consequent = self.parse_stmt()?;
         let alternate = self
             .maybe_consume(&keyword!("else"))?
-            .then_try(|| self.parse_stmt().map(Box::new))?;
+            .then_try(|| self.parse_stmt())?;
 
         let span = self.span_from(span_start);
         Ok(StmtIf {
             span,
             condition: Box::new(condition),
             consequent: Box::new(consequent),
-            alternate,
+            alternate: alternate.map(Box::new),
         }
         .into())
     }
@@ -271,12 +272,14 @@ where
     /// Parses the `WithStatement` production.
     fn parse_with_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
+
         self.consume_assert(&keyword!("with"))?;
         self.consume_assert(&punct!("("))?;
         let object = self.parse_expr()?;
         self.consume_assert(&punct!(")"))?;
 
         let body = self.parse_stmt()?;
+
         let span = self.span_from(span_start);
         Ok(StmtWith {
             span,
@@ -289,12 +292,14 @@ where
     /// Parses the `TryStatement` production.
     fn parse_try_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
-        self.consume_assert(&keyword!("try"))?;
 
+        self.consume_assert(&keyword!("try"))?;
         let block = self.parse_block_stmt()?.unwrap_block_stmt();
+
         let handler = self
             .current_matches(&keyword!("catch"))
             .then_try(|| self.parse_catch_clause())?;
+
         let finalizer = self
             .maybe_consume(&keyword!("finally"))?
             .then_try(|| Ok(self.parse_block_stmt()?.unwrap_block_stmt()))?;
@@ -309,10 +314,11 @@ where
         .into())
     }
 
+    /// Parses the `Catch` production.
     fn parse_catch_clause(&mut self) -> Result<CatchClause> {
         let span_start = self.position();
-        self.consume_assert(&keyword!("catch"))?;
 
+        self.consume_assert(&keyword!("catch"))?;
         let parameter = self.maybe_consume(&punct!("("))?.then_try(|| {
             let pattern = self.parse_binding_pattern()?;
             self.consume_assert(&punct!(")"))?;
@@ -329,15 +335,17 @@ where
         })
     }
 
+    /// Parses the `SwitchStatement` production.
     fn parse_switch_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
+
         self.consume_assert(&keyword!("switch"))?;
         self.consume_assert(&punct!("("))?;
 
         let discriminant = self.parse_expr()?;
         self.consume_assert(&punct!(")"))?;
 
-        let cases = self.parse_switch_cases()?;
+        let cases = self.parse_case_block()?;
 
         let span = self.span_from(span_start);
         Ok(StmtSwitch {
@@ -348,7 +356,8 @@ where
         .into())
     }
 
-    fn parse_switch_cases(&mut self) -> Result<Vec<SwitchCase>> {
+    /// Parses the `CaseBlock` production.
+    fn parse_case_block(&mut self) -> Result<Vec<SwitchCase>> {
         self.consume_assert(&punct!("{"))?;
 
         let mut cases = Vec::new();
@@ -357,7 +366,7 @@ where
                 break;
             }
 
-            cases.push(self.parse_switch_case()?);
+            cases.push(self.parse_case_clause()?);
         }
 
         self.consume_assert(&punct!("}"))?;
@@ -365,7 +374,8 @@ where
         Ok(cases)
     }
 
-    fn parse_switch_case(&mut self) -> Result<SwitchCase> {
+    /// Parses the `CaseClause` production.
+    fn parse_case_clause(&mut self) -> Result<SwitchCase> {
         let span_start = self.position();
         let test = if self.maybe_consume(&keyword!("case"))? {
             let test = self.parse_expr()?;
