@@ -29,9 +29,11 @@ where
         }
     }
 
+    /// Parses the `GeneratorMethod` production.
     fn parse_generator_method(&mut self) -> Result<MethodDefinition> {
         let span_start = self.position();
-        self.consume()?;
+        self.consume_assert(&punct!("*"))?;
+
         let name = self.parse_property_name()?;
         self.with_context(self.context.with_yield(true).with_await(false))
             .parse_method(span_start, name, MethodKind::Method)
@@ -40,13 +42,15 @@ where
     fn parse_getter_or_setter(&mut self, kind: MethodKind) -> Result<MethodDefinition> {
         let span_start = self.position();
         self.consume()?;
+
         let name = self.parse_property_name()?;
         self.parse_method(span_start, name, kind)
     }
 
+    /// Parses the `AsyncMethod` and `AsyncGeneratorMethod` production.
     fn parse_async_method(&mut self) -> Result<MethodDefinition> {
         let span_start = self.position();
-        self.consume()?;
+        self.consume_assert(&keyword!("async"))?;
 
         let generator = self.maybe_consume(&punct!("*"))?;
         let name = self.parse_property_name()?;
