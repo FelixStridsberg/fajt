@@ -28,8 +28,6 @@ where
     /// Parses the `Literal` production.
     pub(super) fn parse_literal(&mut self) -> Result<Expr> {
         let token = self.consume()?;
-        debug_assert!(token_matches!(token, @literal));
-
         if let TokenValue::Literal(literal) = token.value {
             Ok(ExprLiteral {
                 span: token.span,
@@ -37,7 +35,7 @@ where
             }
             .into())
         } else {
-            unreachable!()
+            Err(Error::unexpected_token(token))
         }
     }
 
