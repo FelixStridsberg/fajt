@@ -8,6 +8,22 @@ ast_mapping! {
     }
 }
 
+impl BindingPattern {
+    pub fn get_bound_names(&self) -> Vec<&str> {
+        match &self {
+            BindingPattern::Ident(ident) => {
+                vec![ident.name.as_ref()]
+            }
+            BindingPattern::Array(_arr) => {
+                todo!()
+            }
+            BindingPattern::Object(_obj) => {
+                todo!()
+            }
+        }
+    }
+}
+
 ast_struct! {
     pub struct ArrayBinding {
         pub span: Span,

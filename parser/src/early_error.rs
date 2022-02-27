@@ -1,8 +1,8 @@
 use crate::error::Result;
 use crate::{Error, Parser};
 use fajt_ast::{
-    ArrayElement, AssignmentOperator, Expr, ExprLiteral, LitArray, LitObject, Literal,
-    PropertyDefinition, Spanned,
+    ArrayElement, AssignmentOperator, Expr, ExprLiteral, FormalParameters, LitArray, LitObject,
+    Literal, PropertyDefinition, Spanned,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::token::Token;
@@ -143,4 +143,54 @@ where
             _ => false,
         })
     }
+
+    pub(super) fn validate_unique_formal_parameters(
+        &self,
+        params: &FormalParameters,
+    ) -> Result<()> {
+        let mut bound_names = self.get_bound_names(params);
+        bound_names.sort_unstable();
+
+        let first_duplicate = get_first_duplicate(&bound_names);
+
+        if let Some(duplicate) = first_duplicate {
+            return Err(Error::syntax_error(
+                format!(
+                    "Found duplicate parameter '{}', duplicates not allowed here",
+                    duplicate
+                ),
+                params.span.clone(),
+            ));
+        }
+
+        Ok(())
+    }
+
+    fn get_bound_names<'a>(&self, params: &'a FormalParameters) -> Vec<&'a str> {
+        let mut names: Vec<&str> = params
+            .bindings
+            .iter()
+            .flat_map(|binding| binding.pattern.get_bound_names())
+            .collect();
+
+        if let Some(rest) = &params.rest {
+            names.append(&mut rest.as_ref().get_bound_names());
+        }
+
+        names
+    }
+}
+
+/// Assumes the `list` is sorted.
+fn get_first_duplicate<'a>(list: &[&'a str]) -> Option<&'a str> {
+    let mut iter = list.iter().peekable();
+    while let Some(item) = iter.next() {
+        if let Some(peek) = iter.peek() {
+            if item == *peek {
+                return Some(item);
+            }
+        }
+    }
+
+    None
 }

@@ -66,6 +66,8 @@ where
     ) -> Result<MethodDefinition> {
         // TODO this should be `UniqueFormalParameters` or `PropertySetParameterList` depending on kind.
         let parameters = self.parse_formal_parameters()?;
+        self.validate_unique_formal_parameters(&parameters)?;
+
         let body = self.parse_function_body()?;
 
         let span = self.span_from(span_start);
