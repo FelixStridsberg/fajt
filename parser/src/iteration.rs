@@ -139,7 +139,9 @@ where
         left: ForInit,
         asynchronous: bool,
     ) -> Result<Stmt> {
-        // TODO verify that `left` is a valid LeftHandSideExpression if not declaration.
+        if let ForInit::Expr(expr) = &left {
+            self.validate_left_side_expr(expr, &AssignmentOperator::Assign)?;
+        }
 
         self.consume_assert(&keyword!("of"))?;
 
