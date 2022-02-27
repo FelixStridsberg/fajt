@@ -116,30 +116,10 @@ where
 
         // `import "./module.js"`;
         if self.current_matches_string_literal() {
-            let from = self.parse_module_specifier()?;
-            self.consume_optional_semicolon()?;
-            let span = self.span_from(span_start);
-            return Ok(DeclImport {
-                span,
-                default_binding: None,
-                namespace_binding: None,
-                named_imports: None,
-                from,
-            }
-            .into());
+            return self.parse_module_import(span_start);
         }
 
-        let default_binding = self.is_identifier().then_try(|| self.parse_identifier())?;
-        let (named_imports, namespace_binding) =
-            if default_binding.is_none() || self.maybe_consume(&punct!(","))? {
-                match self.current() {
-                    token_matches!(ok: punct!("*")) => (None, Some(self.parse_namespace_import()?)),
-                    token_matches!(ok: punct!("{")) => (Some(self.parse_named_imports()?), None),
-                    _ => return Err(Error::unexpected_token(self.consume()?)),
-                }
-            } else {
-                (None, None)
-            };
+        let import_clause = self.parse_import_clause()?;
 
         self.consume_assert(&keyword!("from"))?;
         let from = self.parse_module_specifier()?;
@@ -149,9 +129,48 @@ where
         let span = self.span_from(span_start);
         Ok(DeclImport {
             span,
+            default_binding: import_clause.default_binding,
+            namespace_binding: import_clause.namespace_binding,
+            named_imports: import_clause.named_imports,
+            from,
+        }
+        .into())
+    }
+
+    /// Parses the `ImportClause` production.
+    fn parse_import_clause(&mut self) -> Result<ImportClause> {
+        let default_binding = self.is_identifier().then_try(|| self.parse_identifier())?;
+        let mut clause = ImportClause {
             default_binding,
-            namespace_binding,
-            named_imports,
+            namespace_binding: None,
+            named_imports: None,
+        };
+
+        if clause.default_binding.is_none() || self.maybe_consume(&punct!(","))? {
+            match self.current() {
+                token_matches!(ok: punct!("*")) => {
+                    clause.namespace_binding = Some(self.parse_namespace_import()?)
+                }
+                token_matches!(ok: punct!("{")) => {
+                    clause.named_imports = Some(self.parse_named_imports()?)
+                }
+                _ => return Err(Error::unexpected_token(self.consume()?)),
+            }
+        }
+
+        Ok(clause)
+    }
+
+    fn parse_module_import(&mut self, span_start: usize) -> Result<Stmt> {
+        let from = self.parse_module_specifier()?;
+        self.consume_optional_semicolon()?;
+
+        let span = self.span_from(span_start);
+        Ok(DeclImport {
+            span,
+            default_binding: None,
+            namespace_binding: None,
+            named_imports: None,
             from,
         }
         .into())
@@ -239,4 +258,10 @@ where
             alias_of,
         })
     }
+}
+
+struct ImportClause {
+    pub default_binding: Option<Ident>,
+    pub namespace_binding: Option<Ident>,
+    pub named_imports: Option<Vec<NamedImport>>,
 }
