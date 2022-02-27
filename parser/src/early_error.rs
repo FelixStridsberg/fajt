@@ -144,6 +144,17 @@ where
         })
     }
 
+    pub(super) fn validate_empty_parameters(&self, params: &FormalParameters) -> Result<()> {
+        if !params.bindings.is_empty() || params.rest.is_some() {
+            return Err(Error::syntax_error(
+                "Getter must not have any formal parameters".to_owned(),
+                params.span.clone(),
+            ));
+        }
+
+        Ok(())
+    }
+
     pub(super) fn validate_unique_formal_parameters(
         &self,
         params: &FormalParameters,
