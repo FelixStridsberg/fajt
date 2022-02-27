@@ -58,7 +58,6 @@ where
             }
             token_matches!(ok: keyword!("async")) => self.parse_assignment_expr_async(),
             _ if self.is_identifier()
-                && !self.followed_by_new_line()
                 && self.peek_matches(&punct!("=>")) =>
             {
                 self.parse_arrow_function_expr()

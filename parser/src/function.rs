@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::{Parser, ThenTry};
+use crate::{Error, Parser, ThenTry};
 use fajt_ast::{
     ArrowFunctionBody, BindingElement, Body, DeclFunction, Expr, ExprArrowFunction, ExprFunction,
     FormalParameters, Ident, Span, Stmt,
@@ -36,7 +36,11 @@ where
         asynchronous: bool,
     ) -> Result<Expr> {
         let (binding_parameter, parameters) = self.parse_arrow_function_parameters()?;
-        self.consume_assert(&punct!("=>"))?;
+
+        let arrow = self.consume_assert(&punct!("=>"))?;
+        if arrow.first_on_line {
+            return Err(Error::unexpected_token(arrow));
+        }
 
         let body = self
             .with_context(self.context.with_await(asynchronous))
