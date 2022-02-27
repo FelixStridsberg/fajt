@@ -80,11 +80,13 @@ where
             return self.parse_for(span_start, init);
         }
 
-        if self.current_matches(&keyword!("of")) {
-            return self.parse_for_of(span_start, init.unwrap(), asynchronous);
+        match self.current()? {
+            token_matches!(keyword!("of")) => {
+                self.parse_for_of(span_start, init.unwrap(), asynchronous)
+            }
+            token_matches!(keyword!("in")) => self.parse_for_in(span_start, init.unwrap()),
+            _ => Err(Error::unexpected_token(self.consume()?)),
         }
-
-        self.parse_for_in(span_start, init.unwrap())
     }
 
     /// Parses a standard for loop, i.e. not for in/for of.
