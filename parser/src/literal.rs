@@ -53,15 +53,13 @@ where
     }
 
     pub(super) fn parse_template_literal(&mut self) -> Result<LitTemplate> {
-        let head = self.consume()?;
-        let head_str = match head.value {
-            TokenValue::Literal(Literal::Template(template)) => return Ok(template),
-            TokenValue::TemplateHead(string) => string,
-            _ => return Err(Error::unexpected_token(head)),
-        };
+        if token_matches!(self.current()?, @literal) {
+            return self.parse_non_substitution_template();
+        }
 
-        let mut parts = vec![];
+        let mut parts = Vec::new();
 
+        let head_str = self.parse_template_literal_head_string()?;
         if !head_str.is_empty() {
             parts.push(TemplatePart::String(head_str));
         }
@@ -89,6 +87,24 @@ where
         }
 
         Ok(LitTemplate { parts })
+    }
+
+    /// Parses the `NonSubstitutionTemplate` production.
+    fn parse_non_substitution_template(&mut self) -> Result<LitTemplate> {
+        let template = self.consume()?;
+        if let TokenValue::Literal(Literal::Template(template)) = template.value {
+            Ok(template)
+        } else {
+            Err(Error::unexpected_token(template))
+        }
+    }
+
+    fn parse_template_literal_head_string(&mut self) -> Result<String> {
+        let head = self.consume()?;
+        match head.value {
+            TokenValue::TemplateHead(string) => Ok(string),
+            _ => Err(Error::unexpected_token(head)),
+        }
     }
 
     /// Parses the `ArrayLiteral` production.
