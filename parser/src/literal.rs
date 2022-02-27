@@ -120,23 +120,12 @@ where
                 break;
             }
 
-            match self.current()? {
-                token_matches!(punct!(",")) => {
-                    self.consume()?;
-                    elements.push(ArrayElement::Elision);
-                }
-                token_matches!(punct!("...")) => {
-                    self.consume()?;
-                    let expr = self.parse_assignment_expr()?;
-                    elements.push(ArrayElement::Spread(expr));
-                    self.consume_list_delimiter(&punct!("]"))?;
-                }
-                _ => {
-                    let expr = self.parse_assignment_expr()?;
-                    elements.push(ArrayElement::Expr(expr));
-                    self.consume_list_delimiter(&punct!("]"))?;
-                }
+            let element = self.parse_array_element()?;
+            if element != ArrayElement::Elision {
+                self.consume_list_delimiter(&punct!("]"))?;
             }
+
+            elements.push(element);
         }
 
         let span = self.span_from(span_start);
@@ -145,6 +134,24 @@ where
             literal: Literal::Array(LitArray { elements }),
         }
         .into())
+    }
+
+    fn parse_array_element(&mut self) -> Result<ArrayElement> {
+        match self.current()? {
+            token_matches!(punct!(",")) => {
+                self.consume()?;
+                Ok(ArrayElement::Elision)
+            }
+            token_matches!(punct!("...")) => {
+                self.consume()?;
+                let expr = self.parse_assignment_expr()?;
+                Ok(ArrayElement::Spread(expr))
+            }
+            _ => {
+                let expr = self.parse_assignment_expr()?;
+                Ok(ArrayElement::Expr(expr))
+            }
+        }
     }
 
     /// Parses the `ObjectLiteral` production.
