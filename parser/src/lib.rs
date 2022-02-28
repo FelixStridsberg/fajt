@@ -15,11 +15,12 @@ mod literal;
 mod member_access;
 mod method;
 mod module;
+mod static_semantics;
 mod stmt;
 mod variable;
-mod static_semantics;
 
 use crate::error::{Error, Result};
+use crate::static_semantics::DirectivePrologueSemantics;
 use fajt_ast::{
     Expr, Ident, LitString, Literal, Program, PropertyName, SourceType, Span, Stmt, StmtList,
 };
@@ -29,7 +30,6 @@ use fajt_lexer::{punct, Lexer};
 use fajt_lexer::{token_matches, LexerState};
 use std::cell::Cell;
 use std::rc::Rc;
-use crate::static_semantics::DirectivePrologueSemantics;
 
 /// Similar trait to bool.then, but handles closures returning `Result`.
 pub trait ThenTry {

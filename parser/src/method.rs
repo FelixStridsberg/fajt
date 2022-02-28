@@ -1,4 +1,5 @@
 use crate::error::Result;
+use crate::static_semantics::FormalParametersSemantics;
 use crate::Parser;
 use fajt_ast::{MethodDefinition, MethodKind, PropertyName};
 use fajt_common::io::{PeekRead, ReReadWithState};
@@ -6,7 +7,6 @@ use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
 use fajt_lexer::{keyword, LexerState};
-use crate::static_semantics::FormalParametersSemantics;
 
 impl<I> Parser<'_, I>
 where
@@ -69,7 +69,7 @@ where
 
         match kind {
             MethodKind::Get => parameters.early_errors_getter()?,
-            MethodKind::Set => self.validate_property_set_parameters(&parameters)?,
+            MethodKind::Set => parameters.early_errors_setter()?,
             MethodKind::Method => self.validate_unique_formal_parameters(&parameters)?,
         }
 
