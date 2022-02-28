@@ -6,6 +6,7 @@ use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
 use fajt_lexer::{keyword, LexerState};
+use crate::static_semantics::FormalParametersSemantics;
 
 impl<I> Parser<'_, I>
 where
@@ -67,7 +68,7 @@ where
         let parameters = self.parse_formal_parameters()?;
 
         match kind {
-            MethodKind::Get => self.validate_empty_parameters(&parameters)?,
+            MethodKind::Get => parameters.early_errors_getter()?,
             MethodKind::Set => self.validate_property_set_parameters(&parameters)?,
             MethodKind::Method => self.validate_unique_formal_parameters(&parameters)?,
         }
