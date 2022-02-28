@@ -1,6 +1,6 @@
 use crate::error::Result;
 use crate::Error;
-use fajt_ast::{FormalParameters, LitString};
+use fajt_ast::{BindingPattern, FormalParameters, LitString};
 
 pub(crate) trait DirectivePrologueSemantics {
     fn contains_strict(&self) -> bool;
@@ -12,13 +12,48 @@ impl DirectivePrologueSemantics for Vec<LitString> {
     }
 }
 
+pub(crate) trait BindingPatternSemantics {
+    fn get_bound_names(&self) -> Vec<&str>;
+}
+
+impl BindingPatternSemantics for BindingPattern {
+    fn get_bound_names(&self) -> Vec<&str> {
+        match &self {
+            BindingPattern::Ident(ident) => {
+                vec![ident.name.as_ref()]
+            }
+            BindingPattern::Array(_arr) => {
+                todo!()
+            }
+            BindingPattern::Object(_obj) => {
+                todo!()
+            }
+        }
+    }
+}
+
 pub(crate) trait FormalParametersSemantics {
+    fn bound_names(&self) -> Vec<&str>;
     fn early_errors_getter(&self) -> Result<()>;
     fn early_errors_setter(&self) -> Result<()>;
     fn early_errors_method(&self) -> Result<()>;
 }
 
 impl FormalParametersSemantics for FormalParameters {
+    fn bound_names(&self) -> Vec<&str> {
+        let mut names: Vec<&str> = self
+            .bindings
+            .iter()
+            .flat_map(|binding| binding.pattern.get_bound_names())
+            .collect();
+
+        if let Some(rest) = &self.rest {
+            names.append(&mut rest.as_ref().get_bound_names());
+        }
+
+        names
+    }
+
     fn early_errors_getter(&self) -> Result<()> {
         if !self.bindings.is_empty() || self.rest.is_some() {
             return Err(Error::syntax_error(
@@ -49,7 +84,7 @@ impl FormalParametersSemantics for FormalParameters {
     }
 
     fn early_errors_method(&self) -> Result<()> {
-        let mut bound_names = get_bound_names(self);
+        let mut bound_names = self.bound_names();
         bound_names.sort_unstable();
 
         let first_duplicate = get_first_duplicate(&bound_names);
@@ -66,21 +101,6 @@ impl FormalParametersSemantics for FormalParameters {
 
         Ok(())
     }
-}
-
-// TODO move into trait
-fn get_bound_names(params: &FormalParameters) -> Vec<&str> {
-    let mut names: Vec<&str> = params
-        .bindings
-        .iter()
-        .flat_map(|binding| binding.pattern.get_bound_names())
-        .collect();
-
-    if let Some(rest) = &params.rest {
-        names.append(&mut rest.as_ref().get_bound_names());
-    }
-
-    names
 }
 
 /// Assumes the `list` is sorted.
