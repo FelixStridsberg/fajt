@@ -70,7 +70,7 @@ where
         match kind {
             MethodKind::Get => parameters.early_errors_getter()?,
             MethodKind::Set => parameters.early_errors_setter()?,
-            MethodKind::Method => self.validate_unique_formal_parameters(&parameters)?,
+            MethodKind::Method => parameters.early_errors_method()?,
         }
 
         let body = self.parse_function_body()?;
