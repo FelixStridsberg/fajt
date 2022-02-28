@@ -17,6 +17,7 @@ mod method;
 mod module;
 mod stmt;
 mod variable;
+mod static_semantics;
 
 use crate::error::{Error, Result};
 use fajt_ast::{
@@ -28,6 +29,7 @@ use fajt_lexer::{punct, Lexer};
 use fajt_lexer::{token_matches, LexerState};
 use std::cell::Cell;
 use std::rc::Rc;
+use crate::static_semantics::DirectivePrologueSemantics;
 
 /// Similar trait to bool.then, but handles closures returning `Result`.
 pub trait ThenTry {
@@ -167,7 +169,7 @@ impl Parse for Program {
         let span_start = parser.position();
 
         let directives = parser.parse_directive_prologue()?;
-        let strict_mode = directives.iter().any(|s| s.value == "use strict");
+        let strict_mode = directives.contains_strict();
 
         let body = if strict_mode {
             parser

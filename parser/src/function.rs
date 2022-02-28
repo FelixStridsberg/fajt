@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::{Error, Parser, ThenTry};
+use crate::{DirectivePrologueSemantics, Error, Parser, ThenTry};
 use fajt_ast::{
     ArrowFunctionBody, BindingElement, Body, DeclFunction, Expr, ExprArrowFunction, ExprFunction,
     FormalParameters, Ident, Span, Stmt,
@@ -269,7 +269,7 @@ where
 
         let directives = self.parse_directive_prologue()?;
         let is_strict =
-            self.context.is_strict || directives.iter().any(|s| s.value == "use strict");
+            self.context.is_strict || directives.contains_strict();
 
         let statements = self
             .with_context(self.context.with_strict(is_strict))
