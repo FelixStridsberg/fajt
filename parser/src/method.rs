@@ -73,6 +73,8 @@ where
         }
 
         let body = self.parse_function_body()?;
+        // TODO validate if body is strict and `IsSimpleParametersList` is false.
+        // TODO validate if bound names of set list is in `LexicallyDeclaredNames` of body (Set only).
 
         let span = self.span_from(span_start);
         Ok(MethodDefinition {

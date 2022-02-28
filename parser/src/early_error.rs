@@ -8,6 +8,7 @@ use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::token::Token;
 use fajt_lexer::LexerState;
 
+// TODO start thinking where to really place these.
 impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
