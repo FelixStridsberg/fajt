@@ -178,6 +178,17 @@ where
         Ok(())
     }
 
+    pub(super) fn validate_property_set_parameters(&self, params: &FormalParameters) -> Result<()> {
+        if let Some(rest) = &params.rest {
+            return Err(Error::syntax_error(
+                "Setter function parameter must not be a rest parameter".to_owned(),
+                params.span.clone(),
+            ));
+        }
+
+        Ok(())
+    }
+
     fn get_bound_names<'a>(&self, params: &'a FormalParameters) -> Vec<&'a str> {
         let mut names: Vec<&str> = params
             .bindings

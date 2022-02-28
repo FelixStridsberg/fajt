@@ -68,7 +68,7 @@ where
 
         match kind {
             MethodKind::Get => self.validate_empty_parameters(&parameters)?,
-            MethodKind::Set => {/* TODO `PropertySetParameterList` */}
+            MethodKind::Set => self.validate_property_set_parameters(&parameters)?,
             MethodKind::Method => self.validate_unique_formal_parameters(&parameters)?,
         }
 
