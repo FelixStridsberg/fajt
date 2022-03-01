@@ -1,12 +1,10 @@
 use crate::error::Result;
+use crate::static_semantics::{ExprSemantics, LitArraySemantics, LitObjectSemantics};
 use crate::{Error, Parser};
-use fajt_ast::{
-    AssignmentOperator, Expr, ExprLiteral, Literal, Spanned,
-};
+use fajt_ast::{AssignmentOperator, Expr, ExprLiteral, Literal, Spanned};
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::token::Token;
 use fajt_lexer::LexerState;
-use crate::static_semantics::{LitArraySemantics, LitObjectSemantics};
 
 // TODO start thinking where to really place these.
 impl<I> Parser<'_, I>
@@ -16,7 +14,7 @@ where
 {
     /// Early error on invalid update expression argument.
     pub(super) fn validate_update_expression_argument(&self, argument: &Expr) -> Result<()> {
-        if !self.is_assignment_target_type_simple(argument)? {
+        if !argument.is_assignment_target_type_simple(&self.context)? {
             return Err(Error::syntax_error(
                 "Invalid update expression argument".to_owned(),
                 argument.span().clone(),
@@ -50,7 +48,7 @@ where
             }
         }
 
-        if !self.is_assignment_target_type_simple(expr)? {
+        if !expr.is_assignment_target_type_simple(&self.context)? {
             return Err(Error::syntax_error(
                 "Invalid left-hand side assignment".to_owned(),
                 expr.span().clone(),
@@ -58,23 +56,5 @@ where
         }
 
         Ok(())
-    }
-
-    /// Returns true if `AssignmentTargetType` for `expr` is simple.
-    fn is_assignment_target_type_simple(&self, expr: &Expr) -> Result<bool> {
-        Ok(match expr {
-            Expr::IdentRef(ident) => {
-                if self.context.is_strict && (ident.name == "arguments" || ident.name == "eval") {
-                    return Err(Error::syntax_error(
-                        "Unexpected `eval` or `arguments` in strict mode".to_owned(),
-                        expr.span().clone(),
-                    ));
-                } else {
-                    true
-                }
-            }
-            Expr::Member(_) => true,
-            _ => false,
-        })
     }
 }

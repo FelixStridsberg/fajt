@@ -3,7 +3,10 @@ mod macros;
 
 use crate::error::Result;
 use crate::{Context, Error};
-use fajt_ast::{ArrayElement, BindingPattern, Expr, FormalParameters, LitArray, LitObject, LitString, PropertyDefinition, Spanned};
+use fajt_ast::{
+    ArrayElement, BindingPattern, Expr, FormalParameters, LitArray, LitObject, LitString,
+    PropertyDefinition, Spanned,
+};
 
 impl_trait!(
     impl trait LitArraySemantics for LitArray {
@@ -79,6 +82,24 @@ impl_trait!(
             }
 
             Ok(())
+        }
+
+        /// Returns true if `AssignmentTargetType` for `expr` is simple.
+        fn is_assignment_target_type_simple(&self, context: &Context) -> Result<bool> {
+            Ok(match self {
+                Expr::IdentRef(ident) => {
+                    if context.is_strict && (ident.name == "arguments" || ident.name == "eval") {
+                        return Err(Error::syntax_error(
+                            "Unexpected `eval` or `arguments` in strict mode".to_owned(),
+                            self.span().clone(),
+                        ));
+                    } else {
+                        true
+                    }
+                }
+                Expr::Member(_) => true,
+                _ => false,
+            })
         }
     }
 );
