@@ -170,7 +170,7 @@ where
         })
     }
 
-    /// All binary expressions are parsed the same way, they are broken up into multiple productions
+    /// All logical expressions are parsed the same way, they are broken up into multiple productions
     /// for precedence. This is the common parse method for all of them.
     ///
     /// `next` is a method for retrieving the result of the _next_ production (i.e. right hand).

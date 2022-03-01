@@ -81,8 +81,6 @@ where
     }
 
     /// Parses the `ArrowParameters` production.
-    /// Returns true in second tuple element if the parameters are a binding identifier without
-    /// parentheses.
     pub(super) fn parse_arrow_identifier_argument(&mut self) -> Result<FormalParameters> {
         let span_start = self.position();
         let identifier = self.parse_identifier()?;
