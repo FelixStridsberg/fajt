@@ -66,16 +66,16 @@ where
         kind: MethodKind,
     ) -> Result<MethodDefinition> {
         let parameters = self.parse_formal_parameters()?;
+        let body = self.parse_function_body()?;
 
         match kind {
+            MethodKind::Method => parameters.early_errors_method(&body.directives)?,
             MethodKind::Get => parameters.early_errors_getter()?,
-            MethodKind::Set => parameters.early_errors_setter()?,
-            MethodKind::Method => parameters.early_errors_method()?,
+            MethodKind::Set => {
+                parameters.early_errors_setter(&body.directives)?
+                // TODO validate if bound names of set list is in `LexicallyDeclaredNames` of body
+            }
         }
-
-        let body = self.parse_function_body()?;
-        // TODO validate if body is strict and `IsSimpleParametersList` is false.
-        // TODO validate if bound names of set list is in `LexicallyDeclaredNames` of body (Set only).
 
         let span = self.span_from(span_start);
         Ok(MethodDefinition {

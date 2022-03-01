@@ -102,7 +102,7 @@ impl_trait!(
 );
 
 impl_trait!(
-    impl trait DirectivePrologueSemantics for Vec<LitString> {
+    impl trait DirectivePrologueSemantics for &[LitString] {
         fn contains_strict(&self) -> bool {
             self.iter().any(|s| s.value == "use strict")
         }
@@ -129,6 +129,24 @@ impl_trait!(
 
 impl_trait!(
     impl trait FormalParametersSemantics for FormalParameters {
+        fn is_simple(&self) -> bool {
+            if self.rest.is_some() {
+                return false;
+            }
+
+            for binding in &self.bindings {
+                if binding.initializer.is_some() {
+                    return false;
+                }
+
+                if matches!(binding.pattern, BindingPattern::Object(_) | BindingPattern::Array(_)) {
+                    return false;
+                }
+            }
+
+            true
+        }
+
         fn bound_names(&self) -> Vec<&str> {
             let mut names: Vec<&str> = self
                 .bindings
@@ -154,7 +172,30 @@ impl_trait!(
             Ok(())
         }
 
-        fn early_errors_setter(&self) -> Result<()> {
+        fn early_errors_method(&self, body_directives: &[LitString]) -> Result<()> {
+            self.early_errors_forbidden_use_strict(body_directives)?;
+
+            let mut bound_names = self.bound_names();
+            bound_names.sort_unstable();
+
+            let first_duplicate = get_first_duplicate(&bound_names);
+
+            if let Some(duplicate) = first_duplicate {
+                return Err(Error::syntax_error(
+                    format!(
+                        "Found duplicate parameter '{}', duplicates not allowed here",
+                        duplicate
+                    ),
+                    self.span.clone(),
+                ));
+            }
+
+            Ok(())
+        }
+
+        fn early_errors_setter(&self, body_directives: &[LitString]) -> Result<()> {
+            self.early_errors_forbidden_use_strict(body_directives)?;
+
             if self.rest.is_some() {
                 return Err(Error::syntax_error(
                     "Setter function parameter must not be a rest parameter".to_owned(),
@@ -172,20 +213,12 @@ impl_trait!(
             Ok(())
         }
 
-        fn early_errors_method(&self) -> Result<()> {
-            let mut bound_names = self.bound_names();
-            bound_names.sort_unstable();
-
-            let first_duplicate = get_first_duplicate(&bound_names);
-
-            if let Some(duplicate) = first_duplicate {
+        fn early_errors_forbidden_use_strict(&self, body_directives: &[LitString]) -> Result<()> {
+            if !self.is_simple() && body_directives.contains_strict() {
                 return Err(Error::syntax_error(
-                    format!(
-                        "Found duplicate parameter '{}', duplicates not allowed here",
-                        duplicate
-                    ),
-                    self.span.clone(),
-                ));
+                    "Only name parameters allowed in method with \"use strict\"".to_owned(),
+                    self.span.clone()
+                ))
             }
 
             Ok(())

@@ -168,7 +168,7 @@ impl Parse for Program {
         let span_start = parser.position();
 
         let directives = parser.parse_directive_prologue()?;
-        let strict_mode = directives.contains_strict();
+        let strict_mode = directives.as_slice().contains_strict();
 
         let body = if strict_mode {
             parser
