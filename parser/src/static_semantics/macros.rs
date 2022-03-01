@@ -1,4 +1,5 @@
 // TODO document
+// TODO allow private functions (only impl block) for easier abstraction.
 macro_rules! impl_trait {
     (
         impl trait $trait_name:ident for $type:ty {
