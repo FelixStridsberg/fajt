@@ -1,12 +1,12 @@
 use crate::error::Result;
 use crate::{Error, Parser};
 use fajt_ast::{
-    ArrayElement, AssignmentOperator, Expr, ExprLiteral, LitArray, LitObject, Literal,
-    PropertyDefinition, Spanned,
+    AssignmentOperator, Expr, ExprLiteral, Literal, Spanned,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::token::Token;
 use fajt_lexer::LexerState;
+use crate::static_semantics::{LitArraySemantics, LitObjectSemantics};
 
 // TODO start thinking where to really place these.
 impl<I> Parser<'_, I>
@@ -38,13 +38,13 @@ where
                     literal: Literal::Array(array),
                     ..
                 }) => {
-                    return self.validate_array_literal_cover_assignment(array);
+                    return array.assert_covers_assignment_pattern();
                 }
                 Expr::Literal(ExprLiteral {
                     literal: Literal::Object(object),
                     ..
                 }) => {
-                    return self.validate_object_literal_cover_assignment(object);
+                    return object.assert_covers_assignment_pattern();
                 }
                 _ => {}
             }
@@ -55,51 +55,6 @@ where
                 "Invalid left-hand side assignment".to_owned(),
                 expr.span().clone(),
             ));
-        }
-
-        Ok(())
-    }
-
-    /// Early error if `ArrayLiteral` do not cover `ArrayAssignment`.
-    fn validate_array_literal_cover_assignment(&self, array: &LitArray) -> Result<()> {
-        let mut elements = array.elements.iter().peekable();
-
-        while let Some(element) = elements.next() {
-            if elements.peek().is_none() {
-                break;
-            }
-
-            if let ArrayElement::Spread(spread) = element {
-                return Err(Error::syntax_error(
-                    "Rest element must be last element".to_owned(),
-                    spread.span().clone(),
-                ));
-            }
-        }
-
-        Ok(())
-    }
-
-    /// Early error if `ObjectLiteral` do not cover `ObjectAssignment`.
-    fn validate_object_literal_cover_assignment(&self, object: &LitObject) -> Result<()> {
-        let mut props = object.props.iter().peekable();
-
-        while let Some(prop) = props.next() {
-            if let PropertyDefinition::Method(method) = prop {
-                return Err(Error::syntax_error(
-                    "Invalid destructuring assignment target".to_owned(),
-                    method.span.clone(),
-                ));
-            }
-
-            if props.peek().is_some() {
-                if let PropertyDefinition::Spread(spread) = prop {
-                    return Err(Error::syntax_error(
-                        "Rest element must be last element".to_owned(),
-                        spread.span().clone(),
-                    ));
-                }
-            }
         }
 
         Ok(())
