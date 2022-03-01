@@ -1,4 +1,5 @@
 use crate::error::Result;
+use crate::static_semantics::ExprSemantics;
 use crate::{Context, Error, Parser};
 use fajt_ast::{assignment_op, AssignmentOperator, ExprParenthesized, Spanned, UnaryOperator};
 use fajt_ast::{unary_op, ExprTaggedTemplate};
@@ -224,7 +225,7 @@ where
         let argument = self.parse_unary_expr()?;
 
         if operator == unary_op!("delete") {
-            self.validate_delete_argument(&argument)?;
+            argument.early_errors_unary_delete(&self.context)?;
         }
 
         let span = self.span_from(span_start);

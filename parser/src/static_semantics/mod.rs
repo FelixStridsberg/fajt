@@ -2,8 +2,33 @@
 mod macros;
 
 use crate::error::Result;
-use crate::Error;
-use fajt_ast::{BindingPattern, FormalParameters, LitString};
+use crate::{Context, Error};
+use fajt_ast::{BindingPattern, Expr, FormalParameters, LitString};
+
+impl_trait!(
+    impl trait ExprSemantics for Expr {
+        fn early_errors_unary_delete(&self, context: &Context) -> Result<()> {
+            if !context.is_strict {
+                return Ok(());
+            }
+
+            match self {
+                Expr::IdentRef(ident) => {
+                    return Err(Error::syntax_error(
+                        "Delete of an unqualified identifier in strict mode".to_owned(),
+                        ident.span.clone(),
+                    ));
+                }
+                Expr::Parenthesized(parenthesized) => {
+                    return parenthesized.expression.early_errors_unary_delete(context);
+                }
+                _ => {}
+            }
+
+            Ok(())
+        }
+    }
+);
 
 impl_trait!(
     impl trait DirectivePrologueSemantics for Vec<LitString> {

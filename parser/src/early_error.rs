@@ -26,28 +26,6 @@ where
         Ok(())
     }
 
-    /// Early error for invalid delete argument.
-    pub(super) fn validate_delete_argument(&self, argument: &Expr) -> Result<()> {
-        if !self.context.is_strict {
-            return Ok(());
-        }
-
-        match argument {
-            Expr::IdentRef(ident) => {
-                return Err(Error::syntax_error(
-                    "Delete of an unqualified identifier in strict mode".to_owned(),
-                    ident.span.clone(),
-                ));
-            }
-            Expr::Parenthesized(parenthesized) => {
-                return self.validate_delete_argument(parenthesized.expression.as_ref());
-            }
-            _ => {}
-        }
-
-        Ok(())
-    }
-
     /// Early error on invalid left hand side expression.
     pub(super) fn validate_left_side_expr(
         &self,
