@@ -12,18 +12,6 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
     I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
-    /// Early error on invalid update expression argument.
-    pub(super) fn validate_update_expression_argument(&self, argument: &Expr) -> Result<()> {
-        if !argument.is_assignment_target_type_simple(&self.context)? {
-            return Err(Error::syntax_error(
-                "Invalid update expression argument".to_owned(),
-                argument.span().clone(),
-            ));
-        }
-
-        Ok(())
-    }
-
     /// Early error on invalid left hand side expression.
     pub(super) fn validate_left_side_expr(
         &self,

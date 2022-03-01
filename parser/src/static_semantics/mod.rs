@@ -63,6 +63,37 @@ impl_trait!(
 
 impl_trait!(
     impl trait ExprSemantics for Expr {
+        /// Returns true if `AssignmentTargetType` for `expr` is simple.
+        fn is_assignment_target_type_simple(&self, context: &Context) -> Result<bool> {
+            Ok(match self {
+                Expr::IdentRef(ident) => {
+                    if context.is_strict && (ident.name == "arguments" || ident.name == "eval") {
+                        return Err(Error::syntax_error(
+                            "Unexpected `eval` or `arguments` in strict mode".to_owned(),
+                            self.span().clone(),
+                        ));
+                    } else {
+                        true
+                    }
+                }
+                Expr::Member(_) => true,
+                _ => false,
+            })
+        }
+
+        /// Early error on invalid update expression argument.
+        fn early_errors_update_expr_argument(&self, context: &Context) -> Result<()> {
+            if !self.is_assignment_target_type_simple(&context)? {
+                return Err(Error::syntax_error(
+                    "Invalid update expression argument".to_owned(),
+                    self.span().clone(),
+                ));
+            }
+
+            Ok(())
+        }
+
+        /// Early error on invalid delete argument.
         fn early_errors_unary_delete(&self, context: &Context) -> Result<()> {
             if !context.is_strict {
                 return Ok(());
@@ -82,24 +113,6 @@ impl_trait!(
             }
 
             Ok(())
-        }
-
-        /// Returns true if `AssignmentTargetType` for `expr` is simple.
-        fn is_assignment_target_type_simple(&self, context: &Context) -> Result<bool> {
-            Ok(match self {
-                Expr::IdentRef(ident) => {
-                    if context.is_strict && (ident.name == "arguments" || ident.name == "eval") {
-                        return Err(Error::syntax_error(
-                            "Unexpected `eval` or `arguments` in strict mode".to_owned(),
-                            self.span().clone(),
-                        ));
-                    } else {
-                        true
-                    }
-                }
-                Expr::Member(_) => true,
-                _ => false,
-            })
         }
     }
 );

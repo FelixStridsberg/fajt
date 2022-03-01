@@ -299,7 +299,7 @@ where
         operator: UpdateOperator,
     ) -> Result<Expr> {
         let argument = self.parse_unary_expr()?;
-        self.validate_update_expression_argument(&argument)?;
+        argument.early_errors_update_expr_argument(&self.context)?;
 
         let span = self.span_from(span_start);
         Ok(ExprUpdate {
@@ -317,7 +317,7 @@ where
         argument: Expr,
         operator: UpdateOperator,
     ) -> Result<Expr> {
-        self.validate_update_expression_argument(&argument)?;
+        argument.early_errors_update_expr_argument(&self.context)?;
 
         let span = self.span_from(argument.span().start);
         Ok(ExprUpdate {
