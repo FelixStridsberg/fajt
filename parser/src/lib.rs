@@ -7,7 +7,6 @@ mod binary_expr;
 mod binding;
 mod class;
 mod cover;
-mod early_error;
 mod expr;
 mod function;
 mod iteration;

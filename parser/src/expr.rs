@@ -95,7 +95,7 @@ where
         left: Expr,
         operator: AssignmentOperator,
     ) -> Result<Expr> {
-        self.validate_left_side_expr(&left, &operator)?;
+        left.early_errors_left_hand_side_expr(&self.context, &operator)?;
 
         let right = self.parse_assignment_expr()?;
         let span = self.span_from(span_start);

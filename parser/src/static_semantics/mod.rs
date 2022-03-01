@@ -4,8 +4,8 @@ mod macros;
 use crate::error::Result;
 use crate::{Context, Error};
 use fajt_ast::{
-    ArrayElement, BindingPattern, Expr, FormalParameters, LitArray, LitObject, LitString,
-    PropertyDefinition, Spanned,
+    ArrayElement, AssignmentOperator, BindingPattern, Expr, ExprLiteral, FormalParameters,
+    LitArray, LitObject, LitString, Literal, PropertyDefinition, Spanned,
 };
 
 impl_trait!(
@@ -81,9 +81,43 @@ impl_trait!(
             })
         }
 
+        /// Early error on invalid left hand side expression.
+        fn early_errors_left_hand_side_expr(
+            &self,
+            context: &Context,
+            operator: &AssignmentOperator,
+        ) -> Result<()> {
+            if operator == &AssignmentOperator::Assign {
+                match self {
+                    Expr::Literal(ExprLiteral {
+                        literal: Literal::Array(array),
+                        ..
+                    }) => {
+                        return array.assert_covers_assignment_pattern();
+                    }
+                    Expr::Literal(ExprLiteral {
+                        literal: Literal::Object(object),
+                        ..
+                    }) => {
+                        return object.assert_covers_assignment_pattern();
+                    }
+                    _ => {}
+                }
+            }
+
+            if !self.is_assignment_target_type_simple(context)? {
+                return Err(Error::syntax_error(
+                    "Invalid left-hand side assignment".to_owned(),
+                    self.span().clone(),
+                ));
+            }
+
+            Ok(())
+        }
+
         /// Early error on invalid update expression argument.
         fn early_errors_update_expr_argument(&self, context: &Context) -> Result<()> {
-            if !self.is_assignment_target_type_simple(&context)? {
+            if !self.is_assignment_target_type_simple(context)? {
                 return Err(Error::syntax_error(
                     "Invalid update expression argument".to_owned(),
                     self.span().clone(),
