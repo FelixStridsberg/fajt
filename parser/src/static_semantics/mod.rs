@@ -31,7 +31,6 @@ impl_trait!(
             })
         }
 
-        /// Early error on invalid left hand side expression.
         fn early_errors_left_hand_side_expr(
             &self,
             context: &Context,
@@ -65,7 +64,6 @@ impl_trait!(
             Ok(())
         }
 
-        /// Early error on invalid update expression argument.
         fn early_errors_update_expr_argument(&self, context: &Context) -> Result<()> {
             if !self.is_assignment_target_type_simple(context)? {
                 return Err(Error::syntax_error(
@@ -77,7 +75,6 @@ impl_trait!(
             Ok(())
         }
 
-        /// Early error on invalid delete argument.
         fn early_errors_unary_delete(&self, context: &Context) -> Result<()> {
             if !context.is_strict {
                 return Ok(());
