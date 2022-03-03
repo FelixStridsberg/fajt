@@ -2,7 +2,7 @@ use crate::error::Result;
 use crate::{DirectivePrologueSemantics, Error, Parser, ThenTry};
 use fajt_ast::{
     ArrowFunctionBody, BindingElement, Body, DeclFunction, Expr, ExprArrowFunction, ExprFunction,
-    FormalParameters, Ident, Span, Stmt,
+    FormalParameters, Ident, Stmt,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
@@ -212,16 +212,13 @@ where
         .into())
     }
 
-    /// Parses the name of a function, if in `default` (export default) context, the ident may be
-    /// empty/non existent.
+    /// Parses the name of a function. If in `default` (export default) context, the ident may be
+    /// empty/non existent in which case a dummy identifier is returned.
     fn parse_function_identifier(&mut self) -> Result<Ident> {
         // In `default` context the identifier is optional.
         if self.context.is_default && self.current_matches(&punct!("(")) {
             let current = self.current().unwrap();
-            Ok(Ident::new(
-                "",
-                Span::new(current.span.start, current.span.start),
-            ))
+            Ok(Ident::dummy(current.span.start))
         } else {
             self.parse_identifier()
         }
