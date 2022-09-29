@@ -50,6 +50,9 @@ impl_trait!(
                     }) => {
                         return object.assert_covers_assignment_pattern();
                     }
+                    Expr::Object(object) => {
+                        return object.assert_covers_assignment_pattern();
+                    }
                     _ => {}
                 }
             }

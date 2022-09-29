@@ -2,7 +2,7 @@ use crate::error::Result;
 use crate::{Error, Parser};
 use fajt_ast::{
     ArrayElement, Expr, ExprLiteral, LitArray, LitObject, LitTemplate, Literal, MethodKind,
-    NamedProperty, PropertyDefinition, PropertyName, TemplatePart,
+    NamedProperty, PropertyDefinition, PropertyName, SingleNameBinding, TemplatePart,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
@@ -166,6 +166,7 @@ where
             }
 
             props.push(self.parse_property_definition()?);
+
             self.consume_list_delimiter(&punct!("}"))?;
         }
 
@@ -201,9 +202,25 @@ where
                     .parse_method_definition()?;
                 Ok(PropertyDefinition::Method(method))
             }
-            // TODO CoverInitializedName
             _ => {
+                let span_start = self.position();
                 let ident = self.parse_identifier()?;
+
+                // `CoverInitializedName`, we are probably reading an object assignment pattern
+                // rather than an object literal. It is either converted higher up or turned into
+                // an early error.
+                if self.current_matches(&punct!("=")) {
+                    let initializer = self.parse_initializer()?;
+                    let span = self.span_from(span_start);
+                    return Ok(PropertyDefinition::CoverInitializedName(
+                        SingleNameBinding {
+                            span,
+                            ident,
+                            initializer: Some(Box::new(initializer)),
+                        },
+                    ));
+                }
+
                 Ok(PropertyDefinition::IdentRef(ident))
             }
         }

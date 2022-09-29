@@ -1,7 +1,10 @@
 use crate::error::Result;
 use crate::static_semantics::ExprSemantics;
 use crate::{Context, Error, Parser};
-use fajt_ast::{assignment_op, AssignmentOperator, ExprParenthesized, Spanned, UnaryOperator};
+use fajt_ast::{
+    assignment_op, AssignmentOperator, ExprParenthesized, LitObject, ObjectBinding,
+    ObjectBindingProp, PropertyDefinition, Spanned, UnaryOperator,
+};
 use fajt_ast::{unary_op, ExprTaggedTemplate};
 use fajt_ast::{update_op, UpdateOperator};
 use fajt_ast::{
@@ -61,12 +64,36 @@ where
                 self.parse_arrow_function_expr()
             }
             _ => {
+                // TODO if current is `{`, parse object or pattern
                 let expr = self.parse_conditional_expr()?;
 
                 let assignment_operator = self.parse_optional_assignment_operator();
                 if let Some(operator) = assignment_operator {
-                    self.parse_assignment(span_start, expr, operator)
+                    let expr2 = match expr {
+                        Expr::Literal(ExprLiteral {
+                            span,
+                            literal: Literal::Object(LitObject { props, .. }),
+                            ..
+                        }) => {
+                            // TODO stop hacking
+                            let first_prop = props.into_iter().next().unwrap();
+                            match first_prop {
+                                PropertyDefinition::CoverInitializedName(binding) => {
+                                    Expr::Object(ObjectBinding {
+                                        span,
+                                        props: vec![ObjectBindingProp::Single(binding)],
+                                        rest: None,
+                                    })
+                                }
+                                _ => panic!("Messing around..."),
+                            }
+                        }
+                        _ => expr,
+                    };
+
+                    self.parse_assignment(span_start, expr2, operator)
                 } else {
+                    // TODO validate object literal don't contain initializers, then it's not an object literal.
                     Ok(expr)
                 }
             }
@@ -707,7 +734,7 @@ where
 
     /// Parses the `Initializer` production.
     pub(super) fn parse_initializer(&mut self) -> Result<Expr> {
-        self.consume()?; // Skip =
+        self.consume_assert(&punct!("="))?;
         self.parse_assignment_expr()
     }
 }

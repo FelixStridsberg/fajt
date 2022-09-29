@@ -1,6 +1,8 @@
 use crate::error::Result;
 use crate::Error;
-use fajt_ast::{ArrayElement, LitArray, LitObject, PropertyDefinition, Spanned};
+use fajt_ast::{
+    ArrayElement, LitArray, LitObject, ObjectBinding, PropertyDefinition, Spanned,
+};
 
 impl_trait!(
     impl trait LitArraySemantics for LitArray {
@@ -50,6 +52,15 @@ impl_trait!(
                 }
             }
 
+            Ok(())
+        }
+    }
+);
+
+impl_trait!(
+    // The BindingPattern may be used as an object literal as left hand in assignments.
+    impl trait LitObjectBindingSemantics for ObjectBinding {
+        fn assert_covers_assignment_pattern(&self) -> Result<()> {
             Ok(())
         }
     }
