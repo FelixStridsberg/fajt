@@ -2,7 +2,7 @@ use crate::error::Result;
 use crate::{Error, Parser};
 use fajt_ast::{
     ArrayElement, Expr, ExprLiteral, LitArray, LitObject, LitTemplate, Literal, MethodKind,
-    NamedProperty, PropertyDefinition, PropertyName, SingleNameBinding, TemplatePart,
+    NamedProperty, PropertyDefinition, PropertyName, TemplatePart,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
@@ -157,7 +157,7 @@ where
     /// Parses the `ObjectLiteral` production.
     pub(super) fn parse_object_literal(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        self.consume_assert(&punct!("{"))?;
+        let start_token = self.consume_assert(&punct!("{"))?;
 
         let mut props = Vec::new();
         loop {
@@ -165,7 +165,20 @@ where
                 break;
             }
 
-            props.push(self.parse_property_definition()?);
+            let prop = self.parse_property_definition()?;
+
+            // If we hit an `ident` followed by a `=` in this context, we are either parsing the left
+            // side of an object assignment, or this is illegal syntax. It's covered by the
+            // `CoverInitializedName` production. Here we assume we are in an `ObjectAssignmentPattern`
+            // since that is the only legal case.
+            if self.current_matches(&punct!("="))
+                && matches!(&prop, PropertyDefinition::IdentRef(_))
+            {
+                self.reader.rewind_to(&start_token)?;
+                return Ok(Expr::Object(self.parse_object_binding_pattern()?));
+            }
+
+            props.push(prop);
 
             self.consume_list_delimiter(&punct!("}"))?;
         }
@@ -203,24 +216,7 @@ where
                 Ok(PropertyDefinition::Method(method))
             }
             _ => {
-                let span_start = self.position();
                 let ident = self.parse_identifier()?;
-
-                // `CoverInitializedName`, we are probably reading an object assignment pattern
-                // rather than an object literal. It is either converted higher up or turned into
-                // an early error.
-                if self.current_matches(&punct!("=")) {
-                    let initializer = self.parse_initializer()?;
-                    let span = self.span_from(span_start);
-                    return Ok(PropertyDefinition::CoverInitializedName(
-                        SingleNameBinding {
-                            span,
-                            ident,
-                            initializer: Some(Box::new(initializer)),
-                        },
-                    ));
-                }
-
                 Ok(PropertyDefinition::IdentRef(ident))
             }
         }

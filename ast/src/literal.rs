@@ -1,4 +1,4 @@
-use crate::{Expr, Ident, MethodDefinition, PropertyName, SingleNameBinding, Span};
+use crate::{Expr, Ident, MethodDefinition, PropertyName, Span};
 
 ast_node! {
     pub enum Literal {
@@ -69,9 +69,6 @@ ast_node! {
         Spread(Expr),
         Named(NamedProperty),
         Method(MethodDefinition),
-
-        // TODO, this will never actually exist when tree is done, how do we hide from api?
-        CoverInitializedName(SingleNameBinding),
     }
 }
 

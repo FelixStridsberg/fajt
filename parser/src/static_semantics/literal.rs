@@ -1,8 +1,6 @@
 use crate::error::Result;
 use crate::Error;
-use fajt_ast::{
-    ArrayElement, LitArray, LitObject, ObjectBinding, PropertyDefinition, Spanned,
-};
+use fajt_ast::{ArrayElement, LitArray, LitObject, ObjectBinding, PropertyDefinition, Spanned};
 
 impl_trait!(
     impl trait LitArraySemantics for LitArray {

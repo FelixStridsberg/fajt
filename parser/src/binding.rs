@@ -18,14 +18,18 @@ where
     /// Parses the `BindingPattern` production.
     pub(super) fn parse_binding_pattern(&mut self) -> Result<BindingPattern> {
         Ok(match self.current()? {
-            token_matches!(punct!("{")) => self.parse_object_binding_pattern()?,
-            token_matches!(punct!("[")) => self.parse_array_binding_pattern()?,
+            token_matches!(punct!("{")) => {
+                BindingPattern::Object(self.parse_object_binding_pattern()?)
+            }
+            token_matches!(punct!("[")) => {
+                BindingPattern::Array(self.parse_array_binding_pattern()?)
+            }
             _ => BindingPattern::Ident(self.parse_identifier()?),
         })
     }
 
     /// Parses the `ObjectBindingPattern` production.
-    fn parse_object_binding_pattern(&mut self) -> Result<BindingPattern> {
+    pub(super) fn parse_object_binding_pattern(&mut self) -> Result<ObjectBinding> {
         let span_start = self.position();
         self.consume_assert(&punct!("{"))?;
 
@@ -55,7 +59,7 @@ where
         }
 
         let span = self.span_from(span_start);
-        Ok(ObjectBinding { span, props, rest }.into())
+        Ok(ObjectBinding { span, props, rest })
     }
 
     /// Parses the `SingleNameBinding` production.
@@ -92,7 +96,7 @@ where
     }
 
     /// Parses the `ArrayBindingPattern` production.
-    fn parse_array_binding_pattern(&mut self) -> Result<BindingPattern> {
+    fn parse_array_binding_pattern(&mut self) -> Result<ArrayBinding> {
         let span_start = self.position();
         self.consume_assert(&punct!("["))?;
 
@@ -126,8 +130,7 @@ where
             span,
             elements,
             rest,
-        }
-        .into())
+        })
     }
 
     pub(super) fn is_binding_element(&self) -> Result<bool> {
