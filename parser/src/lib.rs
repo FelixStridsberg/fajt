@@ -22,7 +22,8 @@ mod variable;
 use crate::error::{Error, Result};
 use crate::static_semantics::DirectivePrologueSemantics;
 use fajt_ast::{
-    Expr, Ident, LitString, Literal, Program, PropertyName, SourceType, Span, Stmt, StmtList,
+    Expr, ExprLiteral, Ident, LitString, Literal, Program, PropertyName, SourceType, Span, Stmt,
+    StmtExpr, StmtList,
 };
 use fajt_common::io::{PeekRead, PeekReader, ReReadWithState};
 use fajt_lexer::token::{KeywordContext, Token, TokenValue};
@@ -62,7 +63,7 @@ where
     T: Parse,
 {
     let lexer = Lexer::new(source).unwrap();
-    let mut reader = fajt_common::io::PeekReader::new(lexer).unwrap();
+    let mut reader = PeekReader::new(lexer).unwrap();
     Parser::parse::<T>(&mut reader, source_type)
 }
 
@@ -392,16 +393,26 @@ where
         let mut directives = Vec::new();
 
         loop {
-            if self.current_matches_string_literal() {
-                let stmt = self.parse_stmt()?;
-                let string = stmt
-                    .unwrap_expr_stmt()
-                    .expr
-                    .unwrap_literal()
-                    .literal
-                    .unwrap_string();
+            if !self.current_matches_string_literal() {
+                break;
+            }
+
+            let stmt_start_token = self.current()?.clone();
+            let string_literal = match self.parse_stmt()? {
+                Stmt::Expr(StmtExpr { expr, .. }) => match *expr {
+                    Expr::Literal(ExprLiteral {
+                        literal: Literal::String(string),
+                        ..
+                    }) => Some(string),
+                    _ => None,
+                },
+                _ => None,
+            };
+
+            if let Some(string) = string_literal {
                 directives.push(string);
             } else {
+                self.reader.rewind_to(&stmt_start_token)?;
                 break;
             }
         }
