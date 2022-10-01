@@ -15,22 +15,21 @@
     "span": "0:9",
     "operator": "Assign",
     "left": {
-      "Literal": {
+      "ArrayBinding": {
         "span": "0:5",
-        "literal": {
-          "Array": {
-            "elements": [
-              {
-                "Expr": {
-                  "IdentRef": {
-                    "span": "2:3",
-                    "name": "a"
-                  }
-                }
+        "elements": [
+          {
+            "span": "2:3",
+            "pattern": {
+              "Ident": {
+                "span": "2:3",
+                "name": "a"
               }
-            ]
+            },
+            "initializer": null
           }
-        }
+        ],
+        "rest": null
       }
     },
     "right": {

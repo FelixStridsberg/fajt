@@ -1,4 +1,4 @@
-use crate::binding::ObjectBinding;
+use crate::binding::{ArrayBinding, ObjectBinding};
 use crate::class::ExprClass;
 use crate::literal::*;
 use crate::{Body, FormalParameters, Ident, Span};
@@ -20,6 +20,7 @@ ast_mapping! {
         Member(ExprMember),
         MetaProperty(ExprMetaProperty),
         New(ExprNew),
+        ArrayBinding(ArrayBinding),
         ObjectBinding(ObjectBinding),
         OptionalCall(ExprOptionalCall),
         OptionalMember(ExprOptionalMember),

@@ -1,7 +1,9 @@
 use crate::error::Result;
 use crate::static_semantics::ExprSemantics;
 use crate::{Context, Error, Parser};
-use fajt_ast::{assignment_op, AssignmentOperator, ExprParenthesized, Spanned, UnaryOperator};
+use fajt_ast::{
+    assignment_op, AssignmentOperator, BindingPattern, ExprParenthesized, Spanned, UnaryOperator,
+};
 use fajt_ast::{unary_op, ExprTaggedTemplate};
 use fajt_ast::{update_op, UpdateOperator};
 use fajt_ast::{
@@ -83,8 +85,8 @@ where
         }
     }
 
-    /// If the `expr` is an object literal, the stream is rewound to start_token and expect to
-    /// reread a object binding pattern.
+    /// If the `expr` is an object or array literal, the stream is rewound to start_token and expect
+    /// to reread an object or array binding pattern.
     fn reread_literal_as_binding_pattern(
         &mut self,
         start_token: Token,
@@ -92,14 +94,18 @@ where
     ) -> Result<Expr> {
         match expr {
             Expr::Literal(ExprLiteral {
-                literal: Literal::Object(_),
+                literal: Literal::Object(_) | Literal::Array(_),
                 ..
             }) => {
                 self.reader.rewind_to(&start_token)?;
+                let binding_pattern = self.parse_binding_pattern()?;
+                self.consume()?; // skip operator, already read by parent.
 
-                let object = self.parse_object_binding_pattern()?;
-                self.consume().unwrap(); // operator
-                Ok(Expr::ObjectBinding(object))
+                match binding_pattern {
+                    BindingPattern::Array(array) => Ok(Expr::ArrayBinding(array)),
+                    BindingPattern::Object(object) => Ok(Expr::ObjectBinding(object)),
+                    BindingPattern::Ident(_) => unreachable!(),
+                }
             }
             _ => Ok(expr),
         }
