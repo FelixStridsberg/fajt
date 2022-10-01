@@ -363,6 +363,16 @@ where
         })
     }
 
+    /// Parses the `IdentifierName` production, this do not respect the reserved words.
+    fn parse_identifier_name(&mut self) -> Result<Ident> {
+        let token = self.consume()?;
+        Ok(match token.value {
+            TokenValue::Identifier(s) => Ident::new(s, token.span),
+            TokenValue::Keyword(keyword) => Ident::new(keyword.to_string(), token.span),
+            _ => return Err(Error::expected_ident(token)),
+        })
+    }
+
     /// Parses the `PropertyName` production.
     fn parse_property_name(&mut self) -> Result<PropertyName> {
         match self.current()? {
