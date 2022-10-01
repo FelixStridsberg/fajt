@@ -55,11 +55,12 @@ impl<'a, 'b, 'c, W: Write> ErrorEmitter<'a, 'b, 'c, W> {
         writeln!(self.out, "{:<pad$}|", " ", pad = padding)?;
 
         let line = &self.source[line_span.start..line_span.end];
+        let tab_indents = &line[0..err_span.start].matches('\t').count();
         writeln!(
             self.out,
             "{:<pad$}| {}",
             line_number_str,
-            line,
+            line.replace('\t', "    "),
             pad = padding
         )?;
         writeln!(
@@ -70,7 +71,7 @@ impl<'a, 'b, 'c, W: Write> ErrorEmitter<'a, 'b, 'c, W> {
             "^",
             label,
             pad = padding,
-            err_offset = err_span.start,
+            err_offset = err_span.start + tab_indents * 3,
             err_mark = err_token_length
         )?;
 
