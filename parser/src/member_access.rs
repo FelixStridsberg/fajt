@@ -133,7 +133,7 @@ where
         match self.current() {
             token_matches!(ok: punct!(".")) => {
                 self.consume()?;
-                let identifier = self.parse_identifier()?;
+                let identifier = self.parse_identifier_name()?;
                 Ok(MemberProperty::Ident(identifier))
             }
             token_matches!(ok: punct!("[")) => {
