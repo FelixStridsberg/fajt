@@ -346,6 +346,17 @@ where
         is_identifier(self.current().ok(), self.context.keyword_context())
     }
 
+    /// Returns `true` if current token could be parsed to a valid identifier name.
+    fn is_identifier_name(&self) -> bool {
+        matches!(
+            self.current(),
+            Ok(Token {
+                value: TokenValue::Identifier(_) | TokenValue::Keyword(_),
+                ..
+            })
+        )
+    }
+
     /// Tries to parse an identifier from current token, either directly from a `Identifier` token
     /// or from `Keyword` if the keyword is allowed in current context.
     fn parse_identifier(&mut self) -> Result<Ident> {
@@ -359,6 +370,16 @@ where
                     return Err(Error::forbidden_identifier(keyword.to_string(), token.span));
                 }
             }
+            _ => return Err(Error::expected_ident(token)),
+        })
+    }
+
+    /// Parses the `IdentifierName` production, this do not respect the reserved words.
+    fn parse_identifier_name(&mut self) -> Result<Ident> {
+        let token = self.consume()?;
+        Ok(match token.value {
+            TokenValue::Identifier(s) => Ident::new(s, token.span),
+            TokenValue::Keyword(keyword) => Ident::new(keyword.to_string(), token.span),
             _ => return Err(Error::expected_ident(token)),
         })
     }
@@ -384,7 +405,9 @@ where
                 self.consume_assert(&punct!("]"))?;
                 Ok(PropertyName::Computed(expr.into()))
             }
-            _ if self.is_identifier() => Ok(PropertyName::Ident(self.parse_identifier()?)),
+            _ if self.is_identifier_name() => {
+                Ok(PropertyName::Ident(self.parse_identifier_name()?))
+            }
             _ => Err(Error::unexpected_token(self.consume()?)),
         }
     }
@@ -441,7 +464,8 @@ where
     }
 }
 
-/// Returns `true` if provided `token` could be parsed to a valid identifier.
+/// Returns `true` if provided `token` could be parsed to a valid identifier, and not a reserved
+/// word in provided context.
 fn is_identifier(token: Option<&Token>, keyword_context: KeywordContext) -> bool {
     match token {
         Some(Token {
