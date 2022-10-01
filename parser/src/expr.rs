@@ -11,7 +11,7 @@ use fajt_ast::{
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
-use fajt_lexer::token::{Token, TokenValue};
+use fajt_lexer::token::{Punctuator, Token, TokenValue};
 use fajt_lexer::token_matches;
 use fajt_lexer::{keyword, LexerState};
 
@@ -66,6 +66,23 @@ where
 
                 let assignment_operator = self.parse_optional_assignment_operator();
                 if let Some(operator) = assignment_operator {
+                    expr.early_errors_left_hand_side_expr(&self.context, &operator)?;
+
+                    if matches!(
+                        expr,
+                        Expr::Literal(ExprLiteral {
+                            literal: Literal::Object(_),
+                            ..
+                        })
+                    ) {
+                        self.reader.rewind_to(&Token {
+                            value: TokenValue::Punctuator(Punctuator::BracketOpen),
+                            span: expr.span().clone(),
+                            first_on_line: false,
+                        })?;
+                        return self.parse_object_assignment_expr();
+                    }
+
                     self.parse_assignment(span_start, expr, operator)
                 } else {
                     // TODO validate object literal don't contain initializers, then it's not an object literal.
@@ -73,6 +90,13 @@ where
                 }
             }
         }
+    }
+
+    fn parse_object_assignment_expr(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+        let object = self.parse_object_binding_pattern()?;
+        let operator = self.parse_optional_assignment_operator().unwrap(); // TODO
+        self.parse_assignment(span_start, Expr::Object(object), operator)
     }
 
     /// Parses the part of `AssignmentExpression` that starts with the `async` keyword.
@@ -97,8 +121,6 @@ where
         left: Expr,
         operator: AssignmentOperator,
     ) -> Result<Expr> {
-        left.early_errors_left_hand_side_expr(&self.context, &operator)?;
-
         let right = self.parse_assignment_expr()?;
         let span = self.span_from(span_start);
         Ok(ExprAssignment {
