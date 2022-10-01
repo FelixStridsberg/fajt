@@ -285,6 +285,7 @@ generate_test_modules!(
     source_module: ["tests/cases/source-module"],
     source_script: ["tests/cases/source-script"],
     comment: ["tests/cases/comment"],
+    error: ["tests/cases/error"],
 );
 
 #[test]
