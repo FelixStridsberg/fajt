@@ -1,3 +1,4 @@
+extern crate core;
 extern crate fajt_lexer;
 extern crate serde;
 

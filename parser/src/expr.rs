@@ -61,17 +61,47 @@ where
                 self.parse_arrow_function_expr()
             }
             _ => {
-                // TODO if current is `{`, parse object or pattern
+                let start_token = self.current().cloned().unwrap();
+
                 let expr = self.parse_conditional_expr()?;
 
                 let assignment_operator = self.parse_optional_assignment_operator();
                 if let Some(operator) = assignment_operator {
-                    self.parse_assignment(span_start, expr, operator)
+                    expr.early_errors_left_hand_side_expr(&self.context, &operator)?;
+
+                    // This is not strictly necessary, but gives an easier to use api where the left
+                    // side of an assignment is always a binding pattern, and never object or array
+                    // literal.
+                    let left = self.reread_literal_as_binding_pattern(start_token, expr)?;
+
+                    self.parse_assignment(span_start, left, operator)
                 } else {
                     // TODO validate object literal don't contain initializers, then it's not an object literal.
                     Ok(expr)
                 }
             }
+        }
+    }
+
+    /// If the `expr` is an object literal, the stream is rewound to start_token and expect to
+    /// reread a object binding pattern.
+    fn reread_literal_as_binding_pattern(
+        &mut self,
+        start_token: Token,
+        expr: Expr,
+    ) -> Result<Expr> {
+        match expr {
+            Expr::Literal(ExprLiteral {
+                literal: Literal::Object(_),
+                ..
+            }) => {
+                self.reader.rewind_to(&start_token)?;
+
+                let object = self.parse_object_binding_pattern()?;
+                self.consume().unwrap(); // operator
+                Ok(Expr::Object(object))
+            }
+            _ => Ok(expr),
         }
     }
 
@@ -97,8 +127,6 @@ where
         left: Expr,
         operator: AssignmentOperator,
     ) -> Result<Expr> {
-        left.early_errors_left_hand_side_expr(&self.context, &operator)?;
-
         let right = self.parse_assignment_expr()?;
         let span = self.span_from(span_start);
         Ok(ExprAssignment {
