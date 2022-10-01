@@ -99,7 +99,7 @@ where
 
                 let object = self.parse_object_binding_pattern()?;
                 self.consume().unwrap(); // operator
-                Ok(Expr::Object(object))
+                Ok(Expr::ObjectBinding(object))
             }
             _ => Ok(expr),
         }

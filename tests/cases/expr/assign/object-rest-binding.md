@@ -15,7 +15,7 @@
     "span": "0:12",
     "operator": "Assign",
     "left": {
-      "Object": {
+      "ObjectBinding": {
         "span": "0:8",
         "props": [],
         "rest": {
