@@ -52,7 +52,7 @@ generate_fold_and_visit! {
             Member
             MetaProperty
             New
-            Object
+            ObjectBinding
             OptionalCall
             OptionalMember
             Parenthesized

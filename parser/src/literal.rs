@@ -175,7 +175,7 @@ where
                 && matches!(&prop, PropertyDefinition::IdentRef(_))
             {
                 self.reader.rewind_to(&start_token)?;
-                return Ok(Expr::Object(self.parse_object_binding_pattern()?));
+                return Ok(Expr::ObjectBinding(self.parse_object_binding_pattern()?));
             }
 
             props.push(prop);

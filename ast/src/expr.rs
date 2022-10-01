@@ -20,7 +20,7 @@ ast_mapping! {
         Member(ExprMember),
         MetaProperty(ExprMetaProperty),
         New(ExprNew),
-        Object(ObjectBinding),
+        ObjectBinding(ObjectBinding),
         OptionalCall(ExprOptionalCall),
         OptionalMember(ExprOptionalMember),
         Parenthesized(ExprParenthesized),
