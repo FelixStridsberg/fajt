@@ -24,7 +24,7 @@ pub trait PeekRead<T> {
     /// The item is returned in a tuple with the end position as first element.
     fn next(&mut self) -> std::result::Result<Option<(usize, T)>, Self::Error>;
 
-    fn read_next_safe(&mut self) -> Result<(usize, T), Self::Error> {
+    fn read_next(&mut self) -> Result<(usize, T), Self::Error> {
         match self.next() {
             Ok(Some(item)) => Ok(item),
             Ok(None) => Err(Error::EndOfStream),
@@ -73,7 +73,7 @@ where
     pub fn rewind_to(&mut self, item: &T) -> Result<(), E> {
         self.inner.rewind_before(item);
         self.current = self.inner.next()?;
-        self.next = self.inner.read_next_safe();
+        self.next = self.inner.read_next();
         Ok(())
     }
 
@@ -83,7 +83,7 @@ where
             self.inner.rewind_before(token);
 
             self.current = self.inner.read_with_state(state)?;
-            self.next = self.inner.read_next_safe();
+            self.next = self.inner.read_next();
         }
 
         Ok(())
@@ -103,7 +103,7 @@ where
 
     pub fn with_offset(mut inner: I, offset: usize) -> Result<Self, I::Error> {
         let current = inner.next()?;
-        let next = inner.read_next_safe();
+        let next = inner.read_next();
 
         Ok(PeekReader {
             inner,
@@ -143,7 +143,7 @@ where
     /// Consuming passed the end of stream results in EndOfStream error.
     /// Any errors from the inner reader while reading will also result in an error.
     pub fn consume(&mut self) -> Result<T, I::Error> {
-        let mut next = self.inner.read_next_safe();
+        let mut next = self.inner.read_next();
         mem::swap(&mut next, &mut self.next);
 
         let mut current = next.ok();
