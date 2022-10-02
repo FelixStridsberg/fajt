@@ -559,7 +559,7 @@ impl ReReadWithState<Token> for Lexer<'_> {
 }
 
 impl PeekRead<Token> for Lexer<'_> {
-    type Error = error::Error;
+    type Error = Error;
 
     fn next(&mut self) -> std::result::Result<Option<(usize, Token)>, Error> {
         match self.read() {

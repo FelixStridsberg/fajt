@@ -23,6 +23,10 @@ impl Span {
             end: (self.end as isize + offset) as usize,
         }
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.start == 0 && self.end == 0
+    }
 }
 
 impl Serialize for Span {

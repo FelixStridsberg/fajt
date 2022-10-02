@@ -23,9 +23,9 @@ pub enum ErrorKind {
 }
 
 impl Error {
-    pub fn unexpected_end_of_stream(pos: usize) -> Self {
+    pub fn unexpected_end_of_stream() -> Self {
         Error {
-            span: Span::new(pos, pos),
+            span: Span::empty(),
             kind: EndOfStream,
         }
     }
@@ -79,7 +79,7 @@ impl error::Error for Error {}
 impl From<CommonError<()>> for Error {
     fn from(error: CommonError<()>) -> Self {
         match error {
-            CommonError::EndOfStream(pos) => Error::unexpected_end_of_stream(pos),
+            CommonError::EndOfStream => Error::unexpected_end_of_stream(),
             CommonError::ReaderError(_) => unreachable!(),
         }
     }

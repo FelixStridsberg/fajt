@@ -25,11 +25,16 @@ impl<'a, 'b, 'c, W: Write> ErrorEmitter<'a, 'b, 'c, W> {
         let line_number = self.get_line_number(span);
 
         writeln!(self.out, "{}", error)?;
-        writeln!(
-            self.out,
-            " --> {}:{}:{}",
-            self.filename, line_number, col_number
-        )?;
+
+        if span.is_empty() {
+            writeln!(self.out, " --> {}", self.filename)?;
+        } else {
+            writeln!(
+                self.out,
+                " --> {}:{}:{}",
+                self.filename, line_number, col_number
+            )?;
+        }
 
         if error.kind != ErrorKind::EndOfStream {
             let label = self.get_kind_description(error);

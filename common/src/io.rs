@@ -5,7 +5,7 @@ use std::str::CharIndices;
 
 #[derive(Debug)]
 pub enum Error<E> {
-    EndOfStream(usize),
+    EndOfStream,
     ReaderError(E),
 }
 
@@ -27,7 +27,7 @@ pub trait PeekRead<T> {
     fn read_next_safe(&mut self) -> Result<(usize, T), Self::Error> {
         match self.next() {
             Ok(Some(item)) => Ok(item),
-            Ok(None) => Err(Error::EndOfStream(1)),
+            Ok(None) => Err(Error::EndOfStream),
             Err(error) => Err(Error::ReaderError(error)),
         }
     }
@@ -125,7 +125,7 @@ where
         if let Some((_, current)) = self.current.as_ref() {
             Ok(current)
         } else {
-            Err(Error::EndOfStream(self.position))
+            Err(Error::EndOfStream)
         }
     }
 
@@ -153,7 +153,7 @@ where
             self.position = position + self.offset;
             Ok(item)
         } else {
-            Err(Error::EndOfStream(self.position))
+            Err(Error::EndOfStream)
         }
     }
 }
@@ -176,7 +176,7 @@ where
                         break;
                     }
                 }
-                Err(Error::EndOfStream(_)) => {
+                Err(Error::EndOfStream) => {
                     break;
                 }
                 Err(e) => {
