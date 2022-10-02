@@ -53,7 +53,7 @@ macro_rules! produce {
         Ok($produce)
     }};
     ($self:ident, peek: $peek:literal ? $product1:expr ; $product2:expr) => {{
-        if $self.reader.peek() == Some(&$peek) {
+        if $self.reader.peek().ok() == Some(&$peek) {
             produce!($self, 2, $product1)
         } else {
             produce!($self, 1, $product2)
@@ -113,7 +113,7 @@ impl<'a> Lexer<'a> {
         let value = match current {
             // <op>=
             '/' | '*' | '%' | '+' | '-' | '|' | '^' | '&' | '<' | '>' | '='
-                if self.reader.peek() == Some(&'=') =>
+                if self.reader.peek().ok() == Some(&'=') =>
             {
                 match current {
                     '/' => produce!(self, 2, punct!("/=")),
@@ -133,22 +133,22 @@ impl<'a> Lexer<'a> {
                     _ => unreachable!(),
                 }
             }
-            '<' if self.reader.peek() == Some(&'<') => {
+            '<' if self.reader.peek().ok() == Some(&'<') => {
                 self.reader.consume()?;
                 produce!(self, peek: '=' ? punct!("<<=") ; punct!("<<"))
             }
-            '>' if self.reader.peek() == Some(&'>') => {
+            '>' if self.reader.peek().ok() == Some(&'>') => {
                 self.reader.consume()?;
                 match self.reader.peek() {
-                    Some(&'>') => {
+                    Ok(&'>') => {
                         self.reader.consume()?;
                         produce!(self, peek: '=' ? punct!(">>>=") ; punct!(">>>"))
                     }
-                    Some(&'=') => produce!(self, 2, punct!(">>=")),
+                    Ok(&'=') => produce!(self, 2, punct!(">>=")),
                     _ => produce!(self, 1, punct!(">>")),
                 }
             }
-            '!' if self.reader.peek() == Some(&'=') => {
+            '!' if self.reader.peek().ok() == Some(&'=') => {
                 self.reader.consume()?;
                 produce!(self, peek: '=' ? punct!("!==") ; punct!("!="))
             }
@@ -175,7 +175,7 @@ impl<'a> Lexer<'a> {
             '?' => {
                 self.reader.consume()?;
                 Ok(match self.reader.current() {
-                    Ok(&'.') if !matches!(self.reader.peek(), Some('0'..='9')) => {
+                    Ok(&'.') if !matches!(self.reader.peek(), Ok('0'..='9')) => {
                         self.reader.consume()?;
                         punct!("?.")
                     }
@@ -187,7 +187,7 @@ impl<'a> Lexer<'a> {
                 })
             }
             '*' => {
-                if self.reader.peek() == Some(&'*') {
+                if self.reader.peek().ok() == Some(&'*') {
                     self.reader.consume()?;
                     produce!(self, peek: '=' ? punct!("**=") ; punct!("**"))
                 } else {
@@ -195,9 +195,9 @@ impl<'a> Lexer<'a> {
                 }
             }
             '.' => {
-                if self.reader.peek() == Some(&'.') {
+                if self.reader.peek().ok() == Some(&'.') {
                     self.reader.consume()?;
-                    if self.reader.peek() == Some(&'.') {
+                    if self.reader.peek().ok() == Some(&'.') {
                         produce!(self, 2, punct!("..."))
                     } else {
                         let end = self.reader.position();
@@ -214,7 +214,7 @@ impl<'a> Lexer<'a> {
             '"' | '\'' => self.read_string_literal(),
             '`' => self.read_template_literal_head(),
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
-            c => unimplemented!("Lexer did not recognize code point '{}'.", c),
+            c => return Err(Error::unrecognized_code_point(*c, (start, start + 1))),
         }?;
         let end = self.reader.position();
 
@@ -229,13 +229,13 @@ impl<'a> Lexer<'a> {
             skipped_new_line = self.skip_whitespaces()? || skipped_new_line;
 
             match self.reader.current() {
-                Ok('/') if self.reader.peek() == Some(&'/') => {
+                Ok('/') if self.reader.peek().ok() == Some(&'/') => {
                     self.skip_single_line_comment();
                     // Single line comments never includes the ending new line. If at end of file it
                     // doesn't matter if we lie and say there was a new line.
                     skipped_new_line = true;
                 }
-                Ok('/') if self.reader.peek() == Some(&'*') => {
+                Ok('/') if self.reader.peek().ok() == Some(&'*') => {
                     skipped_new_line = self.skip_multi_line_comment()? || skipped_new_line;
                 }
                 _ => break,
@@ -268,7 +268,7 @@ impl<'a> Lexer<'a> {
         let mut contains_line_break = false;
         let mut content = String::new();
         loop {
-            if matches!(self.reader.current(), Ok('*')) && self.reader.peek() == Some(&'/') {
+            if matches!(self.reader.current(), Ok('*')) && self.reader.peek().ok() == Some(&'/') {
                 self.reader.consume()?;
                 self.reader.consume()?;
                 break;
@@ -404,13 +404,13 @@ impl<'a> Lexer<'a> {
     fn read_number_literal(&mut self) -> Result<TokenValue> {
         let current = self.reader.current()?;
         let (base, number) = match self.reader.peek() {
-            Some(&'x' | &'X') if current == &'0' => {
+            Ok(&'x' | &'X') if current == &'0' => {
                 (Hex, self.read_number(16, char::is_ascii_hexdigit)?)
             }
-            Some(&'o' | &'O') if current == &'0' => {
+            Ok(&'o' | &'O') if current == &'0' => {
                 (Octal, self.read_number(8, |c| ('0'..='7').contains(c))?)
             }
-            Some(&'b' | &'B') if current == &'0' => {
+            Ok(&'b' | &'B') if current == &'0' => {
                 (Binary, self.read_number(2, |c| c == &'0' || c == &'1')?)
             }
             _ => {
@@ -559,7 +559,7 @@ impl ReReadWithState<Token> for Lexer<'_> {
 }
 
 impl PeekRead<Token> for Lexer<'_> {
-    type Error = error::Error;
+    type Error = Error;
 
     fn next(&mut self) -> std::result::Result<Option<(usize, Token)>, Error> {
         match self.read() {

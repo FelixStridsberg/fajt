@@ -79,10 +79,10 @@ impl Error {
         }
     }
 
-    pub(crate) fn end_of_stream(pos: usize) -> Self {
+    pub(crate) fn end_of_stream() -> Self {
         Error {
             kind: EndOfStream,
-            span: Span::new(pos, pos),
+            span: Span::empty(),
         }
     }
 
@@ -140,7 +140,7 @@ impl From<LexerError> for Error {
 impl From<CommonError<LexerError>> for Error {
     fn from(error: CommonError<LexerError>) -> Self {
         match error {
-            CommonError::EndOfStream(pos) => Error::end_of_stream(pos),
+            CommonError::EndOfStream => Error::end_of_stream(),
             CommonError::ReaderError(lexer_error) => lexer_error.into(),
         }
     }

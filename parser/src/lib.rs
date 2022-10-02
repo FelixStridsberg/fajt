@@ -238,7 +238,7 @@ where
     }
 
     fn peek(&self) -> Option<&Token> {
-        self.reader.peek()
+        self.reader.peek().ok()
     }
 
     fn is_end(&self) -> bool {
