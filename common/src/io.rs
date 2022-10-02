@@ -23,6 +23,14 @@ pub trait PeekRead<T> {
     /// Returns next item if exists, otherwise `None`.
     /// The item is returned in a tuple with the end position as first element.
     fn next(&mut self) -> std::result::Result<Option<(usize, T)>, Self::Error>;
+
+    fn read_next_safe(&mut self) -> Result<(usize, T), Self::Error> {
+        match self.next() {
+            Ok(Some(item)) => Ok(item),
+            Ok(None) => Err(Error::EndOfStream(1)),
+            Err(error) => Err(Error::ReaderError(error)),
+        }
+    }
 }
 
 // It's not necessarily logic that this trait depends on Seek, it should really be two traits, but
@@ -46,10 +54,13 @@ pub trait ReReadWithState<T>: Seek {
 }
 
 /// The peek reader is always one step ahead to enable peeking.
-pub struct PeekReader<T, I> {
+pub struct PeekReader<T, I>
+where
+    I: PeekRead<T>,
+{
     inner: I,
     current: Option<(usize, T)>,
-    next: Option<(usize, T)>,
+    next: Result<(usize, T), I::Error>,
     position: usize,
     offset: usize,
 }
@@ -62,7 +73,7 @@ where
     pub fn rewind_to(&mut self, item: &T) -> Result<(), E> {
         self.inner.rewind_before(item);
         self.current = self.inner.next()?;
-        self.next = self.inner.next()?;
+        self.next = self.inner.read_next_safe();
         Ok(())
     }
 
@@ -72,7 +83,7 @@ where
             self.inner.rewind_before(token);
 
             self.current = self.inner.read_with_state(state)?;
-            self.next = self.inner.next()?;
+            self.next = self.inner.read_next_safe();
         }
 
         Ok(())
@@ -92,7 +103,7 @@ where
 
     pub fn with_offset(mut inner: I, offset: usize) -> Result<Self, I::Error> {
         let current = inner.next()?;
-        let next = inner.next()?;
+        let next = inner.read_next_safe();
 
         Ok(PeekReader {
             inner,
@@ -124,18 +135,18 @@ where
     }
 
     /// Peek at the item that will become current after next consume.
-    pub fn peek(&self) -> Option<&T> {
-        self.next.as_ref().map(|(_, item)| item)
+    pub fn peek(&self) -> std::result::Result<&T, &Error<I::Error>> {
+        self.next.as_ref().map(|(_, t)| t)
     }
 
     /// Returns the current item and reads a new one from the inner reader.
     /// Consuming passed the end of stream results in EndOfStream error.
     /// Any errors from the inner reader while reading will also result in an error.
     pub fn consume(&mut self) -> Result<T, I::Error> {
-        let mut next = self.inner.next()?;
+        let mut next = self.inner.read_next_safe();
         mem::swap(&mut next, &mut self.next);
 
-        let mut current = next;
+        let mut current = next.ok();
         mem::swap(&mut current, &mut self.current);
 
         if let Some((position, item)) = current {
