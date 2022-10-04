@@ -40,7 +40,8 @@ class{get(){}set(){}}
             "statements": []
           },
           "generator": false,
-          "asynchronous": false
+          "asynchronous": false,
+          "is_static": false
         }
       },
       {
@@ -64,7 +65,8 @@ class{get(){}set(){}}
             "statements": []
           },
           "generator": false,
-          "asynchronous": false
+          "asynchronous": false,
+          "is_static": false
         }
       }
     ]

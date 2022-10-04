@@ -9,6 +9,7 @@ ast_struct! {
         pub body: Body,
         pub generator: bool,
         pub asynchronous: bool,
+        pub is_static: bool,
     }
 }
 

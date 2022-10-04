@@ -94,7 +94,8 @@ const a={set v(val){super.a}}
                               ]
                             },
                             "generator": false,
-                            "asynchronous": false
+                            "asynchronous": false,
+                            "is_static": false
                           }
                         }
                       ]

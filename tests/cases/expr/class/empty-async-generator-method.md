@@ -54,7 +54,8 @@ class{async*method1(){yield}}
             ]
           },
           "generator": true,
-          "asynchronous": true
+          "asynchronous": true,
+          "is_static": false
         }
       }
     ]

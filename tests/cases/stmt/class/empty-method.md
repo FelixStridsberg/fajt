@@ -42,7 +42,8 @@ class cls{method1(){}}
             "statements": []
           },
           "generator": false,
-          "asynchronous": false
+          "asynchronous": false,
+          "is_static": false
         }
       }
     ]

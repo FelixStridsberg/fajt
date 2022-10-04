@@ -42,7 +42,8 @@ class cls{async method1(){}}
             "statements": []
           },
           "generator": false,
-          "asynchronous": true
+          "asynchronous": true,
+          "is_static": false
         }
       }
     ]

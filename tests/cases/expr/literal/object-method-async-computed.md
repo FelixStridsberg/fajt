@@ -39,7 +39,8 @@
                 "statements": []
               },
               "generator": false,
-              "asynchronous": true
+              "asynchronous": true,
+              "is_static": false
             }
           }
         ]

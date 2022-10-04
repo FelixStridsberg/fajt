@@ -83,7 +83,8 @@ const a={get v(){super.a}}
                               ]
                             },
                             "generator": false,
-                            "asynchronous": false
+                            "asynchronous": false,
+                            "is_static": false
                           }
                         }
                       ]

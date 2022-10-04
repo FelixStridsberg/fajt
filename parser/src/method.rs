@@ -90,6 +90,7 @@ where
             body,
             generator: self.context.is_yield,
             asynchronous: self.context.is_await,
+            is_static: false,
         })
     }
 }

@@ -78,7 +78,8 @@ class Test extends Test2{method(a=super.a){}}
                   "statements": []
                 },
                 "generator": false,
-                "asynchronous": false
+                "asynchronous": false,
+                "is_static": false
               }
             }
           ]

@@ -42,7 +42,8 @@ class cls{get getter(){}}
             "statements": []
           },
           "generator": false,
-          "asynchronous": false
+          "asynchronous": false,
+          "is_static": false
         }
       }
     ]

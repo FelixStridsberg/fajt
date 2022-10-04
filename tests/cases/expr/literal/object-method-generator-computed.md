@@ -50,7 +50,8 @@
                 "statements": []
               },
               "generator": true,
-              "asynchronous": false
+              "asynchronous": false,
+              "is_static": false
             }
           }
         ]

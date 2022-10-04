@@ -68,7 +68,8 @@ class Test extends Test2{constructor(){super()}}
                   ]
                 },
                 "generator": false,
-                "asynchronous": false
+                "asynchronous": false,
+                "is_static": false
               }
             }
           ]

@@ -76,7 +76,8 @@ class Test extends Test2{method(){super.a}}
                   ]
                 },
                 "generator": false,
-                "asynchronous": false
+                "asynchronous": false,
+                "is_static": false
               }
             }
           ]

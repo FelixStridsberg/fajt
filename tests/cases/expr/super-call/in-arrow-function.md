@@ -107,7 +107,8 @@ class Test extends Test2{constructor(){const a=()=>{super()}}}
                   ]
                 },
                 "generator": false,
-                "asynchronous": false
+                "asynchronous": false,
+                "is_static": false
               }
             }
           ]

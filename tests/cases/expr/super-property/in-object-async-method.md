@@ -83,7 +83,8 @@ const a={async method(){super.a}}
                               ]
                             },
                             "generator": false,
-                            "asynchronous": true
+                            "asynchronous": true,
+                            "is_static": false
                           }
                         }
                       ]
