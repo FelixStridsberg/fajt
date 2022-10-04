@@ -91,6 +91,9 @@ pub struct Context {
 
     /// `true` if we are in a context where `super()`-call is allowed.
     super_call_allowed: bool,
+
+    /// `true` if static methods are allowed.
+    static_method_allowed: bool,
 }
 
 macro_rules! modifier {
@@ -114,6 +117,7 @@ impl Context {
 
     modifier!(with_in_method: in_method);
     modifier!(with_super_call_allowed: super_call_allowed);
+    modifier!(with_static_method_allowed: static_method_allowed);
 
     fn keyword_context(&self) -> KeywordContext {
         let mut keyword_context = KeywordContext::empty();

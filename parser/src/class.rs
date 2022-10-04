@@ -93,6 +93,7 @@ where
         let context = self
             .context
             .with_in_method(true)
+            .with_static_method_allowed(true)
             .with_super_call_allowed(super_call_allowed);
 
         Ok(self.with_context(context).parse_method_definition()?.into())

@@ -210,6 +210,7 @@ where
                     .with_context(
                         self.context
                             .with_in_method(true)
+                            .with_static_method_allowed(false)
                             .with_super_call_allowed(false),
                     )
                     .parse_method_definition()?;
