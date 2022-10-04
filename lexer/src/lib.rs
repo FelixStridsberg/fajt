@@ -431,9 +431,26 @@ impl<'a> Lexer<'a> {
             let fraction = self.read_number(10, |c| c.is_numeric())?;
             let digits = (fraction as f64).log10().floor() + 1.0;
             let float = integral as f64 + (fraction as f64 / (digits * 10.0));
-            Ok(literal!(decimal, float))
+
+            if let Some(exponent) = self.read_number_exponent()? {
+                Ok(literal!(scientific, float, exponent))
+            } else {
+                Ok(literal!(decimal, float))
+            }
+        } else if let Some(exponent) = self.read_number_exponent()? {
+            Ok(literal!(scientific, integral as f64, exponent))
         } else {
             Ok(literal!(integer, integral))
+        }
+    }
+
+    fn read_number_exponent(&mut self) -> Result<Option<i32>> {
+        if let Ok(&'e') = self.reader.current() {
+            self.reader.consume()?;
+            let exponent = self.read_number(10, |c| c.is_numeric())?;
+            Ok(Some(exponent as i32))
+        } else {
+            Ok(None)
         }
     }
 
