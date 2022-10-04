@@ -459,12 +459,22 @@ where
     }
 
     /// `true` if the current token is not preceded by a line feed or is a semicolon.
-    fn stmt_not_ended(&self) -> bool {
+    fn stmt_ended(&self) -> bool {
         match self.current() {
-            token_matches!(ok: punct!(";")) | Err(_) => false,
-            Ok(token) if token.first_on_line => false,
-            _ => true,
+            token_matches!(ok: punct!(";")) | Err(_) => true,
+            _ => self.can_insert_semicolon(),
         }
+    }
+
+    /// Check if it is valid to insert semicolon before the current token.
+    fn can_insert_semicolon(&self) -> bool {
+        self.is_end()
+            || self.current_matches(&punct!("}"))
+            || self
+                .reader
+                .current()
+                .map(|t| t.first_on_line)
+                .unwrap_or(false)
     }
 }
 

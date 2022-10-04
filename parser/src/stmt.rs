@@ -171,7 +171,7 @@ where
         let span_start = self.position();
         self.consume_assert(&keyword!("break"))?;
 
-        let label = self.stmt_not_ended().then_try(|| self.parse_identifier())?;
+        let label = (!self.stmt_ended()).then_try(|| self.parse_identifier())?;
         self.maybe_consume(&punct!(";"))?;
 
         let span = self.span_from(span_start);
@@ -183,7 +183,7 @@ where
         let span_start = self.position();
         self.consume_assert(&keyword!("continue"))?;
 
-        let label = self.stmt_not_ended().then_try(|| self.parse_identifier())?;
+        let label = (!self.stmt_ended()).then_try(|| self.parse_identifier())?;
         self.maybe_consume(&punct!(";"))?;
 
         let span = self.span_from(span_start);
@@ -195,7 +195,7 @@ where
         let span_start = self.position();
         self.consume_assert(&keyword!("return"))?;
 
-        let argument = self.stmt_not_ended().then_try(|| self.parse_expr())?;
+        let argument = (!self.stmt_ended()).then_try(|| self.parse_expr())?;
         self.maybe_consume(&punct!(";"))?;
 
         let span = self.span_from(span_start);
@@ -417,21 +417,10 @@ where
     /// Consumes semicolon if exists, returns error if no semicolon exists and no semicolon can be
     /// auto inserted.
     pub(super) fn consume_optional_semicolon(&mut self) -> Result<()> {
-        if !self.maybe_consume(&punct!(";"))? && !self.valid_auto_semicolon()? {
+        if !self.maybe_consume(&punct!(";"))? && !self.can_insert_semicolon() {
             Err(Error::unexpected_token(self.consume()?))
         } else {
             Ok(())
         }
-    }
-
-    /// Check if it is valid to insert semicolon before the current token.
-    fn valid_auto_semicolon(&self) -> Result<bool> {
-        Ok(self.is_end()
-            || self.current_matches(&punct!("}"))
-            || self
-                .reader
-                .current()
-                .map(|t| t.first_on_line)
-                .unwrap_or(false))
     }
 }
