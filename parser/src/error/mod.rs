@@ -1,9 +1,7 @@
 use crate::error::ErrorKind::{
-    EndOfStream, ExpectedIdentifier, ForbiddenIdentifier, SyntaxError, UnexpectedIdent,
-    UnexpectedToken,
+    ExpectedIdentifier, ForbiddenIdentifier, SyntaxError, UnexpectedIdent, UnexpectedToken,
 };
 use fajt_ast::{Ident, Span};
-use fajt_common::io::Error as CommonError;
 use fajt_lexer::error::Error as LexerError;
 use fajt_lexer::token::{Token, TokenValue};
 use std::fmt::Formatter;
@@ -79,13 +77,6 @@ impl Error {
         }
     }
 
-    pub(crate) fn end_of_stream() -> Self {
-        Error {
-            kind: EndOfStream,
-            span: Span::empty(),
-        }
-    }
-
     pub fn kind(&self) -> &ErrorKind {
         &self.kind
     }
@@ -137,12 +128,10 @@ impl From<LexerError> for Error {
     }
 }
 
-impl From<CommonError<LexerError>> for Error {
-    fn from(error: CommonError<LexerError>) -> Self {
-        match error {
-            CommonError::EndOfStream => Error::end_of_stream(),
-            CommonError::ReaderError(lexer_error) => lexer_error.into(),
-        }
+impl From<&LexerError> for Error {
+    fn from(error: &LexerError) -> Self {
+        let span = error.span().clone();
+        Error::lexer_error(error.clone(), span)
     }
 }
 

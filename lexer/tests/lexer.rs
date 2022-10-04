@@ -25,14 +25,14 @@ fn seek_from_start() {
     let ident = lexer.next().unwrap();
     assert_eq!(
         ident,
-        Some((
+        (
             14,
             Token {
                 span: Span::new(8, 14),
                 value: TokenValue::Identifier("ident2".to_string()),
                 first_on_line: false,
             }
-        ))
+        )
     );
 }
 
@@ -45,14 +45,14 @@ fn seek_from_end() {
     let ident = lexer.next().unwrap();
     assert_eq!(
         ident,
-        Some((
+        (
             22,
             Token {
                 span: Span::new(16, 22),
                 value: TokenValue::Identifier("ident3".to_string()),
                 first_on_line: false,
             }
-        ))
+        )
     );
 }
 
@@ -67,13 +67,13 @@ fn seek_from_current() {
     let ident = lexer.next().unwrap();
     assert_eq!(
         ident,
-        Some((
+        (
             6,
             Token {
                 span: Span::new(0, 6),
                 value: TokenValue::Identifier("ident1".to_string()),
                 first_on_line: true,
             }
-        ))
+        )
     );
 }

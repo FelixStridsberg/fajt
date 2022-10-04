@@ -507,7 +507,7 @@ impl Seek for Lexer<'_> {
 }
 
 impl ReReadWithState<Token> for Lexer<'_> {
-    type Error = error::Error;
+    type Error = Error;
     type State = LexerState;
 
     /// Rewind reader to before `token`, `token` must have been previously read from this lexer.
@@ -549,7 +549,7 @@ impl ReReadWithState<Token> for Lexer<'_> {
     fn read_with_state(
         &mut self,
         mut state: LexerState,
-    ) -> std::result::Result<Option<(usize, Token)>, Self::Error> {
+    ) -> std::result::Result<(usize, Token), Self::Error> {
         mem::swap(&mut state, &mut self.state);
         let result = self.next()?;
         mem::swap(&mut self.state, &mut state);
@@ -561,15 +561,8 @@ impl ReReadWithState<Token> for Lexer<'_> {
 impl PeekRead<Token> for Lexer<'_> {
     type Error = Error;
 
-    fn next(&mut self) -> std::result::Result<Option<(usize, Token)>, Error> {
-        match self.read() {
-            Ok(t) => Ok(Some((t.span.end, t))),
-            Err(e) => {
-                if *e.kind() == EndOfStream {
-                    return Ok(None);
-                }
-                Err(e)
-            }
-        }
+    fn next(&mut self) -> std::result::Result<(usize, Token), Error> {
+        let token = self.read()?;
+        Ok((token.span.end, token))
     }
 }

@@ -6,6 +6,7 @@ use fajt_ast::{
     SwitchCase, VariableKind,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
+
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
@@ -19,7 +20,7 @@ where
     pub(super) fn parse_all_stmts(&mut self) -> Result<Vec<Stmt>> {
         let mut stmts = Vec::new();
         loop {
-            if self.reader.is_end() {
+            if self.is_end() {
                 break;
             }
 

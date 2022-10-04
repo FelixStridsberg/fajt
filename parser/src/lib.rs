@@ -26,6 +26,7 @@ use fajt_ast::{
     StmtExpr, StmtList,
 };
 use fajt_common::io::{PeekRead, PeekReader, ReReadWithState};
+use fajt_lexer::error::ErrorKind as LexerErrorKind;
 use fajt_lexer::token::{KeywordContext, Token, TokenValue};
 use fajt_lexer::{punct, Lexer};
 use fajt_lexer::{token_matches, LexerState};
@@ -242,7 +243,10 @@ where
     }
 
     fn is_end(&self) -> bool {
-        self.reader.is_end()
+        self.reader
+            .current()
+            .err()
+            .map_or(false, |error| error.kind() == &LexerErrorKind::EndOfStream)
     }
 
     fn position(&self) -> usize {

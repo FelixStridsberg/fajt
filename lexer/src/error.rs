@@ -2,18 +2,18 @@ use crate::error::ErrorKind::{ForbiddenIdentifier, UnrecognizedCodePoint};
 use crate::token::Keyword;
 use crate::{EndOfStream, InvalidOrUnexpectedToken, Token};
 use fajt_ast::Span;
-use fajt_common::io::Error as CommonError;
+use fajt_common::io::char_reader::Error as CharReaderError;
 use serde::{Deserialize, Serialize};
 use std::fmt::Formatter;
 use std::{error, fmt};
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Error {
     span: Span,
     kind: ErrorKind,
 }
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[non_exhaustive]
 pub enum ErrorKind {
     InvalidOrUnexpectedToken(Token),
@@ -76,11 +76,18 @@ impl fmt::Display for Error {
 
 impl error::Error for Error {}
 
-impl From<CommonError<()>> for Error {
-    fn from(error: CommonError<()>) -> Self {
+impl From<CharReaderError> for Error {
+    fn from(error: CharReaderError) -> Self {
         match error {
-            CommonError::EndOfStream => Error::unexpected_end_of_stream(),
-            CommonError::ReaderError(_) => unreachable!(),
+            CharReaderError::EndOfStream => Error::unexpected_end_of_stream(),
+        }
+    }
+}
+
+impl From<&CharReaderError> for Error {
+    fn from(error: &CharReaderError) -> Self {
+        match error {
+            CharReaderError::EndOfStream => Error::unexpected_end_of_stream(),
         }
     }
 }

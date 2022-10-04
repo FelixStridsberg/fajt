@@ -1,36 +1,15 @@
 use std::fmt::Debug;
 use std::io::Seek;
 use std::mem;
-use std::str::CharIndices;
 
-#[derive(Debug)]
-pub enum Error<E> {
-    EndOfStream,
-    ReaderError(E),
-}
-
-impl<E> From<E> for Error<E> {
-    fn from(error: E) -> Self {
-        Self::ReaderError(error)
-    }
-}
-
-type Result<T, E> = std::result::Result<T, Error<E>>;
+pub mod char_reader;
 
 pub trait PeekRead<T> {
     type Error;
 
     /// Returns next item if exists, otherwise `None`.
     /// The item is returned in a tuple with the end position as first element.
-    fn next(&mut self) -> std::result::Result<Option<(usize, T)>, Self::Error>;
-
-    fn read_next(&mut self) -> Result<(usize, T), Self::Error> {
-        match self.next() {
-            Ok(Some(item)) => Ok(item),
-            Ok(None) => Err(Error::EndOfStream),
-            Err(error) => Err(Error::ReaderError(error)),
-        }
-    }
+    fn next(&mut self) -> Result<(usize, T), Self::Error>;
 }
 
 // It's not necessarily logic that this trait depends on Seek, it should really be two traits, but
@@ -47,10 +26,7 @@ pub trait ReReadWithState<T>: Seek {
     /// Re-read the last 2 items with another state. If no change the same two items will be
     /// returned. If result change the first returned item is the new item and second is either
     /// the second parameter of input or None if both in input were consumed.
-    fn read_with_state(
-        &mut self,
-        state: Self::State,
-    ) -> std::result::Result<Option<(usize, T)>, Self::Error>;
+    fn read_with_state(&mut self, state: Self::State) -> Result<(usize, T), Self::Error>;
 }
 
 /// The peek reader is always one step ahead to enable peeking.
@@ -59,7 +35,7 @@ where
     I: PeekRead<T>,
 {
     inner: I,
-    current: Option<(usize, T)>,
+    current: Result<(usize, T), I::Error>,
     next: Result<(usize, T), I::Error>,
     position: usize,
     offset: usize,
@@ -72,18 +48,18 @@ where
 {
     pub fn rewind_to(&mut self, item: &T) -> Result<(), E> {
         self.inner.rewind_before(item);
-        self.current = self.inner.next()?;
-        self.next = self.inner.read_next();
+        self.current = self.inner.next();
+        self.next = self.inner.next();
         Ok(())
     }
 
     /// Re-read `current` token with a specific state.
     pub fn reread_with_state(&mut self, state: <I as ReReadWithState<T>>::State) -> Result<(), E> {
-        if let Some((_, token)) = self.current.as_ref() {
+        if let Ok((_, token)) = self.current.as_ref() {
             self.inner.rewind_before(token);
 
-            self.current = self.inner.read_with_state(state)?;
-            self.next = self.inner.read_next();
+            self.current = self.inner.read_with_state(state);
+            self.next = self.inner.next();
         }
 
         Ok(())
@@ -102,8 +78,8 @@ where
     }
 
     pub fn with_offset(mut inner: I, offset: usize) -> Result<Self, I::Error> {
-        let current = inner.next()?;
-        let next = inner.read_next();
+        let current = inner.next();
+        let next = inner.next();
 
         Ok(PeekReader {
             inner,
@@ -120,22 +96,12 @@ where
     }
 
     /// Returns reference to the current item.
-    /// Calling this function after the stream has been fully consumed results in EndOfStream error.
-    pub fn current(&self) -> Result<&T, I::Error> {
-        if let Some((_, current)) = self.current.as_ref() {
-            Ok(current)
-        } else {
-            Err(Error::EndOfStream)
-        }
-    }
-
-    /// Returns true if the next token would result in `Error::EndOfStream`.
-    pub fn is_end(&self) -> bool {
-        self.current.is_none()
+    pub fn current(&self) -> Result<&T, &I::Error> {
+        self.current.as_ref().map(|(_, t)| t)
     }
 
     /// Peek at the item that will become current after next consume.
-    pub fn peek(&self) -> std::result::Result<&T, &Error<I::Error>> {
+    pub fn peek(&self) -> Result<&T, &I::Error> {
         self.next.as_ref().map(|(_, t)| t)
     }
 
@@ -143,56 +109,18 @@ where
     /// Consuming passed the end of stream results in EndOfStream error.
     /// Any errors from the inner reader while reading will also result in an error.
     pub fn consume(&mut self) -> Result<T, I::Error> {
-        let mut next = self.inner.read_next();
+        let mut next = self.inner.next();
         mem::swap(&mut next, &mut self.next);
 
-        let mut current = next.ok();
+        let mut current = next;
         mem::swap(&mut current, &mut self.current);
 
-        if let Some((position, item)) = current {
-            self.position = position + self.offset;
-            Ok(item)
-        } else {
-            Err(Error::EndOfStream)
-        }
-    }
-}
-
-impl<I> PeekReader<char, I>
-where
-    I: PeekRead<char>,
-    I::Error: Debug,
-{
-    /// Read a string until `check` callback returns false or the end of the stream is reached.
-    pub fn read_while(&mut self, check: fn(&char) -> bool) -> Result<String, I::Error> {
-        let mut result = String::new();
-
-        loop {
-            match self.current() {
-                Ok(c) => {
-                    if check(c) {
-                        result.push(self.consume()?);
-                    } else {
-                        break;
-                    }
-                }
-                Err(Error::EndOfStream) => {
-                    break;
-                }
-                Err(e) => {
-                    return Err(e);
-                }
+        match current {
+            Ok((position, item)) => {
+                self.position = position + self.offset;
+                Ok(item)
             }
+            Err(error) => Err(error),
         }
-
-        Ok(result)
-    }
-}
-
-impl<'a> PeekRead<char> for CharIndices<'a> {
-    type Error = ();
-
-    fn next(&mut self) -> std::result::Result<Option<(usize, char)>, Self::Error> {
-        Ok(Iterator::next(self).map(|(pos, c)| (pos + c.len_utf16(), c)))
     }
 }
