@@ -1,6 +1,7 @@
 use crate::error::ErrorKind::{
     ExpectedIdentifier, ForbiddenIdentifier, SyntaxError, UnexpectedIdent, UnexpectedToken,
 };
+use crate::LexerErrorKind;
 use fajt_ast::{Ident, Span};
 use fajt_lexer::error::Error as LexerError;
 use fajt_lexer::token::{Token, TokenValue};
@@ -24,10 +25,17 @@ pub struct Diagnostic {
 }
 
 impl Error {
-    pub(crate) fn lexer_error(error: LexerError, span: Span) -> Self {
+    pub(crate) fn lexer_error(error: LexerError) -> Self {
+        if error.kind() == &LexerErrorKind::EndOfStream {
+            return Error {
+                span: Span::empty(),
+                kind: ErrorKind::EndOfStream,
+            };
+        }
+
         Error {
+            span: error.span().clone(),
             kind: ErrorKind::LexerError(error),
-            span,
         }
     }
 
@@ -123,15 +131,14 @@ impl error::Error for Error {}
 
 impl From<LexerError> for Error {
     fn from(error: LexerError) -> Self {
-        let span = error.span().clone();
-        Error::lexer_error(error, span)
+        Error::lexer_error(error)
     }
 }
 
 impl From<&LexerError> for Error {
     fn from(error: &LexerError) -> Self {
-        let span = error.span().clone();
-        Error::lexer_error(error.clone(), span)
+        let error = error.clone();
+        Error::lexer_error(error)
     }
 }
 

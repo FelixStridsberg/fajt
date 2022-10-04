@@ -56,7 +56,7 @@ impl Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match &self.kind {
-            EndOfStream => write!(f, "Unexpected end of stream"),
+            EndOfStream => write!(f, "Unexpected end of input"),
             InvalidOrUnexpectedToken(t) => {
                 write!(f, "Invalid or unexpected token {:?}", t)
             }

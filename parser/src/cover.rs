@@ -1,5 +1,6 @@
+use crate::error::ErrorKind::LexerError;
 use crate::error::Result;
-use crate::Parser;
+use crate::{LexerErrorKind, Parser};
 use fajt_ast::Expr;
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
@@ -56,15 +57,25 @@ where
     fn skip_until_closing_parenthesis(&mut self) -> Result<()> {
         let mut depth = 0;
         loop {
-            let token = self.consume()?;
-            match &token {
-                token_matches!(punct!("(")) => depth += 1,
-                token_matches!(punct!(")")) => {
+            match self.consume() {
+                token_matches!(ok: punct!("(")) => depth += 1,
+                token_matches!(ok: punct!(")")) => {
                     depth -= 1;
                     if depth == 0 {
                         break;
                     }
                 }
+                Err(error) => match error.kind() {
+                    LexerError(lexer_error) => {
+                        if !matches!(
+                            lexer_error.kind(),
+                            &LexerErrorKind::UnrecognizedCodePoint(_)
+                        ) {
+                            return Err(error);
+                        }
+                    }
+                    _ => return Err(error),
+                },
                 _ => {}
             }
         }

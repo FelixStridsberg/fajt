@@ -214,7 +214,10 @@ impl<'a> Lexer<'a> {
             '"' | '\'' => self.read_string_literal(),
             '`' => self.read_template_literal_head(),
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
-            c => return Err(Error::unrecognized_code_point(*c, (start, start + 1))),
+            _ => {
+                let c = self.reader.consume()?;
+                return Err(Error::unrecognized_code_point(c, (start, start + 1)));
+            }
         }?;
         let end = self.reader.position();
 
