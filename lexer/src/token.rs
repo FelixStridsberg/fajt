@@ -319,6 +319,15 @@ macro_rules! literal(
             )
         )
     };
+    (scientific, $m:expr, $n:expr) => {
+        $crate::token::TokenValue::Literal(
+            fajt_ast::Literal::Number(
+                fajt_ast::LitNumber::Scientific(
+                    $m, $n
+                )
+            )
+        )
+    };
     (string, $type:expr, $value:expr) => {
          $crate::token::TokenValue::Literal(
             fajt_ast::Literal::String(

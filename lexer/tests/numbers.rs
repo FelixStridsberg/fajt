@@ -51,3 +51,13 @@ fn number_binary() {
         ]
     );
 }
+
+#[test]
+fn number_scientific() {
+    assert_lexer!(
+        input: "123e10",
+        output: [
+            (literal!(scientific, 123.0, 10), (0, 6)),
+        ]
+    );
+}

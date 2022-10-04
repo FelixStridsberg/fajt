@@ -84,6 +84,7 @@ ast_node! {
     pub enum LitNumber {
         Integer(i64, Base),
         Decimal(f64),
+        Scientific(f64, i32),
     }
 }
 
