@@ -796,6 +796,11 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_method_definition(&mut self, node: &mut MethodDefinition) -> bool {
+        if node.is_static {
+            self.string("static");
+            self.space();
+        }
+
         if node.asynchronous {
             self.string("async");
             self.space();

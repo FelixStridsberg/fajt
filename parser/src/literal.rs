@@ -229,7 +229,7 @@ where
         if self.current_matches(&punct!(":")) {
             self.parse_named_property_definition(span_start, name)
         } else {
-            self.parse_method(span_start, name, MethodKind::Method)
+            self.parse_method(span_start, false, name, MethodKind::Method)
                 .map(PropertyDefinition::Method)
         }
     }
@@ -253,6 +253,7 @@ where
     pub fn is_object_method_definition(&self) -> bool {
         match self.current() {
             token_matches!(ok: punct!("*") | punct!("[")) => true,
+            token_matches!(ok: keyword!("static")) => true,
             token_matches!(ok: keyword!("async")) if !self.peek_matches(&punct!(":")) => true,
             token_matches!(ok: keyword!("get") | keyword!("set")) => true,
             _ => self.peek_matches(&punct!("(")),
