@@ -1,5 +1,5 @@
 ### Source
-```js parse:expr
+```js parse:expr check-format:no
 .5
 ```
 

@@ -120,8 +120,7 @@ fn optional_chaining_exception() {
         input: "?.2",
         output: [
             (punct!("?"), (0, 1)),
-            (punct!("."), (1, 2)),
-            (literal!(integer, 2), (2, 3)),
+            (literal!(decimal, 0.2), (1, 3)),
         ]
     );
 }

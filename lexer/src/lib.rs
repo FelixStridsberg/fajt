@@ -194,8 +194,8 @@ impl<'a> Lexer<'a> {
                     produce!(self, 1, punct!("*"))
                 }
             }
-            '.' => {
-                if self.reader.peek().ok() == Some(&'.') {
+            '.' => match self.reader.peek() {
+                Ok('.') => {
                     self.reader.consume()?;
                     if self.reader.peek().ok() == Some(&'.') {
                         produce!(self, 2, punct!("..."))
@@ -204,10 +204,10 @@ impl<'a> Lexer<'a> {
                         let error_token = Token::new(punct!("."), new_line, (start, end));
                         return Err(Error::invalid_or_unexpected_token(error_token));
                     }
-                } else {
-                    produce!(self, 1, punct!("."))
                 }
-            }
+                Ok('0'..='9') => self.read_number_literal(),
+                _ => produce!(self, 1, punct!(".")),
+            },
             '/' if self.state.regex_allowed => self.read_regexp_literal(),
             '/' => produce!(self, 1, punct!("/")),
             '0'..='9' => self.read_number_literal(),
@@ -425,7 +425,13 @@ impl<'a> Lexer<'a> {
     }
 
     fn read_integer_or_decimal(&mut self) -> Result<TokenValue> {
-        let integral = self.read_number(10, |c| c.is_numeric())?;
+        let integral = if self.reader.current()? == &'.' {
+            // Decimals without zero: .5
+            0
+        } else {
+            self.read_number(10, |c| c.is_numeric())?
+        };
+
         if let Ok(&'.') = self.reader.current() {
             self.reader.consume()?;
             let fraction = self.read_number(10, |c| c.is_numeric())?;

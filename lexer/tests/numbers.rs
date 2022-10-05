@@ -23,6 +23,16 @@ fn number_decimal() {
 }
 
 #[test]
+fn number_decimal_no_zero() {
+    assert_lexer!(
+        input: ".5",
+        output: [
+            (literal!(decimal, 0.5), (0, 3)),
+        ]
+    );
+}
+
+#[test]
 fn number_hex() {
     assert_lexer!(
         input: "0xff08",
