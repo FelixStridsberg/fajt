@@ -385,7 +385,6 @@ where
     pub(super) fn parse_left_hand_side_expr(&mut self) -> Result<Expr> {
         let span_start = self.position();
         let expr = match self.current() {
-            token_matches!(ok: keyword!("new")) => self.parse_new_or_member_expr(),
             token_matches!(ok: keyword!("super")) if self.peek_matches(&punct!("(")) => {
                 self.parse_super_call_expr()
             }
