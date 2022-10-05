@@ -436,7 +436,7 @@ impl<'a> Lexer<'a> {
             self.reader.consume()?;
             let fraction = self.read_number(10, |c| c.is_numeric())?;
             let digits = (fraction as f64).log10().floor() + 1.0;
-            let float = integral as f64 + (fraction as f64 / (digits * 10.0));
+            let float = integral as f64 + (fraction as f64 / 10_i32.pow(digits as u32) as f64);
 
             if let Some(exponent) = self.read_number_exponent()? {
                 Ok(literal!(scientific, float, exponent))

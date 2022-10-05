@@ -17,7 +17,7 @@ fn number_decimal() {
     assert_lexer!(
         input: "1234.5678",
         output: [
-            (literal!(decimal, 1234.5678), (0, 6)),
+            (literal!(decimal, 1234.5678), (0, 9)),
         ]
     );
 }
