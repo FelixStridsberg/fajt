@@ -15,9 +15,9 @@ fn number_integer_decimal() {
 #[test]
 fn number_decimal() {
     assert_lexer!(
-        input: "1234.5",
+        input: "1234.5678",
         output: [
-            (literal!(decimal, 1234.5), (0, 6)),
+            (literal!(decimal, 1234.5678), (0, 6)),
         ]
     );
 }
@@ -27,7 +27,7 @@ fn number_decimal_no_zero() {
     assert_lexer!(
         input: ".5",
         output: [
-            (literal!(decimal, 0.5), (0, 3)),
+            (literal!(decimal, 0.5), (0, 2)),
         ]
     );
 }
