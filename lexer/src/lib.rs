@@ -467,7 +467,12 @@ impl<'a> Lexer<'a> {
             self.reader.consume()?;
         }
 
-        let number_str = self.reader.read_while(check)?;
+        let number_str = self.reader.read_while(|c| check(c) || c == &'_')?;
+        if number_str.contains("__") {
+            // TODO return Err(/* syntax error */);
+        }
+
+        let number_str = number_str.replace('_', "");
 
         // The check must be strict enough for a safe unwrap here
         Ok(i64::from_str_radix(&number_str, base).unwrap())

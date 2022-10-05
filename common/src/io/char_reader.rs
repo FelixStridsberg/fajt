@@ -13,7 +13,10 @@ where
     I: PeekRead<char, Error = Error>,
 {
     /// Read a string until `check` callback returns false or the end of the stream is reached.
-    pub fn read_while(&mut self, check: fn(&char) -> bool) -> Result<String, I::Error> {
+    pub fn read_while<F>(&mut self, check: F) -> Result<String, I::Error>
+    where
+        F: Fn(&char) -> bool,
+    {
         let mut result = String::new();
 
         while let Ok(c) = self.current() {
