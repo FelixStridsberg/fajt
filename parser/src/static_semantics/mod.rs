@@ -117,10 +117,12 @@ impl_trait!(
                     vec![ident.name.as_ref()]
                 }
                 BindingPattern::Array(_arr) => {
-                    todo!()
+                    // TODO
+                    vec![]
                 }
                 BindingPattern::Object(_obj) => {
-                    todo!()
+                    // TODO
+                    vec![]
                 }
             }
         }
