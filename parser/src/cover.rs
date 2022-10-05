@@ -4,7 +4,7 @@ use crate::{LexerErrorKind, Parser};
 use fajt_ast::Expr;
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
-use fajt_lexer::token::Token;
+use fajt_lexer::token::{Token, TokenValue};
 use fajt_lexer::token_matches;
 use fajt_lexer::LexerState;
 
@@ -64,6 +64,10 @@ where
                     if depth == 0 {
                         break;
                     }
+                }
+                token_matches!(ok: TokenValue::TemplateHead(_)) => {
+                    // Template strings requires internal lexer state, can't be read token by token.
+                    self.parse_template_literal_parts(&mut Vec::new())?;
                 }
                 Err(error) => match error.kind() {
                     LexerError(lexer_error) => {

@@ -65,6 +65,15 @@ where
             parts.push(TemplatePart::String(head_str));
         }
 
+        self.parse_template_literal_parts(&mut parts)?;
+
+        Ok(LitTemplate { parts })
+    }
+
+    pub(super) fn parse_template_literal_parts(
+        &mut self,
+        parts: &mut Vec<TemplatePart>,
+    ) -> Result<()> {
         loop {
             parts.push(TemplatePart::Expr(Box::new(self.parse_expr()?)));
             self.reader
@@ -87,7 +96,7 @@ where
             }
         }
 
-        Ok(LitTemplate { parts })
+        Ok(())
     }
 
     /// Parses the `NonSubstitutionTemplate` production.
