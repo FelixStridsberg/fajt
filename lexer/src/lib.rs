@@ -116,6 +116,7 @@ impl<'a> Lexer<'a> {
 
         let start = self.reader.position();
         let value = match current {
+            '/' if self.state.regex_allowed => self.read_regexp_literal(),
             // <op>=
             '/' | '*' | '%' | '+' | '-' | '|' | '^' | '&' | '<' | '>' | '='
                 if self.reader.peek().ok() == Some(&'=') =>
@@ -213,7 +214,6 @@ impl<'a> Lexer<'a> {
                 Ok('0'..='9') => self.read_number_literal(),
                 _ => produce!(self, 1, punct!(".")),
             },
-            '/' if self.state.regex_allowed => self.read_regexp_literal(),
             '/' => produce!(self, 1, punct!("/")),
             '0'..='9' => self.read_number_literal(),
             '"' | '\'' => self.read_string_literal(),

@@ -1,6 +1,6 @@
-use fajt_ast::Literal;
-use crate::{CodePoint, Lexer, TokenValue};
 use crate::error::Error;
+use crate::{CodePoint, Lexer, TokenValue};
+use fajt_ast::Literal;
 
 type Result<T> = std::result::Result<T, Error>;
 
@@ -32,16 +32,16 @@ impl<'a> Lexer<'a> {
 
     fn read_regexp_group_body(&mut self) -> Result<String> {
         let mut result = String::new();
-         loop {
-             let c = self.reader.consume()?;
-             result.push(c);
+        loop {
+            let c = self.reader.consume()?;
+            result.push(c);
 
-             match c {
-                 ']' => break,
-                 '\\' => result.push(self.reader.consume()?),
-                 _ => {}
-             }
-         }
+            match c {
+                ']' => break,
+                '\\' => result.push(self.reader.consume()?),
+                _ => {}
+            }
+        }
 
         Ok(result)
     }

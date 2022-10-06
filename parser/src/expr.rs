@@ -702,13 +702,12 @@ where
             token_matches!(@template-head) => self.parse_template_literal_expr()?,
             token_matches!(punct!("(")) => self.parse_cover_parenthesized_and_arrow_parameters()?,
             _ => {
-                // To avoid errors like "unexpected token `.`, expected identifier" as default
-                // errors, only parse the identifier if it may be a identifier in any context
-                // otherwise fall back to generic unexpected token.
                 if self.with_context(Context::default()).is_identifier() {
                     self.parse_identifier_reference()?
                 } else {
-                    return Err(Error::unexpected_token(self.consume()?));
+                    // This doesn't match any production, try to re-read as regexp.
+                    self.reader.reread_with_state(LexerState::regex_allowed())?;
+                    self.parse_regexp_literal()?
                 }
             }
         })
