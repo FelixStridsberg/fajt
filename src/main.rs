@@ -5,6 +5,7 @@ use fajt_parser::parse_program;
 use std::fs::read_to_string;
 
 struct Arguments {
+    check: bool,
     file_name: String,
     generator_context: Option<GeneratorContext>,
 }
@@ -18,6 +19,11 @@ fn main() {
         let mut stderr = std::io::stderr();
         let mut emitter = ErrorEmitter::new(&args.file_name, &source, &mut stderr);
         emitter.emit_error(&error).unwrap();
+        std::process::exit(1);
+    }
+
+    if args.check {
+        println!("Parsed successfully!");
         return;
     }
 
@@ -39,10 +45,12 @@ fn get_arguments() -> Arguments {
                 .value_name("format")
                 .possible_values(&["pretty", "minified"]),
         )
+        .arg(Arg::with_name("check").long("check").short("c"))
         .get_matches();
 
     let file_name = matches.value_of("file").expect("File argument required");
     let format = matches.value_of("format");
+    let check = matches.is_present("check");
 
     let generator_context = format.map(|format| {
         let mut context = GeneratorContext::new();
@@ -53,6 +61,7 @@ fn get_arguments() -> Arguments {
     });
 
     Arguments {
+        check,
         file_name: file_name.to_owned(),
         generator_context,
     }
