@@ -81,6 +81,10 @@ impl<'a> Lexer<'a> {
         })
     }
 
+    pub fn set_state(&mut self, state: LexerState) {
+        self.state = state;
+    }
+
     pub fn read_all(&mut self) -> Result<Vec<Token>> {
         let mut tokens = Vec::new();
 

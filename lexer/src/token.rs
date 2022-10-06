@@ -337,6 +337,13 @@ macro_rules! literal(
                 }
             )
         )
+    };
+    (regexp, $value:expr) => {
+         $crate::token::TokenValue::Literal(
+            fajt_ast::Literal::Regexp(
+                $value.to_owned(),
+            )
+        )
     }
 );
 

@@ -18,8 +18,12 @@
 /// ```
 #[macro_export]
 macro_rules! assert_lexer {
-    (input: $input:expr, output: [$(($token:expr, ($col1:expr, $col2:expr)),)+]) => {
+    ($(state: $state:expr,)? input: $input:expr, output: [$(($token:expr, ($col1:expr, $col2:expr)),)+]) => {
         let mut lexer = fajt_lexer::Lexer::new($input).expect("Could not create lexer, empty input?");
+        $(
+            lexer.set_state($state);
+        )?
+
         let tokens = lexer.read_all().unwrap();
 
         let mut expected = vec![$(fajt_lexer::token::Token::new($token, false, ($col1, $col2))),*];
