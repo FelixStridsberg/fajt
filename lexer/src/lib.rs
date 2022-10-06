@@ -461,6 +461,8 @@ impl<'a> Lexer<'a> {
     }
 
     fn read_number(&mut self, base: u32, check: fn(&char) -> bool) -> Result<i64> {
+        let span_start = self.reader.position();
+
         // All but base 10 have 2 char prefix: 0b, 0o, 0x
         if base != 10 {
             self.reader.consume()?;
@@ -469,7 +471,19 @@ impl<'a> Lexer<'a> {
 
         let number_str = self.reader.read_while(|c| check(c) || c == &'_')?;
         if number_str.contains("__") {
-            // TODO return Err(/* syntax error */);
+            let span_end = self.reader.position();
+            return Err(Error::syntax_error(
+                "number cannot contain multiple adjacent underscores".to_owned(),
+                (span_start, span_end),
+            ));
+        }
+
+        if number_str.ends_with('_') {
+            let span_end = self.reader.position();
+            return Err(Error::syntax_error(
+                "number cannot end with underscore".to_owned(),
+                (span_start, span_end),
+            ));
         }
 
         let number_str = number_str.replace('_', "");

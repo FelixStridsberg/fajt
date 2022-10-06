@@ -63,7 +63,7 @@ where
                 self.parse_arrow_function_expr()
             }
             _ => {
-                let start_token = self.current().cloned().unwrap();
+                let start_token = self.current().cloned()?;
 
                 let expr = self.parse_conditional_expr()?;
 

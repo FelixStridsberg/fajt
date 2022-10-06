@@ -1,5 +1,6 @@
 use crate::error::ErrorKind::{
-    ExpectedIdentifier, ForbiddenIdentifier, SyntaxError, UnexpectedIdent, UnexpectedToken,
+    EndOfStream, ExpectedIdentifier, ForbiddenIdentifier, SyntaxError, UnexpectedIdent,
+    UnexpectedToken,
 };
 use crate::LexerErrorKind;
 use fajt_ast::{Ident, Span};
@@ -26,16 +27,19 @@ pub struct Diagnostic {
 
 impl Error {
     pub(crate) fn lexer_error(error: LexerError) -> Self {
-        if error.kind() == &LexerErrorKind::EndOfStream {
-            return Error {
+        match &error.kind() {
+            LexerErrorKind::EndOfStream => Error {
                 span: Span::empty(),
-                kind: ErrorKind::EndOfStream,
-            };
-        }
-
-        Error {
-            span: error.span().clone(),
-            kind: ErrorKind::LexerError(error),
+                kind: EndOfStream,
+            },
+            LexerErrorKind::SyntaxError(error_msg) => Error {
+                span: error.span().clone(),
+                kind: SyntaxError(error_msg.clone()),
+            },
+            _ => Error {
+                span: error.span().clone(),
+                kind: ErrorKind::LexerError(error),
+            },
         }
     }
 
@@ -105,20 +109,20 @@ pub enum ErrorKind {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match &self.kind {
-            ErrorKind::EndOfStream => write!(f, "Syntax error: Unexpected end of input")?,
+            EndOfStream => write!(f, "Syntax error: Unexpected end of input")?,
             ErrorKind::LexerError(e) => write!(f, "Lexer error '{}'", e)?,
-            ErrorKind::SyntaxError(msg) => write!(f, "Syntax error: {}", msg)?,
-            ErrorKind::ExpectedIdentifier(token) | ErrorKind::UnexpectedToken(token, _) => {
+            SyntaxError(msg) => write!(f, "Syntax error: {}", msg)?,
+            ExpectedIdentifier(token) | UnexpectedToken(token, _) => {
                 if let Some(token_str) = expected_token_to_string(token) {
                     write!(f, "Syntax error: Unexpected token `{}`", token_str)?
                 } else {
                     write!(f, "Syntax error: Unexpected token")?
                 }
             }
-            ErrorKind::UnexpectedIdent(ident) => {
+            UnexpectedIdent(ident) => {
                 write!(f, "Syntax Error: Unexpected identifier `{}`", ident.name)?
             }
-            ErrorKind::ForbiddenIdentifier(identifier) => {
+            ForbiddenIdentifier(identifier) => {
                 write!(f, "Syntax error: Forbidden identifier `{}`", identifier)?
             }
         }

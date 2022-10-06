@@ -1,4 +1,4 @@
-use crate::error::ErrorKind::{ForbiddenIdentifier, UnrecognizedCodePoint};
+use crate::error::ErrorKind::{ForbiddenIdentifier, SyntaxError, UnrecognizedCodePoint};
 use crate::token::Keyword;
 use crate::{EndOfStream, InvalidOrUnexpectedToken, Token};
 use fajt_ast::Span;
@@ -19,6 +19,7 @@ pub enum ErrorKind {
     InvalidOrUnexpectedToken(Token),
     ForbiddenIdentifier(Keyword),
     UnrecognizedCodePoint(char),
+    SyntaxError(String),
     EndOfStream,
 }
 
@@ -41,6 +42,13 @@ impl Error {
         Error {
             span: span.into(),
             kind: UnrecognizedCodePoint(char),
+        }
+    }
+
+    pub fn syntax_error<S: Into<Span>>(error: String, span: S) -> Self {
+        Error {
+            span: span.into(),
+            kind: SyntaxError(error),
         }
     }
 
@@ -69,6 +77,9 @@ impl fmt::Display for Error {
             }
             UnrecognizedCodePoint(char) => {
                 write!(f, "Unknown code point {char}")
+            }
+            SyntaxError(error) => {
+                write!(f, "Syntax Error: {error}")
             }
         }
     }
