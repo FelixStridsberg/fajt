@@ -8,6 +8,7 @@ pub mod error;
 
 #[macro_use]
 pub mod token;
+mod regexp;
 
 use crate::code_point::CodePoint;
 use crate::error::Error;
@@ -373,21 +374,6 @@ impl<'a> Lexer<'a> {
                 result.push(c);
             }
         }
-    }
-
-    fn read_regexp_literal(&mut self) -> Result<TokenValue> {
-        let mut result = String::new();
-        let regexp_start = self.reader.consume()?;
-        debug_assert_eq!(regexp_start, '/');
-        result.push(regexp_start);
-
-        self.read_until_not_escaped('/', &mut result)?;
-        result.push('/');
-
-        let flags = self.reader.read_while(char::is_part_of_identifier)?;
-        result.push_str(&flags);
-
-        Ok(TokenValue::Literal(Literal::Regexp(result)))
     }
 
     /// Consumes from reader and push to `result` until an unescaped `delimiter` is reached.
