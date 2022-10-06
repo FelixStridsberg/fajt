@@ -1,12 +1,7 @@
-```js
+### Source
+```js parse:expr
 class { set setter(a, b) {} }
 ```
 
-```json
-{
-  "SyntaxError": [
-    "Setter must have exactly one formal parameter.",
-    "18:24"
-  ]
-}
-```
+### Output: error
+Setter must have exactly one formal parameter
