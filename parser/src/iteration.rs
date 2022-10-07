@@ -46,7 +46,7 @@ where
         self.consume_assert(&keyword!("while"))?;
         self.consume_assert(&punct!("("))?;
 
-        let test = self.parse_expr()?;
+        let test = self.with_context(self.context.with_in(true)).parse_expr()?;
 
         self.consume_assert(&punct!(")"))?;
 
