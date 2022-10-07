@@ -714,7 +714,7 @@ where
     }
 
     /// Parses the `RegularExpressionLiteral` production.
-    fn parse_regexp_literal(&mut self) -> Result<Expr> {
+    pub(super) fn parse_regexp_literal(&mut self) -> Result<Expr> {
         let regexp = self.parse_literal()?;
         debug_assert!(matches!(
             regexp,
