@@ -94,10 +94,12 @@ where
     fn parse_for(&mut self, span_start: usize, init: Option<ForInit>) -> Result<Stmt> {
         self.consume_assert(&punct!(";"))?;
 
-        let test = (!self.current_matches(&punct!(";"))).then_try(|| self.parse_expr())?;
+        let test = (!self.current_matches(&punct!(";")))
+            .then_try(|| self.with_context(self.context.with_in(true)).parse_expr())?;
         self.consume_assert(&punct!(";"))?;
 
-        let update = (!self.current_matches(&punct!(")"))).then_try(|| self.parse_expr())?;
+        let update = (!self.current_matches(&punct!(")")))
+            .then_try(|| self.with_context(self.context.with_in(true)).parse_expr())?;
         self.consume_assert(&punct!(")"))?;
 
         let body = self.parse_stmt()?;
