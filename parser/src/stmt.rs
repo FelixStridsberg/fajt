@@ -252,7 +252,7 @@ where
 
         self.consume_assert(&keyword!("if"))?;
         self.consume_assert(&punct!("("))?;
-        let condition = self.parse_expr()?;
+        let condition = self.with_context(self.context.with_in(true)).parse_expr()?;
         self.consume_assert(&punct!(")"))?;
 
         let consequent = self.parse_stmt()?;
