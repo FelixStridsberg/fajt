@@ -1,6 +1,5 @@
-use crate::error::ErrorKind::LexerError;
-use crate::error::Result;
-use crate::{LexerErrorKind, Parser};
+use crate::error::{ErrorKind, Result};
+use crate::Parser;
 use fajt_ast::Expr;
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
@@ -69,17 +68,11 @@ where
                     // Template strings requires internal lexer state, can't be read token by token.
                     self.parse_template_literal_parts(&mut Vec::new())?;
                 }
-                Err(error) => match error.kind() {
-                    LexerError(lexer_error) => {
-                        if !matches!(
-                            lexer_error.kind(),
-                            &LexerErrorKind::UnrecognizedCodePoint(_)
-                        ) {
-                            return Err(error);
-                        }
+                Err(error) => {
+                    if error.kind() == &ErrorKind::EndOfStream {
+                        return Err(error);
                     }
-                    _ => return Err(error),
-                },
+                }
                 _ => {}
             }
         }
