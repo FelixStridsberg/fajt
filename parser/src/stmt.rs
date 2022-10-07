@@ -344,7 +344,7 @@ where
         self.consume_assert(&keyword!("switch"))?;
         self.consume_assert(&punct!("("))?;
 
-        let discriminant = self.parse_expr()?;
+        let discriminant = self.with_context(self.context.with_in(true)).parse_expr()?;
         self.consume_assert(&punct!(")"))?;
 
         let cases = self.parse_case_block()?;
@@ -380,7 +380,7 @@ where
     fn parse_case_clause(&mut self) -> Result<SwitchCase> {
         let span_start = self.position();
         let test = if self.maybe_consume(&keyword!("case"))? {
-            let test = self.parse_expr()?;
+            let test = self.with_context(self.context.with_in(true)).parse_expr()?;
             self.consume_assert(&punct!(":"))?;
             Some(test)
         } else {
