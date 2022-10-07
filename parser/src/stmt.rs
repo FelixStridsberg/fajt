@@ -225,7 +225,7 @@ where
             _ => {}
         }
 
-        let argument = self.parse_expr()?;
+        let argument = self.with_context(self.context.with_in(true)).parse_expr()?;
         self.maybe_consume(&punct!(";"))?;
 
         let span = self.span_from(span_start);
