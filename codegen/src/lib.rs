@@ -539,9 +539,11 @@ impl Visitor for CodeGenerator<'_> {
         self.parenthesize('(', false, |s| {
             node.init.traverse(s);
             s.char(';');
+            node.test.is_some().then(|| s.space());
 
             node.test.traverse(s);
             s.char(';');
+            node.update.is_some().then(|| s.space());
 
             node.update.traverse(s);
         });
@@ -562,7 +564,10 @@ impl Visitor for CodeGenerator<'_> {
 
         self.parenthesize('(', false, |s| {
             node.left.traverse(s);
+
             s.string("of");
+            s.space();
+
             node.right.traverse(s);
         });
 
@@ -584,7 +589,10 @@ impl Visitor for CodeGenerator<'_> {
 
         self.parenthesize('(', false, |s| {
             node.left.traverse(s);
+
             s.string("in");
+            s.space();
+
             node.right.traverse(s);
         });
 

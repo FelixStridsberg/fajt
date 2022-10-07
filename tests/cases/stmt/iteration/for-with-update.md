@@ -1,6 +1,6 @@
 ### Source
 ```js parse:stmt
-for (;;a) ;
+for (;; a) ;
 ```
 
 ### Output: minified
@@ -12,18 +12,18 @@ for(;;a);
 ```json
 {
   "For": {
-    "span": "0:11",
+    "span": "0:12",
     "init": null,
     "test": null,
     "update": {
       "IdentRef": {
-        "span": "7:8",
+        "span": "8:9",
         "name": "a"
       }
     },
     "body": {
       "Empty": {
-        "span": "10:11"
+        "span": "11:12"
       }
     }
   }
