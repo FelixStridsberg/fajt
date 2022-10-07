@@ -195,7 +195,8 @@ where
         let span_start = self.position();
         self.consume_assert(&keyword!("return"))?;
 
-        let argument = (!self.stmt_ended()).then_try(|| self.parse_expr())?;
+        let argument = (!self.stmt_ended())
+            .then_try(|| self.with_context(self.context.with_in(true)).parse_expr())?;
         self.maybe_consume(&punct!(";"))?;
 
         let span = self.span_from(span_start);
