@@ -1,7 +1,6 @@
 ### Source
 ```js parse:stmt
-if ("a" in b)
-    ;
+throw "a" in b
 ```
 
 ### Output: minified

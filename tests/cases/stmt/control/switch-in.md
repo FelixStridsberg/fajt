@@ -1,7 +1,8 @@
 ### Source
 ```js parse:stmt
-if ("a" in b)
-    ;
+switch ("a" in b) {
+    case "c" in d:
+}
 ```
 
 ### Output: minified

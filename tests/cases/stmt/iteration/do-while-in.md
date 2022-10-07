@@ -1,8 +1,7 @@
 ### Source
 ```js parse:stmt
-if ("a" in b)
-    ;
+do a;
+while ("b" in c)
 ```
 
-### Output: minified
 ### Output: ast

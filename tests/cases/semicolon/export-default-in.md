@@ -1,7 +1,6 @@
 ### Source
-```js parse:stmt
-if ("a" in b)
-    ;
+```js check-format:no
+export default ("a" in b);
 ```
 
 ### Output: minified
