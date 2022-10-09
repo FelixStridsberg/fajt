@@ -46,9 +46,8 @@ where
                     rest = self.parse_rest_binding_ident(BracketClose)?;
                     break;
                 }
-                _ if self.peek_matches(&punct!(":")) => {
+                token if token_matches!(token, punct!("[")) || self.peek_matches(&punct!(":")) => {
                     props.push(ObjectBindingProp::Named(self.parse_named_binding()?));
-
                     self.consume_list_delimiter(&punct!("}"))?;
                 }
                 _ => {
