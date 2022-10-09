@@ -13,3 +13,4 @@ fajt_macros = { path = "../macros" }
 
 bitflags = "1.0"
 serde = {version = "1.0", features = ["derive"]}
+unicode-id = "0.3.3"

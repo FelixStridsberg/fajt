@@ -1,6 +1,5 @@
 #[macro_use]
 extern crate bitflags;
-
 extern crate fajt_macros;
 
 mod code_point;
@@ -221,7 +220,10 @@ impl<'a> Lexer<'a> {
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
             _ => {
                 let c = self.reader.consume()?;
-                return Err(Error::unrecognized_code_point(c, (start, start + 1)));
+                return Err(Error::unrecognized_code_point(
+                    c,
+                    (start, start + c.len_utf8()),
+                ));
             }
         }?;
         let end = self.reader.position();

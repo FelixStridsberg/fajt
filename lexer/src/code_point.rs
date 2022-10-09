@@ -1,3 +1,5 @@
+use unicode_id::UnicodeID;
+
 /// ECMA Script code points are unicode characters.
 pub trait CodePoint {
     fn is_ecma_whitespace(&self) -> bool;
@@ -22,14 +24,12 @@ impl CodePoint for char {
     }
 
     fn is_start_of_identifier(&self) -> bool {
-        // TODO all unicode ID_Start is allowed
         // TODO unicode escape sequence is allowed (ecma-262: 11.8.4)
-        matches!(self, 'A'..='Z' | 'a'..='z' | '_' | '$')
+        matches!(self,  'A'..='Z' | 'a'..='z' | '_' | '$') || self.is_id_start()
     }
 
     fn is_part_of_identifier(&self) -> bool {
-        // TODO all unicode ID_Continue is allowed
         // TODO unicode escape sequence is allowed (ecma-262: 11.8.4)
-        matches!(self, '0'..='9' | 'A'..='Z' | 'a'..='z' | '_' | '$')
+        matches!(self, '0'..='9' | 'A'..='Z' | 'a'..='z' | '_' | '$') || self.is_id_continue()
     }
 }

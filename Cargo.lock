@@ -97,6 +97,7 @@ dependencies = [
  "fajt_common",
  "fajt_macros",
  "serde",
+ "unicode-id",
 ]
 
 [[package]]
@@ -251,6 +252,12 @@ checksum = "d326610f408c7a4eb6f51c37c330e496b08506c9457c9d34287ecc38809fb060"
 dependencies = [
  "unicode-width",
 ]
+
+[[package]]
+name = "unicode-id"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d70b6494226b36008c8366c288d77190b3fad2eb4c10533139c1c1f461127f1a"
 
 [[package]]
 name = "unicode-width"
