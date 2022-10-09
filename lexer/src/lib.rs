@@ -424,6 +424,11 @@ impl<'a> Lexer<'a> {
 
         if let Ok(&'.') = self.reader.current() {
             self.reader.consume()?;
+            if !matches!(self.reader.current(), Ok('0'..='9')) {
+                // Decimals without decimal part: 1.
+                return Ok(literal!(decimal, integral as f64));
+            }
+
             let fraction = self.read_number(10, |c| c.is_numeric())?;
             let digits = (fraction as f64).log10().floor() + 1.0;
             let float = integral as f64 + (fraction as f64 / 10_i32.pow(digits as u32) as f64);

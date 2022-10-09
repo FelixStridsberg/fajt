@@ -23,11 +23,21 @@ fn number_decimal() {
 }
 
 #[test]
-fn number_decimal_no_zero() {
+fn number_decimal_no_integral() {
     assert_lexer!(
         input: ".5",
         output: [
             (literal!(decimal, 0.5), (0, 2)),
+        ]
+    );
+}
+
+#[test]
+fn number_decimal_no_decimals() {
+    assert_lexer!(
+        input: "1.",
+        output: [
+            (literal!(decimal, 1.0), (0, 2)),
         ]
     );
 }
