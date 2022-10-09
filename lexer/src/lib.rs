@@ -443,8 +443,15 @@ impl<'a> Lexer<'a> {
     fn read_number_exponent(&mut self) -> Result<Option<i32>> {
         if let Ok(&'e') = self.reader.current() {
             self.reader.consume()?;
+            let sign = if matches!(self.reader.current(), Ok('-')) {
+                self.reader.consume()?;
+                -1
+            } else {
+                1
+            };
+
             let exponent = self.read_number(10, |c| c.is_numeric())?;
-            Ok(Some(exponent as i32))
+            Ok(Some(sign * exponent as i32))
         } else {
             Ok(None)
         }

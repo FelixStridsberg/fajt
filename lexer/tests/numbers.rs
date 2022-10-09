@@ -71,3 +71,13 @@ fn number_scientific() {
         ]
     );
 }
+
+#[test]
+fn number_scientific_negative_exponent() {
+    assert_lexer!(
+        input: "123e-10",
+        output: [
+            (literal!(scientific, 123.0, -10), (0, 7)),
+        ]
+    );
+}
