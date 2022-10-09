@@ -1,34 +1,56 @@
 ### Source
 ```js parse:expr
-test ? "a" in b : alternate
+("a" in b) ? "c" in d : "e" in f
 ```
 
 ### Output: minified
 ```js
-test?"a"in b:alternate
+("a"in b)?"c"in d:"e"in f
 ```
 
 ### Output: ast
 ```json
 {
   "Conditional": {
-    "span": "0:27",
+    "span": "0:32",
     "condition": {
-      "IdentRef": {
-        "span": "0:4",
-        "name": "test"
+      "Parenthesized": {
+        "span": "0:10",
+        "expression": {
+          "Binary": {
+            "span": "1:9",
+            "operator": "In",
+            "left": {
+              "Literal": {
+                "span": "1:4",
+                "literal": {
+                  "String": {
+                    "value": "a",
+                    "delimiter": "\""
+                  }
+                }
+              }
+            },
+            "right": {
+              "IdentRef": {
+                "span": "8:9",
+                "name": "b"
+              }
+            }
+          }
+        }
       }
     },
     "consequent": {
       "Binary": {
-        "span": "7:15",
+        "span": "13:21",
         "operator": "In",
         "left": {
           "Literal": {
-            "span": "7:10",
+            "span": "13:16",
             "literal": {
               "String": {
-                "value": "a",
+                "value": "c",
                 "delimiter": "\""
               }
             }
@@ -36,16 +58,33 @@ test?"a"in b:alternate
         },
         "right": {
           "IdentRef": {
-            "span": "14:15",
-            "name": "b"
+            "span": "20:21",
+            "name": "d"
           }
         }
       }
     },
     "alternate": {
-      "IdentRef": {
-        "span": "18:27",
-        "name": "alternate"
+      "Binary": {
+        "span": "24:32",
+        "operator": "In",
+        "left": {
+          "Literal": {
+            "span": "24:27",
+            "literal": {
+              "String": {
+                "value": "e",
+                "delimiter": "\""
+              }
+            }
+          }
+        },
+        "right": {
+          "IdentRef": {
+            "span": "31:32",
+            "name": "f"
+          }
+        }
       }
     }
   }

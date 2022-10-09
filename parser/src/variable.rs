@@ -15,7 +15,12 @@ where
         let token = self.consume()?;
         let span_start = token.span.start;
 
-        let declarations = self.parse_variable_declarations()?;
+        let declarations = if kind == VariableKind::Var {
+            self.with_context(self.context.with_in(true))
+                .parse_variable_declarations()?
+        } else {
+            self.parse_variable_declarations()?
+        };
         self.maybe_consume(&punct!(";"))?;
 
         let span = self.span_from(span_start);

@@ -174,7 +174,7 @@ where
         let span_start = self.position();
 
         self.consume_assert(&punct!("("))?;
-        let expr = self.parse_expr()?;
+        let expr = self.with_context(self.context.with_in(true)).parse_expr()?;
         self.consume_assert(&punct!(")"))?;
 
         let span = self.span_from(span_start);
