@@ -441,7 +441,7 @@ impl<'a> Lexer<'a> {
     }
 
     fn read_number_exponent(&mut self) -> Result<Option<i32>> {
-        if let Ok(&'e') = self.reader.current() {
+        if matches!(self.reader.current(), Ok(&'e' | &'E')) {
             self.reader.consume()?;
             let sign = if matches!(self.reader.current(), Ok('-')) {
                 self.reader.consume()?;

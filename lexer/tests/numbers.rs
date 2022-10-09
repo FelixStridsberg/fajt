@@ -43,9 +43,29 @@ fn number_hex() {
 }
 
 #[test]
+fn number_hex_uppercase() {
+    assert_lexer!(
+        input: "0XFF08",
+        output: [
+            (literal!(hex, 0xff08), (0, 6)),
+        ]
+    );
+}
+
+#[test]
 fn number_octal() {
     assert_lexer!(
         input: "0o347",
+        output: [
+            (literal!(octal, 0o347), (0, 5)),
+        ]
+    );
+}
+
+#[test]
+fn number_octal_uppercase() {
+    assert_lexer!(
+        input: "0O347",
         output: [
             (literal!(octal, 0o347), (0, 5)),
         ]
@@ -63,9 +83,29 @@ fn number_binary() {
 }
 
 #[test]
+fn number_binary_uppercase() {
+    assert_lexer!(
+        input: "0B10111100",
+        output: [
+            (literal!(binary, 0b10111100), (0, 10)),
+        ]
+    );
+}
+
+#[test]
 fn number_scientific() {
     assert_lexer!(
         input: "123e10",
+        output: [
+            (literal!(scientific, 123.0, 10), (0, 6)),
+        ]
+    );
+}
+
+#[test]
+fn number_scientific_uppercase() {
+    assert_lexer!(
+        input: "123E10",
         output: [
             (literal!(scientific, 123.0, 10), (0, 6)),
         ]
