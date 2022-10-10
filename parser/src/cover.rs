@@ -40,16 +40,11 @@ where
         let start_token = self.current()?.clone();
         match self.parse_covered_call_expression() {
             Ok(expr) if !self.current_matches(&punct!("=>")) => Ok(expr),
-            result => {
+            Ok(_) => {
                 self.reader.rewind_to(&start_token)?;
-                let arrow_function = self.parse_async_arrow_function_expr();
-                if result.is_err() && arrow_function.is_err() {
-                    // TODO make real error handling
-                    println!("Error during cover case:\n{:?}", result.unwrap_err());
-                }
-
-                arrow_function
+                self.parse_async_arrow_function_expr()
             }
+            error => error,
         }
     }
 
