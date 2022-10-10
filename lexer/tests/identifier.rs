@@ -21,3 +21,23 @@ fn non_ascii() {
         ]
     );
 }
+
+#[test]
+fn unicode_escaped_hex() {
+    assert_lexer!(
+        input: r#"\u0069dent"#,
+        output: [
+            (Identifier("ident".to_owned()), (0, 10)),
+        ]
+    );
+}
+
+#[test]
+fn unicode_escaped_codepoint() {
+    assert_lexer!(
+        input: r#"\u{0069}dent"#,
+        output: [
+            (Identifier("ident".to_owned()), (0, 12)),
+        ]
+    );
+}
