@@ -38,7 +38,6 @@ generate_fold_and_visit! {
         }
 
         Expr: (enter: enter_expr, exit: exit_expr) {
-            ArrayBinding
             ArrowFunction
             Assignment
             Await

@@ -15,12 +15,21 @@
     "span": "0:15",
     "operator": "Assign",
     "left": {
-      "ArrayBinding": {
+      "Literal": {
         "span": "0:11",
-        "elements": [],
-        "rest": {
-          "span": "5:9",
-          "name": "rest"
+        "literal": {
+          "Array": {
+            "elements": [
+              {
+                "Spread": {
+                  "IdentRef": {
+                    "span": "5:9",
+                    "name": "rest"
+                  }
+                }
+              }
+            ]
+          }
         }
       }
     },

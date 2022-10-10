@@ -1,9 +1,7 @@
 use crate::error::Result;
 use crate::static_semantics::ExprSemantics;
 use crate::{Context, Error, Parser};
-use fajt_ast::{
-    assignment_op, AssignmentOperator, BindingPattern, ExprParenthesized, Spanned, UnaryOperator,
-};
+use fajt_ast::{assignment_op, AssignmentOperator, ExprParenthesized, Spanned, UnaryOperator};
 use fajt_ast::{unary_op, ExprTaggedTemplate};
 use fajt_ast::{update_op, UpdateOperator};
 use fajt_ast::{
@@ -72,7 +70,7 @@ where
                     expr.early_errors_left_hand_side_expr(&self.context, &operator)?;
 
                     // This is not strictly necessary, but gives an easier to use api where the left
-                    // side of an assignment is always a binding pattern, and never object or array
+                    // side of an assignment is always an object binding pattern, and never object
                     // literal.
                     let left = self.reread_literal_as_binding_pattern(start_token, expr)?;
 
@@ -94,18 +92,13 @@ where
     ) -> Result<Expr> {
         match expr {
             Expr::Literal(ExprLiteral {
-                literal: Literal::Object(_) | Literal::Array(_),
+                literal: Literal::Object(_),
                 ..
             }) => {
                 self.reader.rewind_to(&start_token)?;
-                let binding_pattern = self.parse_binding_pattern()?;
+                let object = self.parse_object_binding_pattern()?;
                 self.consume()?; // skip operator, already read by parent.
-
-                match binding_pattern {
-                    BindingPattern::Array(array) => Ok(Expr::ArrayBinding(array)),
-                    BindingPattern::Object(object) => Ok(Expr::ObjectBinding(object)),
-                    BindingPattern::Ident(_) => unreachable!(),
-                }
+                Ok(Expr::ObjectBinding(object))
             }
             _ => Ok(expr),
         }

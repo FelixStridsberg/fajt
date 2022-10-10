@@ -5,7 +5,7 @@
 
 ### Output: minified
 ```js
-[,]=a
+[]=a
 ```
 
 ### Output: ast
@@ -15,12 +15,15 @@
     "span": "0:9",
     "operator": "Assign",
     "left": {
-      "ArrayBinding": {
+      "Literal": {
         "span": "0:5",
-        "elements": [
-          null
-        ],
-        "rest": null
+        "literal": {
+          "Array": {
+            "elements": [
+              "Elision"
+            ]
+          }
+        }
       }
     },
     "right": {
