@@ -1,3 +1,4 @@
+use crate::error::ErrorKind::UnexpectedToken;
 use crate::error::Result;
 use crate::Parser;
 use fajt_ast::Expr;
@@ -14,19 +15,23 @@ where
     /// Parses and resolves the `CoverParenthesizedExpressionAndArrowParameterList` production.
     pub(super) fn parse_cover_parenthesized_and_arrow_parameters(&mut self) -> Result<Expr> {
         let start_token = self.current()?.clone();
+
+        // A parenthesized expression cannot be empty, it must be arrow function.
+        if self.peek_matches(&punct!(")")) {
+            return self.parse_arrow_function_expr();
+        }
+
         match self.parse_parenthesized_expr() {
             Ok(expr) if !self.current_matches(&punct!("=>")) => Ok(expr),
-            result => {
+            Ok(_) => {
                 self.reader.rewind_to(&start_token)?;
-
-                let arrow_function = self.parse_arrow_function_expr();
-                if result.is_err() && arrow_function.is_err() {
-                    // TODO make real error handling
-                    println!("Error during cover case:\n{:?}", result.unwrap_err());
-                }
-
-                arrow_function
+                self.parse_arrow_function_expr()
             }
+            Err(error) if matches!(error.kind(), &UnexpectedToken(punct!("..."), _)) => {
+                self.reader.rewind_to(&start_token)?;
+                self.parse_arrow_function_expr()
+            }
+            error => error,
         }
     }
 
