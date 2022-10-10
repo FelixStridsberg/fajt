@@ -61,46 +61,17 @@ where
                 self.parse_arrow_function_expr()
             }
             _ => {
-                let start_token = self.current().cloned()?;
-
                 let expr = self.parse_conditional_expr()?;
 
                 let assignment_operator = self.parse_optional_assignment_operator();
                 if let Some(operator) = assignment_operator {
                     expr.early_errors_left_hand_side_expr(&self.context, &operator)?;
-
-                    // This is not strictly necessary, but gives an easier to use api where the left
-                    // side of an assignment is always an object binding pattern, and never object
-                    // literal.
-                    let left = self.reread_literal_as_binding_pattern(start_token, expr)?;
-
-                    self.parse_assignment(span_start, left, operator)
+                    self.parse_assignment(span_start, expr, operator)
                 } else {
                     // TODO validate object literal don't contain initializers, then it's not an object literal.
                     Ok(expr)
                 }
             }
-        }
-    }
-
-    /// If the `expr` is an object or array literal, the stream is rewound to start_token and expect
-    /// to reread an object or array binding pattern.
-    fn reread_literal_as_binding_pattern(
-        &mut self,
-        start_token: Token,
-        expr: Expr,
-    ) -> Result<Expr> {
-        match expr {
-            Expr::Literal(ExprLiteral {
-                literal: Literal::Object(_),
-                ..
-            }) => {
-                self.reader.rewind_to(&start_token)?;
-                let object = self.parse_object_binding_pattern()?;
-                self.consume()?; // skip operator, already read by parent.
-                Ok(Expr::ObjectBinding(object))
-            }
-            _ => Ok(expr),
         }
     }
 

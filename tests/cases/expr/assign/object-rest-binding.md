@@ -15,12 +15,21 @@
     "span": "0:12",
     "operator": "Assign",
     "left": {
-      "ObjectBinding": {
+      "Literal": {
         "span": "0:8",
-        "props": [],
-        "rest": {
-          "span": "5:6",
-          "name": "a"
+        "literal": {
+          "Object": {
+            "props": [
+              {
+                "Spread": {
+                  "IdentRef": {
+                    "span": "5:6",
+                    "name": "a"
+                  }
+                }
+              }
+            ]
+          }
         }
       }
     },

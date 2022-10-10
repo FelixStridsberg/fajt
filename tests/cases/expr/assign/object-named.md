@@ -15,32 +15,31 @@
     "span": "0:12",
     "operator": "Assign",
     "left": {
-      "ObjectBinding": {
+      "Literal": {
         "span": "0:8",
-        "props": [
-          {
-            "Named": {
-              "span": "2:6",
-              "property": {
-                "Ident": {
-                  "span": "2:3",
-                  "name": "a"
-                }
-              },
-              "binding": {
-                "span": "5:6",
-                "pattern": {
-                  "Ident": {
-                    "span": "5:6",
-                    "name": "b"
+        "literal": {
+          "Object": {
+            "props": [
+              {
+                "Named": {
+                  "span": "2:6",
+                  "name": {
+                    "Ident": {
+                      "span": "2:3",
+                      "name": "a"
+                    }
+                  },
+                  "value": {
+                    "IdentRef": {
+                      "span": "5:6",
+                      "name": "b"
+                    }
                   }
-                },
-                "initializer": null
+                }
               }
-            }
+            ]
           }
-        ],
-        "rest": null
+        }
       }
     },
     "right": {
