@@ -61,3 +61,13 @@ fn unicode_escaped_codepoint_ident_middle() {
         ]
     );
 }
+
+#[test]
+fn unicode_escaped_codepoint_short() {
+    assert_lexer!(
+        input: r#"\u{65}"#,
+        output: [
+            (Identifier("i".to_owned()), (0, 12)),
+        ]
+    );
+}
