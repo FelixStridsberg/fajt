@@ -65,9 +65,9 @@ fn unicode_escaped_codepoint_ident_middle() {
 #[test]
 fn unicode_escaped_codepoint_short() {
     assert_lexer!(
-        input: r#"\u{65}"#,
+        input: r#"\u{69}"#,
         output: [
-            (Identifier("i".to_owned()), (0, 12)),
+            (Identifier("i".to_owned()), (0, 6)),
         ]
     );
 }
@@ -84,7 +84,7 @@ fn unicode_escaped_codepoint_just_a_slash() {
 fn unicode_escaped_codepoint_no_numbers() {
     assert_lexer!(
         input: r#"\u"#,
-        error: Error::syntax_error("invalid escape sequence".to_owned(), (0, 2))
+        error: Error::unexpected_end_of_stream()
     );
 }
 

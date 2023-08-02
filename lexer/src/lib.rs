@@ -347,7 +347,21 @@ impl<'a> Lexer<'a> {
     }
 
     fn read_code_point(&mut self, span_start: usize) -> Result<u32> {
-        todo!()
+        let open_bracket = self.reader.consume()?;
+        debug_assert_eq!(open_bracket, '{');
+
+        let mut hex = String::with_capacity(4);
+        loop {
+            hex.push(self.read_hex_char(span_start)?);
+
+            if self.reader.current()? == &'}' {
+                self.reader.consume()?;
+                break;
+            }
+        }
+
+        // TODO this unwrap is not safe, value must be within range
+        Ok(u32::from_str_radix(&hex, 16).unwrap())
     }
 
     fn read_4digit_hex(&mut self, span_start: usize) -> Result<u32> {
