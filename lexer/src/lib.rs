@@ -218,6 +218,8 @@ impl<'a> Lexer<'a> {
             '"' | '\'' => self.read_string_literal(),
             '`' => self.read_template_literal_head(),
             c if c.is_start_of_identifier() => self.read_identifier_or_keyword(),
+            // Handles identifiers and keywords that start with unicode escape sequence.
+            '\\' => self.read_identifier_or_keyword(),
             _ => {
                 let c = self.reader.consume()?;
                 return Err(Error::unrecognized_code_point(
@@ -295,7 +297,7 @@ impl<'a> Lexer<'a> {
     }
 
     fn read_identifier_or_keyword(&mut self) -> Result<TokenValue> {
-        let word = self.reader.read_while(char::is_part_of_identifier)?;
+        let word = self.read_identifier_or_keyword_expand_unicode()?;
         let value = if let Ok(keyword) = word.parse() {
             TokenValue::Keyword(keyword)
         } else {
@@ -303,6 +305,22 @@ impl<'a> Lexer<'a> {
         };
 
         Ok(value)
+    }
+
+    fn read_identifier_or_keyword_expand_unicode(&mut self) -> Result<String> {
+        let mut word = String::new();
+
+        loop {
+            match self.reader.current() {
+                Ok(c) if c.is_part_of_identifier() => {
+                    word.push(self.reader.consume()?);
+                },
+                Ok('\\') => todo!("Unicode"),
+                _ => break,
+            }
+        }
+
+        Ok(word)
     }
 
     fn read_string_literal(&mut self) -> Result<TokenValue> {
