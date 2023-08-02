@@ -1,6 +1,6 @@
 mod lib;
 
-use fajt_lexer::token::TokenValue::Identifier;
+use fajt_lexer::{error::Error, token::TokenValue::Identifier};
 
 #[test]
 fn ascii() {
@@ -69,5 +69,45 @@ fn unicode_escaped_codepoint_short() {
         output: [
             (Identifier("i".to_owned()), (0, 12)),
         ]
+    );
+}
+
+#[test]
+fn unicode_escaped_codepoint_just_a_slash() {
+    assert_lexer!(
+        input: r#"\"#,
+        error: Error::unexpected_end_of_stream()
+    );
+}
+
+#[test]
+fn unicode_escaped_codepoint_no_numbers() {
+    assert_lexer!(
+        input: r#"\u"#,
+        error: Error::syntax_error("invalid escape sequence".to_owned(), (0, 2))
+    );
+}
+
+#[test]
+fn unicode_escaped_codepoint_not_a_u() {
+    assert_lexer!(
+        input: r#"\a0065"#,
+        error: Error::syntax_error("invalid escape sequence".to_owned(), (0, 2))
+    );
+}
+
+#[test]
+fn unicode_escaped_hex_invalid_hex_value() {
+    assert_lexer!(
+        input: r#"id\u00g6nt"#,
+        error: Error::syntax_error("invalid escape sequence".to_owned(), (2, 7))
+    );
+}
+
+#[test]
+fn unicode_escaped_codepoint_invalid_hex_value() {
+    assert_lexer!(
+        input: r#"id\u{00g6}nt"#,
+        error: Error::syntax_error("invalid escape sequence".to_owned(), (2, 8))
     );
 }
