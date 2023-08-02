@@ -314,13 +314,64 @@ impl<'a> Lexer<'a> {
             match self.reader.current() {
                 Ok(c) if c.is_part_of_identifier() => {
                     word.push(self.reader.consume()?);
-                },
-                Ok('\\') => todo!("Unicode"),
+                }
+                Ok('\\') => word.push(self.read_unicode_escape_sequence()?),
                 _ => break,
             }
         }
 
         Ok(word)
+    }
+
+    fn read_unicode_escape_sequence(&mut self) -> Result<char> {
+        let span_start = self.reader.position();
+
+        let slash = self.reader.consume()?;
+        debug_assert_eq!(slash, '\\');
+
+        if self.reader.consume()? != 'u' {
+            let span_end = self.reader.position();
+            return Err(Error::syntax_error(
+                "invalid escape sequence".to_owned(),
+                (span_start, span_end),
+            ));
+        }
+
+        let code_point = match self.reader.current()? {
+            '{' => self.read_code_point(span_start)?,
+            _ => self.read_4digit_hex(span_start)?,
+        };
+
+        // TODO handle invalid code points
+        Ok(char::try_from(code_point).unwrap())
+    }
+
+    fn read_code_point(&mut self, span_start: usize) -> Result<u32> {
+        todo!()
+    }
+
+    fn read_4digit_hex(&mut self, span_start: usize) -> Result<u32> {
+        let mut hex = String::with_capacity(4);
+        hex.push(self.read_hex_char(span_start)?);
+        hex.push(self.read_hex_char(span_start)?);
+        hex.push(self.read_hex_char(span_start)?);
+        hex.push(self.read_hex_char(span_start)?);
+
+        // This unwrap is safe because we know the string contains only 4 hex chars.
+        Ok(u32::from_str_radix(&hex, 16).unwrap())
+    }
+
+    fn read_hex_char(&mut self, span_start: usize) -> Result<char> {
+        match self.reader.consume()? {
+            c @ ('0'..='9' | 'a'..='f') => Ok(c),
+            _ => {
+                let span_end = self.reader.position();
+                return Err(Error::syntax_error(
+                    "invalid escape sequence".to_owned(),
+                    (span_start, span_end),
+                ));
+            }
+        }
     }
 
     fn read_string_literal(&mut self) -> Result<TokenValue> {
