@@ -23,7 +23,7 @@ fn non_ascii() {
 }
 
 #[test]
-fn unicode_escaped_hex() {
+fn unicode_escaped_hex_ident_start() {
     assert_lexer!(
         input: r#"\u0069dent"#,
         output: [
@@ -33,9 +33,29 @@ fn unicode_escaped_hex() {
 }
 
 #[test]
-fn unicode_escaped_codepoint() {
+fn unicode_escaped_codepoint_ident_start() {
     assert_lexer!(
         input: r#"\u{0069}dent"#,
+        output: [
+            (Identifier("ident".to_owned()), (0, 12)),
+        ]
+    );
+}
+
+#[test]
+fn unicode_escaped_hex_ident_middle() {
+    assert_lexer!(
+        input: r#"id\u0065nt"#,
+        output: [
+            (Identifier("ident".to_owned()), (0, 10)),
+        ]
+    );
+}
+
+#[test]
+fn unicode_escaped_codepoint_ident_middle() {
+    assert_lexer!(
+        input: r#"id\u{0065}nt"#,
         output: [
             (Identifier("ident".to_owned()), (0, 12)),
         ]
