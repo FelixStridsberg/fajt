@@ -109,7 +109,7 @@ impl<'a> Lexer<'a> {
             return self.read_template_literal_middle_or_tail();
         }
 
-        let new_line = self.skip_comments_and_white_spaces()? | self.override_first_on_line;
+        let first_on_line = self.skip_comments_and_white_spaces()? | self.override_first_on_line;
         let current = self.reader.current()?;
 
         self.override_first_on_line = false;
@@ -207,7 +207,7 @@ impl<'a> Lexer<'a> {
                         produce!(self, 2, punct!("..."))
                     } else {
                         let end = self.reader.position();
-                        let error_token = Token::new(punct!("."), new_line, (start, end));
+                        let error_token = Token::new(punct!("."), first_on_line, (start, end));
                         return Err(Error::invalid_or_unexpected_token(error_token));
                     }
                 }
@@ -231,7 +231,7 @@ impl<'a> Lexer<'a> {
         }?;
         let end = self.reader.position();
 
-        Ok(Token::new(value, new_line, (start, end)))
+        Ok(Token::new(value, first_on_line, (start, end)))
     }
 
     /// Skips all consecutive comments and white spaces, returns true if a new line was skipped.
