@@ -111,3 +111,35 @@ fn unicode_escaped_codepoint_invalid_hex_value() {
         error: Error::syntax_error("invalid escape sequence".to_owned(), (2, 8))
     );
 }
+
+#[test]
+fn unicode_escaped_codepoint_invalid_id_start_hex() {
+    assert_lexer!(
+        input: r#"\u0030foo"#,
+        error: Error::syntax_error("invalid escape sequence".to_owned(), (0, 6))
+    );
+}
+
+#[test]
+fn unicode_escaped_codepoint_invalid_id_start() {
+    assert_lexer!(
+        input: r#"\u{30}foo"#,
+        error: Error::syntax_error("invalid escape sequence".to_owned(), (0, 6))
+    );
+}
+
+#[test]
+fn unicode_escaped_codepoint_invalid_id_continue_hex() {
+    assert_lexer!(
+        input: r#"foo\u0020"#,
+        error: Error::syntax_error("invalid escape sequence".to_owned(), (3, 9))
+    );
+}
+
+#[test]
+fn unicode_escaped_codepoint_invalid_id_continue() {
+    assert_lexer!(
+        input: r#"foo\u{20}"#,
+        error: Error::syntax_error("invalid escape sequence".to_owned(), (3, 9))
+    );
+}

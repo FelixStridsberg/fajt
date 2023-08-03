@@ -315,7 +315,25 @@ impl<'a> Lexer<'a> {
                 Ok(c) if c.is_part_of_identifier() => {
                     word.push(self.reader.consume()?);
                 }
-                Ok('\\') => word.push(self.read_unicode_escape_sequence()?),
+                Ok('\\') => {
+                    let span_start = self.reader.position();
+                    let char = self.read_unicode_escape_sequence()?;
+                    let valid = if word.is_empty() {
+                        char.is_start_of_identifier()
+                    } else {
+                        char.is_start_of_identifier()
+                    };
+
+                    if !valid {
+                        let span_end = self.reader.position();
+                        return Err(Error::syntax_error(
+                            "invalid escape sequence".to_owned(),
+                            (span_start, span_end),
+                        ));
+                    }
+
+                    word.push(char);
+                }
                 _ => break,
             }
         }
@@ -342,7 +360,6 @@ impl<'a> Lexer<'a> {
             _ => self.read_4digit_hex(span_start)?,
         };
 
-        // TODO handle invalid code points
         Ok(char::try_from(code_point).unwrap())
     }
 
