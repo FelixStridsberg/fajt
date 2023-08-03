@@ -377,8 +377,16 @@ impl<'a> Lexer<'a> {
             }
         }
 
-        // TODO this unwrap is not safe, value must be within range
-        Ok(u32::from_str_radix(&hex, 16).unwrap())
+        match u32::from_str_radix(&hex, 16) {
+            Ok(code_point) if code_point <= 0x10FFFF => Ok(code_point),
+            _ => {
+                let span_end = self.reader.position();
+                Err(Error::syntax_error(
+                    "invalid escape sequence".to_owned(),
+                    (span_start, span_end),
+                ))
+            }
+        }
     }
 
     fn read_4digit_hex(&mut self, span_start: usize) -> Result<u32> {

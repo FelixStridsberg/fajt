@@ -160,3 +160,11 @@ fn unicode_escaped_codepoint_invalid_id_continue() {
         error: Error::syntax_error("invalid escape sequence".to_owned(), (3, 9))
     );
 }
+
+#[test]
+fn unicode_escaped_codepoint_overflow_int() {
+    assert_lexer!(
+        input: r#"\u{fffffffffffffffffffff}"#,
+        error: Error::syntax_error("invalid escape sequence".to_owned(), (0, 25))
+    );
+}
