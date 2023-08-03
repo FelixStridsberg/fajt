@@ -107,6 +107,6 @@ fn create_identifier(name: &str, extension: &str) -> syn::Ident {
         .to_owned()
         .replace(['-', '.'], "_")
         .replace('/', "__");
-    name.retain(|c| c.is_ascii_alphanumeric());
+    name.retain(|c| c.is_ascii_alphanumeric() || c == '_');
     format_ident!("{}", name)
 }
