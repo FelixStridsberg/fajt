@@ -32,7 +32,6 @@ fn unicode_escape_sequence_hex_ident_start() {
     );
 }
 
-
 #[test]
 fn unicode_escape_sequence_hex_ident_middle() {
     assert_lexer!(
@@ -127,7 +126,6 @@ fn unicode_escape_sequence_code_point_short() {
     );
 }
 
-
 #[test]
 fn unicode_escape_sequence_code_point_invalid_character() {
     assert_lexer!(
@@ -211,4 +209,3 @@ fn unicode_escape_sequence_code_point_not_a_u() {
         error: Error::syntax_error("invalid escape sequence".to_owned(), (0, 2))
     );
 }
-
