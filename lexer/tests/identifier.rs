@@ -63,6 +63,23 @@ fn unicode_escaped_codepoint_ident_middle() {
 }
 
 #[test]
+fn unicode_escaped_mixed_case() {
+    assert_lexer!(
+        input: r#"f\u004F\u004f"#,
+        output: [
+            (Identifier("fOO".to_owned()), (0, 13)),
+        ]
+    );
+    assert_lexer!(
+        input: r#"f\u{4F}\u{4f}"#,
+        output: [
+            (Identifier("fOO".to_owned()), (0, 13)),
+        ]
+    );
+}
+
+
+#[test]
 fn unicode_escaped_codepoint_short() {
     assert_lexer!(
         input: r#"\u{69}"#,

@@ -394,7 +394,7 @@ impl<'a> Lexer<'a> {
 
     fn read_hex_char(&mut self, span_start: usize) -> Result<char> {
         match self.reader.consume()? {
-            c @ ('0'..='9' | 'a'..='f') => Ok(c),
+            c @ ('0'..='9' | 'a'..='f' | 'A'..='F') => Ok(c),
             _ => {
                 let span_end = self.reader.position();
                 return Err(Error::syntax_error(
