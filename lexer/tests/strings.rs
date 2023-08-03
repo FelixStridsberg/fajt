@@ -1,4 +1,4 @@
-mod lib;
+mod utils;
 
 use fajt_lexer::literal;
 

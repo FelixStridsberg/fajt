@@ -231,6 +231,7 @@ impl<'a> Lexer<'a> {
 
         let token = Token::new(value, self.first_on_line, (start, end));
         self.first_on_line = false;
+
         Ok(token)
     }
 
