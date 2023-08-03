@@ -5,7 +5,10 @@ use crate::Lexer;
 type Result<T> = std::result::Result<T, Error>;
 
 impl<'a> Lexer<'a> {
-    pub(super) fn read_and_expand_unicode_escape_sequence(&mut self, is_start: bool) -> Result<char> {
+    pub(super) fn read_and_expand_unicode_escape_sequence(
+        &mut self,
+        is_start: bool,
+    ) -> Result<char> {
         let span_start = self.reader.position();
         let char = self.read_unicode_escape_sequence()?;
         let valid = if is_start {
@@ -17,9 +20,9 @@ impl<'a> Lexer<'a> {
         if !valid {
             let span_end = self.reader.position();
             return Err(Error::syntax_error(
-                    "invalid escape sequence".to_owned(),
-                    (span_start, span_end),
-                    ));
+                "invalid escape sequence".to_owned(),
+                (span_start, span_end),
+            ));
         }
 
         Ok(char)
@@ -89,10 +92,10 @@ impl<'a> Lexer<'a> {
             c @ ('0'..='9' | 'a'..='f' | 'A'..='F') => Ok(c),
             _ => {
                 let span_end = self.reader.position();
-                return Err(Error::syntax_error(
+                Err(Error::syntax_error(
                     "invalid escape sequence".to_owned(),
                     (span_start, span_end),
-                ));
+                ))
             }
         }
     }

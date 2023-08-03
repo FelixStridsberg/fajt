@@ -90,7 +90,7 @@ impl<'a> CodeGenerator<'a> {
         }
     }
 
-    fn comma_separated<I>(&mut self, items: &mut Vec<I>)
+    fn comma_separated<I>(&mut self, items: &mut [I])
     where
         I: Traverse,
     {

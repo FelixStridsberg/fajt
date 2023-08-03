@@ -105,11 +105,8 @@ fn to_file(entry: &DirEntry, relative_path: &str) -> File {
 fn create_identifier(name: &str, extension: &str) -> syn::Ident {
     let mut name = name[0..name.len() - (extension.len() + 1)]
         .to_owned()
-        .replace('-', "_")
-        .replace('.', "_")
+        .replace(['-', '.'], "_")
         .replace('/', "__");
-    name.retain(|c| {
-        ('a'..'z').contains(&c) || ('A'..'Z').contains(&c) || ('0'..'9').contains(&c) || c == '_'
-    });
+    name.retain(|c| c.is_ascii_alphanumeric());
     format_ident!("{}", name)
 }
