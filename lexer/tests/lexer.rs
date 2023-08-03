@@ -30,7 +30,7 @@ fn seek_from_start() {
             Token {
                 span: Span::new(8, 14),
                 value: TokenValue::Identifier("ident2".to_string()),
-                first_on_line: false,
+                first_on_line: true,
             }
         )
     );
@@ -50,7 +50,7 @@ fn seek_from_end() {
             Token {
                 span: Span::new(16, 22),
                 value: TokenValue::Identifier("ident3".to_string()),
-                first_on_line: false,
+                first_on_line: true,
             }
         )
     );

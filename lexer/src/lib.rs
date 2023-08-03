@@ -68,7 +68,7 @@ pub struct Lexer<'a> {
     data: &'a str,
     state: LexerState,
     reader: PeekReader<char, CharIndices<'a>>,
-    override_first_on_line: bool,
+    first_on_line: bool,
 }
 
 impl<'a> Lexer<'a> {
@@ -78,7 +78,7 @@ impl<'a> Lexer<'a> {
             data,
             state: LexerState::default(),
             reader,
-            override_first_on_line: false,
+            first_on_line: true,
         })
     }
 
@@ -109,10 +109,8 @@ impl<'a> Lexer<'a> {
             return self.read_template_literal_middle_or_tail();
         }
 
-        let first_on_line = self.skip_comments_and_white_spaces()? | self.override_first_on_line;
+        self.skip_comments_and_white_spaces()?;
         let current = self.reader.current()?;
-
-        self.override_first_on_line = false;
 
         let start = self.reader.position();
         let value = match current {
@@ -207,7 +205,7 @@ impl<'a> Lexer<'a> {
                         produce!(self, 2, punct!("..."))
                     } else {
                         let end = self.reader.position();
-                        let error_token = Token::new(punct!("."), first_on_line, (start, end));
+                        let error_token = Token::new(punct!("."), self.first_on_line, (start, end));
                         return Err(Error::invalid_or_unexpected_token(error_token));
                     }
                 }
@@ -231,33 +229,31 @@ impl<'a> Lexer<'a> {
         }?;
         let end = self.reader.position();
 
-        Ok(Token::new(value, first_on_line, (start, end)))
+        let token = Token::new(value, self.first_on_line, (start, end));
+        self.first_on_line = false;
+        Ok(token)
     }
 
-    /// Skips all consecutive comments and white spaces, returns true if a new line was skipped.
-    fn skip_comments_and_white_spaces(&mut self) -> Result<bool> {
-        let mut skipped_new_line = false;
-
+    fn skip_comments_and_white_spaces(&mut self) -> Result<()> {
         loop {
-            skipped_new_line = self.skip_whitespaces()? || skipped_new_line;
+            self.skip_whitespaces()?;
 
             match self.reader.current() {
                 Ok('/') if self.reader.peek().ok() == Some(&'/') => {
                     self.skip_single_line_comment();
                     // Single line comments never includes the ending new line. If at end of file it
                     // doesn't matter if we lie and say there was a new line.
-                    skipped_new_line = true;
+                    self.first_on_line = true;
                 }
                 Ok('/') if self.reader.peek().ok() == Some(&'*') => {
-                    skipped_new_line = self.skip_multi_line_comment()? || skipped_new_line;
+                    self.skip_multi_line_comment()?;
                 }
                 _ => break,
             }
         }
 
-        skipped_new_line = self.skip_whitespaces()? || skipped_new_line;
-
-        Ok(skipped_new_line)
+        self.skip_whitespaces()?;
+        Ok(())
     }
 
     fn skip_single_line_comment(&mut self) {
@@ -274,11 +270,10 @@ impl<'a> Lexer<'a> {
     }
 
     /// Skips multi line comment, returns true if a new line was skipped.
-    fn skip_multi_line_comment(&mut self) -> Result<bool> {
+    fn skip_multi_line_comment(&mut self) -> Result<()> {
         self.reader.consume()?;
         self.reader.consume()?;
 
-        let mut contains_line_break = false;
         let mut content = String::new();
         loop {
             if matches!(self.reader.current(), Ok('*')) && self.reader.peek().ok() == Some(&'/') {
@@ -289,12 +284,12 @@ impl<'a> Lexer<'a> {
 
             let char = self.reader.consume()?;
             if char.is_ecma_line_terminator() {
-                contains_line_break = true;
+                self.first_on_line = true;
             }
             content.push(char);
         }
 
-        Ok(contains_line_break)
+        Ok(())
     }
 
     fn read_identifier_or_keyword(&mut self) -> Result<TokenValue> {
@@ -516,12 +511,10 @@ impl<'a> Lexer<'a> {
         Ok(i64::from_str_radix(&number_str, base).unwrap())
     }
 
-    fn skip_whitespaces(&mut self) -> Result<bool> {
-        let mut line_terminator = self.reader.position() == 0;
-
+    fn skip_whitespaces(&mut self) -> Result<()> {
         loop {
             if self.reader.current()?.is_ecma_line_terminator() {
-                line_terminator = true;
+                self.first_on_line = true;
                 self.reader.consume()?;
                 continue;
             }
@@ -534,7 +527,7 @@ impl<'a> Lexer<'a> {
             break;
         }
 
-        Ok(line_terminator)
+        Ok(())
     }
 }
 
@@ -561,6 +554,8 @@ impl LexerState {
 }
 
 impl Seek for Lexer<'_> {
+    /// Seeks to `pos`.
+    /// The first_on_line must be manually corrected by caller.
     fn seek(&mut self, pos: SeekFrom) -> std::io::Result<u64> {
         let pos = match pos {
             SeekFrom::Start(offset) => offset,
@@ -570,6 +565,7 @@ impl Seek for Lexer<'_> {
 
         let offset = pos as usize;
         self.reader = PeekReader::with_offset(self.data[offset..].char_indices(), offset).unwrap();
+        self.first_on_line = true;
 
         Ok(pos)
     }
@@ -582,7 +578,7 @@ impl ReReadWithState<Token> for Lexer<'_> {
     /// Rewind reader to before `token`, `token` must have been previously read from this lexer.
     fn rewind_before(&mut self, token: &Token) {
         self.seek(SeekFrom::Start(token.span.start as u64)).unwrap();
-        self.override_first_on_line = token.first_on_line;
+        self.first_on_line = token.first_on_line;
     }
 
     /// Read one token with a different lexer state.
