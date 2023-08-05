@@ -209,3 +209,39 @@ fn unicode_escape_sequence_code_point_not_a_u() {
         error: Error::syntax_error("invalid escape sequence".to_owned(), (0, 2))
     );
 }
+
+#[test]
+fn zwnj_ident_continue() {
+    assert_lexer!(
+        input: "id\u{200c}ent",
+        output: [
+            (Identifier("id\u{200c}ent".to_owned()), (0, 8)),
+        ]
+    );
+}
+
+#[test]
+fn zwnj_ident_start() {
+    assert_lexer!(
+        input: "\u{200c}ident",
+        error: Error::unrecognized_code_point('\u{200c}', (0, 3))
+    );
+}
+
+#[test]
+fn zwj_ident_continue() {
+    assert_lexer!(
+        input: "id\u{200d}ent",
+        output: [
+            (Identifier("id\u{200d}ent".to_owned()), (0, 8)),
+        ]
+    );
+}
+
+#[test]
+fn zwj_ident_start() {
+    assert_lexer!(
+        input: "\u{200d}ident",
+        error: Error::unrecognized_code_point('\u{200d}', (0, 3))
+    );
+}
