@@ -16,7 +16,7 @@ members = [
 ]
 
 [dependencies]
-clap = "2.33"
+clap = "4.3"
 fajt_parser = { path = "./parser" }
 fajt_codegen = { path = "./codegen" }
 

@@ -1,4 +1,4 @@
-use clap::{App, Arg};
+use clap::{Arg, Command};
 use fajt_codegen::{generate_code, GeneratorContext};
 use fajt_parser::error::emitter::ErrorEmitter;
 use fajt_parser::parse_program;
@@ -36,21 +36,23 @@ fn main() {
 }
 
 fn get_arguments() -> Arguments {
-    let matches = App::new("fajt")
-        .arg(Arg::with_name("file").required(true))
+    let matches = Command::new("fajt")
+        .arg(Arg::new("file").required(true))
         .arg(
-            Arg::with_name("format")
+            Arg::new("format")
                 .long("format")
-                .short("f")
+                .short('f')
                 .value_name("format")
-                .possible_values(&["pretty", "minified"]),
+                .value_names(&["pretty", "minified"]),
         )
-        .arg(Arg::with_name("check").long("check").short("c"))
+        .arg(Arg::new("check").long("check").short('c').num_args(0))
         .get_matches();
 
-    let file_name = matches.value_of("file").expect("File argument required");
-    let format = matches.value_of("format");
-    let check = matches.is_present("check");
+    let file_name = matches
+        .get_one::<String>("file")
+        .expect("File argument required");
+    let format = matches.get_one::<String>("format");
+    let check = matches.contains_id("check");
 
     let generator_context = format.map(|format| {
         let mut context = GeneratorContext::new();
