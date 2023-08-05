@@ -81,6 +81,11 @@ where
                 break;
             }
 
+            if self.current_matches(&punct!(";")) {
+                self.consume()?;
+                continue;
+            }
+
             class_body.push(self.parse_class_element(has_super)?);
         }
 
