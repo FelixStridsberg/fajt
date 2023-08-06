@@ -204,7 +204,7 @@ where
     fn parse_optional_variable_kind(&mut self) -> Result<Option<VariableKind>> {
         let variable_kind = match self.current()? {
             token_matches!(keyword!("var")) => Some(VariableKind::Var),
-            token_matches!(keyword!("let")) => Some(VariableKind::Let),
+            token_matches!(keyword!("let")) if self.peek_matches_lexical_binding() => Some(VariableKind::Let),
             token_matches!(keyword!("const")) => Some(VariableKind::Const),
             _ => None,
         };

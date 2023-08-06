@@ -17,7 +17,7 @@ for(let in b);
       "Expr": {
         "IdentRef": {
           "span": "5:8",
-          "name": "a"
+          "name": "let"
         }
       }
     },
