@@ -710,6 +710,8 @@ where
     }
 
     fn expr_ended(&self) -> bool {
-        self.stmt_ended() || self.current_matches(&punct!(")"))
+        self.stmt_ended()
+            || self.current_matches(&punct!(")"))
+            || self.current_matches(&punct!("]"))
     }
 }
