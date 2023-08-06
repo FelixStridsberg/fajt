@@ -46,6 +46,12 @@ where
         Ok(declarations)
     }
 
+    pub(super) fn peek_matches_lexical_binding(&self) -> bool {
+        return self.peek_matches(&punct!("{"))
+            || self.peek_matches(&punct!("["))
+            || self.peek_is_identifier();
+    }
+
     /// Parses the `VariableDeclaration` or `LexicalBinding` production.
     fn parse_variable_declaration(&mut self) -> Result<VariableDeclaration> {
         let span_start = self.position();

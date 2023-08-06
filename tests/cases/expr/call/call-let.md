@@ -1,33 +1,39 @@
 ### Source
 ```js
-let()
+let();
 ```
 
 ### Output: minified
+TODO the semicolon should not be there
 ```js
-let()
+let();
 ```
 
 ### Output: ast
 ```json
 {
   "Script": {
-    "span": "0:5",
+    "span": "0:6",
     "directives": [],
     "body": [
       {
-        "Call": {
-          "span": "0:5",
-          "callee": {
-            "Expr": {
-              "IdentRef": {
-                "span": "0:3",
-                "name": "let"
-              }
+        "Expr": {
+          "span": "0:6",
+          "expr": {
+            "Call": {
+              "span": "0:5",
+              "callee": {
+                "Expr": {
+                  "IdentRef": {
+                    "span": "0:3",
+                    "name": "let"
+                  }
+                }
+              },
+              "arguments_span": "3:5",
+              "arguments": []
             }
-          },
-          "arguments_span": "3:5",
-          "arguments": []
+          }
         }
       }
     ]

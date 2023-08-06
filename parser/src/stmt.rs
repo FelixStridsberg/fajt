@@ -38,7 +38,9 @@ where
             token_matches!(punct!("{")) => self.parse_block_stmt()?,
             token_matches!(keyword!("var")) => self.parse_variable_stmt(VariableKind::Var)?,
             token_matches!(keyword!("const")) => self.parse_variable_stmt(VariableKind::Const)?,
-            token_matches!(keyword!("let")) => self.parse_variable_stmt(VariableKind::Let)?,
+            token_matches!(keyword!("let")) if self.peek_matches_lexical_binding() => {
+                self.parse_variable_stmt(VariableKind::Let)?
+            }
             token_matches!(keyword!("if")) => self.parse_if_stmt()?,
             token_matches!(keyword!("break")) => self.parse_break_stmt()?,
             token_matches!(keyword!("continue")) => self.parse_continue_stmt()?,
