@@ -1,49 +1,46 @@
 ### Source
-```js parse:stmt
-class cls {
-    static() {}
+```js parse:expr
+class {
+    static static() {}
 }
 ```
 
 ### Output: minified
 ```js
-class cls{static(){}}
+class{static static(){}}
 ```
 
 ### Output: ast
 ```json
 {
-  "ClassDecl": {
-    "span": "0:29",
-    "identifier": {
-      "span": "6:9",
-      "name": "cls"
-    },
+  "Class": {
+    "span": "0:32",
+    "identifier": null,
     "super_class": null,
     "body": [
       {
         "Method": {
-          "span": "16:27",
+          "span": "19:30",
           "name": {
             "Ident": {
-              "span": "16:22",
+              "span": "19:25",
               "name": "static"
             }
           },
           "kind": "Method",
           "parameters": {
-            "span": "22:24",
+            "span": "25:27",
             "bindings": [],
             "rest": null
           },
           "body": {
-            "span": "25:27",
+            "span": "28:30",
             "directives": [],
             "statements": []
           },
           "generator": false,
           "asynchronous": false,
-          "is_static": false
+          "is_static": true
         }
       }
     ]

@@ -15,8 +15,9 @@ where
 {
     /// Parses the `MethodDefinition` production.
     pub(super) fn parse_method_definition(&mut self) -> Result<MethodDefinition> {
-        let is_static =
-            self.context.static_method_allowed && self.maybe_consume(&keyword!("static"))?;
+        let is_static = self.context.static_method_allowed
+            && !self.peek_matches(&punct!("("))
+            && self.maybe_consume(&keyword!("static"))?;
 
         match self.current()? {
             token_matches!(punct!("*")) => self.parse_generator_method(is_static),
