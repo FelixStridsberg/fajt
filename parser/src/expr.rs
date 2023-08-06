@@ -154,7 +154,7 @@ where
         let span_start = self.position();
         self.consume_assert(&keyword!("yield"))?;
 
-        if self.is_end() || self.stmt_ended() {
+        if self.is_end() || self.expr_ended() {
             let span = self.span_from(span_start);
             return Ok(ExprYield {
                 span,
@@ -707,5 +707,9 @@ where
     pub(super) fn parse_initializer(&mut self) -> Result<Expr> {
         self.consume_assert(&punct!("="))?;
         self.parse_assignment_expr()
+    }
+
+    fn expr_ended(&self) -> bool {
+        self.stmt_ended() || self.current_matches(&punct!(")"))
     }
 }
