@@ -2,7 +2,7 @@ use crate::error::Result;
 use crate::{Error, Parser, ThenTry};
 use fajt_ast::{
     ArrayBinding, BindingElement, BindingPattern, NamedBinding, ObjectBinding,
-    ObjectBindingProp, SingleNameBinding, Span,
+    ObjectBindingProp, SingleNameBinding, Span, Spanned
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::token::Punctuator::{BraceClose, BracketClose};
@@ -167,16 +167,16 @@ where
     fn parse_rest_binding_ident(&mut self, expected_end: Punctuator) -> Result<Option<BindingPattern>> {
         let dots = self.consume_assert(&punct!("..."))?;
 
-        let ident = self.parse_identifier()?;
+        let pattern = self.parse_binding_pattern()?;
         let end_token = self.consume()?;
 
         if let TokenValue::Punctuator(p) = end_token.value {
             if p == expected_end {
-                return Ok(Some(BindingPattern::Ident(ident)));
+                return Ok(Some(pattern));
             }
         }
 
-        let span = Span::new(dots.span.start, ident.span.end);
+        let span = Span::new(dots.span.start, pattern.span().end);
         Err(Error::syntax_error(
             "Rest element must be last element".to_owned(),
             span,
