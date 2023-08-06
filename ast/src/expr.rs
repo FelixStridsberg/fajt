@@ -1,6 +1,6 @@
 use crate::binding::ObjectBinding;
 use crate::class::ExprClass;
-use crate::literal::*;
+use crate::{literal::*, PropertyName};
 use crate::{Body, FormalParameters, Ident, Span};
 use fajt_macros::FromString;
 
@@ -8,6 +8,7 @@ ast_mapping! {
     pub enum Expr {
         ArrowFunction(ExprArrowFunction),
         Assignment(ExprAssignment),
+        AssignmentPattern(AssignmentPattern),
         Await(ExprAwait),
         Binary(ExprBinary),
         Call(ExprCall),
@@ -20,6 +21,7 @@ ast_mapping! {
         Member(ExprMember),
         MetaProperty(ExprMetaProperty),
         New(ExprNew),
+        // DEPRECATED: Use `AssignmentPattern` instead.
         ObjectBinding(ObjectBinding),
         OptionalCall(ExprOptionalCall),
         OptionalMember(ExprOptionalMember),
@@ -444,5 +446,59 @@ ast_struct! {
         pub span: Span,
         pub callee: Box<Expr>,
         pub template: LitTemplate,
+    }
+}
+
+ast_mapping! {
+    pub enum AssignmentPattern {
+        Array(ArrayAssignmentPattern),
+        Object(ObjectAssignmentPattern),
+    }
+}
+
+ast_struct! {
+    pub struct ArrayAssignmentPattern {
+        pub span: Span,
+        pub elements: Vec<Option<AssignmentElement>>,
+        pub rest: Option<Box<Expr>>,
+    }
+}
+
+ast_struct! {
+    pub struct AssignmentElement {
+        pub span: Span,
+        pub target: Box<Expr>,
+        pub initializer: Option<Box<Expr>>,
+    }
+}
+
+ast_struct! {
+    pub struct ObjectAssignmentPattern {
+        pub span: Span,
+        pub props: Vec<AssignmentProp>,
+        pub rest: Option<Box<Expr>>,
+    }
+}
+
+ast_node! {
+    pub enum AssignmentProp {
+        Single(SingleNameProp),
+        Named(NamedProp)
+    }
+}
+
+ast_struct! {
+    pub struct SingleNameProp {
+        pub span: Span,
+        pub ident: Ident,
+        pub initializer: Option<Box<Expr>>,
+    }
+}
+
+ast_struct! {
+    pub struct NamedProp {
+        pub span: Span,
+        pub property: PropertyName,
+        pub value: Box<Expr>,
     }
 }
