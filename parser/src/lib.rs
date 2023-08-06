@@ -122,6 +122,7 @@ impl Context {
     /// Resets all production parameters.
     fn reset_parameters(&self) -> Self {
         Context {
+            in_method: self.in_method,
             super_call_allowed: self.super_call_allowed,
             static_method_allowed: self.static_method_allowed,
             ..Context::default()
