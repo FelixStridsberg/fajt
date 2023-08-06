@@ -119,6 +119,15 @@ impl Context {
     modifier!(with_super_call_allowed: super_call_allowed);
     modifier!(with_static_method_allowed: static_method_allowed);
 
+    /// Resets all production parameters.
+    fn reset_parameters(&self) -> Self {
+        Context {
+            super_call_allowed: self.super_call_allowed,
+            static_method_allowed: self.static_method_allowed,
+            ..Context::default()
+        }
+    }
+
     fn keyword_context(&self) -> KeywordContext {
         let mut keyword_context = KeywordContext::empty();
         if self.is_await {
