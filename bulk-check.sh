@@ -21,9 +21,7 @@ if [ -z "$EXPECTED_EXIT_CODE" ]; then
   exit 1
 fi
 
-if [ ! -f "$FAJT" ]; then
-  (cd $ROOT && cargo build)
-fi
+(cd $ROOT && cargo build)
 
 FAILED=0
 PASSED=0
