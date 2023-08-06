@@ -38,8 +38,10 @@ class{method([...rest]){}}
                     "span": "19:30",
                     "elements": [],
                     "rest": {
-                      "span": "24:28",
-                      "name": "rest"
+                      "Ident": {
+                        "span": "24:28",
+                        "name": "rest"
+                      }
                     }
                   }
                 },

@@ -49,8 +49,10 @@ class{method({a,...rest}){}}
                       }
                     ],
                     "rest": {
-                      "span": "27:31",
-                      "name": "rest"
+                      "Ident": {
+                        "span": "27:31",
+                        "name": "rest"
+                      }
                     }
                   }
                 },

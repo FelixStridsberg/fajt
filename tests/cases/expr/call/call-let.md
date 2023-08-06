@@ -5,6 +5,7 @@ let();
 
 ### Output: minified
 TODO the semicolon should not be there
+
 ```js
 let();
 ```

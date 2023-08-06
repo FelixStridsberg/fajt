@@ -33,8 +33,10 @@ var[yield,...yield]=c;
               }
             ],
             "rest": {
-              "span": "16:21",
-              "name": "yield"
+              "Ident": {
+                "span": "16:21",
+                "name": "yield"
+              }
             }
           }
         },

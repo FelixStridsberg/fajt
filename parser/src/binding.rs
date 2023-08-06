@@ -1,7 +1,7 @@
 use crate::error::Result;
 use crate::{Error, Parser, ThenTry};
 use fajt_ast::{
-    ArrayBinding, BindingElement, BindingPattern, Ident, NamedBinding, ObjectBinding,
+    ArrayBinding, BindingElement, BindingPattern, NamedBinding, ObjectBinding,
     ObjectBindingProp, SingleNameBinding, Span,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
@@ -43,7 +43,7 @@ where
                     break;
                 }
                 token_matches!(punct!("...")) => {
-                    rest = self.parse_rest_binding_ident(BracketClose)?;
+                    rest = self.parse_rest_binding_ident(BracketClose)?.map(Box::new);
                     break;
                 }
                 token if token_matches!(token, punct!("[")) || self.peek_matches(&punct!(":")) => {
@@ -113,7 +113,7 @@ where
                     elements.push(None);
                 }
                 token_matches!(punct!("...")) => {
-                    rest = self.parse_rest_binding_ident(BraceClose)?;
+                    rest = self.parse_rest_binding_ident(BraceClose)?.map(Box::new);
                     break;
                 }
                 _ if self.is_binding_element()? => {
@@ -164,7 +164,7 @@ where
 
     /// Parses the `BindingIdentifier` production.
     /// This also consumes the expected end punctuator.
-    fn parse_rest_binding_ident(&mut self, expected_end: Punctuator) -> Result<Option<Ident>> {
+    fn parse_rest_binding_ident(&mut self, expected_end: Punctuator) -> Result<Option<BindingPattern>> {
         let dots = self.consume_assert(&punct!("..."))?;
 
         let ident = self.parse_identifier()?;
@@ -172,7 +172,7 @@ where
 
         if let TokenValue::Punctuator(p) = end_token.value {
             if p == expected_end {
-                return Ok(Some(ident));
+                return Ok(Some(BindingPattern::Ident(ident)));
             }
         }
 

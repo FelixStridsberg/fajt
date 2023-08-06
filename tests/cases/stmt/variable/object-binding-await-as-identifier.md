@@ -33,8 +33,10 @@ var{await,...await}=c;
               }
             ],
             "rest": {
-              "span": "16:21",
-              "name": "await"
+              "Ident": {
+                "span": "16:21",
+                "name": "await"
+              }
             }
           }
         },

@@ -47,8 +47,10 @@
                           }
                         ],
                         "rest": {
-                          "span": "17:21",
-                          "name": "rest"
+                          "Ident": {
+                            "span": "17:21",
+                            "name": "rest"
+                          }
                         }
                       }
                     },

@@ -36,8 +36,10 @@
                         "span": "9:20",
                         "elements": [],
                         "rest": {
-                          "span": "14:18",
-                          "name": "rest"
+                          "Ident": {
+                            "span": "14:18",
+                            "name": "rest"
+                          }
                         }
                       }
                     },

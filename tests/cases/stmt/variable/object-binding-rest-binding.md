@@ -22,8 +22,10 @@ var{...rest}=c;
             "span": "4:15",
             "props": [],
             "rest": {
-              "span": "9:13",
-              "name": "rest"
+              "Ident": {
+                "span": "9:13",
+                "name": "rest"
+              }
             }
           }
         },

@@ -22,8 +22,10 @@ var[...a]=b;
             "span": "4:12",
             "elements": [],
             "rest": {
-              "span": "9:10",
-              "name": "a"
+              "Ident": {
+                "span": "9:10",
+                "name": "a"
+              }
             }
           }
         },

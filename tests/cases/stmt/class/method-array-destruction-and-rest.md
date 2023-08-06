@@ -52,8 +52,10 @@ class cls{method([a,...rest]){}}
                       }
                     ],
                     "rest": {
-                      "span": "31:35",
-                      "name": "rest"
+                      "Ident": {
+                        "span": "31:35",
+                        "name": "rest"
+                      }
                     }
                   }
                 },

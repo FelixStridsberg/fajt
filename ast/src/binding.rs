@@ -12,7 +12,7 @@ ast_struct! {
     pub struct ArrayBinding {
         pub span: Span,
         pub elements: Vec<Option<BindingElement>>,
-        pub rest: Option<Ident>,
+        pub rest: Option<Box<BindingPattern>>,
     }
 }
 
@@ -20,7 +20,7 @@ ast_struct! {
     pub struct ObjectBinding {
         pub span: Span,
         pub props: Vec<ObjectBindingProp>,
-        pub rest: Option<Ident>,
+        pub rest: Option<Box<BindingPattern>>,
     }
 }
 
