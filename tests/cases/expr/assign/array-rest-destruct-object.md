@@ -15,37 +15,32 @@
     "span": "0:19",
     "operator": "Assign",
     "left": {
-      "Literal": {
-        "span": "0:15",
-        "literal": {
-          "Array": {
-            "elements": [
-              {
-                "Spread": {
-                  "Literal": {
-                    "span": "5:13",
-                    "literal": {
-                      "Object": {
-                        "props": [
-                          {
-                            "IdentRef": {
-                              "span": "7:8",
-                              "name": "a"
-                            }
-                          },
-                          {
-                            "IdentRef": {
-                              "span": "10:11",
-                              "name": "b"
-                            }
-                          }
-                        ]
+      "AssignmentPattern": {
+        "Array": {
+          "span": "0:15",
+          "elements": [],
+          "rest": {
+            "Literal": {
+              "span": "5:13",
+              "literal": {
+                "Object": {
+                  "props": [
+                    {
+                      "IdentRef": {
+                        "span": "7:8",
+                        "name": "a"
+                      }
+                    },
+                    {
+                      "IdentRef": {
+                        "span": "10:11",
+                        "name": "b"
                       }
                     }
-                  }
+                  ]
                 }
               }
-            ]
+            }
           }
         }
       }

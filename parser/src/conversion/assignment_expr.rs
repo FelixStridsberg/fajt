@@ -1,7 +1,8 @@
 use crate::error::{Error, Result};
 use fajt_ast::{
-    AssignmentPattern, AssignmentProp, Expr, ExprLiteral, LitObject, Literal, NamedAssignmentProp,
-    ObjectAssignmentPattern, PropertyDefinition, SingleNameAssignmentProp, Span, Spanned,
+    ArrayAssignmentPattern, ArrayElement, AssignmentElement, AssignmentPattern, AssignmentProp,
+    Expr, ExprLiteral, LitArray, LitObject, Literal, NamedAssignmentProp, ObjectAssignmentPattern,
+    PropertyDefinition, SingleNameAssignmentProp, Span, Spanned,
 };
 
 pub trait IntoAssignmentPattern {
@@ -21,9 +22,42 @@ impl IntoAssignmentPattern for Expr {
 
 fn convert_literal(expr: ExprLiteral) -> Result<Expr> {
     match expr.literal {
+        Literal::Array(array) => convert_array_literal(expr.span, array),
         Literal::Object(object) => convert_object_literal(expr.span, object),
         _ => Ok(Expr::Literal(expr)),
     }
+}
+
+fn convert_array_literal(span: Span, array: LitArray) -> Result<Expr> {
+    let mut pattern = ArrayAssignmentPattern {
+        span,
+        elements: Vec::with_capacity(array.elements.len()),
+        rest: None,
+    };
+
+    let mut elements = array.elements.into_iter().peekable();
+    while let Some(element) = elements.next() {
+        match element {
+            ArrayElement::Elision => pattern.elements.push(None),
+            ArrayElement::Spread(expr) => {
+                if elements.peek().is_some() {
+                    return Err(Error::syntax_error(
+                        "Rest element must be last element".to_owned(),
+                        expr.span().clone(),
+                    ));
+                }
+
+                pattern.rest = Some(Box::new(expr));
+            }
+            ArrayElement::Expr(expr) => pattern.elements.push(Some(AssignmentElement {
+                span: expr.span().clone(),
+                target: Box::new(expr),
+                initializer: None,
+            })),
+        }
+    }
+
+    Ok(Expr::AssignmentPattern(AssignmentPattern::Array(pattern)))
 }
 
 fn convert_object_literal(span: Span, object: LitObject) -> Result<Expr> {
@@ -75,4 +109,3 @@ fn convert_object_literal(span: Span, object: LitObject) -> Result<Expr> {
 
     Ok(Expr::AssignmentPattern(AssignmentPattern::Object(pattern)))
 }
-

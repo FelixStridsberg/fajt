@@ -15,21 +15,22 @@
     "span": "0:9",
     "operator": "Assign",
     "left": {
-      "Literal": {
-        "span": "0:5",
-        "literal": {
-          "Array": {
-            "elements": [
-              {
-                "Expr": {
-                  "IdentRef": {
-                    "span": "2:3",
-                    "name": "a"
-                  }
+      "AssignmentPattern": {
+        "Array": {
+          "span": "0:5",
+          "elements": [
+            {
+              "span": "2:3",
+              "target": {
+                "IdentRef": {
+                  "span": "2:3",
+                  "name": "a"
                 }
-              }
-            ]
-          }
+              },
+              "initializer": null
+            }
+          ],
+          "rest": null
         }
       }
     },

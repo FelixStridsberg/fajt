@@ -15,14 +15,13 @@
     "span": "0:9",
     "operator": "Assign",
     "left": {
-      "Literal": {
-        "span": "0:5",
-        "literal": {
-          "Array": {
-            "elements": [
-              "Elision"
-            ]
-          }
+      "AssignmentPattern": {
+        "Array": {
+          "span": "0:5",
+          "elements": [
+            null
+          ],
+          "rest": null
         }
       }
     },
