@@ -15,20 +15,15 @@
     "span": "0:12",
     "operator": "Assign",
     "left": {
-      "Literal": {
-        "span": "0:8",
-        "literal": {
-          "Object": {
-            "props": [
-              {
-                "Spread": {
-                  "IdentRef": {
-                    "span": "5:6",
-                    "name": "a"
-                  }
-                }
-              }
-            ]
+      "AssignmentPattern": {
+        "Object": {
+          "span": "0:8",
+          "props": [],
+          "rest": {
+            "IdentRef": {
+              "span": "5:6",
+              "name": "a"
+            }
           }
         }
       }

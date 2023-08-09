@@ -33,13 +33,13 @@ ast_struct! {
 
 ast_node! {
     pub enum AssignmentProp {
-        Single(SingleNameProp),
-        Named(NamedProp)
+        Single(SingleNameAssignmentProp),
+        Named(NamedAssignmentProp)
     }
 }
 
 ast_struct! {
-    pub struct SingleNameProp {
+    pub struct SingleNameAssignmentProp {
         pub span: Span,
         pub ident: Ident,
         pub initializer: Option<Box<Expr>>,
@@ -47,7 +47,7 @@ ast_struct! {
 }
 
 ast_struct! {
-    pub struct NamedProp {
+    pub struct NamedAssignmentProp {
         pub span: Span,
         pub name: PropertyName,
         pub value: Box<Expr>,

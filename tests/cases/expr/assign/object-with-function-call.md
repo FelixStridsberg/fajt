@@ -15,52 +15,51 @@
     "span": "0:16",
     "operator": "Assign",
     "left": {
-      "Literal": {
-        "span": "0:12",
-        "literal": {
-          "Object": {
-            "props": [
-              {
-                "Named": {
-                  "span": "2:10",
-                  "name": {
-                    "Ident": {
-                      "span": "2:3",
-                      "name": "a"
-                    }
-                  },
-                  "value": {
-                    "Member": {
-                      "span": "5:10",
-                      "object": {
-                        "Expr": {
-                          "Call": {
-                            "span": "5:8",
-                            "callee": {
-                              "Expr": {
-                                "IdentRef": {
-                                  "span": "5:6",
-                                  "name": "b"
-                                }
+      "AssignmentPattern": {
+        "Object": {
+          "span": "0:12",
+          "props": [
+            {
+              "Named": {
+                "span": "2:10",
+                "name": {
+                  "Ident": {
+                    "span": "2:3",
+                    "name": "a"
+                  }
+                },
+                "value": {
+                  "Member": {
+                    "span": "5:10",
+                    "object": {
+                      "Expr": {
+                        "Call": {
+                          "span": "5:8",
+                          "callee": {
+                            "Expr": {
+                              "IdentRef": {
+                                "span": "5:6",
+                                "name": "b"
                               }
-                            },
-                            "arguments_span": "6:8",
-                            "arguments": []
-                          }
+                            }
+                          },
+                          "arguments_span": "6:8",
+                          "arguments": []
                         }
-                      },
-                      "property": {
-                        "Ident": {
-                          "span": "9:10",
-                          "name": "b"
-                        }
+                      }
+                    },
+                    "property": {
+                      "Ident": {
+                        "span": "9:10",
+                        "name": "b"
                       }
                     }
                   }
                 }
               }
-            ]
-          }
+            }
+          ],
+          "rest": null
         }
       }
     },
