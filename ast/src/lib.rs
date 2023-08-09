@@ -20,6 +20,7 @@ pub use crate::literal::*;
 pub use crate::method::*;
 pub use crate::span::*;
 pub use crate::stmt::*;
+pub use crate::assignment::*;
 
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub enum SourceType {

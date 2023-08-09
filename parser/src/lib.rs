@@ -1,5 +1,4 @@
 extern crate core;
-extern crate fajt_lexer;
 extern crate serde;
 
 #[macro_use]
@@ -18,6 +17,7 @@ mod module;
 mod static_semantics;
 mod stmt;
 mod variable;
+mod conversion;
 
 use crate::error::{Error, Result};
 use crate::static_semantics::DirectivePrologueSemantics;

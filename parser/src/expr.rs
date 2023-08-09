@@ -1,6 +1,7 @@
 use crate::error::Result;
 use crate::static_semantics::ExprSemantics;
 use crate::{Context, Error, Parser};
+use crate::conversion::IntoAssignmentPattern;
 use fajt_ast::{assignment_op, AssignmentOperator, ExprParenthesized, Spanned, UnaryOperator};
 use fajt_ast::{unary_op, ExprTaggedTemplate};
 use fajt_ast::{update_op, UpdateOperator};
@@ -66,7 +67,8 @@ where
                 let assignment_operator = self.parse_optional_assignment_operator();
                 if let Some(operator) = assignment_operator {
                     expr.early_errors_left_hand_side_expr(&self.context, &operator)?;
-                    self.parse_assignment(span_start, expr, operator)
+                    let assignment_expr = expr.try_into_assignment_pattern()?;
+                    self.parse_assignment(span_start, assignment_expr, operator)
                 } else {
                     // TODO validate object literal don't contain initializers, then it's not an object literal.
                     Ok(expr)
