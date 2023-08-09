@@ -9,6 +9,7 @@ pub mod class;
 pub mod literal;
 pub mod method;
 pub mod stmt;
+pub mod assignment;
 
 use serde::{Deserialize, Serialize};
 

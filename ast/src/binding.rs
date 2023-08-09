@@ -20,6 +20,7 @@ ast_struct! {
     pub struct ObjectBinding {
         pub span: Span,
         pub props: Vec<ObjectBindingProp>,
+        // TODO This should be identifier when the assignment pattern is separated.
         pub rest: Option<Box<BindingPattern>>,
     }
 }
