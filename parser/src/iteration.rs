@@ -1,3 +1,4 @@
+use crate::conversion::IntoAssignmentPattern;
 use crate::error::Result;
 use crate::static_semantics::ExprSemantics;
 use crate::{Error, Parser, ThenTry};
@@ -115,9 +116,13 @@ where
     }
 
     fn parse_for_in(&mut self, span_start: usize, left: ForInit) -> Result<Stmt> {
-        if let ForInit::Expr(expr) = &left {
+        let left = if let ForInit::Expr(expr) = left {
             expr.early_errors_left_hand_side_expr(&self.context, &AssignmentOperator::Assign)?;
-        }
+            ForInit::Expr(Box::new(expr.try_into_assignment_pattern()?))
+        } else {
+            left
+        };
+
 
         self.consume_assert(&keyword!("in"))?;
 
@@ -142,9 +147,12 @@ where
         left: ForInit,
         asynchronous: bool,
     ) -> Result<Stmt> {
-        if let ForInit::Expr(expr) = &left {
+        let left = if let ForInit::Expr(expr) = left {
             expr.early_errors_left_hand_side_expr(&self.context, &AssignmentOperator::Assign)?;
-        }
+            ForInit::Expr(Box::new(expr.try_into_assignment_pattern()?))
+        } else {
+            left
+        };
 
         self.consume_assert(&keyword!("of"))?;
 
@@ -204,7 +212,9 @@ where
     fn parse_optional_variable_kind(&mut self) -> Result<Option<VariableKind>> {
         let variable_kind = match self.current()? {
             token_matches!(keyword!("var")) => Some(VariableKind::Var),
-            token_matches!(keyword!("let")) if self.peek_matches_lexical_binding() => Some(VariableKind::Let),
+            token_matches!(keyword!("let")) if self.peek_matches_lexical_binding() => {
+                Some(VariableKind::Let)
+            }
             token_matches!(keyword!("const")) => Some(VariableKind::Const),
             _ => None,
         };

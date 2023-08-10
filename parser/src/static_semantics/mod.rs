@@ -1,8 +1,5 @@
 #[macro_use]
 mod macros;
-mod literal;
-
-pub(crate) use literal::*;
 
 use crate::error::Result;
 use crate::{Context, Error};
@@ -39,16 +36,16 @@ impl_trait!(
             if operator == &AssignmentOperator::Assign {
                 match self {
                     Expr::Literal(ExprLiteral {
-                        literal: Literal::Array(array),
+                        literal: Literal::Array(_),
                         ..
                     }) => {
-                        return array.assert_covers_assignment_pattern();
+                        return Ok(())
                     }
                     Expr::Literal(ExprLiteral {
-                        literal: Literal::Object(object),
+                        literal: Literal::Object(_),
                         ..
                     }) => {
-                        return object.assert_covers_assignment_pattern();
+                        return Ok(())
                     }
                     Expr::AssignmentPattern(_) => {
                         return Ok(())
