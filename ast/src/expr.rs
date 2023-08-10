@@ -1,5 +1,4 @@
 use crate::assignment::AssignmentPattern;
-use crate::binding::ObjectBinding;
 use crate::class::ExprClass;
 use crate::literal::*;
 use crate::{Body, FormalParameters, Ident, Span};
@@ -22,8 +21,6 @@ ast_mapping! {
         Member(ExprMember),
         MetaProperty(ExprMetaProperty),
         New(ExprNew),
-        // DEPRECATED: Use `AssignmentPattern` instead.
-        ObjectBinding(ObjectBinding),
         OptionalCall(ExprOptionalCall),
         OptionalMember(ExprOptionalMember),
         Parenthesized(ExprParenthesized),
