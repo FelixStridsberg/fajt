@@ -1,7 +1,7 @@
+use crate::conversion::IntoAssignmentPattern;
 use crate::error::Result;
 use crate::static_semantics::ExprSemantics;
 use crate::{Context, Error, Parser};
-use crate::conversion::IntoAssignmentPattern;
 use fajt_ast::{assignment_op, AssignmentOperator, ExprParenthesized, Spanned, UnaryOperator};
 use fajt_ast::{unary_op, ExprTaggedTemplate};
 use fajt_ast::{update_op, UpdateOperator};

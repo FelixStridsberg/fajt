@@ -53,6 +53,9 @@ impl_trait!(
                     Expr::ObjectBinding(object) => {
                         return object.assert_covers_assignment_pattern();
                     }
+                    Expr::AssignmentPattern(_) => {
+                        return Ok(())
+                    }
                     _ => {}
                 }
             }

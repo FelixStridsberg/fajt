@@ -18,6 +18,7 @@ mod static_semantics;
 mod stmt;
 mod variable;
 mod conversion;
+mod assignment_pattern;
 
 use crate::error::{Error, Result};
 use crate::static_semantics::DirectivePrologueSemantics;
