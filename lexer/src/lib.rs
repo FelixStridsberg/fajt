@@ -231,7 +231,7 @@ impl<'a> Lexer<'a> {
 
         // Support for legacy html end comment: `-->`
         if value == punct!("--") && self.reader.current().ok() == Some(&'>') {
-            self.skip_single_line_comment();
+            self.skip_rest_of_line();
             self.first_on_line = true;
             return self.read();
         }
@@ -270,6 +270,10 @@ impl<'a> Lexer<'a> {
         self.reader.consume().unwrap();
         self.reader.consume().unwrap();
 
+        self.skip_rest_of_line();
+    }
+
+    fn skip_rest_of_line(&mut self) {
         self.reader
             .read_while(|c| !c.is_ecma_line_terminator())
             .unwrap();

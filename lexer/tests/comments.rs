@@ -24,6 +24,18 @@ fn empty_multiline_comment() {
 }
 
 #[test]
+fn empty_single_multiline_comment() {
+    let tokens = lex("/**/");
+    assert_eq!(tokens.len(), 0);
+}
+
+#[test]
+fn empty_single_comment() {
+    let tokens = lex("//");
+    assert_eq!(tokens.len(), 0);
+}
+
+#[test]
 fn no_space_between_comments() {
     let tokens = lex("/* Hello, I am comment. *//**/b");
     assert!(tokens[0].first_on_line);
@@ -42,9 +54,21 @@ fn single_line_html_open_comment() {
 }
 
 #[test]
+fn empty_single_line_html_open_comment() {
+    let tokens = lex("<!--");
+    assert_eq!(tokens.len(), 0);
+}
+
+#[test]
 fn single_line_html_close_comment() {
     let tokens = lex("--> Hello, I am comment.\na");
     assert_eq!(tokens.len(), 1);
+}
+
+#[test]
+fn empty_single_line_html_close_comment() {
+    let tokens = lex("-->");
+    assert_eq!(tokens.len(), 0);
 }
 
 #[test]
