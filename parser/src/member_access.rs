@@ -137,7 +137,9 @@ where
                 Ok(MemberProperty::Ident(identifier))
             }
             token_matches!(ok: punct!("[")) => {
-                let member = self.parse_computed_property()?;
+                let member = self
+                    .with_context(self.context.with_in(true))
+                    .parse_computed_property()?;
                 Ok(MemberProperty::Expr(member.into()))
             }
             _ => unreachable!(),
