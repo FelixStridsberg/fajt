@@ -230,7 +230,7 @@ impl<'a> Lexer<'a> {
         let end = self.reader.position();
 
         // Support for legacy html end comment: `-->`
-        if value == punct!("--") && self.reader.current().ok() == Some(&'>') {
+        if self.first_on_line && value == punct!("--") && self.reader.current().ok() == Some(&'>') {
             self.skip_rest_of_line();
             self.first_on_line = true;
             return self.read();

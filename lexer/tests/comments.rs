@@ -1,3 +1,7 @@
+mod utils;
+
+use fajt_lexer::literal;
+use fajt_lexer::punct;
 use fajt_lexer::token::Token;
 
 fn lex(input: &str) -> Vec<Token> {
@@ -69,6 +73,19 @@ fn single_line_html_close_comment() {
 fn empty_single_line_html_close_comment() {
     let tokens = lex("-->");
     assert_eq!(tokens.len(), 0);
+}
+
+#[test]
+fn not_single_line_html_close_comment_if_not_first() {
+    assert_lexer!(
+        input: "a-->1",
+        output: [
+            (identifier!("a"), (0, 1)),
+            (punct!("--"), (1, 3)),
+            (punct!(">"), (3, 4)),
+            (literal!(integer, 1), (4, 5)),
+        ]
+    );
 }
 
 #[test]
