@@ -24,6 +24,9 @@ impl_trait!(
                     }
                 }
                 Expr::Member(_) => true,
+                Expr::Parenthesized(parenthesized) => {
+                    parenthesized.expression.is_assignment_target_type_simple(context)?
+                }
                 _ => false,
             })
         }
