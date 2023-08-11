@@ -51,5 +51,6 @@ ast_struct! {
         pub span: Span,
         pub name: PropertyName,
         pub value: Box<Expr>,
+        pub initializer: Option<Box<Expr>>,
     }
 }

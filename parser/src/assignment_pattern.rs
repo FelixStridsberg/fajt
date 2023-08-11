@@ -62,9 +62,17 @@ where
         self.consume_assert(&punct!(":"))?;
 
         let value = Box::new(self.parse_left_hand_side_expr()?);
+        let initializer = self
+            .current_matches(&punct!("="))
+            .then_try(|| self.parse_initializer())?;
 
         let span = self.span_from(span_start);
-        Ok(NamedAssignmentProp { span, name, value })
+        Ok(NamedAssignmentProp {
+            span,
+            name,
+            value,
+            initializer: initializer.map(Box::new),
+        })
     }
 
     /// Parses the `SingleNameBinding` production.

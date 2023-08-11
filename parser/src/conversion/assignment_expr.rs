@@ -49,11 +49,16 @@ fn convert_array_literal(span: Span, array: LitArray) -> Result<Expr> {
 
                 pattern.rest = Some(Box::new(expr));
             }
-            ArrayElement::Expr(expr) => pattern.elements.push(Some(AssignmentElement {
-                span: expr.span().clone(),
-                target: Box::new(expr),
-                initializer: None,
-            })),
+            ArrayElement::Expr(expr) => {
+                let span = expr.span().clone();
+                let (target, initializer) = expr_to_assignment_element(expr)?;
+
+                pattern.elements.push(Some(AssignmentElement {
+                    span,
+                    target,
+                    initializer,
+                }))
+            }
         }
     }
 
@@ -81,13 +86,18 @@ fn convert_object_literal(span: Span, object: LitObject) -> Result<Expr> {
                         initializer: None,
                     }))
             }
-            Named(property) => pattern
+            Named(property) => {
+                let (value, initializer) = expr_to_assignment_element(property.value)?;
+
+                pattern
                 .props
                 .push(AssignmentProp::Named(NamedAssignmentProp {
                     span: property.span.clone(),
                     name: property.name,
-                    value: Box::new(property.value),
-                })),
+                    value,
+                    initializer,
+                }))
+            },
             Spread(expr) => {
                 if props.peek().is_some() {
                     return Err(Error::syntax_error(
@@ -108,4 +118,13 @@ fn convert_object_literal(span: Span, object: LitObject) -> Result<Expr> {
     }
 
     Ok(Expr::AssignmentPattern(AssignmentPattern::Object(pattern)))
+}
+
+fn expr_to_assignment_element(expr: Expr) -> Result<(Box<Expr>, Option<Box<Expr>>)> {
+    match expr {
+        Expr::Assignment(assign) => return Ok((assign.left, Some(assign.right))),
+        _ => {}
+    }
+
+    Ok((Box::new(expr), None))
 }
