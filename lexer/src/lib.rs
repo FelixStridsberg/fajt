@@ -483,6 +483,10 @@ impl<'a> Lexer<'a> {
                 self.reader.consume()?;
                 -1
             } else {
+                if self.reader.current()? == &'+' {
+                    self.reader.consume()?;
+                }
+
                 1
             };
 
