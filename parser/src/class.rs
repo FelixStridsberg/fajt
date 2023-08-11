@@ -94,7 +94,8 @@ where
 
     /// Parses the `ClassElement` production.
     fn parse_class_element(&mut self, has_super: bool) -> Result<ClassElement> {
-        let super_call_allowed = has_super && self.current_matches_identifier("constructor");
+        let super_call_allowed =
+            has_super && self.current_matches_identifier_or_literal("constructor");
         let context = self
             .context
             .with_in_method(true)

@@ -3,9 +3,11 @@ extern crate serde;
 
 #[macro_use]
 pub mod error;
+mod assignment_pattern;
 mod binary_expr;
 mod binding;
 mod class;
+mod conversion;
 mod cover;
 mod expr;
 mod function;
@@ -17,8 +19,6 @@ mod module;
 mod static_semantics;
 mod stmt;
 mod variable;
-mod conversion;
-mod assignment_pattern;
 
 use crate::error::{Error, Result};
 use crate::static_semantics::DirectivePrologueSemantics;
@@ -304,16 +304,19 @@ where
         )
     }
 
-    /// Returns `true` if current token is an identifier with name that matches `value`.
-    fn current_matches_identifier(&self, value: &str) -> bool {
-        if let Ok(Token {
-            value: TokenValue::Identifier(identifier),
-            ..
-        }) = self.current()
-        {
-            value == identifier
-        } else {
-            false
+    /// Returns `true` if current token is an identifier or string literal that
+    /// matches `value`.
+    fn current_matches_identifier_or_literal(&self, value: &str) -> bool {
+        match self.current() {
+            Ok(Token {
+                value: TokenValue::Identifier(identifier),
+                ..
+            }) => value == identifier,
+            Ok(Token {
+                value: TokenValue::Literal(Literal::String(LitString { value: string, .. })),
+                ..
+            }) => value == string,
+            _ => false,
         }
     }
 
