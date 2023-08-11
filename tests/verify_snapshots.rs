@@ -230,8 +230,7 @@ fn get_attribute<'a>(language: &'a str, attribute: &str) -> Option<&'a str> {
     language
         .split(' ')
         .find(|s| s.starts_with(attribute))
-        .map(|attr| attr.split(':').next_back())
-        .flatten()
+        .and_then(|attr| attr.split(':').next_back())
 }
 
 fn result_to_string<T>(result: Result<T>) -> String

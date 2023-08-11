@@ -43,7 +43,7 @@ fn get_arguments() -> Arguments {
                 .long("format")
                 .short('f')
                 .value_name("format")
-                .value_names(&["pretty", "minified"]),
+                .value_names(["pretty", "minified"]),
         )
         .arg(Arg::new("check").long("check").short('c').num_args(0))
         .get_matches();

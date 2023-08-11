@@ -121,9 +121,8 @@ fn convert_object_literal(span: Span, object: LitObject) -> Result<Expr> {
 }
 
 fn expr_to_assignment_element(expr: Expr) -> Result<(Box<Expr>, Option<Box<Expr>>)> {
-    match expr {
-        Expr::Assignment(assign) => return Ok((assign.left, Some(assign.right))),
-        _ => {}
+    if let Expr::Assignment(assign) = expr {
+        return Ok((assign.left, Some(assign.right)));
     }
 
     Ok((Box::new(expr), None))
