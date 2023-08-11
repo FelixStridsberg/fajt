@@ -78,7 +78,9 @@ where
         name: PropertyName,
         kind: MethodKind,
     ) -> Result<MethodDefinition> {
-        let parameters = self.parse_formal_parameters()?;
+        let parameters = self
+            .with_context(self.context.with_yield(false))
+            .parse_formal_parameters()?;
         let body = self.parse_function_body()?;
 
         match kind {
