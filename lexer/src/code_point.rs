@@ -28,6 +28,7 @@ impl CodePoint for char {
     }
 
     fn is_part_of_identifier(&self) -> bool {
-        matches!(self, '0'..='9' | 'A'..='Z' | 'a'..='z' | '_' | '$' | '\u{200c}' | '\u{200d}') || self.is_id_continue()
+        matches!(self, '0'..='9' | 'A'..='Z' | 'a'..='z' | '_' | '$' | '\u{200c}' | '\u{200d}')
+            || self.is_id_continue()
     }
 }

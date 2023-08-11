@@ -44,7 +44,8 @@ where
 
         let body = self
             .with_context(
-                self.context.reset_parameters()
+                self.context
+                    .reset_parameters()
                     .with_in(self.context.is_in)
                     .with_await(asynchronous),
             )

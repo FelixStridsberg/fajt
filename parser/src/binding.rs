@@ -1,8 +1,8 @@
 use crate::error::Result;
 use crate::{Error, Parser, ThenTry};
 use fajt_ast::{
-    ArrayBinding, BindingElement, BindingPattern, NamedBinding, ObjectBinding,
-    ObjectBindingProp, SingleNameBinding, Span, Spanned
+    ArrayBinding, BindingElement, BindingPattern, NamedBinding, ObjectBinding, ObjectBindingProp,
+    SingleNameBinding, Span, Spanned,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::token::Punctuator::{BraceClose, BracketClose};
@@ -164,7 +164,10 @@ where
 
     /// Parses the `BindingIdentifier` production.
     /// This also consumes the expected end punctuator.
-    fn parse_rest_binding_ident(&mut self, expected_end: Punctuator) -> Result<Option<BindingPattern>> {
+    fn parse_rest_binding_ident(
+        &mut self,
+        expected_end: Punctuator,
+    ) -> Result<Option<BindingPattern>> {
         let dots = self.consume_assert(&punct!("..."))?;
 
         let pattern = self.parse_binding_pattern()?;

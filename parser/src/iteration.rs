@@ -123,7 +123,6 @@ where
             left
         };
 
-
         self.consume_assert(&keyword!("in"))?;
 
         let right = self.with_context(self.context.with_in(true)).parse_expr()?;

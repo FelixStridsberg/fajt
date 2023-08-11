@@ -90,14 +90,14 @@ fn convert_object_literal(span: Span, object: LitObject) -> Result<Expr> {
                 let (value, initializer) = expr_to_assignment_element(property.value)?;
 
                 pattern
-                .props
-                .push(AssignmentProp::Named(NamedAssignmentProp {
-                    span: property.span.clone(),
-                    name: property.name,
-                    value,
-                    initializer,
-                }))
-            },
+                    .props
+                    .push(AssignmentProp::Named(NamedAssignmentProp {
+                        span: property.span.clone(),
+                        name: property.name,
+                        value,
+                        initializer,
+                    }))
+            }
             Spread(expr) => {
                 if props.peek().is_some() {
                     return Err(Error::syntax_error(

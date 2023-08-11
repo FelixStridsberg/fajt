@@ -1,4 +1,4 @@
-use crate::{ Ident, Span, Expr, PropertyName};
+use crate::{Expr, Ident, PropertyName, Span};
 
 ast_mapping! {
     pub enum AssignmentPattern {
