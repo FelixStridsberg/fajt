@@ -229,6 +229,13 @@ impl<'a> Lexer<'a> {
         }?;
         let end = self.reader.position();
 
+        // Support for legacy html end comment: `-->`
+        if value == punct!("--") && self.reader.current().ok() == Some(&'>') {
+            self.skip_single_line_comment();
+            self.first_on_line = true;
+            return self.read();
+        }
+
         let token = Token::new(value, self.first_on_line, (start, end));
         self.first_on_line = false;
 
@@ -242,8 +249,10 @@ impl<'a> Lexer<'a> {
             match self.reader.current() {
                 Ok('/') if self.reader.peek().ok() == Some(&'/') => {
                     self.skip_single_line_comment();
-                    // Single line comments never includes the ending new line. If at end of file it
-                    // doesn't matter if we lie and say there was a new line.
+                    self.first_on_line = true;
+                }
+                Ok('<') if self.reader.peek().ok() == Some(&'!') => {
+                    self.skip_single_line_comment();
                     self.first_on_line = true;
                 }
                 Ok('/') if self.reader.peek().ok() == Some(&'*') => {
