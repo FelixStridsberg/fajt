@@ -130,6 +130,11 @@ generate_fold_and_visit! {
             Declaration
         }
 
+        ForDeclaration: (enter: enter_for_declaration, exit: exit_for_declaration) {
+            Expr
+            Declaration
+        }
+
         Callee: (enter: enter_callee, exit: exit_callee) {
             Expr
         }
@@ -518,5 +523,7 @@ generate_fold_and_visit! {
             directives
             statements
         }
+
+        ForBinding: (enter: enter_for_binding, exit: exit_for_binding) { }
     }
 }

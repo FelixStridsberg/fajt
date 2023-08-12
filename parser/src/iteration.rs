@@ -1,10 +1,9 @@
-use crate::conversion::IntoAssignmentPattern;
 use crate::error::Result;
-use crate::static_semantics::ExprSemantics;
 use crate::{Error, Parser, ThenTry};
+use crate::conversion::TryIntoForDeclaration;
 use fajt_ast::{
-    AssignmentOperator, ForInit, Stmt, StmtDoWhile, StmtFor, StmtForIn, StmtForOf, StmtVariable,
-    StmtWhile, VariableKind,
+    ForDeclaration, ForInit, Stmt, StmtDoWhile, StmtFor, StmtForIn, StmtForOf,
+    StmtVariable, StmtWhile, VariableKind,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
@@ -82,11 +81,14 @@ where
             return self.parse_for(span_start, init);
         }
 
+
+        let declaration = init.unwrap().try_into_for_declaration(&self.context)?;
+
         match self.current()? {
             token_matches!(keyword!("of")) => {
-                self.parse_for_of(span_start, init.unwrap(), asynchronous)
+                self.parse_for_of(span_start, declaration, asynchronous)
             }
-            token_matches!(keyword!("in")) => self.parse_for_in(span_start, init.unwrap()),
+            token_matches!(keyword!("in")) => self.parse_for_in(span_start, declaration),
             _ => Err(Error::unexpected_token(self.consume()?)),
         }
     }
@@ -115,14 +117,7 @@ where
         .into())
     }
 
-    fn parse_for_in(&mut self, span_start: usize, left: ForInit) -> Result<Stmt> {
-        let left = if let ForInit::Expr(expr) = left {
-            expr.early_errors_left_hand_side_expr(&self.context, &AssignmentOperator::Assign)?;
-            ForInit::Expr(Box::new(expr.try_into_assignment_pattern()?))
-        } else {
-            left
-        };
-
+    fn parse_for_in(&mut self, span_start: usize, left: ForDeclaration) -> Result<Stmt> {
         self.consume_assert(&keyword!("in"))?;
 
         let right = self.with_context(self.context.with_in(true)).parse_expr()?;
@@ -143,16 +138,9 @@ where
     fn parse_for_of(
         &mut self,
         span_start: usize,
-        left: ForInit,
+        left: ForDeclaration,
         asynchronous: bool,
     ) -> Result<Stmt> {
-        let left = if let ForInit::Expr(expr) = left {
-            expr.early_errors_left_hand_side_expr(&self.context, &AssignmentOperator::Assign)?;
-            ForInit::Expr(Box::new(expr.try_into_assignment_pattern()?))
-        } else {
-            left
-        };
-
         self.consume_assert(&keyword!("of"))?;
 
         let right = self.with_context(self.context.with_in(true)).parse_expr()?;
@@ -181,7 +169,7 @@ where
         let variable_kind = self.parse_optional_variable_kind()?;
         if let Some(kind) = variable_kind {
             return Ok(Some(
-                self.parse_for_init_variable_declarations(span_start, kind)?,
+                self.parse_for_init_variable_declaration(span_start, kind)?,
             ));
         }
 
@@ -191,7 +179,7 @@ where
         ))))
     }
 
-    fn parse_for_init_variable_declarations(
+    fn parse_for_init_variable_declaration(
         &mut self,
         span_start: usize,
         kind: VariableKind,

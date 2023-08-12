@@ -17,18 +17,12 @@ for(var a in"b"in c);
       "Declaration": {
         "span": "5:10",
         "kind": "Var",
-        "declarations": [
-          {
+        "binding": {
+          "Ident": {
             "span": "9:10",
-            "pattern": {
-              "Ident": {
-                "span": "9:10",
-                "name": "a"
-              }
-            },
-            "initializer": null
+            "name": "a"
           }
-        ]
+        }
       }
     },
     "right": {

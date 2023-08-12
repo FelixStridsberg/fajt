@@ -253,10 +253,17 @@ ast_struct! {
     }
 }
 
+ast_node! {
+    pub enum ForInit {
+        Expr(Box<Expr>),
+        Declaration(StmtVariable),
+    }
+}
+
 ast_struct! {
     pub struct StmtForIn {
         pub span: Span,
-        pub left: ForInit,
+        pub left: ForDeclaration,
         pub right: Box<Expr>,
         pub body: Box<Stmt>,
     }
@@ -265,7 +272,7 @@ ast_struct! {
 ast_struct! {
     pub struct StmtForOf {
         pub span: Span,
-        pub left: ForInit,
+        pub left: ForDeclaration,
         pub right: Box<Expr>,
         pub body: Box<Stmt>,
         pub asynchronous: bool,
@@ -273,9 +280,17 @@ ast_struct! {
 }
 
 ast_node! {
-    pub enum ForInit {
+    pub enum ForDeclaration {
         Expr(Box<Expr>),
-        Declaration(StmtVariable),
+        Declaration(ForBinding),
+    }
+}
+
+ast_struct! {
+    pub struct ForBinding {
+        pub span: Span,
+        pub kind: VariableKind,
+        pub binding: BindingPattern,
     }
 }
 
