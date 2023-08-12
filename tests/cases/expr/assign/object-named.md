@@ -33,7 +33,8 @@
                     "span": "5:6",
                     "name": "b"
                   }
-                }
+                },
+                "initializer": null
               }
             }
           ],

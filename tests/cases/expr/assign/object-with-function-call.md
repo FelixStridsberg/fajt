@@ -55,7 +55,8 @@
                       }
                     }
                   }
-                }
+                },
+                "initializer": null
               }
             }
           ],

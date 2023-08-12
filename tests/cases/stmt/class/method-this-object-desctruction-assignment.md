@@ -83,7 +83,8 @@ class cls{method(){({a:this.a}={a:1})}}
                                             }
                                           }
                                         }
-                                      }
+                                      },
+                                      "initializer": null
                                     }
                                   }
                                 ],

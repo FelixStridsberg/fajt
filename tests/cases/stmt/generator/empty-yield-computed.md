@@ -62,7 +62,8 @@ function*fn(){({[yield]:a}={})}
                                     "span": "33:34",
                                     "name": "a"
                                   }
-                                }
+                                },
+                                "initializer": null
                               }
                             }
                           ],

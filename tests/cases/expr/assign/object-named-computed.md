@@ -35,7 +35,8 @@
                     "span": "7:8",
                     "name": "b"
                   }
-                }
+                },
+                "initializer": null
               }
             }
           ],
