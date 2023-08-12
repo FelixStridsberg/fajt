@@ -614,7 +614,10 @@ where
                 break;
             }
 
-            arguments.push(self.parse_argument()?);
+            arguments.push(
+                self.with_context(self.context.with_in(true))
+                    .parse_argument()?,
+            );
             self.consume_list_delimiter(&punct!(")"))?;
         }
 
