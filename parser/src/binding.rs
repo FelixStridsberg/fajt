@@ -66,9 +66,10 @@ where
         let span_start = self.position();
 
         let ident = self.parse_identifier()?;
-        let initializer = self
-            .current_matches(&punct!("="))
-            .then_try(|| self.parse_initializer())?;
+        let initializer = self.current_matches(&punct!("=")).then_try(|| {
+            self.with_context(self.context.with_in(true))
+                .parse_initializer()
+        })?;
 
         let span = self.span_from(span_start);
         Ok(SingleNameBinding {
@@ -144,9 +145,10 @@ where
     pub(super) fn parse_binding_element(&mut self) -> Result<BindingElement> {
         let span_start = self.position();
         let pattern = self.parse_binding_pattern()?;
-        let initializer = self
-            .current_matches(&punct!("="))
-            .then_try(|| self.parse_initializer())?;
+        let initializer = self.current_matches(&punct!("=")).then_try(|| {
+            self.with_context(self.context.with_in(true))
+                .parse_initializer()
+        })?;
 
         let span = self.span_from(span_start);
         Ok(BindingElement {
