@@ -87,7 +87,7 @@ where
         self.consume_assert(&punct!("*"))?;
         let alias = self
             .maybe_consume(&keyword!("as"))?
-            .then_try(|| self.parse_identifier())?;
+            .then_try(|| self.parse_identifier_name())?;
         self.consume_assert(&keyword!("from"))?;
         let from = self.parse_module_specifier()?;
         self.consume_optional_semicolon()?;
@@ -216,7 +216,7 @@ where
     /// Parses the `ImportSpecifier` production.
     fn parse_import_specifier(&mut self) -> Result<NamedImport> {
         let span_start = self.position();
-        let name = self.parse_identifier()?;
+        let name = self.parse_identifier_name()?;
         let alias = self
             .maybe_consume(&keyword!("as"))?
             .then_try(|| self.parse_identifier())?;
@@ -244,13 +244,13 @@ where
     /// Parses the `ExportSpecifier` production.
     fn parse_export_specifier(&mut self) -> Result<NamedExport> {
         let span_start = self.position();
-        let mut name = self.parse_identifier()?;
+        let mut name = self.parse_identifier_name()?;
 
         // If there is an alias, we swap the name and alias identifiers, since the name should be
         // the name of the export, and the alias the local name.
         let alias_of = self
             .maybe_consume(&keyword!("as"))?
-            .then_try(|| self.parse_identifier())?
+            .then_try(|| self.parse_identifier_name())?
             .map(|alias| std::mem::replace(&mut name, alias));
 
         let span = self.span_from(span_start);
