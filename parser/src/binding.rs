@@ -96,7 +96,7 @@ where
     }
 
     /// Parses the `ArrayBindingPattern` production.
-    fn parse_array_binding_pattern(&mut self) -> Result<ArrayBinding> {
+    pub(super) fn parse_array_binding_pattern(&mut self) -> Result<ArrayBinding> {
         let span_start = self.position();
         self.consume_assert(&punct!("["))?;
 

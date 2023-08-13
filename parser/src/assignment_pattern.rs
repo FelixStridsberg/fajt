@@ -2,8 +2,8 @@ use crate::error::Result;
 use crate::Parser;
 use crate::ThenTry;
 use fajt_ast::{
-    AssignmentPattern, AssignmentProp, Expr, NamedAssignmentProp, ObjectAssignmentPattern,
-    SingleNameAssignmentProp,
+    ArrayAssignmentPattern, AssignmentElement, AssignmentPattern, AssignmentProp, Expr,
+    NamedAssignmentProp, ObjectAssignmentPattern, SingleNameAssignmentProp,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
@@ -16,6 +16,73 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
     I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
+    pub(super) fn parse_assignment_pattern(&mut self) -> Result<Expr> {
+        match self.current()? {
+            token_matches!(punct!("[")) => self.parse_array_assignment_pattern(),
+            token_matches!(punct!("{")) => self.parse_object_assignment_pattern(),
+            _ => Ok(Expr::IdentRef(self.parse_identifier()?)),
+        }
+    }
+
+    fn parse_array_assignment_pattern(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+        self.consume_assert(&punct!("["))?;
+
+        let mut elements = Vec::new();
+        let mut rest = None;
+
+        loop {
+            match self.current()? {
+                token_matches!(punct!("]")) => {
+                    self.consume()?;
+                    break;
+                }
+                // TODO must be last
+                token_matches!(punct!("...")) => {
+                    rest = Some(Box::new(self.parse_left_hand_side_expr()?));
+                    break;
+                }
+                token_matches!(punct!(",")) => {
+                    elements.push(None);
+                    self.consume()?;
+                }
+                _ => {
+                    elements.push(Some(self.parse_assignment_element()?));
+                }
+            }
+        }
+
+        let span = self.span_from(span_start);
+        Ok(Expr::AssignmentPattern(AssignmentPattern::Array(
+            ArrayAssignmentPattern {
+                span,
+                elements,
+                rest,
+            },
+        )))
+    }
+
+    fn parse_assignment_element(&mut self) -> Result<AssignmentElement> {
+        let span_start = self.position();
+        let target = Box::new(self.parse_left_hand_side_expr()?);
+
+        let initializer = if self.maybe_consume(&punct!("="))? {
+            Some(Box::new(
+                self.with_context(self.context.with_in(true))
+                    .parse_assignment_expr()?,
+            ))
+        } else {
+            None
+        };
+
+        let span = self.span_from(span_start);
+        Ok(AssignmentElement {
+            span,
+            target,
+            initializer,
+        })
+    }
+
     /// Parses the `ObjectAssignmentPattern` production.
     pub(super) fn parse_object_assignment_pattern(&mut self) -> Result<Expr> {
         let span_start = self.position();
