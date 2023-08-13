@@ -2,7 +2,7 @@ use crate::error::Result;
 use crate::Parser;
 use crate::ThenTry;
 use fajt_ast::{
-    AssignmentPattern, AssignmentProp, NamedAssignmentProp, ObjectAssignmentPattern,
+    AssignmentPattern, AssignmentProp, Expr, NamedAssignmentProp, ObjectAssignmentPattern,
     SingleNameAssignmentProp,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
@@ -17,7 +17,7 @@ where
     I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
     /// Parses the `ObjectAssignmentPattern` production.
-    pub(super) fn parse_object_assignment_pattern(&mut self) -> Result<AssignmentPattern> {
+    pub(super) fn parse_object_assignment_pattern(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.consume_assert(&punct!("{"))?;
 
@@ -48,11 +48,9 @@ where
         }
 
         let span = self.span_from(span_start);
-        Ok(AssignmentPattern::Object(ObjectAssignmentPattern {
-            span,
-            props,
-            rest,
-        }))
+        Ok(Expr::AssignmentPattern(AssignmentPattern::Object(
+            ObjectAssignmentPattern { span, props, rest },
+        )))
     }
 
     /// Parses the `PropertyName: AssignmentElement` case of the `AssignmentProperty` production.
