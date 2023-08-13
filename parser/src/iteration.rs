@@ -191,6 +191,8 @@ where
         }
     }
 
+    /// Parses the first `Expression` in `for (Expression; Expression; Expression;')`.
+    /// Returns None if it does not exists or it failed to parse.
     fn parse_optional_for_init(&mut self) -> Result<Option<ForInit>> {
         if self.current_matches(&punct!(";")) {
             return Ok(None);
