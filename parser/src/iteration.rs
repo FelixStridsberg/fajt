@@ -61,67 +61,49 @@ where
         .into())
     }
 
-    /// Parses the `ForStatement` production.
+    /// Parses the `ForStatement` and `ForInOfStatement` production.
     pub(super) fn parse_for_stmt(&mut self) -> Result<Stmt> {
         let span_start = self.position();
         self.consume_assert(&keyword!("for"))?;
 
         let asynchronous = self.context.is_await && self.maybe_consume(&keyword!("await"))?;
+        self.consume_assert(&punct!("("))?;
 
-        let open_parenthesis = self.consume_assert(&punct!("("))?;
+        let for_init = self.parse_optional_for_init()?;
+        if self.current_matches(&punct!(";")) {
+            if asynchronous {
+                let span = self.span_from(span_start);
+                return Err(Error::syntax_error(
+                    "'for await' loops must be used with 'of'".to_owned(),
+                    span,
+                ));
+            }
 
-        let maybe_init = self.parse_optional_for_init();
-
-        // Only for-of loops are allowed to be asynchronous.
-        if asynchronous && !self.current_matches(&keyword!("of")) {
-            return Err(Error::unexpected_token(self.consume()?));
+            return self.parse_for(span_start, for_init);
         }
 
-        if let Ok(init) = maybe_init {
-            if init.is_none() || self.current_matches(&punct!(";")) {
-                return self.parse_for(span_start, init);
-            }
-
-            let declaration = init.unwrap().try_into_for_declaration(&self.context)?;
-
-            match self.current()? {
-                token_matches!(keyword!("of")) => {
-                    self.parse_for_of(span_start, declaration, asynchronous)
-                }
-                token_matches!(keyword!("in")) => self.parse_for_in(span_start, declaration),
-                _ => Err(Error::unexpected_token(self.consume()?)),
-            }
+        let for_declaration = if let Some(init) = for_init {
+            init.try_into_for_declaration(&self.context)?
         } else {
-            self.reader.rewind_to(&open_parenthesis)?;
-            self.consume_assert(&punct!("("))?;
+            self.parse_for_declaration()?
+        };
 
-            let declaration = self.parse_for_declaration()?;
-
-            match self.current()? {
-                token_matches!(keyword!("of")) => {
-                    self.parse_for_of(span_start, declaration, asynchronous)
-                }
-                token_matches!(keyword!("in")) => self.parse_for_in(span_start, declaration),
-                _ => Err(Error::unexpected_token(self.consume()?)),
+        match self.current()? {
+            token_matches!(keyword!("of")) => {
+                self.parse_for_of(span_start, for_declaration, asynchronous)
             }
-        }
-    }
+            token_matches!(keyword!("in")) => {
+                if asynchronous {
+                    let span = self.span_from(span_start);
+                    return Err(Error::syntax_error(
+                        "'for await' loops must be used with 'of'".to_owned(),
+                        span,
+                    ));
+                }
 
-    /// Parses the `ForDeclaration` and `var ForBinding` productions.
-    fn parse_for_declaration(&mut self) -> Result<ForDeclaration> {
-        let span_start = self.position();
-        let variable_kind = self.parse_optional_variable_kind()?;
-
-        if let Some(kind) = variable_kind {
-            let binding = self.parse_binding_pattern()?;
-            Ok(ForDeclaration::Declaration(ForBinding {
-                span: self.span_from(span_start),
-                kind,
-                binding,
-            }))
-        } else {
-            let assignment_pattern = self.parse_assignment_pattern()?;
-            Ok(ForDeclaration::Expr(Box::new(assignment_pattern)))
+                self.parse_for_in(span_start, for_declaration)
+            }
+            _ => Err(Error::unexpected_token(self.consume()?)),
         }
     }
 
@@ -191,24 +173,50 @@ where
         .into())
     }
 
-    pub(super) fn parse_optional_for_init(&mut self) -> Result<Option<ForInit>> {
+    /// Parses the `ForDeclaration` and `var ForBinding` productions.
+    fn parse_for_declaration(&mut self) -> Result<ForDeclaration> {
         let span_start = self.position();
+        let variable_kind = self.parse_optional_variable_kind()?;
 
+        if let Some(kind) = variable_kind {
+            let binding = self.parse_binding_pattern()?;
+            Ok(ForDeclaration::Declaration(ForBinding {
+                span: self.span_from(span_start),
+                kind,
+                binding,
+            }))
+        } else {
+            let assignment_pattern = self.parse_assignment_pattern()?;
+            Ok(ForDeclaration::Expr(Box::new(assignment_pattern)))
+        }
+    }
+
+    fn parse_optional_for_init(&mut self) -> Result<Option<ForInit>> {
         if self.current_matches(&punct!(";")) {
             return Ok(None);
         }
 
+        let star_token = self.reader.current()?.clone();
+        if let Ok(for_init) = self.parse_for_init() {
+            Ok(Some(for_init))
+        } else {
+            self.reader.rewind_to(&star_token)?;
+            Ok(None)
+        }
+    }
+
+    fn parse_for_init(&mut self) -> Result<ForInit> {
+        let span_start = self.position();
+
         let variable_kind = self.parse_optional_variable_kind()?;
         if let Some(kind) = variable_kind {
-            return Ok(Some(
-                self.parse_for_init_variable_declaration(span_start, kind)?,
-            ));
+            return Ok(self.parse_for_init_variable_declaration(span_start, kind)?);
         }
 
-        Ok(Some(ForInit::Expr(Box::new(
+        Ok(ForInit::Expr(Box::new(
             self.with_context(self.context.with_in(false))
                 .parse_expr()?,
-        ))))
+        )))
     }
 
     fn parse_for_init_variable_declaration(

@@ -7,9 +7,9 @@ async function fn() {
 
 ### Output: error
 ```txt
-Syntax error: Unexpected token `in`
- --> test.js:2:18
+Syntax error: 'for await' loops must be used with 'of'
+ --> test.js:2:5
   |
 2 |     for await (a in b) ;
-  |                  ^^ Unexpected token
+  |     ^^^^^^^^^^^^ 
 ```
