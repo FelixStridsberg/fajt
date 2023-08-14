@@ -31,8 +31,12 @@ macro_rules! assert_lexer {
 
         assert_eq!(tokens, expected);
     };
-    (input: $input:expr, error: $error:expr) => {
+    ($(state: $state:expr,)? input: $input:expr, error: $error:expr) => {
         let mut lexer = fajt_lexer::Lexer::new($input).expect("Could not create lexer, empty input?");
+        $(
+            lexer.set_state($state);
+        )?
+
         let error = lexer.read().expect_err("Expected error but test passed.");
 
         assert_eq!(error, $error);

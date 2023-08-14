@@ -1,6 +1,8 @@
 mod utils;
 
 use fajt_lexer::{literal, LexerState};
+use fajt_lexer::error::Error;
+
 
 #[test]
 fn single_char() {
@@ -43,5 +45,14 @@ fn forward_slash_in_group() {
         output: [
             (literal!(regexp, r#"/a[/]b/"#), (0, 7)),
         ]
+    );
+}
+
+#[test]
+fn new_line_in_regexp() {
+    assert_lexer!(
+        state: LexerState::regex_allowed(),
+        input: "/a\nb/",
+        error: Error::syntax_error("unterminated regular expression literal".to_owned(), (0, 2))
     );
 }

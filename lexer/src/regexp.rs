@@ -6,6 +6,7 @@ type Result<T> = std::result::Result<T, Error>;
 
 impl<'a> Lexer<'a> {
     pub(super) fn read_regexp_literal(&mut self) -> Result<TokenValue> {
+        let span_start = self.reader.position();
         let mut result = String::new();
         let regexp_start = self.reader.consume()?;
         debug_assert_eq!(regexp_start, '/');
@@ -17,6 +18,13 @@ impl<'a> Lexer<'a> {
             result.push(c);
 
             match c {
+                '\n' => {
+                    let span_end = self.reader.position();
+                    return Err(Error::syntax_error(
+                        "unterminated regular expression literal".to_owned(),
+                        (span_start, span_end - 1),
+                    ))
+                }
                 '/' => break,
                 '\\' => result.push(self.reader.consume()?),
                 '[' => result.push_str(&self.read_regexp_group_body()?),
