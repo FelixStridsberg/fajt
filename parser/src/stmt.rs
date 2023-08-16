@@ -30,17 +30,16 @@ where
         Ok(stmts)
     }
 
-    // Parses statements, we handle declarations as statements as well since they appear in the same
-    // contexts.
     pub(super) fn parse_stmt(&mut self) -> Result<Stmt> {
+        let decl = self.parse_declaration()?;
+        if let Some(decl) = decl {
+            return Ok(decl);
+        }
+
         Ok(match self.current()? {
             token_matches!(punct!(";")) => self.parse_empty_stmt()?,
             token_matches!(punct!("{")) => self.parse_block_stmt()?,
             token_matches!(keyword!("var")) => self.parse_variable_stmt(VariableKind::Var)?,
-            token_matches!(keyword!("const")) => self.parse_variable_stmt(VariableKind::Const)?,
-            token_matches!(keyword!("let")) if self.peek_matches_lexical_binding() => {
-                self.parse_variable_stmt(VariableKind::Let)?
-            }
             token_matches!(keyword!("if")) => self.parse_if_stmt()?,
             token_matches!(keyword!("break")) => self.parse_break_stmt()?,
             token_matches!(keyword!("continue")) => self.parse_continue_stmt()?,
@@ -53,13 +52,26 @@ where
             token_matches!(keyword!("while")) => self.parse_while_stmt()?,
             token_matches!(keyword!("for")) => self.parse_for_stmt()?,
             token_matches!(keyword!("switch")) => self.parse_switch_stmt()?,
-            token_matches!(keyword!("function")) => self.parse_function_declaration()?,
-            token_matches!(keyword!("async")) if self.peek_matches(&keyword!("function")) => {
-                self.parse_async_function_declaration()?
+            _ if self.is_identifier() && self.peek_matches(&punct!(":")) => {
+                self.parse_labeled_stmt()?
             }
-            token_matches!(keyword!("class")) => self
-                .with_context(self.context.with_strict(true))
-                .parse_class_decl()?,
+            _ if self.is_expr_stmt()? => self
+                .with_context(self.context.with_in(true))
+                .parse_expr_stmt()?,
+            t => unimplemented!("Invalid statement error handling {:?}", t),
+        })
+    }
+
+    fn parse_declaration(&mut self) -> Result<Option<Stmt>> {
+        Ok(match self.current()? {
+            token_matches!(keyword!("function")) => Some(self.parse_function_declaration()?),
+            token_matches!(keyword!("async")) if self.peek_matches(&keyword!("function")) => {
+                Some(self.parse_async_function_declaration()?)
+            }
+            token_matches!(keyword!("class")) => Some(
+                self.with_context(self.context.with_strict(true))
+                    .parse_class_decl()?,
+            ),
             token_matches!(keyword!("import")) => {
                 if self.source_type() == SourceType::Script {
                     return Err(Error::syntax_error(
@@ -69,7 +81,7 @@ where
                 }
 
                 self.set_source_type(SourceType::Module);
-                self.parse_import_declaration()?
+                Some(self.parse_import_declaration()?)
             }
             token_matches!(keyword!("export")) => {
                 if self.source_type() == SourceType::Script {
@@ -80,15 +92,15 @@ where
                 }
 
                 self.set_source_type(SourceType::Module);
-                self.parse_export_declaration()?
+                Some(self.parse_export_declaration()?)
             }
-            _ if self.is_identifier() && self.peek_matches(&punct!(":")) => {
-                self.parse_labeled_stmt()?
+            token_matches!(keyword!("const")) => {
+                Some(self.parse_variable_stmt(VariableKind::Const)?)
             }
-            _ if self.is_expr_stmt()? => self
-                .with_context(self.context.with_in(true))
-                .parse_expr_stmt()?,
-            t => unimplemented!("Invalid statement error handling {:?}", t),
+            token_matches!(keyword!("let")) if self.peek_matches_lexical_binding() => {
+                Some(self.parse_variable_stmt(VariableKind::Let)?)
+            }
+            _ => None,
         })
     }
 
