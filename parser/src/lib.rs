@@ -173,7 +173,7 @@ impl Parse for Stmt {
         I: PeekRead<Token, Error = fajt_lexer::error::Error>,
         I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
     {
-        parser.parse_stmt()
+        parser.parse_declaration_or_statement()
     }
 }
 
@@ -443,7 +443,7 @@ where
             }
 
             let stmt_start_token = self.current()?.clone();
-            let string_literal = match self.parse_stmt()? {
+            let string_literal = match self.parse_declaration_or_statement()? {
                 Stmt::Expr(StmtExpr { expr, .. }) => match *expr {
                     Expr::Literal(ExprLiteral {
                         literal: Literal::String(string),

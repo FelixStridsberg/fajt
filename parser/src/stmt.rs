@@ -24,18 +24,22 @@ where
                 break;
             }
 
-            stmts.push(self.parse_stmt()?);
+            stmts.push(self.parse_declaration_or_statement()?);
         }
 
         Ok(stmts)
     }
 
-    pub(super) fn parse_stmt(&mut self) -> Result<Stmt> {
+    pub(super) fn parse_declaration_or_statement(&mut self) -> Result<Stmt> {
         let decl = self.parse_declaration()?;
         if let Some(decl) = decl {
             return Ok(decl);
         }
 
+        self.parse_stmt()
+    }
+
+    pub(super) fn parse_stmt(&mut self) -> Result<Stmt> {
         Ok(match self.current()? {
             token_matches!(punct!(";")) => self.parse_empty_stmt()?,
             token_matches!(punct!("{")) => self.parse_block_stmt()?,
@@ -58,11 +62,11 @@ where
             _ if self.is_expr_stmt()? => self
                 .with_context(self.context.with_in(true))
                 .parse_expr_stmt()?,
-            t => unimplemented!("Invalid statement error handling {:?}", t),
+            token => return Err(Error::unexpected_token(token.clone()))
         })
     }
 
-    fn parse_declaration(&mut self) -> Result<Option<Stmt>> {
+    pub(super) fn parse_declaration(&mut self) -> Result<Option<Stmt>> {
         Ok(match self.current()? {
             token_matches!(keyword!("function")) => Some(self.parse_function_declaration()?),
             token_matches!(keyword!("async")) if self.peek_matches(&keyword!("function")) => {
@@ -135,7 +139,7 @@ where
             if self.maybe_consume(&punct!("}"))? {
                 break;
             } else {
-                let statement = self.parse_stmt()?;
+                let statement = self.parse_declaration_or_statement()?;
                 statements.push(statement)
             }
         }

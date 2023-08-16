@@ -2,7 +2,7 @@ use crate::error::Result;
 use crate::{Error, Parser, ThenTry};
 use fajt_ast::{
     DeclExport, DeclImport, ExportDecl, ExportDefaultDecl, ExportDefaultExpr, ExportNamed,
-    ExportNamespace, Ident, LitString, NamedExport, NamedImport, Stmt,
+    ExportNamespace, Ident, LitString, NamedExport, NamedImport, Stmt, VariableKind,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
@@ -23,8 +23,8 @@ where
         match self.current() {
             token_matches!(ok: punct!("{")) => self.parse_named_export(span_start),
             token_matches!(ok: punct!("*")) => self.parse_namespace_export(span_start),
-            token_matches!(ok: keyword!("var"))
-            | token_matches!(ok: keyword!("let"))
+            token_matches!(ok: keyword!("var")) => self.parse_varible_statement_export(span_start),
+            token_matches!(ok: keyword!("let"))
             | token_matches!(ok: keyword!("const"))
             | token_matches!(ok: keyword!("function"))
             | token_matches!(ok: keyword!("class")) => self.parse_declaration_export(span_start),
@@ -60,9 +60,20 @@ where
         }
     }
 
+    /// Parses any `export` followed by a `var`.
+    fn parse_varible_statement_export(&mut self, span_start: usize) -> Result<Stmt> {
+        let stmt = self.parse_variable_stmt(VariableKind::Var)?;
+        let span = self.span_from(span_start);
+        Ok(DeclExport::Decl(ExportDecl {
+            span,
+            decl: Box::new(stmt),
+        })
+        .into())
+    }
+
     /// Parses any `export` followed by a declaration.
     fn parse_declaration_export(&mut self, span_start: usize) -> Result<Stmt> {
-        let decl = self.parse_stmt()?;
+        let decl = self.parse_required_declaration()?;
         let span = self.span_from(span_start);
         Ok(DeclExport::Decl(ExportDecl {
             span,
@@ -73,13 +84,23 @@ where
 
     /// Parses any `export default` followed by a declaration.
     fn parse_declaration_default_export(&mut self, span_start: usize) -> Result<Stmt> {
-        let decl = self.parse_stmt()?;
+        let decl = self.parse_required_declaration()?;
         let span = self.span_from(span_start);
         Ok(DeclExport::DefaultDecl(ExportDefaultDecl {
             span,
             decl: Box::new(decl),
         })
         .into())
+    }
+
+    fn parse_required_declaration(&mut self) -> Result<Stmt> {
+        let decl = self.parse_declaration()?;
+        if let Some(decl) = decl {
+            Ok(decl)
+        } else {
+            let span = self.span_from(self.position());
+            Err(Error::syntax_error("Expected statement".to_owned(), span))
+        }
     }
 
     /// Parses `export * from 'module'` and `export * as alias from 'module'`.
