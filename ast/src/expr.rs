@@ -36,7 +36,7 @@ ast_mapping! {
 #[test]
 fn size_of_expr() {
     // To avoid unexpected increase in node size.
-    assert_eq!(std::mem::size_of::<Expr>(), 184);
+    assert_eq!(std::mem::size_of::<Expr>(), 176);
 }
 
 impl Expr {

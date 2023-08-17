@@ -33,7 +33,7 @@ ast_mapping! {
 #[test]
 fn size_of_stmt() {
     // To avoid unexpected increase in node size.
-    assert_eq!(std::mem::size_of::<Stmt>(), 184);
+    assert_eq!(std::mem::size_of::<Stmt>(), 176);
 }
 
 impl Stmt {
