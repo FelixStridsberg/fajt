@@ -1,3 +1,5 @@
+[![Test](https://github.com/FelixStridsberg/fajt/actions/workflows/test.yaml/badge.svg)](https://github.com/FelixStridsberg/fajt/actions/workflows/test.yaml)
+
 # Experimental javascript parser
 
 This is a parser that parses javascript based on the ECMA-262 (edition 12) specification.
