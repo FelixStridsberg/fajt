@@ -1,5 +1,6 @@
 mod utils;
 
+use fajt_lexer::error::Error;
 use fajt_lexer::literal;
 
 #[test]
@@ -139,5 +140,21 @@ fn number_scientific_negative_exponent() {
         output: [
             (literal!(scientific, 123.0, -10), (0, 7)),
         ]
+    );
+}
+
+#[test]
+fn number_scientific_with_missing_exponent() {
+    assert_lexer!(
+        input: "1e",
+        error: Error::syntax_error("missing exponent".to_owned(), (0, 2))
+    );
+}
+
+#[test]
+fn number_scientific_with_invalid_exponent() {
+    assert_lexer!(
+        input: "1ea",
+        error: Error::syntax_error("expected number".to_owned(), (2, 2))
     );
 }

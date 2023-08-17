@@ -454,6 +454,7 @@ impl<'a> Lexer<'a> {
     }
 
     fn read_integer_or_decimal(&mut self) -> Result<TokenValue> {
+        let span_start = self.reader.position();
         let integral = if self.reader.current()? == &'.' {
             // Decimals without zero: .5
             0
@@ -472,21 +473,30 @@ impl<'a> Lexer<'a> {
             let digits = (fraction as f64).log10().floor() + 1.0;
             let float = integral as f64 + (fraction as f64 / 10_i32.pow(digits as u32) as f64);
 
-            if let Some(exponent) = self.read_number_exponent()? {
+            if let Some(exponent) = self.read_number_exponent(span_start)? {
                 Ok(literal!(scientific, float, exponent))
             } else {
                 Ok(literal!(decimal, float))
             }
-        } else if let Some(exponent) = self.read_number_exponent()? {
+        } else if let Some(exponent) = self.read_number_exponent(span_start)? {
             Ok(literal!(scientific, integral as f64, exponent))
         } else {
             Ok(literal!(integer, integral))
         }
     }
 
-    fn read_number_exponent(&mut self) -> Result<Option<i32>> {
+    fn read_number_exponent(&mut self, span_start: usize) -> Result<Option<i32>> {
         if matches!(self.reader.current(), Ok(&'e' | &'E')) {
             self.reader.consume()?;
+
+            if self.reader.current().is_err() {
+                let span_end = self.reader.position();
+                return Err(Error::syntax_error(
+                    "missing exponent".to_owned(),
+                    (span_start, span_end),
+                ));
+            }
+
             let sign = if matches!(self.reader.current(), Ok('-')) {
                 self.reader.consume()?;
                 -1
@@ -498,7 +508,7 @@ impl<'a> Lexer<'a> {
                 1
             };
 
-            let exponent = self.read_number(10, |c| c.is_numeric())?;
+            let exponent = self.read_number(10, |c| c.is_ascii_digit())?;
             Ok(Some(sign * exponent as i32))
         } else {
             Ok(None)
@@ -532,6 +542,14 @@ impl<'a> Lexer<'a> {
         }
 
         let number_str = number_str.replace('_', "");
+
+        if number_str.is_empty() {
+            let position = self.reader.position();
+            return Err(Error::syntax_error(
+                "expected number".to_owned(),
+                (position, position),
+            ));
+        }
 
         // The check must be strict enough for a safe unwrap here
         Ok(i64::from_str_radix(&number_str, base).unwrap())
