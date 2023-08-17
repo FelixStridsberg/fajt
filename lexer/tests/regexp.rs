@@ -1,8 +1,7 @@
 mod utils;
 
-use fajt_lexer::{literal, LexerState};
 use fajt_lexer::error::Error;
-
+use fajt_lexer::{literal, LexerState};
 
 #[test]
 fn single_char() {

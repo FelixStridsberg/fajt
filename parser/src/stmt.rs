@@ -62,7 +62,7 @@ where
             _ if self.is_expr_stmt()? => self
                 .with_context(self.context.with_in(true))
                 .parse_expr_stmt()?,
-            token => return Err(Error::unexpected_token(token.clone()))
+            token => return Err(Error::unexpected_token(token.clone())),
         })
     }
 

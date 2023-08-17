@@ -23,7 +23,7 @@ impl<'a> Lexer<'a> {
                     return Err(Error::syntax_error(
                         "unterminated regular expression literal".to_owned(),
                         (span_start, span_end - 1),
-                    ))
+                    ));
                 }
                 '/' => break,
                 '\\' => result.push(self.reader.consume()?),
