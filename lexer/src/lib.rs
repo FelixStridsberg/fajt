@@ -285,6 +285,7 @@ impl<'a> Lexer<'a> {
 
     /// Skips multi line comment, returns true if a new line was skipped.
     fn skip_multi_line_comment(&mut self) -> Result<()> {
+        let span_start = self.reader.position();
         self.reader.consume()?;
         self.reader.consume()?;
 
@@ -294,6 +295,13 @@ impl<'a> Lexer<'a> {
                 self.reader.consume()?;
                 self.reader.consume()?;
                 break;
+            }
+
+            if self.reader.current().is_err() {
+                return Err(Error::syntax_error(
+                    "Unterminated comment".to_owned(),
+                    (span_start, span_start + 2),
+                ));
             }
 
             let char = self.reader.consume()?;

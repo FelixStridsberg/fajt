@@ -1,5 +1,6 @@
 mod utils;
 
+use fajt_lexer::error::Error;
 use fajt_lexer::literal;
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
@@ -31,6 +32,14 @@ fn empty_multiline_comment() {
 fn empty_single_multiline_comment() {
     let tokens = lex("/**/");
     assert_eq!(tokens.len(), 0);
+}
+
+#[test]
+fn unterminated_multiline_comment() {
+    assert_lexer!(
+        input: "/* *",
+        error: Error::syntax_error("Unterminated comment".to_owned(), (0, 2))
+    );
 }
 
 #[test]
