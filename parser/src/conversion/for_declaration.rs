@@ -1,5 +1,5 @@
 use crate::conversion::IntoAssignmentPattern;
-use crate::error::Result;
+use crate::error::{Error, Result};
 use crate::static_semantics::ExprSemantics;
 use crate::Context;
 use fajt_ast::{AssignmentOperator, ForBinding, ForDeclaration, ForInit};
@@ -17,13 +17,28 @@ impl TryIntoForDeclaration for ForInit {
                     expr.try_into_assignment_pattern()?,
                 )))
             }
-            // TODO validate only one declaration
-            ForInit::Declaration(decl) => Ok(ForDeclaration::Declaration(ForBinding {
-                span: decl.span.clone(),
-                kind: decl.kind.clone(),
-                // TODO
-                binding: decl.declarations.into_iter().next().unwrap().pattern,
-            })),
+            ForInit::Declaration(mut decl) => {
+                if decl.declarations.len() != 1 {
+                    return Err(Error::syntax_error(
+                        "Only one declaration is allowed in this context".to_owned(),
+                        decl.span,
+                    ));
+                }
+
+                let declaration = decl.declarations.pop().unwrap();
+                if declaration.initializer.is_some() {
+                    return Err(Error::syntax_error(
+                        "Initializers are not allowed in this context".to_owned(),
+                        decl.span,
+                    ));
+                }
+
+                Ok(ForDeclaration::Declaration(ForBinding {
+                    span: decl.span.clone(),
+                    kind: decl.kind.clone(),
+                    binding: declaration.pattern,
+                }))
+            }
         }
     }
 }
