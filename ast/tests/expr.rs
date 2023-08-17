@@ -1,4 +1,4 @@
-mod lib;
+mod utils;
 
 #[test]
 fn traverse_expr() {
