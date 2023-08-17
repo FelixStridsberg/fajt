@@ -147,7 +147,7 @@ fn number_scientific_negative_exponent() {
 fn number_scientific_with_missing_exponent() {
     assert_lexer!(
         input: "1e",
-        error: Error::syntax_error("missing exponent".to_owned(), (0, 2))
+        error: Error::unexpected_end_of_stream()
     );
 }
 

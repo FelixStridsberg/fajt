@@ -1,4 +1,6 @@
-use crate::error::ErrorKind::{ForbiddenIdentifier, SyntaxError, UnrecognizedCodePoint};
+use crate::error::ErrorKind::{
+    ForbiddenIdentifier, SyntaxError, UnexpectedEndOfStream, UnrecognizedCodePoint,
+};
 use crate::token::Keyword;
 use crate::{EndOfStream, InvalidOrUnexpectedToken, Token};
 use fajt_ast::Span;
@@ -20,14 +22,22 @@ pub enum ErrorKind {
     ForbiddenIdentifier(Keyword),
     UnrecognizedCodePoint(char),
     SyntaxError(String),
+    UnexpectedEndOfStream,
     EndOfStream,
 }
 
 impl Error {
-    pub fn unexpected_end_of_stream() -> Self {
+    pub fn end_of_stream() -> Self {
         Error {
             span: Span::empty(),
             kind: EndOfStream,
+        }
+    }
+
+    pub fn unexpected_end_of_stream() -> Self {
+        Error {
+            span: Span::empty(),
+            kind: UnexpectedEndOfStream,
         }
     }
 
@@ -64,7 +74,8 @@ impl Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match &self.kind {
-            EndOfStream => write!(f, "Unexpected end of input"),
+            EndOfStream => write!(f, "End of stream"),
+            UnexpectedEndOfStream => write!(f, "Unexpected end of stream"),
             InvalidOrUnexpectedToken(t) => {
                 write!(f, "Invalid or unexpected token {:?}", t)
             }

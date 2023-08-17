@@ -110,6 +110,11 @@ impl<'a> Lexer<'a> {
         }
 
         self.skip_comments_and_white_spaces()?;
+
+        if self.is_end() {
+            return Err(Error::end_of_stream());
+        }
+
         let current = self.reader.current()?;
 
         let start = self.reader.position();
@@ -454,7 +459,6 @@ impl<'a> Lexer<'a> {
     }
 
     fn read_integer_or_decimal(&mut self) -> Result<TokenValue> {
-        let span_start = self.reader.position();
         let integral = if self.reader.current()? == &'.' {
             // Decimals without zero: .5
             0
@@ -473,29 +477,21 @@ impl<'a> Lexer<'a> {
             let digits = (fraction as f64).log10().floor() + 1.0;
             let float = integral as f64 + (fraction as f64 / 10_i32.pow(digits as u32) as f64);
 
-            if let Some(exponent) = self.read_number_exponent(span_start)? {
+            if let Some(exponent) = self.read_number_exponent()? {
                 Ok(literal!(scientific, float, exponent))
             } else {
                 Ok(literal!(decimal, float))
             }
-        } else if let Some(exponent) = self.read_number_exponent(span_start)? {
+        } else if let Some(exponent) = self.read_number_exponent()? {
             Ok(literal!(scientific, integral as f64, exponent))
         } else {
             Ok(literal!(integer, integral))
         }
     }
 
-    fn read_number_exponent(&mut self, span_start: usize) -> Result<Option<i32>> {
+    fn read_number_exponent(&mut self) -> Result<Option<i32>> {
         if matches!(self.reader.current(), Ok(&'e' | &'E')) {
             self.reader.consume()?;
-
-            if self.reader.current().is_err() {
-                let span_end = self.reader.position();
-                return Err(Error::syntax_error(
-                    "missing exponent".to_owned(),
-                    (span_start, span_end),
-                ));
-            }
 
             let sign = if matches!(self.reader.current(), Ok('-')) {
                 self.reader.consume()?;
@@ -557,6 +553,10 @@ impl<'a> Lexer<'a> {
 
     fn skip_whitespaces(&mut self) -> Result<()> {
         loop {
+            if self.is_end() {
+                break;
+            }
+
             if self.reader.current()?.is_ecma_line_terminator() {
                 self.first_on_line = true;
                 self.reader.consume()?;
@@ -572,6 +572,11 @@ impl<'a> Lexer<'a> {
         }
 
         Ok(())
+    }
+
+    fn is_end(&self) -> bool {
+        use fajt_common::io::char_reader::Error;
+        matches!(self.reader.current(), Err(Error::EndOfStream))
     }
 }
 
