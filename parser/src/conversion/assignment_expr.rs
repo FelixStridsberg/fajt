@@ -5,14 +5,13 @@ use fajt_ast::{
     PropertyDefinition, SingleNameAssignmentProp, Span, Spanned,
 };
 
-pub trait IntoAssignmentPattern {
-    // Converts any compatible Expr::* into Expr::AssignmentPattern, or returns
-    // error if not compatible.
-    fn try_into_assignment_pattern(self) -> Result<Expr>;
+pub trait NormalizeAssignmentPattern {
+    // Converts any compatible Expr::* into Expr::AssignmentPattern.
+    fn normalize_assignment_pattern(self) -> Result<Expr>;
 }
 
-impl IntoAssignmentPattern for Expr {
-    fn try_into_assignment_pattern(self) -> Result<Expr> {
+impl NormalizeAssignmentPattern for Expr {
+    fn normalize_assignment_pattern(self) -> Result<Expr> {
         match self {
             Expr::Literal(literal) => convert_literal(literal),
             _ => Ok(self),

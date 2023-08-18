@@ -1,4 +1,4 @@
-use crate::conversion::IntoAssignmentPattern;
+use crate::conversion::NormalizeAssignmentPattern;
 use crate::error::{Error, Result};
 use crate::static_semantics::ExprSemantics;
 use crate::Context;
@@ -12,7 +12,7 @@ impl TryIntoForDeclaration for ForInit {
     fn try_into_for_declaration(self, context: &Context) -> Result<ForDeclaration> {
         match self {
             ForInit::Expr(expr) => {
-                let assignment_expr = expr.try_into_assignment_pattern()?;
+                let assignment_expr = expr.normalize_assignment_pattern()?;
                 if !matches!(assignment_expr, Expr::AssignmentPattern(_)) {
                     assignment_expr.early_errors_left_hand_side_expr(context)?;
                 }

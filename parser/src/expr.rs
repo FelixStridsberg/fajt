@@ -1,4 +1,4 @@
-use crate::conversion::IntoAssignmentPattern;
+use crate::conversion::NormalizeAssignmentPattern;
 use crate::error::Result;
 use crate::static_semantics::ExprSemantics;
 use crate::{Context, Error, Parser};
@@ -66,7 +66,7 @@ where
 
                 let assignment_operator = self.parse_optional_assignment_operator();
                 if let Some(operator) = assignment_operator {
-                    let assignment_expr = expr.try_into_assignment_pattern()?;
+                    let assignment_expr = expr.normalize_assignment_pattern()?;
                     if !matches!(assignment_expr, Expr::AssignmentPattern(_)) {
                         assignment_expr.early_errors_left_hand_side_expr(&self.context)?;
                     }
