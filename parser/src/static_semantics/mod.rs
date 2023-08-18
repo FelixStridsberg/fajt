@@ -3,10 +3,7 @@ mod macros;
 
 use crate::error::Result;
 use crate::{Context, Error};
-use fajt_ast::{
-    AssignmentOperator, BindingPattern, Expr, ExprLiteral, FormalParameters, LitString, Literal,
-    Spanned,
-};
+use fajt_ast::{BindingPattern, Expr, FormalParameters, LitString, Spanned};
 
 impl_trait!(
     impl trait ExprSemantics for Expr {
@@ -34,29 +31,7 @@ impl_trait!(
         fn early_errors_left_hand_side_expr(
             &self,
             context: &Context,
-            operator: &AssignmentOperator,
         ) -> Result<()> {
-            if operator == &AssignmentOperator::Assign {
-                match self {
-                    Expr::Literal(ExprLiteral {
-                        literal: Literal::Array(_),
-                        ..
-                    }) => {
-                        return Ok(())
-                    }
-                    Expr::Literal(ExprLiteral {
-                        literal: Literal::Object(_),
-                        ..
-                    }) => {
-                        return Ok(())
-                    }
-                    Expr::AssignmentPattern(_) => {
-                        return Ok(())
-                    }
-                    _ => {}
-                }
-            }
-
             if !self.is_assignment_target_type_simple(context)? {
                 return Err(Error::syntax_error(
                     "Invalid left-hand side assignment".to_owned(),

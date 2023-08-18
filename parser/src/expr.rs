@@ -66,8 +66,11 @@ where
 
                 let assignment_operator = self.parse_optional_assignment_operator();
                 if let Some(operator) = assignment_operator {
-                    expr.early_errors_left_hand_side_expr(&self.context, &operator)?;
                     let assignment_expr = expr.try_into_assignment_pattern()?;
+                    if !matches!(assignment_expr, Expr::AssignmentPattern(_)) {
+                        assignment_expr.early_errors_left_hand_side_expr(&self.context)?;
+                    }
+
                     self.parse_assignment(span_start, assignment_expr, operator)
                 } else {
                     // TODO validate object literal don't contain initializers, then it's not an object literal.
