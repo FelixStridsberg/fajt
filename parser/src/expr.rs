@@ -65,16 +65,20 @@ where
                 let expr = self.parse_conditional_expr()?;
 
                 let assignment_operator = self.parse_optional_assignment_operator();
-                if let Some(operator) = assignment_operator {
-                    let assignment_expr = expr.normalize_assignment_pattern(&self.context)?;
-                    if !matches!(assignment_expr, Expr::AssignmentPattern(_)) {
-                        assignment_expr.early_errors_left_hand_side_expr(&self.context)?;
-                    }
+                match assignment_operator {
+                    Some(AssignmentOperator::Assign) => {
+                        let assignment_expr = expr.normalize_assignment_pattern(&self.context)?;
+                        if !matches!(assignment_expr, Expr::AssignmentPattern(_)) {
+                            assignment_expr.early_errors_left_hand_side_expr(&self.context)?;
+                        }
 
-                    self.parse_assignment(span_start, assignment_expr, operator)
-                } else {
-                    // TODO validate object literal don't contain initializers, then it's not an object literal.
-                    Ok(expr)
+                        self.parse_assignment(span_start, assignment_expr, AssignmentOperator::Assign)
+                    }
+                    Some(operator) => {
+                        expr.early_errors_left_hand_side_expr(&self.context)?;
+                        self.parse_assignment(span_start, expr, operator)
+                    }
+                    _ => Ok(expr),
                 }
             }
         }
