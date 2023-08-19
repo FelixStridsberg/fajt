@@ -2,7 +2,7 @@ use crate::error::Result;
 use crate::{DirectivePrologueSemantics, Error, Parser, ThenTry};
 use fajt_ast::{
     ArrowFunctionBody, BindingElement, Body, DeclFunction, Expr, ExprArrowFunction, ExprFunction,
-    FormalParameters, Ident, Spanned, Stmt,
+    FormalParameters, Ident, Stmt,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
@@ -245,16 +245,10 @@ where
                 }
                 token_matches!(punct!("...")) => {
                     rest = Some(self.parse_binding_rest_element()?);
-                    self.consume_list_delimiter(&punct!(")"))?;
+                    self.consume_assert(&punct!(")"))?;
+                    break;
                 }
                 _ => {
-                    if let Some(rest) = rest {
-                        return Err(Error::syntax_error(
-                            "Rest parameter must be last formal parameter".to_owned(),
-                            rest.span().clone(),
-                        ));
-                    }
-
                     parameters.push(self.parse_binding_element()?);
                     self.consume_list_delimiter(&punct!(")"))?;
                 }
