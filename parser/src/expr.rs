@@ -66,7 +66,7 @@ where
 
                 let assignment_operator = self.parse_optional_assignment_operator();
                 if let Some(operator) = assignment_operator {
-                    let assignment_expr = expr.normalize_assignment_pattern()?;
+                    let assignment_expr = expr.normalize_assignment_pattern(&self.context)?;
                     if !matches!(assignment_expr, Expr::AssignmentPattern(_)) {
                         assignment_expr.early_errors_left_hand_side_expr(&self.context)?;
                     }
