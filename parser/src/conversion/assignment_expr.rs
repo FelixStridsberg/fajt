@@ -99,6 +99,15 @@ fn convert_object_literal(context: &Context, span: Span, object: LitObject) -> R
             Named(property) => {
                 let (value, initializer) = expr_to_assignment_element(context, property.value)?;
 
+                if !matches!(*value, Expr::AssignmentPattern(_))
+                    && !value.is_assignment_target_type_simple(context)?
+                {
+                    return Err(Error::syntax_error(
+                        "Invalid destructuring assignment target".to_owned(),
+                        value.span().clone(),
+                    ));
+                }
+
                 pattern
                     .props
                     .push(AssignmentProp::Named(NamedAssignmentProp {
