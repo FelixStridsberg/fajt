@@ -236,6 +236,13 @@ impl<'a> Lexer<'a> {
 
         // Support for legacy html end comment: `-->`
         if self.first_on_line && value == punct!("--") && self.reader.current().ok() == Some(&'>') {
+            if !self.state.html_comment_allowed {
+                return Err(Error::syntax_error(
+                    "HTML comments are not allowed in this context".to_owned(),
+                    (start, start + 3),
+                ));
+            }
+
             self.skip_rest_of_line();
             self.first_on_line = true;
             return self.read();
@@ -257,6 +264,14 @@ impl<'a> Lexer<'a> {
                     self.first_on_line = true;
                 }
                 Ok('<') if self.reader.peek().ok() == Some(&'!') => {
+                    if !self.state.html_comment_allowed {
+                        let position = self.reader.position();
+                        return Err(Error::syntax_error(
+                            "HTML comments are not allowed in this context".to_owned(),
+                            (position, position + 2),
+                        ));
+                    }
+
                     self.skip_single_line_comment();
                     self.first_on_line = true;
                 }
@@ -580,13 +595,20 @@ impl<'a> Lexer<'a> {
     }
 }
 
-#[derive(Default)]
 pub struct LexerState {
+    html_comment_allowed: bool,
     regex_allowed: bool,
     inside_template: bool,
 }
 
 impl LexerState {
+    pub fn with_html_comments_allowed(&self, allowed: bool) -> Self {
+        LexerState {
+            html_comment_allowed: allowed,
+            ..*self
+        }
+    }
+
     pub fn regex_allowed() -> Self {
         LexerState {
             regex_allowed: true,
@@ -598,6 +620,16 @@ impl LexerState {
         LexerState {
             inside_template: true,
             ..Self::default()
+        }
+    }
+}
+
+impl Default for LexerState {
+    fn default() -> Self {
+        Self {
+            html_comment_allowed: true,
+            regex_allowed: false,
+            inside_template: false,
         }
     }
 }

@@ -4,6 +4,7 @@ use fajt_lexer::error::Error;
 use fajt_lexer::literal;
 use fajt_lexer::punct;
 use fajt_lexer::token::Token;
+use fajt_lexer::LexerState;
 
 fn lex(input: &str) -> Vec<Token> {
     let mut lexer = fajt_lexer::Lexer::new(input).expect("Could not create lexer, empty input?");
@@ -67,6 +68,20 @@ fn single_line_html_open_comment() {
 }
 
 #[test]
+fn single_line_html_open_comment_when_not_allowed() {
+    let mut lexer = fajt_lexer::Lexer::new("<!-- Hello, I am comment.").unwrap();
+    lexer.set_state(LexerState::default().with_html_comments_allowed(false));
+
+    assert_eq!(
+        lexer.read_all(),
+        Err(Error::syntax_error(
+            "HTML comments are not allowed in this context".to_owned(),
+            (0, 2)
+        ))
+    )
+}
+
+#[test]
 fn empty_single_line_html_open_comment() {
     let tokens = lex("<!--");
     assert_eq!(tokens.len(), 0);
@@ -82,6 +97,20 @@ fn single_line_html_close_comment() {
 fn empty_single_line_html_close_comment() {
     let tokens = lex("-->");
     assert_eq!(tokens.len(), 0);
+}
+
+#[test]
+fn single_line_html_close_comment_when_not_allowed() {
+    let mut lexer = fajt_lexer::Lexer::new("-->").unwrap();
+    lexer.set_state(LexerState::default().with_html_comments_allowed(false));
+
+    assert_eq!(
+        lexer.read_all(),
+        Err(Error::syntax_error(
+            "HTML comments are not allowed in this context".to_owned(),
+            (0, 3)
+        ))
+    )
 }
 
 #[test]
