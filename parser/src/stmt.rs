@@ -211,6 +211,13 @@ where
         let span_start = self.position();
         self.consume_assert(&keyword!("return"))?;
 
+        if !self.context.is_return {
+            return Err(Error::syntax_error(
+                "Illegal return statement".to_owned(),
+                self.span_from(span_start),
+            ));
+        }
+
         let argument = (!self.stmt_ended())
             .then_try(|| self.with_context(self.context.with_in(true)).parse_expr())?;
         self.maybe_consume(&punct!(";"))?;

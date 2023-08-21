@@ -272,7 +272,7 @@ where
         let is_strict = self.context.is_strict || directives.as_slice().contains_strict();
 
         let statements = self
-            .with_context(self.context.with_strict(is_strict))
+            .with_context(self.context.with_strict(is_strict).with_return(true))
             .parse_function_body_stmt_list()?;
 
         let span = self.span_from(span_start);

@@ -92,6 +92,9 @@ pub struct Context {
     /// `Default` production parameter.
     is_default: bool,
 
+    /// `Return` production parameter.
+    is_return: bool,
+
     /// `true` if we are inside a method and not a function.
     in_method: bool,
 
@@ -120,6 +123,7 @@ impl Context {
     modifier!(with_in: is_in);
     modifier!(with_strict: is_strict);
     modifier!(with_default: is_default);
+    modifier!(with_return: is_return);
 
     modifier!(with_in_method: in_method);
     modifier!(with_super_call_allowed: super_call_allowed);
