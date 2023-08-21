@@ -64,7 +64,11 @@ pub fn parse<T>(source: &str, source_type: SourceType) -> Result<T>
 where
     T: Parse,
 {
-    let lexer = Lexer::new(source).unwrap();
+    let mut lexer = Lexer::new(source).unwrap();
+    if source_type == SourceType::Module {
+        lexer.set_state(LexerState::default().with_html_comments_allowed(false));
+    };
+
     let mut reader = PeekReader::new(lexer).unwrap();
     Parser::parse::<T>(&mut reader, source_type)
 }
