@@ -72,7 +72,11 @@ where
                             assignment_expr.early_errors_left_hand_side_expr(&self.context)?;
                         }
 
-                        self.parse_assignment(span_start, assignment_expr, AssignmentOperator::Assign)
+                        self.parse_assignment(
+                            span_start,
+                            assignment_expr,
+                            AssignmentOperator::Assign,
+                        )
                     }
                     Some(operator) => {
                         expr.early_errors_left_hand_side_expr(&self.context)?;

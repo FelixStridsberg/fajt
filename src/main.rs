@@ -1,7 +1,8 @@
 use clap::{Arg, Command};
 use fajt_codegen::{generate_code, GeneratorContext};
 use fajt_parser::error::emitter::ErrorEmitter;
-use fajt_parser::parse_program;
+use fajt_parser::parse_module;
+use fajt_parser::parse_script;
 use std::fs::read_to_string;
 
 struct Arguments {
@@ -13,7 +14,14 @@ struct Arguments {
 fn main() {
     let args = get_arguments();
     let source = read_to_string(&args.file_name).unwrap();
-    let mut program = parse_program(&source);
+
+    let is_module = args.file_name.ends_with(".mjs") || args.file_name.ends_with(".module.js");
+
+    let mut program = if is_module {
+        parse_module(&source)
+    } else {
+        parse_script(&source)
+    };
 
     if let Err(error) = program {
         let mut stderr = std::io::stderr();

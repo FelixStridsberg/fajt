@@ -220,9 +220,8 @@ where
 fn get_source_type(language: &str) -> SourceType {
     let source_type = get_attribute(language, "source:").unwrap_or("unknown");
     match source_type {
-        "script" => SourceType::Script,
         "module" => SourceType::Module,
-        _ => SourceType::Unknown,
+        _ => SourceType::Script,
     }
 }
 

@@ -26,7 +26,6 @@ pub use crate::stmt::*;
 pub enum SourceType {
     Module,
     Script,
-    Unknown,
 }
 
 pub trait Spanned {

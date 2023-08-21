@@ -77,25 +77,23 @@ where
                     .parse_class_decl()?,
             ),
             token_matches!(keyword!("import")) => {
-                if self.source_type() == SourceType::Script {
+                if self.source_type == SourceType::Script {
                     return Err(Error::syntax_error(
                         "Cannot use `import` statement outside a module".to_owned(),
                         self.current()?.span.clone(),
                     ));
                 }
 
-                self.set_source_type(SourceType::Module);
                 Some(self.parse_import_declaration()?)
             }
             token_matches!(keyword!("export")) => {
-                if self.source_type() == SourceType::Script {
+                if self.source_type == SourceType::Script {
                     return Err(Error::syntax_error(
                         "Cannot use `export` statement outside a module".to_owned(),
                         self.current()?.span.clone(),
                     ));
                 }
 
-                self.set_source_type(SourceType::Module);
                 Some(self.parse_export_declaration()?)
             }
             token_matches!(keyword!("const")) => {

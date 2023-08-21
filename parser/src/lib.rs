@@ -31,8 +31,6 @@ use fajt_lexer::error::ErrorKind as LexerErrorKind;
 use fajt_lexer::token::{KeywordContext, Token, TokenValue};
 use fajt_lexer::{punct, Lexer};
 use fajt_lexer::{token_matches, LexerState};
-use std::cell::Cell;
-use std::rc::Rc;
 
 /// Similar trait to bool.then, but handles closures returning `Result`.
 pub trait ThenTry {
@@ -54,9 +52,12 @@ impl ThenTry for bool {
     }
 }
 
-/// Parse source into `Program` when the type of the source is unknown.
-pub fn parse_program(source: &str) -> Result<Program> {
-    parse::<Program>(source, SourceType::Unknown)
+pub fn parse_script(source: &str) -> Result<Program> {
+    parse::<Program>(source, SourceType::Script)
+}
+
+pub fn parse_module(source: &str) -> Result<Program> {
+    parse::<Program>(source, SourceType::Module)
 }
 
 /// Parse source into `Program` when type of source is known.
@@ -207,7 +208,7 @@ impl Parse for Program {
             body,
         };
 
-        Ok(Program::new(parser.source_type.get(), stmt_list))
+        Ok(Program::new(parser.source_type, stmt_list))
     }
 }
 
@@ -217,7 +218,7 @@ where
 {
     context: Context,
     reader: &'a mut PeekReader<Token, I>,
-    source_type: Rc<Cell<SourceType>>,
+    source_type: SourceType,
 }
 
 impl<'a, I> Parser<'a, I>
@@ -229,7 +230,7 @@ where
         Ok(Parser {
             context: Context::default(),
             reader,
-            source_type: Rc::new(Cell::new(source_type)),
+            source_type,
         })
     }
 
@@ -239,14 +240,6 @@ where
     {
         let mut parser = Parser::new(reader, source_type)?;
         T::parse(&mut parser)
-    }
-
-    fn source_type(&self) -> SourceType {
-        self.source_type.get()
-    }
-
-    fn set_source_type(&mut self, source_type: SourceType) {
-        self.source_type.replace(source_type);
     }
 
     fn current(&self) -> Result<&Token> {

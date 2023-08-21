@@ -1,5 +1,5 @@
 ### Source
-```js
+```js source:module
 import 'module';
 import def from 'module';
 import * as ns from "module";
