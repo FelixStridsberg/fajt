@@ -58,7 +58,7 @@ fn convert_array_literal(context: &Context, span: Span, array: LitArray) -> Resu
                     && !target.is_assignment_target_type_simple(context)?
                 {
                     return Err(Error::syntax_error(
-                        "Invalid destructuring target".to_owned(),
+                        "Invalid destructuring assignment target".to_owned(),
                         span,
                     ));
                 }
