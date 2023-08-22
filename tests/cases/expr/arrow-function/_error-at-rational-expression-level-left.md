@@ -6,10 +6,3 @@ See the [arrow function level problem](../../../../parser/docs/arrow-function-le
 ```
 
 ### Output: error
-```txt
-Syntax error: Unexpected token `instanceof`
- --> test.js:1:11
-  |
-1 | (() => {} instanceof a)
-  |           ^^^^^^^^^^ Unexpected token, found `instanceof`, expected `)`
-```

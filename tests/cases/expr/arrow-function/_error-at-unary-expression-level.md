@@ -6,10 +6,3 @@ See the [arrow function level problem](../../../../parser/docs/arrow-function-le
 ```
 
 ### Output: error
-```txt
-Syntax error: Arrow function not allowed here
- --> test.js:1:9
-  |
-1 | (typeof () => {})
-  |         ^^^^^^^^ 
-```
