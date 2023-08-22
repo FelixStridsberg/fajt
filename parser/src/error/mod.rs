@@ -89,7 +89,7 @@ impl Error {
         }
     }
 
-    pub(crate) fn arrow_function_covered(expr: Expr) -> Self {
+    pub(crate) fn arrow_function_not_allowed(expr: Expr) -> Self {
         Error {
             span: expr.span().clone(),
             kind: ArrowFunctionNotAllowed(expr),

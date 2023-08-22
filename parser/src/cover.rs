@@ -20,7 +20,7 @@ where
 
         // A parenthesized expression cannot be empty, it must be arrow function.
         if self.peek_matches(&punct!(")")) {
-            return Err(Error::arrow_function_covered(
+            return Err(Error::arrow_function_not_allowed(
                 self.parse_arrow_function_expr()?,
             ));
         }
@@ -29,13 +29,13 @@ where
             Ok(expr) if !self.current_matches(&punct!("=>")) => Ok(expr),
             Ok(_) => {
                 self.reader.rewind_to(&start_token)?;
-                Err(Error::arrow_function_covered(
+                Err(Error::arrow_function_not_allowed(
                     self.parse_arrow_function_expr()?,
                 ))
             }
             Err(error) if matches!(error.kind(), &UnexpectedToken(punct!("..."), _)) => {
                 self.reader.rewind_to(&start_token)?;
-                Err(Error::arrow_function_covered(
+                Err(Error::arrow_function_not_allowed(
                     self.parse_arrow_function_expr()?,
                 ))
             }
