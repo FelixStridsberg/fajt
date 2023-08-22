@@ -1,7 +1,0 @@
-### Source
-```js parse:expr
-class { set setter(a, b) {} }
-```
-
-### Output: error
-Setter must have exactly one formal parameter

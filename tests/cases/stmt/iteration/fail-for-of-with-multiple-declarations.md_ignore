@@ -1,7 +1,0 @@
-### Source
-```js
-for (var a, b of c) ;
-```
-
-### Output: error
-Invalid left-hand side in for-of loop: Must have a single binding

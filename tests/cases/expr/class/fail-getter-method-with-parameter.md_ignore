@@ -1,7 +1,0 @@
-### Source
-```js parse:expr
-class { set getter(a) {} }
-```
-
-### Output: error
-Getter must not have any formal parameters
