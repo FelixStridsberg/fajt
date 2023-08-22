@@ -212,7 +212,7 @@ where
 
         let variable_kind = self.parse_optional_variable_kind()?;
         if let Some(kind) = variable_kind {
-            return Ok(self.parse_for_init_variable_declaration(span_start, kind)?);
+            return self.parse_for_init_variable_declaration(span_start, kind);
         }
 
         Ok(ForInit::Expr(Box::new(

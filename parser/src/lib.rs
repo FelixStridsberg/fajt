@@ -281,7 +281,7 @@ where
         Parser {
             context,
             reader: self.reader,
-            source_type: self.source_type.clone(),
+            source_type: self.source_type,
         }
     }
 
