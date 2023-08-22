@@ -1,9 +1,9 @@
 use crate::error::ErrorKind::{
-    EndOfStream, ExpectedIdentifier, ForbiddenIdentifier, SyntaxError, UnexpectedIdent,
-    UnexpectedToken,
+    ArrowFunctionNotAllowed, EndOfStream, ExpectedIdentifier, ForbiddenIdentifier, SyntaxError,
+    UnexpectedIdent, UnexpectedToken,
 };
 use crate::LexerErrorKind;
-use fajt_ast::{Ident, Span};
+use fajt_ast::{Expr, Ident, Span, Spanned};
 use fajt_lexer::error::Error as LexerError;
 use fajt_lexer::token::{Token, TokenValue};
 use std::fmt::Formatter;
@@ -89,8 +89,27 @@ impl Error {
         }
     }
 
+    pub(crate) fn arrow_function_covered(expr: Expr) -> Self {
+        Error {
+            span: expr.span().clone(),
+            kind: ArrowFunctionNotAllowed(expr),
+        }
+    }
+
     pub fn kind(&self) -> &ErrorKind {
         &self.kind
+    }
+
+    pub(crate) fn span(&self) -> &Span {
+        &self.span
+    }
+
+    pub(crate) fn from_kind(kind: ErrorKind, span: Span) -> Error {
+        Error { kind, span }
+    }
+
+    pub(crate) fn into_kind(self) -> ErrorKind {
+        self.kind
     }
 }
 
@@ -104,6 +123,10 @@ pub enum ErrorKind {
     UnexpectedToken(TokenValue, Option<&'static TokenValue>),
     UnexpectedIdent(Ident),
     ForbiddenIdentifier(String),
+
+    /// The arrow function can be parsed from cover production at lower
+    /// levels than it is allowed on.
+    ArrowFunctionNotAllowed(Expr),
 }
 
 impl fmt::Display for Error {
@@ -124,6 +147,9 @@ impl fmt::Display for Error {
             }
             ForbiddenIdentifier(identifier) => {
                 write!(f, "Syntax error: Forbidden identifier `{}`", identifier)?
+            }
+            ArrowFunctionNotAllowed(_) => {
+                write!(f, "Syntax error: Arrow function not allowed here")?
             }
         }
 

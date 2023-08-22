@@ -1,5 +1,5 @@
 use crate::conversion::NormalizeAssignmentPattern;
-use crate::error::Result;
+use crate::error::{ErrorKind, Result};
 use crate::static_semantics::ExprSemantics;
 use crate::{Context, Error, Parser};
 use fajt_ast::{assignment_op, AssignmentOperator, ExprParenthesized, Spanned, UnaryOperator};
@@ -62,7 +62,7 @@ where
                 self.parse_arrow_function_expr()
             }
             _ => {
-                let expr = self.parse_conditional_expr()?;
+                let expr = self.parse_conditional_expr_or_arrow_function()?;
 
                 let assignment_operator = self.parse_optional_assignment_operator();
                 match assignment_operator {
@@ -85,6 +85,28 @@ where
                     _ => Ok(expr),
                 }
             }
+        }
+    }
+
+    /// Parses conditional expression production and catches and converts arrow
+    /// functions that were parsed on lower level by cover productions.
+    /// See: parser/docs/arrow-function-level-problem.md for details.
+    fn parse_conditional_expr_or_arrow_function(&mut self) -> Result<Expr> {
+        let span_start = self.position();
+
+        match self.parse_conditional_expr() {
+            Ok(expr) => Ok(expr),
+            // Since arrow functions are only allowed at the current level, any
+            // legal arrow function must start at the span_start. Otherwise it
+            // is illegal and the error should propagate further.
+            Err(error) if error.span().start == span_start => {
+                let span = error.span().clone();
+                match error.into_kind() {
+                    ErrorKind::ArrowFunctionNotAllowed(expr) => Ok(expr),
+                    kind => Err(Error::from_kind(kind, span)),
+                }
+            }
+            error => error,
         }
     }
 
