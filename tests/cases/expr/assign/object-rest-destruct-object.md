@@ -20,19 +20,22 @@
           "span": "0:12",
           "props": [],
           "rest": {
-            "Literal": {
-              "span": "5:10",
-              "literal": {
-                "Object": {
-                  "props": [
-                    {
-                      "IdentRef": {
+            "AssignmentPattern": {
+              "Object": {
+                "span": "5:10",
+                "props": [
+                  {
+                    "Single": {
+                      "span": "7:8",
+                      "ident": {
                         "span": "7:8",
                         "name": "a"
-                      }
+                      },
+                      "initializer": null
                     }
-                  ]
-                }
+                  }
+                ],
+                "rest": null
               }
             }
           }

@@ -20,25 +20,32 @@
           "span": "0:15",
           "elements": [],
           "rest": {
-            "Literal": {
-              "span": "5:13",
-              "literal": {
-                "Object": {
-                  "props": [
-                    {
-                      "IdentRef": {
+            "AssignmentPattern": {
+              "Object": {
+                "span": "5:13",
+                "props": [
+                  {
+                    "Single": {
+                      "span": "7:8",
+                      "ident": {
                         "span": "7:8",
                         "name": "a"
-                      }
-                    },
-                    {
-                      "IdentRef": {
+                      },
+                      "initializer": null
+                    }
+                  },
+                  {
+                    "Single": {
+                      "span": "10:11",
+                      "ident": {
                         "span": "10:11",
                         "name": "b"
-                      }
+                      },
+                      "initializer": null
                     }
-                  ]
-                }
+                  }
+                ],
+                "rest": null
               }
             }
           }

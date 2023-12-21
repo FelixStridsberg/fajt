@@ -103,6 +103,9 @@ pub struct Context {
 
     /// `true` if static methods are allowed.
     static_method_allowed: bool,
+
+    /// `true` if we are currently parsing assignment pattern
+    is_inside_assignment_expr: bool,
 }
 
 macro_rules! modifier {
@@ -125,6 +128,7 @@ impl Context {
     modifier!(with_default: is_default);
     modifier!(with_return: is_return);
 
+    modifier!(inside_assignment_expr: is_inside_assignment_expr);
     modifier!(with_in_method: in_method);
     modifier!(with_super_call_allowed: super_call_allowed);
     modifier!(with_static_method_allowed: static_method_allowed);

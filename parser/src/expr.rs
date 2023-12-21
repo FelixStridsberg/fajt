@@ -1,4 +1,3 @@
-use crate::conversion::NormalizeAssignmentPattern;
 use crate::error::{ErrorKind, Result};
 use crate::static_semantics::ExprSemantics;
 use crate::{Context, Error, Parser};
@@ -69,14 +68,19 @@ where
                 match assignment_operator {
                     Some(AssignmentOperator::Assign) => {
                         let assignment_expr = match expr {
+                            // Literals can never be on the left side of an assignment.
+                            // Either it is an assignment expression or the syntax is invalid.
+                            Ok(Expr::Literal(_)) => {
+                                self.reader.rewind_to(&token)?;
+                                let expr = self.parse_assignment_pattern()?;
+                                self.consume_assert(&punct!("="))?;
+                                expr
+                            }
                             Ok(expr) => {
-                                let assignment_expr =
-                                    expr.normalize_assignment_pattern(&self.context)?;
-                                if !matches!(assignment_expr, Expr::AssignmentPattern(_)) {
-                                    assignment_expr
-                                        .early_errors_left_hand_side_expr(&self.context)?;
+                                if !matches!(expr, Expr::AssignmentPattern(_)) {
+                                    expr.early_errors_left_hand_side_expr(&self.context)?;
                                 }
-                                assignment_expr
+                                expr
                             }
                             Err(error) => {
                                 if matches!(error.kind(), ErrorKind::InitializedNameNotAllowed) {
@@ -709,6 +713,12 @@ where
             token_matches!(keyword!("true")) => self.consume_literal(Literal::Boolean(true))?,
             token_matches!(keyword!("false")) => self.consume_literal(Literal::Boolean(false))?,
             token_matches!(@literal) => self.parse_literal()?,
+            token_matches!(punct!("[")) if self.context.is_inside_assignment_expr => {
+                self.parse_array_assignment_pattern()?
+            }
+            token_matches!(punct!("{")) if self.context.is_inside_assignment_expr => {
+                self.parse_object_assignment_pattern()?
+            }
             token_matches!(punct!("[")) => self.parse_array_literal()?,
             token_matches!(punct!("{")) => self.parse_object_literal()?,
             token_matches!(keyword!("function")) => self.parse_function_expr()?,

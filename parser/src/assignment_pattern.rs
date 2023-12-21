@@ -1,9 +1,11 @@
+use crate::error::Error;
 use crate::error::Result;
+use crate::static_semantics::ExprSemantics;
 use crate::Parser;
 use crate::ThenTry;
 use fajt_ast::{
     ArrayAssignmentPattern, AssignmentElement, AssignmentPattern, AssignmentProp, Expr,
-    NamedAssignmentProp, ObjectAssignmentPattern, SingleNameAssignmentProp,
+    NamedAssignmentProp, ObjectAssignmentPattern, SingleNameAssignmentProp, Spanned,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::punct;
@@ -18,13 +20,17 @@ where
 {
     pub(super) fn parse_assignment_pattern(&mut self) -> Result<Expr> {
         match self.current()? {
-            token_matches!(punct!("[")) => self.parse_array_assignment_pattern(),
-            token_matches!(punct!("{")) => self.parse_object_assignment_pattern(),
+            token_matches!(punct!("[")) => self
+                .with_context(self.context.inside_assignment_expr(true))
+                .parse_array_assignment_pattern(),
+            token_matches!(punct!("{")) => self
+                .with_context(self.context.inside_assignment_expr(true))
+                .parse_object_assignment_pattern(),
             _ => Ok(Expr::IdentRef(self.parse_identifier()?)),
         }
     }
 
-    fn parse_array_assignment_pattern(&mut self) -> Result<Expr> {
+    pub(super) fn parse_array_assignment_pattern(&mut self) -> Result<Expr> {
         let span_start = self.position();
         self.consume_assert(&punct!("["))?;
 
@@ -37,9 +43,18 @@ where
                     self.consume()?;
                     break;
                 }
-                // TODO must be last
                 token_matches!(punct!("...")) => {
-                    rest = Some(Box::new(self.parse_left_hand_side_expr()?));
+                    self.consume()?;
+                    let rest_expr = self.parse_left_hand_side_expr()?;
+
+                    if !self.maybe_consume(&punct!("]"))? {
+                        return Err(Error::syntax_error(
+                            "Rest element must be last element".to_owned(),
+                            rest_expr.span().clone(),
+                        ));
+                    }
+
+                    rest = Some(Box::new(rest_expr));
                     break;
                 }
                 token_matches!(punct!(",")) => {
@@ -65,6 +80,15 @@ where
     fn parse_assignment_element(&mut self) -> Result<AssignmentElement> {
         let span_start = self.position();
         let target = Box::new(self.parse_left_hand_side_expr()?);
+
+        if !matches!(*target, Expr::AssignmentPattern(_))
+            && !target.is_assignment_target_type_simple(&self.context)?
+        {
+            return Err(Error::syntax_error(
+                "Invalid destructuring assignment target".to_owned(),
+                target.span().clone(),
+            ));
+        }
 
         let initializer = if self.maybe_consume(&punct!("="))? {
             Some(Box::new(
@@ -98,7 +122,16 @@ where
                     break;
                 }
                 token_matches!(punct!("...")) => {
-                    rest = Some(Box::new(self.parse_left_hand_side_expr()?));
+                    self.consume()?;
+                    let rest_expr = self.parse_left_hand_side_expr()?;
+                    if !self.maybe_consume(&punct!("}"))? {
+                        return Err(Error::syntax_error(
+                            "Rest element must be last element".to_owned(),
+                            rest_expr.span().clone(),
+                        ));
+                    }
+
+                    rest = Some(Box::new(rest_expr));
                     break;
                 }
                 token if token_matches!(token, punct!("[")) || self.peek_matches(&punct!(":")) => {

@@ -20,29 +20,33 @@
           "span": "0:15",
           "elements": [],
           "rest": {
-            "Literal": {
-              "span": "5:13",
-              "literal": {
-                "Array": {
-                  "elements": [
-                    {
-                      "Expr": {
-                        "IdentRef": {
-                          "span": "7:8",
-                          "name": "a"
-                        }
+            "AssignmentPattern": {
+              "Array": {
+                "span": "5:13",
+                "elements": [
+                  {
+                    "span": "7:8",
+                    "target": {
+                      "IdentRef": {
+                        "span": "7:8",
+                        "name": "a"
                       }
                     },
-                    {
-                      "Expr": {
-                        "IdentRef": {
-                          "span": "10:11",
-                          "name": "b"
-                        }
+                    "initializer": null
+                  },
+                  null,
+                  {
+                    "span": "10:11",
+                    "target": {
+                      "IdentRef": {
+                        "span": "10:11",
+                        "name": "b"
                       }
-                    }
-                  ]
-                }
+                    },
+                    "initializer": null
+                  }
+                ],
+                "rest": null
               }
             }
           }

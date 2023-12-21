@@ -5,9 +5,9 @@
 
 ### Output: error
 ```txt
-Syntax error: Invalid left-hand side assignment
+Syntax error: Unexpected token `literal`
  --> test.js:1:1
   |
 1 | "string" = "hej";
-  | ^^^^^^^^ 
+  | ^^^^^^^^ Unexpected token, found `literal`, expected identifier
 ```

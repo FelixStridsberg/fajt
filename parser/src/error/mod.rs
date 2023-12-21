@@ -190,6 +190,7 @@ fn expected_token_to_string(token: &TokenValue) -> Option<&str> {
         TokenValue::Keyword(keyword) => keyword.as_str(),
         TokenValue::Identifier(ident) => ident.as_str(),
         TokenValue::Punctuator(punct) => punct.as_str(),
+        TokenValue::Literal(_) => "literal",
         _ => return None,
     })
 }
