@@ -1,6 +1,6 @@
 use crate::error::ErrorKind::{
-    ArrowFunctionNotAllowed, EndOfStream, ExpectedIdentifier, ForbiddenIdentifier, SyntaxError,
-    UnexpectedIdent, UnexpectedToken,
+    ArrowFunctionNotAllowed, EndOfStream, ExpectedIdentifier, ForbiddenIdentifier,
+    InitializedNameNotAllowed, SyntaxError, UnexpectedIdent, UnexpectedToken,
 };
 use crate::LexerErrorKind;
 use fajt_ast::{Expr, Ident, Span, Spanned};
@@ -96,6 +96,13 @@ impl Error {
         }
     }
 
+    pub(crate) fn initialized_name_not_allowed(span: Span) -> Self {
+        Error {
+            span,
+            kind: InitializedNameNotAllowed,
+        }
+    }
+
     pub fn kind(&self) -> &ErrorKind {
         &self.kind
     }
@@ -127,6 +134,10 @@ pub enum ErrorKind {
     /// The arrow function can be parsed from cover production at lower
     /// levels than it is allowed on.
     ArrowFunctionNotAllowed(Expr),
+
+    /// Initializer pattern can be parsed in cover productions in
+    /// production that does not allow them.
+    InitializedNameNotAllowed,
 }
 
 impl fmt::Display for Error {
@@ -151,6 +162,7 @@ impl fmt::Display for Error {
             ArrowFunctionNotAllowed(_) => {
                 write!(f, "Syntax error: Arrow function not allowed here")?
             }
+            InitializedNameNotAllowed => write!(f, "Syntax error: Initializer not allowed here")?,
         }
 
         Ok(())

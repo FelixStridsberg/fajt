@@ -166,7 +166,7 @@ where
     /// Parses the `ObjectLiteral` production.
     pub(super) fn parse_object_literal(&mut self) -> Result<Expr> {
         let span_start = self.position();
-        let start_token = self.consume_assert(&punct!("{"))?;
+        self.consume_assert(&punct!("{"))?;
 
         let mut props = Vec::new();
         loop {
@@ -176,15 +176,14 @@ where
 
             let prop = self.parse_property_definition()?;
 
-            // If we hit an `ident` followed by a `=` in this context, we are either parsing the left
-            // side of an object assignment, or this is illegal syntax. It's covered by the
-            // `CoverInitializedName` production. Here we assume we are in an `ObjectAssignmentPattern`
-            // since that is the only legal case.
+            // This is covered by the `CoverInitializedName` production. It is invalid syntax in an
+            // object literal.
             if self.current_matches(&punct!("="))
                 && matches!(&prop, PropertyDefinition::IdentRef(_))
             {
-                self.reader.rewind_to(&start_token)?;
-                return self.parse_object_assignment_pattern();
+                return Err(Error::initialized_name_not_allowed(
+                    self.current()?.span.clone(),
+                ));
             }
 
             props.push(prop);

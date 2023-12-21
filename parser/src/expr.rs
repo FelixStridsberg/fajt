@@ -62,15 +62,39 @@ where
                 self.parse_arrow_function_expr()
             }
             _ => {
-                let expr = self.parse_conditional_expr_or_arrow_function()?;
+                let token = self.current()?.clone();
+                let expr = self.parse_conditional_expr_or_arrow_function();
 
                 let assignment_operator = self.parse_optional_assignment_operator();
                 match assignment_operator {
                     Some(AssignmentOperator::Assign) => {
-                        let assignment_expr = expr.normalize_assignment_pattern(&self.context)?;
-                        if !matches!(assignment_expr, Expr::AssignmentPattern(_)) {
-                            assignment_expr.early_errors_left_hand_side_expr(&self.context)?;
-                        }
+                        let assignment_expr = match expr {
+                            Ok(expr) => {
+                                let assignment_expr =
+                                    expr.normalize_assignment_pattern(&self.context)?;
+                                if !matches!(assignment_expr, Expr::AssignmentPattern(_)) {
+                                    assignment_expr
+                                        .early_errors_left_hand_side_expr(&self.context)?;
+                                }
+                                assignment_expr
+                            }
+                            Err(error) => {
+                                if matches!(error.kind(), ErrorKind::InitializedNameNotAllowed) {
+                                    self.reader.rewind_to(&token)?;
+                                    let expr = self.parse_assignment_pattern()?;
+                                    if !self.maybe_consume(&punct!("="))? {
+                                        return Err(Error::syntax_error(
+                                            "Initializer not allowed here".to_owned(),
+                                            error.span().clone(),
+                                        ));
+                                    }
+
+                                    expr
+                                } else {
+                                    return Err(error);
+                                }
+                            }
+                        };
 
                         self.parse_assignment(
                             span_start,
@@ -79,10 +103,11 @@ where
                         )
                     }
                     Some(operator) => {
+                        let expr = expr?;
                         expr.early_errors_left_hand_side_expr(&self.context)?;
                         self.parse_assignment(span_start, expr, operator)
                     }
-                    _ => Ok(expr),
+                    _ => Ok(expr?),
                 }
             }
         }
