@@ -1,5 +1,5 @@
-use crate::conversion::TryIntoForDeclaration;
 use crate::error::Result;
+use crate::static_semantics::ExprSemantics;
 use crate::{Error, Parser, ThenTry};
 use fajt_ast::{
     ForBinding, ForDeclaration, ForInit, Stmt, StmtDoWhile, StmtFor, StmtForIn, StmtForOf,
@@ -76,32 +76,7 @@ where
 
         self.reader.rewind_to(&start_token)?;
 
-        // TODO rewrite to be specific to in/of loops:
-        let for_declaration = match self.parse_optional_for_init() {
-            Ok(Some(init)) => init.try_into_for_declaration(&self.context)?,
-            _ => {
-                self.reader.rewind_to(&start_token)?;
-                self.parse_for_declaration()?
-            }
-        };
-
-        match self.current()? {
-            token_matches!(keyword!("of")) => {
-                self.parse_for_of(span_start, for_declaration, asynchronous)
-            }
-            token_matches!(keyword!("in")) => {
-                if asynchronous {
-                    let span = self.span_from(span_start);
-                    return Err(Error::syntax_error(
-                        "'for await' loops must be used with 'of'".to_owned(),
-                        span,
-                    ));
-                }
-
-                self.parse_for_in(span_start, for_declaration)
-            }
-            _ => Err(Error::unexpected_token(self.consume()?)),
-        }
+        self.parse_for_in_of(span_start, asynchronous)
     }
 
     /// Tries to parse the `ForStatement` production. Returns `Ok(None)` if the loop did not match
@@ -146,6 +121,30 @@ where
             }
             .into(),
         ))
+    }
+
+    /// Parses the `ForInOfStatement` production.
+    /// Expects `for (` to already have been consumed.
+    fn parse_for_in_of(&mut self, span_start: usize, asynchronous: bool) -> Result<Stmt> {
+        let declaration = self.parse_for_declaration()?;
+
+        match self.current()? {
+            token_matches!(keyword!("of")) => {
+                self.parse_for_of(span_start, declaration, asynchronous)
+            }
+            token_matches!(keyword!("in")) => {
+                if asynchronous {
+                    let span = self.span_from(span_start);
+                    return Err(Error::syntax_error(
+                        "'for await' loops must be used with 'of'".to_owned(),
+                        span,
+                    ));
+                }
+
+                self.parse_for_in(span_start, declaration)
+            }
+            _ => Err(Error::unexpected_token(self.consume()?)),
+        }
     }
 
     fn parse_for_in(&mut self, span_start: usize, left: ForDeclaration) -> Result<Stmt> {
@@ -197,14 +196,24 @@ where
 
         if let Some(kind) = variable_kind {
             let binding = self.parse_binding_pattern()?;
-            Ok(ForDeclaration::Declaration(ForBinding {
+            return Ok(ForDeclaration::Declaration(ForBinding {
                 span: self.span_from(span_start),
                 kind,
                 binding,
-            }))
-        } else {
-            let assignment_pattern = self.parse_assignment_pattern()?;
-            Ok(ForDeclaration::Expr(Box::new(assignment_pattern)))
+            }));
+        }
+
+        match self.current()? {
+            token_matches!(punct!("[")) | token_matches!(punct!("{")) => {
+                let assignment_pattern = self.parse_assignment_pattern()?;
+                Ok(ForDeclaration::Expr(Box::new(assignment_pattern)))
+            }
+            _ => {
+                let expr = self.parse_left_hand_side_expr()?;
+
+                expr.early_errors_left_hand_side_expr(&self.context)?;
+                Ok(ForDeclaration::Expr(Box::new(expr)))
+            }
         }
     }
 

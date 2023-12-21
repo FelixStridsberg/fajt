@@ -5,9 +5,9 @@ for ( in b) ;
 
 ### Output: error
 ```txt
-Syntax error: Forbidden identifier `in`
+Syntax error: Unexpected token `in`
  --> test.js:1:7
   |
 1 | for ( in b) ;
-  |       ^^ `in` is not allowed as an identifier in this context
+  |       ^^ Unexpected token
 ```

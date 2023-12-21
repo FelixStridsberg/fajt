@@ -7,7 +7,6 @@ mod assignment_pattern;
 mod binary_expr;
 mod binding;
 mod class;
-mod conversion;
 mod cover;
 mod expr;
 mod function;
