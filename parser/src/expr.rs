@@ -65,42 +65,10 @@ where
                 let expr = self.parse_conditional_expr_or_arrow_function();
 
                 let assignment_operator = self.parse_optional_assignment_operator();
+
                 match assignment_operator {
                     Some(AssignmentOperator::Assign) => {
-                        let assignment_expr = match expr {
-                            // Literals can never be on the left side of an assignment.
-                            // Either it is an assignment expression or the syntax is invalid.
-                            Ok(Expr::Literal(_)) => {
-                                self.reader.rewind_to(&token)?;
-                                let expr = self.parse_assignment_pattern()?;
-                                self.consume_assert(&punct!("="))?;
-                                expr
-                            }
-                            Ok(expr) => {
-                                if !matches!(expr, Expr::AssignmentPattern(_)) {
-                                    expr.early_errors_left_hand_side_expr(&self.context)?;
-                                }
-                                expr
-                            }
-                            Err(error) => {
-                                // TODO clean this up, probably move this up. Maybe merge with
-                                // identical rewind above.
-                                if matches!(error.kind(), ErrorKind::InitializedNameNotAllowed) {
-                                    self.reader.rewind_to(&token)?;
-                                    let expr = self.parse_assignment_pattern()?;
-                                    if !self.maybe_consume(&punct!("="))? {
-                                        return Err(Error::syntax_error(
-                                            "Initializer not allowed here".to_owned(),
-                                            error.span().clone(),
-                                        ));
-                                    }
-
-                                    expr
-                                } else {
-                                    return Err(error);
-                                }
-                            }
-                        };
+                        let assignment_expr = self.normalize_left_side_assignment(&token, expr)?;
 
                         self.parse_assignment(
                             span_start,
@@ -114,6 +82,46 @@ where
                         self.parse_assignment(span_start, expr, operator)
                     }
                     _ => Ok(expr?),
+                }
+            }
+        }
+    }
+
+    /// Makes sure that the left side of an assignment is valid. For example that there are
+    /// assignment patterns and not literals.
+    pub fn normalize_left_side_assignment(
+        &mut self,
+        start_token: &Token,
+        expr: Result<Expr>,
+    ) -> Result<Expr> {
+        match expr {
+            Ok(Expr::Literal(_)) => {
+                self.reader.rewind_to(&start_token)?;
+                let expr = self.parse_assignment_pattern()?;
+                self.consume_assert(&punct!("="))?;
+                Ok(expr)
+            }
+            Ok(expr) => {
+                if !matches!(expr, Expr::AssignmentPattern(_)) {
+                    expr.early_errors_left_hand_side_expr(&self.context)?;
+                }
+
+                Ok(expr)
+            }
+            Err(error) => {
+                if matches!(error.kind(), ErrorKind::InitializedNameNotAllowed) {
+                    self.reader.rewind_to(&start_token)?;
+                    let expr = self.parse_assignment_pattern()?;
+                    if !self.maybe_consume(&punct!("="))? {
+                        return Err(Error::syntax_error(
+                            "Initializer not allowed here".to_owned(),
+                            error.span().clone(),
+                        ));
+                    }
+
+                    Ok(expr)
+                } else {
+                    return Err(error);
                 }
             }
         }
