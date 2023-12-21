@@ -69,23 +69,20 @@ where
         let asynchronous = self.context.is_await && self.maybe_consume(&keyword!("await"))?;
         self.consume_assert(&punct!("("))?;
 
-        let for_init = self.parse_optional_for_init()?;
-        if self.current_matches(&punct!(";")) {
-            if asynchronous {
-                let span = self.span_from(span_start);
-                return Err(Error::syntax_error(
-                    "'for await' loops must be used with 'of'".to_owned(),
-                    span,
-                ));
-            }
-
-            return self.parse_for(span_start, for_init);
+        let start_token = self.current()?.clone();
+        if let Some(stmt) = self.try_parse_for(span_start, asynchronous)? {
+            return Ok(stmt);
         }
 
-        let for_declaration = if let Some(init) = for_init {
-            init.try_into_for_declaration(&self.context)?
-        } else {
-            self.parse_for_declaration()?
+        self.reader.rewind_to(&start_token)?;
+
+        // TODO rewrite to be specific to in/of loops:
+        let for_declaration = match self.parse_optional_for_init() {
+            Ok(Some(init)) => init.try_into_for_declaration(&self.context)?,
+            _ => {
+                self.reader.rewind_to(&start_token)?;
+                self.parse_for_declaration()?
+            }
         };
 
         match self.current()? {
@@ -107,9 +104,26 @@ where
         }
     }
 
-    /// Parses a standard for loop, i.e. not for in/for of.
-    fn parse_for(&mut self, span_start: usize, init: Option<ForInit>) -> Result<Stmt> {
-        self.consume_assert(&punct!(";"))?;
+    /// Tries to parse the `ForStatement` production. Returns `Ok(None)` if the loop did not match
+    /// the `ForStatement` production but it may be a valid `ForInOfStatement` production.
+    /// Expects `for (` to already have been consumed.
+    fn try_parse_for(&mut self, span_start: usize, asynchronous: bool) -> Result<Option<Stmt>> {
+        let init = match self.parse_optional_for_init() {
+            Ok(init) => init,
+            Err(_) => return Ok(None),
+        };
+
+        if !self.maybe_consume(&punct!(";"))? {
+            return Ok(None);
+        }
+
+        if asynchronous {
+            let span = self.span_from(span_start);
+            return Err(Error::syntax_error(
+                "'for await' loops must be used with 'of'".to_owned(),
+                span,
+            ));
+        }
 
         let test = (!self.current_matches(&punct!(";")))
             .then_try(|| self.with_context(self.context.with_in(true)).parse_expr())?;
@@ -121,14 +135,17 @@ where
 
         let body = self.parse_stmt()?;
         let span = self.span_from(span_start);
-        Ok(StmtFor {
-            span,
-            init,
-            test: test.map(Box::new),
-            update: update.map(Box::new),
-            body: Box::new(body),
-        }
-        .into())
+
+        Ok(Some(
+            StmtFor {
+                span,
+                init,
+                test: test.map(Box::new),
+                update: update.map(Box::new),
+                body: Box::new(body),
+            }
+            .into(),
+        ))
     }
 
     fn parse_for_in(&mut self, span_start: usize, left: ForDeclaration) -> Result<Stmt> {
@@ -198,13 +215,7 @@ where
             return Ok(None);
         }
 
-        let star_token = self.reader.current()?.clone();
-        if let Ok(for_init) = self.parse_for_init() {
-            Ok(Some(for_init))
-        } else {
-            self.reader.rewind_to(&star_token)?;
-            Ok(None)
-        }
+        Ok(Some(self.parse_for_init()?))
     }
 
     fn parse_for_init(&mut self) -> Result<ForInit> {
