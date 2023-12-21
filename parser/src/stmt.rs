@@ -432,7 +432,7 @@ where
                 break;
             }
 
-            statements.push(self.parse_stmt()?);
+            statements.push(self.parse_declaration_or_statement()?);
         }
 
         Ok(statements)
