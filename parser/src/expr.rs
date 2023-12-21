@@ -83,6 +83,8 @@ where
                                 expr
                             }
                             Err(error) => {
+                                // TODO clean this up, probably move this up. Maybe merge with
+                                // identical rewind above.
                                 if matches!(error.kind(), ErrorKind::InitializedNameNotAllowed) {
                                     self.reader.rewind_to(&token)?;
                                     let expr = self.parse_assignment_pattern()?;
