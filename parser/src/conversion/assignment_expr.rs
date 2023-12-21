@@ -8,6 +8,7 @@ use fajt_ast::{
 };
 
 pub trait NormalizeAssignmentPattern {
+    // TODO get rid of this, use rewind instead.
     // Converts any compatible Expr::* into Expr::AssignmentPattern.
     fn normalize_assignment_pattern(self, context: &Context) -> Result<Expr>;
 }
