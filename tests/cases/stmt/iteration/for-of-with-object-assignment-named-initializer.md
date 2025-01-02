@@ -14,44 +14,42 @@ for({a=1}of b);
   "ForOf": {
     "span": "0:25",
     "left": {
-      "Expr": {
-        "AssignmentPattern": {
-          "Object": {
-            "span": "5:17",
-            "props": [
-              {
-                "Named": {
-                  "span": "7:15",
-                  "name": {
-                    "Ident": {
-                      "span": "7:8",
-                      "name": "a"
-                    }
-                  },
-                  "value": {
-                    "IdentRef": {
-                      "span": "10:11",
-                      "name": "b"
-                    }
-                  },
-                  "initializer": {
-                    "Literal": {
-                      "span": "14:15",
-                      "literal": {
-                        "Number": {
-                          "Integer": [
-                            1,
-                            "Decimal"
-                          ]
-                        }
+      "AssignmentPattern": {
+        "Object": {
+          "span": "5:17",
+          "props": [
+            {
+              "Named": {
+                "span": "7:15",
+                "name": {
+                  "Ident": {
+                    "span": "7:8",
+                    "name": "a"
+                  }
+                },
+                "value": {
+                  "IdentRef": {
+                    "span": "10:11",
+                    "name": "b"
+                  }
+                },
+                "initializer": {
+                  "Literal": {
+                    "span": "14:15",
+                    "literal": {
+                      "Number": {
+                        "Integer": [
+                          1,
+                          "Decimal"
+                        ]
                       }
                     }
                   }
                 }
               }
-            ],
-            "rest": null
-          }
+            }
+          ],
+          "rest": null
         }
       }
     },

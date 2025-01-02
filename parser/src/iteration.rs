@@ -2,7 +2,7 @@ use crate::error::Result;
 use crate::static_semantics::ExprSemantics;
 use crate::{Error, Parser, ThenTry};
 use fajt_ast::{
-    ForBinding, ForDeclaration, ForInit, Stmt, StmtDoWhile, StmtFor, StmtForIn, StmtForOf,
+    Expr, ForBinding, ForDeclaration, ForInit, Stmt, StmtDoWhile, StmtFor, StmtForIn, StmtForOf,
     StmtVariable, StmtWhile, VariableKind,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
@@ -206,7 +206,13 @@ where
         match self.current()? {
             token_matches!(punct!("[")) | token_matches!(punct!("{")) => {
                 let assignment_pattern = self.parse_assignment_pattern()?;
-                Ok(ForDeclaration::Expr(Box::new(assignment_pattern)))
+
+                match assignment_pattern {
+                    Expr::AssignmentPattern(pattern) => {
+                        Ok(ForDeclaration::AssignmentPattern(pattern))
+                    }
+                    _ => unreachable!(),
+                }
             }
             _ => {
                 let expr = self.parse_left_hand_side_expr()?;
