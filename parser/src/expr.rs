@@ -64,13 +64,28 @@ where
             }
             _ => {
                 let token = self.current()?.clone();
-                let expr = self.parse_conditional_expr_or_arrow_function();
+
+                let mut downstream_error = None;
+                let pattern_or_expr = match self.parse_conditional_expr_or_arrow_function() {
+                    Ok(expr) => PatternOrExpr::Expr(expr),
+                    Err(error) => {
+                        if matches!(error.kind(), ErrorKind::InitializedNameNotAllowed) {
+                            downstream_error = Some(error.clone());
+                            self.reader.rewind_to(&token)?;
+                            let pattern = self.parse_assignment_pattern()?;
+                            PatternOrExpr::AssignmentPattern(pattern)
+                        } else {
+                            return Err(error);
+                        }
+                    }
+                };
 
                 let assignment_operator = self.parse_optional_assignment_operator();
 
                 match assignment_operator {
                     Some(AssignmentOperator::Assign) => {
-                        let assignment_expr = self.normalize_left_side_assignment(&token, expr)?;
+                        let assignment_expr =
+                            self.normalize_left_side_assignment(&token, pattern_or_expr)?;
 
                         self.parse_assignment(
                             span_start,
@@ -78,12 +93,20 @@ where
                             AssignmentOperator::Assign,
                         )
                     }
-                    Some(operator) => {
-                        let expr = expr?;
-                        expr.early_errors_left_hand_side_expr(&self.context)?;
-                        self.parse_assignment(span_start, PatternOrExpr::Expr(expr), operator)
+                    Some(operator) => match pattern_or_expr {
+                        PatternOrExpr::Expr(expr) => {
+                            expr.early_errors_left_hand_side_expr(&self.context)?;
+                            self.parse_assignment(span_start, PatternOrExpr::Expr(expr), operator)
+                        }
+                        _ => todo!("Non assignment pattern"),
+                    },
+                    _ => {
+                        if let PatternOrExpr::Expr(expr) = pattern_or_expr {
+                            Ok(expr)
+                        } else {
+                            Err(downstream_error.unwrap())
+                        }
                     }
-                    _ => Ok(expr?),
                 }
             }
         }
@@ -94,11 +117,11 @@ where
     pub fn normalize_left_side_assignment(
         &mut self,
         start_token: &Token,
-        expr: Result<Expr>,
+        pattern_or_expr: PatternOrExpr,
     ) -> Result<PatternOrExpr> {
-        println!("EXPR: {:?}", expr);
-        match expr {
-            Ok(Expr::Literal(ExprLiteral {
+        match pattern_or_expr {
+            PatternOrExpr::AssignmentPattern(_) => Ok(pattern_or_expr),
+            PatternOrExpr::Expr(Expr::Literal(ExprLiteral {
                 literal: Literal::Object(_) | Literal::Array(_),
                 ..
             })) => {
@@ -107,25 +130,9 @@ where
                 self.consume_assert(&punct!("="))?;
                 Ok(PatternOrExpr::AssignmentPattern(pattern))
             }
-            Ok(expr) => {
+            PatternOrExpr::Expr(expr) => {
                 expr.early_errors_left_hand_side_expr(&self.context)?;
                 Ok(PatternOrExpr::Expr(expr))
-            }
-            Err(error) => {
-                if matches!(error.kind(), ErrorKind::InitializedNameNotAllowed) {
-                    self.reader.rewind_to(start_token)?;
-                    let pattern = self.parse_assignment_pattern()?;
-                    if !self.maybe_consume(&punct!("="))? {
-                        return Err(Error::syntax_error(
-                            "Initializer not allowed here".to_owned(),
-                            error.span().clone(),
-                        ));
-                    }
-
-                    Ok(PatternOrExpr::AssignmentPattern(pattern))
-                } else {
-                    Err(error)
-                }
             }
         }
     }

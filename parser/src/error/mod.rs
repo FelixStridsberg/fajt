@@ -13,7 +13,7 @@ pub mod emitter;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Error {
     kind: ErrorKind,
     span: Span,
@@ -120,7 +120,7 @@ impl Error {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 #[non_exhaustive]
 pub enum ErrorKind {
     EndOfStream,
