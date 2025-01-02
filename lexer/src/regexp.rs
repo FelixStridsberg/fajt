@@ -4,7 +4,7 @@ use fajt_ast::Literal;
 
 type Result<T> = std::result::Result<T, Error>;
 
-impl<'a> Lexer<'a> {
+impl Lexer<'_> {
     pub(super) fn read_regexp_literal(&mut self) -> Result<TokenValue> {
         let span_start = self.reader.position();
         let mut result = String::new();

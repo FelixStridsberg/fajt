@@ -104,7 +104,7 @@ impl<'a> CodeGenerator<'a> {
         }
     }
 
-    fn comma_separated_with_rest<I, R>(&mut self, items: &mut Vec<I>, rest: &mut Option<R>)
+    fn comma_separated_with_rest<I, R>(&mut self, items: &mut [I], rest: &mut Option<R>)
     where
         I: Traverse,
         R: Traverse,

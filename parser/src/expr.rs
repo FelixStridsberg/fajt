@@ -96,7 +96,7 @@ where
     ) -> Result<Expr> {
         match expr {
             Ok(Expr::Literal(_)) => {
-                self.reader.rewind_to(&start_token)?;
+                self.reader.rewind_to(start_token)?;
                 let expr = self.parse_assignment_pattern()?;
                 self.consume_assert(&punct!("="))?;
                 Ok(expr)
@@ -110,7 +110,7 @@ where
             }
             Err(error) => {
                 if matches!(error.kind(), ErrorKind::InitializedNameNotAllowed) {
-                    self.reader.rewind_to(&start_token)?;
+                    self.reader.rewind_to(start_token)?;
                     let expr = self.parse_assignment_pattern()?;
                     if !self.maybe_consume(&punct!("="))? {
                         return Err(Error::syntax_error(
@@ -121,7 +121,7 @@ where
 
                     Ok(expr)
                 } else {
-                    return Err(error);
+                    Err(error)
                 }
             }
         }

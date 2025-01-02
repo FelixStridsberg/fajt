@@ -21,7 +21,7 @@ impl<F: Traverse> Traverse for Box<F> {
 
 impl<F: Traverse> Traverse for Option<F> {
     fn traverse(&mut self, visitor: &mut dyn Visitor) {
-        for node in self {
+        if let Some(node) = self {
             node.traverse(visitor);
         }
     }
