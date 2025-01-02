@@ -31,7 +31,7 @@ where
     }
 }
 
-impl<'a> PeekRead<char> for CharIndices<'a> {
+impl PeekRead<char> for CharIndices<'_> {
     type Error = Error;
 
     fn next(&mut self) -> Result<(usize, char), Self::Error> {

@@ -9,7 +9,7 @@ use fajt_lexer::token::Token;
 use fajt_lexer::token_matches;
 use fajt_lexer::{keyword, LexerState};
 
-impl<'a, I> Parser<'a, I>
+impl<I> Parser<'_, I>
 where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
     I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,

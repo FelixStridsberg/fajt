@@ -4,7 +4,7 @@ use crate::Lexer;
 
 type Result<T> = std::result::Result<T, Error>;
 
-impl<'a> Lexer<'a> {
+impl Lexer<'_> {
     pub(super) fn read_and_expand_unicode_escape_sequence(
         &mut self,
         is_start: bool,
