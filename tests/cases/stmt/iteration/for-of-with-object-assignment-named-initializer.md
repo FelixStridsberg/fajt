@@ -28,9 +28,11 @@ for({a=1}of b);
                   }
                 },
                 "value": {
-                  "IdentRef": {
-                    "span": "10:11",
-                    "name": "b"
+                  "Expr": {
+                    "IdentRef": {
+                      "span": "10:11",
+                      "name": "b"
+                    }
                   }
                 },
                 "initializer": {

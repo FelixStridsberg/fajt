@@ -91,14 +91,13 @@ where
             ));
         }
 
-        let initializer = if self.maybe_consume(&punct!("="))? {
-            Some(Box::new(
+        let initializer = self
+            .current_matches(&punct!("="))
+            .then_try(|| {
                 self.with_context(self.context.with_in(true))
-                    .parse_assignment_expr()?,
-            ))
-        } else {
-            None
-        };
+                    .parse_initializer()
+            })?
+            .map(Box::new);
 
         // TODO temporary to change tree before refactoring
         let adjusted_target = match target {
@@ -166,17 +165,18 @@ where
         let name = self.parse_property_name()?;
         self.consume_assert(&punct!(":"))?;
 
-        let value = Box::new(self.parse_left_hand_side_expr()?);
-        let initializer = self
-            .current_matches(&punct!("="))
-            .then_try(|| self.parse_initializer())?;
+        let AssignmentElement {
+            target,
+            initializer,
+            ..
+        } = self.parse_assignment_element()?;
 
         let span = self.span_from(span_start);
         Ok(NamedAssignmentProp {
             span,
             name,
-            value,
-            initializer: initializer.map(Box::new),
+            value: target,
+            initializer,
         })
     }
 
