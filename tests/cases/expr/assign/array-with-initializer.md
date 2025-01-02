@@ -15,34 +15,36 @@
     "span": "0:13",
     "operator": "Assign",
     "left": {
-      "AssignmentPattern": {
-        "Array": {
-          "span": "0:9",
-          "elements": [
-            {
-              "span": "2:7",
-              "target": {
-                "IdentRef": {
-                  "span": "2:3",
-                  "name": "a"
-                }
-              },
-              "initializer": {
-                "Literal": {
-                  "span": "6:7",
-                  "literal": {
-                    "Number": {
-                      "Integer": [
-                        1,
-                        "Decimal"
-                      ]
+      "Expr": {
+        "AssignmentPattern": {
+          "Array": {
+            "span": "0:9",
+            "elements": [
+              {
+                "span": "2:7",
+                "target": {
+                  "IdentRef": {
+                    "span": "2:3",
+                    "name": "a"
+                  }
+                },
+                "initializer": {
+                  "Literal": {
+                    "span": "6:7",
+                    "literal": {
+                      "Number": {
+                        "Integer": [
+                          1,
+                          "Decimal"
+                        ]
+                      }
                     }
                   }
                 }
               }
-            }
-          ],
-          "rest": null
+            ],
+            "rest": null
+          }
         }
       }
     },

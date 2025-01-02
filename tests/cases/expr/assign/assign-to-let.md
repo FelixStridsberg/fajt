@@ -15,9 +15,11 @@ let=b
     "span": "0:7",
     "operator": "Assign",
     "left": {
-      "IdentRef": {
-        "span": "0:3",
-        "name": "let"
+      "Expr": {
+        "IdentRef": {
+          "span": "0:3",
+          "name": "let"
+        }
       }
     },
     "right": {

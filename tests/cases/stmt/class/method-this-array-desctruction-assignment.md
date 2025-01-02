@@ -50,34 +50,36 @@ class cls{method(){[this.a]=[1]}}
                       "span": "35:53",
                       "operator": "Assign",
                       "left": {
-                        "AssignmentPattern": {
-                          "Array": {
-                            "span": "35:45",
-                            "elements": [
-                              {
-                                "span": "37:43",
-                                "target": {
-                                  "Member": {
-                                    "span": "37:43",
-                                    "object": {
-                                      "Expr": {
-                                        "This": {
-                                          "span": "37:41"
+                        "Expr": {
+                          "AssignmentPattern": {
+                            "Array": {
+                              "span": "35:45",
+                              "elements": [
+                                {
+                                  "span": "37:43",
+                                  "target": {
+                                    "Member": {
+                                      "span": "37:43",
+                                      "object": {
+                                        "Expr": {
+                                          "This": {
+                                            "span": "37:41"
+                                          }
+                                        }
+                                      },
+                                      "property": {
+                                        "Ident": {
+                                          "span": "42:43",
+                                          "name": "a"
                                         }
                                       }
-                                    },
-                                    "property": {
-                                      "Ident": {
-                                        "span": "42:43",
-                                        "name": "a"
-                                      }
                                     }
-                                  }
-                                },
-                                "initializer": null
-                              }
-                            ],
-                            "rest": null
+                                  },
+                                  "initializer": null
+                                }
+                              ],
+                              "rest": null
+                            }
                           }
                         }
                       },

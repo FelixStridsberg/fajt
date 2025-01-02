@@ -1,6 +1,6 @@
 use crate::assignment::AssignmentPattern;
 use crate::class::ExprClass;
-use crate::literal::*;
+use crate::{literal::*, PatternOrExpr};
 use crate::{Body, FormalParameters, Ident, Span};
 use fajt_macros::FromString;
 
@@ -370,7 +370,7 @@ ast_struct! {
     pub struct ExprAssignment {
         pub span: Span,
         pub operator: AssignmentOperator,
-        pub left: Box<Expr>,
+        pub left: PatternOrExpr,
         pub right: Box<Expr>,
     }
 }

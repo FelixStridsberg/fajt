@@ -50,19 +50,21 @@ class cls{method(){this.a=1}}
                       "span": "35:45",
                       "operator": "Assign",
                       "left": {
-                        "Member": {
-                          "span": "35:41",
-                          "object": {
-                            "Expr": {
-                              "This": {
-                                "span": "35:39"
+                        "Expr": {
+                          "Member": {
+                            "span": "35:41",
+                            "object": {
+                              "Expr": {
+                                "This": {
+                                  "span": "35:39"
+                                }
                               }
-                            }
-                          },
-                          "property": {
-                            "Ident": {
-                              "span": "40:41",
-                              "name": "a"
+                            },
+                            "property": {
+                              "Ident": {
+                                "span": "40:41",
+                                "name": "a"
+                              }
                             }
                           }
                         }

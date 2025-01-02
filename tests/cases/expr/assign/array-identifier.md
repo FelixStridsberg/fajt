@@ -15,22 +15,24 @@
     "span": "0:9",
     "operator": "Assign",
     "left": {
-      "AssignmentPattern": {
-        "Array": {
-          "span": "0:5",
-          "elements": [
-            {
-              "span": "2:3",
-              "target": {
-                "IdentRef": {
-                  "span": "2:3",
-                  "name": "a"
-                }
-              },
-              "initializer": null
-            }
-          ],
-          "rest": null
+      "Expr": {
+        "AssignmentPattern": {
+          "Array": {
+            "span": "0:5",
+            "elements": [
+              {
+                "span": "2:3",
+                "target": {
+                  "IdentRef": {
+                    "span": "2:3",
+                    "name": "a"
+                  }
+                },
+                "initializer": null
+              }
+            ],
+            "rest": null
+          }
         }
       }
     },

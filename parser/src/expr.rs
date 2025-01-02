@@ -1,7 +1,7 @@
 use crate::error::{ErrorKind, Result};
 use crate::static_semantics::ExprSemantics;
 use crate::{Context, Error, Parser};
-use fajt_ast::{assignment_op, AssignmentOperator, ExprParenthesized, Spanned, UnaryOperator};
+use fajt_ast::{assignment_op, AssignmentOperator, ExprParenthesized, PatternOrExpr, Spanned, UnaryOperator};
 use fajt_ast::{unary_op, ExprTaggedTemplate};
 use fajt_ast::{update_op, UpdateOperator};
 use fajt_ast::{
@@ -176,7 +176,7 @@ where
         Ok(ExprAssignment {
             span,
             operator,
-            left: Box::new(left),
+            left: PatternOrExpr::Expr(Box::new(left)),
             right: Box::new(right),
         }
         .into())

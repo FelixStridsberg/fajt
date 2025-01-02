@@ -15,50 +15,52 @@
     "span": "0:17",
     "operator": "Assign",
     "left": {
-      "AssignmentPattern": {
-        "Array": {
-          "span": "0:13",
-          "elements": [
-            {
-              "span": "2:11",
-              "target": {
-                "AssignmentPattern": {
-                  "Array": {
-                    "span": "2:11",
-                    "elements": [
-                      {
-                        "span": "4:9",
-                        "target": {
-                          "AssignmentPattern": {
-                            "Array": {
-                              "span": "4:9",
-                              "elements": [
-                                {
-                                  "span": "6:7",
-                                  "target": {
-                                    "IdentRef": {
-                                      "span": "6:7",
-                                      "name": "a"
-                                    }
-                                  },
-                                  "initializer": null
-                                }
-                              ],
-                              "rest": null
+      "Expr": {
+        "AssignmentPattern": {
+          "Array": {
+            "span": "0:13",
+            "elements": [
+              {
+                "span": "2:11",
+                "target": {
+                  "AssignmentPattern": {
+                    "Array": {
+                      "span": "2:11",
+                      "elements": [
+                        {
+                          "span": "4:9",
+                          "target": {
+                            "AssignmentPattern": {
+                              "Array": {
+                                "span": "4:9",
+                                "elements": [
+                                  {
+                                    "span": "6:7",
+                                    "target": {
+                                      "IdentRef": {
+                                        "span": "6:7",
+                                        "name": "a"
+                                      }
+                                    },
+                                    "initializer": null
+                                  }
+                                ],
+                                "rest": null
+                              }
                             }
-                          }
-                        },
-                        "initializer": null
-                      }
-                    ],
-                    "rest": null
+                          },
+                          "initializer": null
+                        }
+                      ],
+                      "rest": null
+                    }
                   }
-                }
-              },
-              "initializer": null
-            }
-          ],
-          "rest": null
+                },
+                "initializer": null
+              }
+            ],
+            "rest": null
+          }
         }
       }
     },

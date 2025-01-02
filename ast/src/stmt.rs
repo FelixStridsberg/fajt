@@ -1,4 +1,6 @@
-use crate::{BindingElement, BindingPattern, DeclClass, Expr, Ident, LitString, Span};
+use crate::{
+    AssignmentPattern, BindingElement, BindingPattern, DeclClass, Expr, Ident, LitString, Span,
+};
 use fajt_macros::FromString;
 
 ast_mapping! {
@@ -282,6 +284,7 @@ ast_struct! {
 ast_node! {
     pub enum ForDeclaration {
         Expr(Box<Expr>),
+        AssignmentPattern(AssignmentPattern),
         Declaration(ForBinding),
     }
 }

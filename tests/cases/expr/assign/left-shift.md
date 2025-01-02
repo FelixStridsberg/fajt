@@ -15,9 +15,11 @@ a<<=b
     "span": "0:7",
     "operator": "LeftShift",
     "left": {
-      "IdentRef": {
-        "span": "0:1",
-        "name": "a"
+      "Expr": {
+        "IdentRef": {
+          "span": "0:1",
+          "name": "a"
+        }
       }
     },
     "right": {

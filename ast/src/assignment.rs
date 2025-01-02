@@ -1,5 +1,12 @@
 use crate::{Expr, Ident, PropertyName, Span};
 
+ast_node! {
+    pub enum PatternOrExpr {
+        Expr(Box<Expr>),
+        AssignmentPattern(AssignmentPattern),
+    }
+}
+
 ast_mapping! {
     pub enum AssignmentPattern {
         Array(ArrayAssignmentPattern),

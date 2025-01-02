@@ -15,13 +15,15 @@
     "span": "0:9",
     "operator": "Assign",
     "left": {
-      "AssignmentPattern": {
-        "Array": {
-          "span": "0:5",
-          "elements": [
-            null
-          ],
-          "rest": null
+      "Expr": {
+        "AssignmentPattern": {
+          "Array": {
+            "span": "0:5",
+            "elements": [
+              null
+            ],
+            "rest": null
+          }
         }
       }
     },

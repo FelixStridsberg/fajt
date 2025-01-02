@@ -15,14 +15,16 @@
     "span": "0:15",
     "operator": "Assign",
     "left": {
-      "AssignmentPattern": {
-        "Array": {
-          "span": "0:11",
-          "elements": [],
-          "rest": {
-            "IdentRef": {
-              "span": "5:9",
-              "name": "rest"
+      "Expr": {
+        "AssignmentPattern": {
+          "Array": {
+            "span": "0:11",
+            "elements": [],
+            "rest": {
+              "IdentRef": {
+                "span": "5:9",
+                "name": "rest"
+              }
             }
           }
         }
