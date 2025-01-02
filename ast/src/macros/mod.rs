@@ -5,6 +5,7 @@ macro_rules! ast_mapping {
         $(#[$enum_attr:meta])*
         $pub:ident $enum:ident $name:ident {
             $(
+                $(#[$variant_attr:meta])*
                 $variant:ident($member:ident),
             )*
         }
@@ -13,7 +14,10 @@ macro_rules! ast_mapping {
         ast_node! {
             $(#[$enum_attr])*
             $pub $enum $name {
-                $( $variant($member), )*
+                $(
+                    $(#[$variant_attr])*
+                    $variant($member),
+                )*
             }
         }
 

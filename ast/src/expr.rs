@@ -8,6 +8,7 @@ ast_mapping! {
     pub enum Expr {
         ArrowFunction(ExprArrowFunction),
         Assignment(ExprAssignment),
+        #[deprecated(note="Should not be part of main Expr")]
         AssignmentPattern(AssignmentPattern),
         Await(ExprAwait),
         Binary(ExprBinary),
