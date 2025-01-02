@@ -15,46 +15,44 @@
     "span": "0:17",
     "operator": "Assign",
     "left": {
-      "Expr": {
-        "AssignmentPattern": {
-          "Array": {
-            "span": "0:9",
-            "elements": [
-              {
-                "span": "2:7",
-                "target": {
-                  "Member": {
-                    "span": "2:7",
-                    "object": {
-                      "Expr": {
-                        "Call": {
-                          "span": "2:5",
-                          "callee": {
-                            "Expr": {
-                              "IdentRef": {
-                                "span": "2:3",
-                                "name": "a"
-                              }
+      "AssignmentPattern": {
+        "Array": {
+          "span": "0:9",
+          "elements": [
+            {
+              "span": "2:7",
+              "target": {
+                "Member": {
+                  "span": "2:7",
+                  "object": {
+                    "Expr": {
+                      "Call": {
+                        "span": "2:5",
+                        "callee": {
+                          "Expr": {
+                            "IdentRef": {
+                              "span": "2:3",
+                              "name": "a"
                             }
-                          },
-                          "arguments_span": "3:5",
-                          "arguments": []
-                        }
-                      }
-                    },
-                    "property": {
-                      "Ident": {
-                        "span": "6:7",
-                        "name": "b"
+                          }
+                        },
+                        "arguments_span": "3:5",
+                        "arguments": []
                       }
                     }
+                  },
+                  "property": {
+                    "Ident": {
+                      "span": "6:7",
+                      "name": "b"
+                    }
                   }
-                },
-                "initializer": null
-              }
-            ],
-            "rest": null
-          }
+                }
+              },
+              "initializer": null
+            }
+          ],
+          "rest": null
         }
       }
     },

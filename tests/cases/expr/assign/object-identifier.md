@@ -15,24 +15,22 @@
     "span": "0:9",
     "operator": "Assign",
     "left": {
-      "Expr": {
-        "AssignmentPattern": {
-          "Object": {
-            "span": "0:5",
-            "props": [
-              {
-                "Single": {
+      "AssignmentPattern": {
+        "Object": {
+          "span": "0:5",
+          "props": [
+            {
+              "Single": {
+                "span": "2:3",
+                "ident": {
                   "span": "2:3",
-                  "ident": {
-                    "span": "2:3",
-                    "name": "a"
-                  },
-                  "initializer": null
-                }
+                  "name": "a"
+                },
+                "initializer": null
               }
-            ],
-            "rest": null
-          }
+            }
+          ],
+          "rest": null
         }
       }
     },

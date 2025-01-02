@@ -1,7 +1,9 @@
 use crate::error::{ErrorKind, Result};
 use crate::static_semantics::ExprSemantics;
 use crate::{Context, Error, Parser};
-use fajt_ast::{assignment_op, AssignmentOperator, ExprParenthesized, PatternOrExpr, Spanned, UnaryOperator};
+use fajt_ast::{
+    assignment_op, AssignmentOperator, ExprParenthesized, PatternOrExpr, Spanned, UnaryOperator,
+};
 use fajt_ast::{unary_op, ExprTaggedTemplate};
 use fajt_ast::{update_op, UpdateOperator};
 use fajt_ast::{
@@ -173,10 +175,16 @@ where
     ) -> Result<Expr> {
         let right = self.parse_assignment_expr()?;
         let span = self.span_from(span_start);
+
+        let left_expr = match left {
+            Expr::AssignmentPattern(pattern) => PatternOrExpr::AssignmentPattern(pattern),
+            ex => PatternOrExpr::Expr(Box::new(ex)),
+        };
+
         Ok(ExprAssignment {
             span,
             operator,
-            left: PatternOrExpr::Expr(Box::new(left)),
+            left: left_expr,
             right: Box::new(right),
         }
         .into())

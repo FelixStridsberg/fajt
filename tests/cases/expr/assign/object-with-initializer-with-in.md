@@ -15,46 +15,44 @@
     "span": "0:20",
     "operator": "Assign",
     "left": {
-      "Expr": {
-        "AssignmentPattern": {
-          "Object": {
-            "span": "0:16",
-            "props": [
-              {
-                "Single": {
-                  "span": "2:14",
-                  "ident": {
-                    "span": "2:3",
-                    "name": "a"
-                  },
-                  "initializer": {
-                    "Binary": {
-                      "span": "6:14",
-                      "operator": "In",
-                      "left": {
-                        "Literal": {
-                          "span": "6:9",
-                          "literal": {
-                            "String": {
-                              "value": "b",
-                              "delimiter": "\""
-                            }
+      "AssignmentPattern": {
+        "Object": {
+          "span": "0:16",
+          "props": [
+            {
+              "Single": {
+                "span": "2:14",
+                "ident": {
+                  "span": "2:3",
+                  "name": "a"
+                },
+                "initializer": {
+                  "Binary": {
+                    "span": "6:14",
+                    "operator": "In",
+                    "left": {
+                      "Literal": {
+                        "span": "6:9",
+                        "literal": {
+                          "String": {
+                            "value": "b",
+                            "delimiter": "\""
                           }
                         }
-                      },
-                      "right": {
-                        "IdentRef": {
-                          "span": "13:14",
-                          "name": "c"
-                        }
+                      }
+                    },
+                    "right": {
+                      "IdentRef": {
+                        "span": "13:14",
+                        "name": "c"
                       }
                     }
                   }
                 }
               }
-            ],
-            "rest": null
-          }
+            }
+          ],
+          "rest": null
         }
       }
     },

@@ -41,35 +41,33 @@ function*fn(){({[yield]:a}={})}
                     "span": "22:41",
                     "operator": "Assign",
                     "left": {
-                      "Expr": {
-                        "AssignmentPattern": {
-                          "Object": {
-                            "span": "22:36",
-                            "props": [
-                              {
-                                "Named": {
-                                  "span": "24:34",
-                                  "name": {
-                                    "Computed": {
-                                      "Yield": {
-                                        "span": "25:30",
-                                        "argument": null,
-                                        "delegate": false
-                                      }
+                      "AssignmentPattern": {
+                        "Object": {
+                          "span": "22:36",
+                          "props": [
+                            {
+                              "Named": {
+                                "span": "24:34",
+                                "name": {
+                                  "Computed": {
+                                    "Yield": {
+                                      "span": "25:30",
+                                      "argument": null,
+                                      "delegate": false
                                     }
-                                  },
-                                  "value": {
-                                    "IdentRef": {
-                                      "span": "33:34",
-                                      "name": "a"
-                                    }
-                                  },
-                                  "initializer": null
-                                }
+                                  }
+                                },
+                                "value": {
+                                  "IdentRef": {
+                                    "span": "33:34",
+                                    "name": "a"
+                                  }
+                                },
+                                "initializer": null
                               }
-                            ],
-                            "rest": null
-                          }
+                            }
+                          ],
+                          "rest": null
                         }
                       }
                     },

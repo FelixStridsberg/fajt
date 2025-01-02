@@ -53,44 +53,42 @@ class cls{method(){({a:this.a}={a:1})}}
                           "span": "36:60",
                           "operator": "Assign",
                           "left": {
-                            "Expr": {
-                              "AssignmentPattern": {
-                                "Object": {
-                                  "span": "36:49",
-                                  "props": [
-                                    {
-                                      "Named": {
-                                        "span": "38:47",
-                                        "name": {
-                                          "Ident": {
-                                            "span": "38:39",
-                                            "name": "a"
-                                          }
-                                        },
-                                        "value": {
-                                          "Member": {
-                                            "span": "41:47",
-                                            "object": {
-                                              "Expr": {
-                                                "This": {
-                                                  "span": "41:45"
-                                                }
-                                              }
-                                            },
-                                            "property": {
-                                              "Ident": {
-                                                "span": "46:47",
-                                                "name": "a"
+                            "AssignmentPattern": {
+                              "Object": {
+                                "span": "36:49",
+                                "props": [
+                                  {
+                                    "Named": {
+                                      "span": "38:47",
+                                      "name": {
+                                        "Ident": {
+                                          "span": "38:39",
+                                          "name": "a"
+                                        }
+                                      },
+                                      "value": {
+                                        "Member": {
+                                          "span": "41:47",
+                                          "object": {
+                                            "Expr": {
+                                              "This": {
+                                                "span": "41:45"
                                               }
                                             }
+                                          },
+                                          "property": {
+                                            "Ident": {
+                                              "span": "46:47",
+                                              "name": "a"
+                                            }
                                           }
-                                        },
-                                        "initializer": null
-                                      }
+                                        }
+                                      },
+                                      "initializer": null
                                     }
-                                  ],
-                                  "rest": null
-                                }
+                                  }
+                                ],
+                                "rest": null
                               }
                             }
                           },

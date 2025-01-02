@@ -15,29 +15,27 @@
     "span": "0:16",
     "operator": "Assign",
     "left": {
-      "Expr": {
-        "AssignmentPattern": {
-          "Object": {
-            "span": "0:12",
-            "props": [],
-            "rest": {
-              "AssignmentPattern": {
-                "Object": {
-                  "span": "5:10",
-                  "props": [
-                    {
-                      "Single": {
+      "AssignmentPattern": {
+        "Object": {
+          "span": "0:12",
+          "props": [],
+          "rest": {
+            "AssignmentPattern": {
+              "Object": {
+                "span": "5:10",
+                "props": [
+                  {
+                    "Single": {
+                      "span": "7:8",
+                      "ident": {
                         "span": "7:8",
-                        "ident": {
-                          "span": "7:8",
-                          "name": "a"
-                        },
-                        "initializer": null
-                      }
+                        "name": "a"
+                      },
+                      "initializer": null
                     }
-                  ],
-                  "rest": null
-                }
+                  }
+                ],
+                "rest": null
               }
             }
           }
