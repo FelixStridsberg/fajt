@@ -84,6 +84,15 @@ where
                         // `CoverInitializedName` production.
                         if matches!(error.kind(), ErrorKind::InitializedNameNotAllowed) {
                             self.reader.rewind_to(&start_token)?;
+
+                            // We are in invalid state because of invalid syntax.
+                            // Propagate all the way to the top for good error message.
+                            if !self.current_matches(&punct!("{"))
+                                && !self.current_matches(&punct!("["))
+                            {
+                                return Err(error);
+                            }
+
                             let pattern = self.parse_assignment_pattern()?;
                             ExprOrRecoveredPattern::Pattern(pattern, error)
                         } else {
