@@ -1,4 +1,4 @@
-use crate::error::ErrorKind::UnexpectedToken;
+use crate::error::ErrorKind::{InitializedNameNotAllowed, UnexpectedToken};
 use crate::error::{Error, Result};
 use crate::Parser;
 use fajt_ast::Expr;
@@ -33,13 +33,15 @@ where
                     self.parse_arrow_function_expr()?,
                 ))
             }
-            Err(error) if matches!(error.kind(), &UnexpectedToken(punct!("..."), _)) => {
-                self.reader.rewind_to(&start_token)?;
-                Err(Error::arrow_function_not_allowed(
-                    self.parse_arrow_function_expr()?,
-                ))
-            }
-            error => error,
+            Err(error) => match error.kind() {
+                &UnexpectedToken(punct!("..."), _) | InitializedNameNotAllowed => {
+                    self.reader.rewind_to(&start_token)?;
+                    Err(Error::arrow_function_not_allowed(
+                        self.parse_arrow_function_expr()?,
+                    ))
+                }
+                _ => Err(error),
+            },
         }
     }
 
