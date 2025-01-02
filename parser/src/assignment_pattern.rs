@@ -87,7 +87,7 @@ where
         let span = self.span_from(span_start);
         Ok(AssignmentElement {
             span,
-            target,
+            target: Box::new(target),
             initializer,
         })
     }
@@ -176,7 +176,7 @@ where
         Ok(NamedAssignmentProp {
             span,
             name,
-            value: Box::new(target),
+            value: target,
             initializer,
         })
     }
