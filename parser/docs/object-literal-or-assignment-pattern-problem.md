@@ -43,44 +43,89 @@ the level we see the error are the top level of the current nest of literals.
 
 ## How to know when to stop bubble
 
-When we hit an `CoverInitializedName` in an object literal, we must let that
-error bubble up through all nested object and nested object literal.
+It turns out that it is non trivial to know when to stop bubble.
 
-We can do this in a few different ways, but all ways requires that we know
-when we are no longer in a nested literal context.
-
-For example:
+Consider this scenario:
 ```js
-[{b = c} = {}]
+[{a =
+//  ^
+// This is not a valid token in an object literal, it is either invalid syntax
+// or an assignment pattern.
 ```
 
-This should be parsed as:
-```
-ArrayLiteral:
-    Assignment:
-        ObjectAssignmentPattern:
-            ...
-```
+In this scenario we should rewind the parser and re-parse as an assignment pattern.
 
-I.e. when we find the `CoverInitializedName` production in the object literal,
-we should only "bubble" up to the parenthesized expression and re-parse as
-assignment pattern, not the whole way up to the array literal.
+But should we rewind to the `{` or the `[`? That depends on which one is followed
+by a `=`. And that we do now know at this point.
 
-However, this expression:
+We could be in this scenario:
 ```js
-[{b = c}] = {}
+[{a = 1}] = b
+// Assignment
+//   ArrayAssignmentPattern
+//     ObjectAssignmentPattern
 ```
 
-Should be parsed as:
-```
-Assignment:
-    ArrayAssigmentPattern:
-        ObjectAssignmentPattern:
-            ...
+```js
+[{a = 1} = b]
+// ArrayLiteral
+//   Assignment
+//     ObjectAssignmentPattern
 ```
 
-I.e. it should bubble passed the array literal and convert that to assignment
-pattern too.
+The simplest solution may be to rewind to the start of the current literal, and
+then later rewind again if a literal value turns out to be an assignment
+pattern.
 
-The common pattern seems to be that we should bubble up to the left hand side
-of the assignment expression and restart from there.
+(Note that there are several levels of productions not represented in the
+following examples)
+
+From the first example above:
+```js
+   [{a =
+//     ^
+// Invalid object literal, may be an assignment pattern
+   [{
+//  ^
+// Re-parse as assignment pattern
+
+   [{a = 1}]
+//         ^
+// An array literal contained assignment pattern as value
+
+   [
+// ^
+// Re-parse as assignment pattern
+
+   [{a = 1}] = b
+// Successfully parsed as:
+// Assignment
+//   ArrayAssignmentPattern
+//     ObjectAssignmentPattern
+```
+
+From the second example above:
+```js
+   [{a =
+//     ^
+// Invalid object literal, may be an assignment pattern
+
+   [{
+//  ^
+// Re-parse as assignment pattern
+
+   [{a = 1} = b]
+// Successfully parsed as:
+// ArrayLiteral
+//   Assignment
+//     ObjectAssignmentPattern
+```
+
+
+## Performance drawbacks
+
+The obvious drawbacks with this approach is that for large nested objects, we
+may need to re-read a lot of data several times.
+
+But the main goal of this parser is simplicity, so that will be acceptable at
+this time.
