@@ -57,7 +57,7 @@ ast_struct! {
     pub struct NamedAssignmentProp {
         pub span: Span,
         pub name: PropertyName,
-        pub value: PatternOrExpr,
+        pub value: Box<PatternOrExpr>,
         pub initializer: Option<Box<Expr>>,
     }
 }

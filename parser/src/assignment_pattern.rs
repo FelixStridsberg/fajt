@@ -176,7 +176,7 @@ where
         Ok(NamedAssignmentProp {
             span,
             name,
-            value: target,
+            value: Box::new(target),
             initializer,
         })
     }
