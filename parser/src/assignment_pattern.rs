@@ -55,7 +55,15 @@ where
                         ));
                     }
 
-                    rest = Some(Box::new(rest_expr));
+                    // TODO temporary to change ast before implementation
+                    let adjusted_rest = match rest_expr {
+                        Expr::AssignmentPattern(pattern) => {
+                            PatternOrExpr::AssignmentPattern(pattern)
+                        }
+                        expr => PatternOrExpr::Expr(Box::new(expr)),
+                    };
+
+                    rest = Some(Box::new(adjusted_rest));
                     break;
                 }
                 token_matches!(punct!(",")) => {
@@ -137,7 +145,15 @@ where
                         ));
                     }
 
-                    rest = Some(Box::new(rest_expr));
+                    // TODO temporary to change ast before implementation
+                    let adjusted_rest = match rest_expr {
+                        Expr::AssignmentPattern(pattern) => {
+                            PatternOrExpr::AssignmentPattern(pattern)
+                        }
+                        expr => PatternOrExpr::Expr(Box::new(expr)),
+                    };
+
+                    rest = Some(Box::new(adjusted_rest));
                     break;
                 }
                 token if token_matches!(token, punct!("[")) || self.peek_matches(&punct!(":")) => {

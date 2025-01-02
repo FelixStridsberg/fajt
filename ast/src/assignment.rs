@@ -18,7 +18,7 @@ ast_struct! {
     pub struct ArrayAssignmentPattern {
         pub span: Span,
         pub elements: Vec<Option<AssignmentElement>>,
-        pub rest: Option<Box<Expr>>,
+        pub rest: Option<Box<PatternOrExpr>>,
     }
 }
 
@@ -34,7 +34,7 @@ ast_struct! {
     pub struct ObjectAssignmentPattern {
         pub span: Span,
         pub props: Vec<AssignmentProp>,
-        pub rest: Option<Box<Expr>>,
+        pub rest: Option<Box<PatternOrExpr>>,
     }
 }
 

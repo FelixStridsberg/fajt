@@ -20,9 +20,11 @@
           "span": "0:8",
           "props": [],
           "rest": {
-            "IdentRef": {
-              "span": "5:6",
-              "name": "a"
+            "Expr": {
+              "IdentRef": {
+                "span": "5:6",
+                "name": "a"
+              }
             }
           }
         }
