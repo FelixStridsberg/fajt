@@ -19,9 +19,11 @@ that would generate lexer error.
             "span": "2:14",
             "operator": "Assign",
             "left": {
-              "IdentRef": {
-                "span": "2:3",
-                "name": "a"
+              "Expr": {
+                "IdentRef": {
+                  "span": "2:3",
+                  "name": "a"
+                }
               }
             },
             "right": {

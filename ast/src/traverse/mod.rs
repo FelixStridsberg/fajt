@@ -132,6 +132,7 @@ generate_fold_and_visit! {
 
         ForDeclaration: (enter: enter_for_declaration, exit: exit_for_declaration) {
             Expr
+            AssignmentPattern
             Declaration
         }
 
@@ -189,6 +190,15 @@ generate_fold_and_visit! {
             DefaultDecl
             Named
             Namespace
+        }
+
+        PatternOrExpr: (enter: enter_pattern_or_expr, exit: exit_pattern_or_expr) {
+            Expr
+            AssignmentPattern
+        }
+
+        AssignmentPattern: (enter: enter_assignment_pattern, exit: exit_assignment_pattern) {
+            // TODO
         }
     }
 

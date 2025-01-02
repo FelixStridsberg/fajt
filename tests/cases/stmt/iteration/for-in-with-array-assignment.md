@@ -14,24 +14,24 @@ for([a]in b);
   "ForIn": {
     "span": "0:18",
     "left": {
-      "Expr": {
-        "AssignmentPattern": {
-          "Array": {
-            "span": "5:10",
-            "elements": [
-              {
-                "span": "7:8",
-                "target": {
+      "AssignmentPattern": {
+        "Array": {
+          "span": "5:10",
+          "elements": [
+            {
+              "span": "7:8",
+              "target": {
+                "Expr": {
                   "IdentRef": {
                     "span": "7:8",
                     "name": "a"
                   }
-                },
-                "initializer": null
-              }
-            ],
-            "rest": null
-          }
+                }
+              },
+              "initializer": null
+            }
+          ],
+          "rest": null
         }
       }
     },

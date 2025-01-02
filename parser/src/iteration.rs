@@ -206,7 +206,7 @@ where
         match self.current()? {
             token_matches!(punct!("[")) | token_matches!(punct!("{")) => {
                 let assignment_pattern = self.parse_assignment_pattern()?;
-                Ok(ForDeclaration::Expr(Box::new(assignment_pattern)))
+                Ok(ForDeclaration::AssignmentPattern(assignment_pattern))
             }
             _ => {
                 let expr = self.parse_left_hand_side_expr()?;

@@ -1,6 +1,13 @@
 use crate::{Expr, Ident, PropertyName, Span};
 
 ast_mapping! {
+    pub enum PatternOrExpr {
+        Expr(Expr),
+        AssignmentPattern(AssignmentPattern),
+    }
+}
+
+ast_mapping! {
     pub enum AssignmentPattern {
         Array(ArrayAssignmentPattern),
         Object(ObjectAssignmentPattern),
@@ -11,14 +18,14 @@ ast_struct! {
     pub struct ArrayAssignmentPattern {
         pub span: Span,
         pub elements: Vec<Option<AssignmentElement>>,
-        pub rest: Option<Box<Expr>>,
+        pub rest: Option<Box<PatternOrExpr>>,
     }
 }
 
 ast_struct! {
     pub struct AssignmentElement {
         pub span: Span,
-        pub target: Box<Expr>,
+        pub target: Box<PatternOrExpr>,
         pub initializer: Option<Box<Expr>>,
     }
 }
@@ -27,7 +34,7 @@ ast_struct! {
     pub struct ObjectAssignmentPattern {
         pub span: Span,
         pub props: Vec<AssignmentProp>,
-        pub rest: Option<Box<Expr>>,
+        pub rest: Option<Box<PatternOrExpr>>,
     }
 }
 
@@ -50,7 +57,7 @@ ast_struct! {
     pub struct NamedAssignmentProp {
         pub span: Span,
         pub name: PropertyName,
-        pub value: Box<Expr>,
+        pub value: Box<PatternOrExpr>,
         pub initializer: Option<Box<Expr>>,
     }
 }

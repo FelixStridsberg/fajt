@@ -22,9 +22,11 @@
             {
               "span": "2:3",
               "target": {
-                "IdentRef": {
-                  "span": "2:3",
-                  "name": "a"
+                "Expr": {
+                  "IdentRef": {
+                    "span": "2:3",
+                    "name": "a"
+                  }
                 }
               },
               "initializer": null

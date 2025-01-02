@@ -67,19 +67,21 @@ class cls{method(){({a:this.a}={a:1})}}
                                         }
                                       },
                                       "value": {
-                                        "Member": {
-                                          "span": "41:47",
-                                          "object": {
-                                            "Expr": {
-                                              "This": {
-                                                "span": "41:45"
+                                        "Expr": {
+                                          "Member": {
+                                            "span": "41:47",
+                                            "object": {
+                                              "Expr": {
+                                                "This": {
+                                                  "span": "41:45"
+                                                }
                                               }
-                                            }
-                                          },
-                                          "property": {
-                                            "Ident": {
-                                              "span": "46:47",
-                                              "name": "a"
+                                            },
+                                            "property": {
+                                              "Ident": {
+                                                "span": "46:47",
+                                                "name": "a"
+                                              }
                                             }
                                           }
                                         }

@@ -15,9 +15,11 @@ a&=b
     "span": "0:6",
     "operator": "BitwiseAnd",
     "left": {
-      "IdentRef": {
-        "span": "0:1",
-        "name": "a"
+      "Expr": {
+        "IdentRef": {
+          "span": "0:1",
+          "name": "a"
+        }
       }
     },
     "right": {

@@ -14,41 +14,41 @@ for([a=b in c]in d);
   "ForIn": {
     "span": "0:25",
     "left": {
-      "Expr": {
-        "AssignmentPattern": {
-          "Array": {
-            "span": "5:17",
-            "elements": [
-              {
-                "span": "6:16",
-                "target": {
+      "AssignmentPattern": {
+        "Array": {
+          "span": "5:17",
+          "elements": [
+            {
+              "span": "6:16",
+              "target": {
+                "Expr": {
                   "IdentRef": {
                     "span": "6:7",
                     "name": "a"
                   }
-                },
-                "initializer": {
-                  "Binary": {
-                    "span": "10:16",
-                    "operator": "In",
-                    "left": {
-                      "IdentRef": {
-                        "span": "10:11",
-                        "name": "b"
-                      }
-                    },
-                    "right": {
-                      "IdentRef": {
-                        "span": "15:16",
-                        "name": "c"
-                      }
+                }
+              },
+              "initializer": {
+                "Binary": {
+                  "span": "10:16",
+                  "operator": "In",
+                  "left": {
+                    "IdentRef": {
+                      "span": "10:11",
+                      "name": "b"
+                    }
+                  },
+                  "right": {
+                    "IdentRef": {
+                      "span": "15:16",
+                      "name": "c"
                     }
                   }
                 }
               }
-            ],
-            "rest": null
-          }
+            }
+          ],
+          "rest": null
         }
       }
     },

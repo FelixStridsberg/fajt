@@ -27,9 +27,11 @@
                   {
                     "span": "7:8",
                     "target": {
-                      "IdentRef": {
-                        "span": "7:8",
-                        "name": "a"
+                      "Expr": {
+                        "IdentRef": {
+                          "span": "7:8",
+                          "name": "a"
+                        }
                       }
                     },
                     "initializer": null

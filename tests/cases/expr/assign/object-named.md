@@ -29,9 +29,11 @@
                   }
                 },
                 "value": {
-                  "IdentRef": {
-                    "span": "5:6",
-                    "name": "b"
+                  "Expr": {
+                    "IdentRef": {
+                      "span": "5:6",
+                      "name": "b"
+                    }
                   }
                 },
                 "initializer": null

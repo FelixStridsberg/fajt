@@ -23,9 +23,11 @@ code points that is not a token.
                   "span": "2:9",
                   "operator": "Assign",
                   "left": {
-                    "IdentRef": {
-                      "span": "2:3",
-                      "name": "a"
+                    "Expr": {
+                      "IdentRef": {
+                        "span": "2:3",
+                        "name": "a"
+                      }
                     }
                   },
                   "right": {
@@ -48,9 +50,11 @@ code points that is not a token.
                   "span": "13:20",
                   "operator": "Assign",
                   "left": {
-                    "IdentRef": {
-                      "span": "13:14",
-                      "name": "b"
+                    "Expr": {
+                      "IdentRef": {
+                        "span": "13:14",
+                        "name": "b"
+                      }
                     }
                   },
                   "right": {
@@ -73,9 +77,11 @@ code points that is not a token.
                   "span": "24:33",
                   "operator": "Assign",
                   "left": {
-                    "IdentRef": {
-                      "span": "24:25",
-                      "name": "c"
+                    "Expr": {
+                      "IdentRef": {
+                        "span": "24:25",
+                        "name": "c"
+                      }
                     }
                   },
                   "right": {

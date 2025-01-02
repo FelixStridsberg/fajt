@@ -51,29 +51,31 @@
                   }
                 },
                 "value": {
-                  "Member": {
-                    "span": "12:17",
-                    "object": {
-                      "Expr": {
-                        "Call": {
-                          "span": "12:15",
-                          "callee": {
-                            "Expr": {
-                              "IdentRef": {
-                                "span": "12:13",
-                                "name": "c"
+                  "Expr": {
+                    "Member": {
+                      "span": "12:17",
+                      "object": {
+                        "Expr": {
+                          "Call": {
+                            "span": "12:15",
+                            "callee": {
+                              "Expr": {
+                                "IdentRef": {
+                                  "span": "12:13",
+                                  "name": "c"
+                                }
                               }
-                            }
-                          },
-                          "arguments_span": "13:15",
-                          "arguments": []
+                            },
+                            "arguments_span": "13:15",
+                            "arguments": []
+                          }
                         }
-                      }
-                    },
-                    "property": {
-                      "Ident": {
-                        "span": "16:17",
-                        "name": "d"
+                      },
+                      "property": {
+                        "Ident": {
+                          "span": "16:17",
+                          "name": "d"
+                        }
                       }
                     }
                   }

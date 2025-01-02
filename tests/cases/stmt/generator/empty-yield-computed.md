@@ -58,9 +58,11 @@ function*fn(){({[yield]:a}={})}
                                   }
                                 },
                                 "value": {
-                                  "IdentRef": {
-                                    "span": "33:34",
-                                    "name": "a"
+                                  "Expr": {
+                                    "IdentRef": {
+                                      "span": "33:34",
+                                      "name": "a"
+                                    }
                                   }
                                 },
                                 "initializer": null
