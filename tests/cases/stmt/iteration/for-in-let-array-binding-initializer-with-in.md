@@ -21,9 +21,11 @@ for([a=b in c]in d);
             {
               "span": "6:16",
               "target": {
-                "IdentRef": {
-                  "span": "6:7",
-                  "name": "a"
+                "Expr": {
+                  "IdentRef": {
+                    "span": "6:7",
+                    "name": "a"
+                  }
                 }
               },
               "initializer": {

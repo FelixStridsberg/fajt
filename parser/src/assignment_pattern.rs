@@ -3,6 +3,7 @@ use crate::error::Result;
 use crate::static_semantics::ExprSemantics;
 use crate::Parser;
 use crate::ThenTry;
+use fajt_ast::PatternOrExpr;
 use fajt_ast::{
     ArrayAssignmentPattern, AssignmentElement, AssignmentPattern, AssignmentProp, Expr,
     NamedAssignmentProp, ObjectAssignmentPattern, SingleNameAssignmentProp, Spanned,
@@ -79,9 +80,9 @@ where
 
     fn parse_assignment_element(&mut self) -> Result<AssignmentElement> {
         let span_start = self.position();
-        let target = Box::new(self.parse_left_hand_side_expr()?);
+        let target = self.parse_left_hand_side_expr()?;
 
-        if !matches!(*target, Expr::AssignmentPattern(_))
+        if !matches!(target, Expr::AssignmentPattern(_))
             && !target.is_assignment_target_type_simple(&self.context)?
         {
             return Err(Error::syntax_error(
@@ -99,10 +100,16 @@ where
             None
         };
 
+        // TODO temporary to change tree before refactoring
+        let adjusted_target = match target {
+            Expr::AssignmentPattern(pattern) => PatternOrExpr::AssignmentPattern(pattern),
+            expr => PatternOrExpr::Expr(Box::new(expr)),
+        };
+
         let span = self.span_from(span_start);
         Ok(AssignmentElement {
             span,
-            target,
+            target: adjusted_target,
             initializer,
         })
     }

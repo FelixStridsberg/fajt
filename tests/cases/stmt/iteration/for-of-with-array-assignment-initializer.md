@@ -21,9 +21,11 @@ for([a=1]of b);
             {
               "span": "7:12",
               "target": {
-                "IdentRef": {
-                  "span": "7:8",
-                  "name": "a"
+                "Expr": {
+                  "IdentRef": {
+                    "span": "7:8",
+                    "name": "a"
+                  }
                 }
               },
               "initializer": {

@@ -25,7 +25,7 @@ ast_struct! {
 ast_struct! {
     pub struct AssignmentElement {
         pub span: Span,
-        pub target: Box<Expr>,
+        pub target: PatternOrExpr,
         pub initializer: Option<Box<Expr>>,
     }
 }
