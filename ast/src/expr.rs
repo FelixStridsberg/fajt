@@ -1,4 +1,3 @@
-use crate::assignment::AssignmentPattern;
 use crate::class::ExprClass;
 use crate::{literal::*, PatternOrExpr};
 use crate::{Body, FormalParameters, Ident, Span};
@@ -8,8 +7,6 @@ ast_mapping! {
     pub enum Expr {
         ArrowFunction(ExprArrowFunction),
         Assignment(ExprAssignment),
-        #[deprecated(note="Should not be part of main Expr")]
-        AssignmentPattern(AssignmentPattern),
         Await(ExprAwait),
         Binary(ExprBinary),
         Call(ExprCall),
@@ -370,7 +367,7 @@ ast_struct! {
     pub struct ExprAssignment {
         pub span: Span,
         pub operator: AssignmentOperator,
-        pub left: PatternOrExpr,
+        pub left: Box<PatternOrExpr>,
         pub right: Box<Expr>,
     }
 }

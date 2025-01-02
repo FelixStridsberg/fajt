@@ -81,7 +81,7 @@ where
                     Some(operator) => {
                         let expr = expr?;
                         expr.early_errors_left_hand_side_expr(&self.context)?;
-                        self.parse_assignment(span_start, expr, operator)
+                        self.parse_assignment(span_start, PatternOrExpr::Expr(expr), operator)
                     }
                     _ => Ok(expr?),
                 }
@@ -95,25 +95,26 @@ where
         &mut self,
         start_token: &Token,
         expr: Result<Expr>,
-    ) -> Result<Expr> {
+    ) -> Result<PatternOrExpr> {
+        println!("EXPR: {:?}", expr);
         match expr {
-            Ok(Expr::Literal(_)) => {
+            Ok(Expr::Literal(ExprLiteral {
+                literal: Literal::Object(_) | Literal::Array(_),
+                ..
+            })) => {
                 self.reader.rewind_to(start_token)?;
-                let expr = self.parse_assignment_pattern()?;
+                let pattern = self.parse_assignment_pattern()?;
                 self.consume_assert(&punct!("="))?;
-                Ok(expr)
+                Ok(PatternOrExpr::AssignmentPattern(pattern))
             }
             Ok(expr) => {
-                if !matches!(expr, Expr::AssignmentPattern(_)) {
-                    expr.early_errors_left_hand_side_expr(&self.context)?;
-                }
-
-                Ok(expr)
+                expr.early_errors_left_hand_side_expr(&self.context)?;
+                Ok(PatternOrExpr::Expr(expr))
             }
             Err(error) => {
                 if matches!(error.kind(), ErrorKind::InitializedNameNotAllowed) {
                     self.reader.rewind_to(start_token)?;
-                    let expr = self.parse_assignment_pattern()?;
+                    let pattern = self.parse_assignment_pattern()?;
                     if !self.maybe_consume(&punct!("="))? {
                         return Err(Error::syntax_error(
                             "Initializer not allowed here".to_owned(),
@@ -121,7 +122,7 @@ where
                         ));
                     }
 
-                    Ok(expr)
+                    Ok(PatternOrExpr::AssignmentPattern(pattern))
                 } else {
                     Err(error)
                 }
@@ -170,21 +171,16 @@ where
     fn parse_assignment(
         &mut self,
         span_start: usize,
-        left: Expr,
+        left: PatternOrExpr,
         operator: AssignmentOperator,
     ) -> Result<Expr> {
         let right = self.parse_assignment_expr()?;
         let span = self.span_from(span_start);
 
-        let left_expr = match left {
-            Expr::AssignmentPattern(pattern) => PatternOrExpr::AssignmentPattern(pattern),
-            ex => PatternOrExpr::Expr(Box::new(ex)),
-        };
-
         Ok(ExprAssignment {
             span,
             operator,
-            left: left_expr,
+            left: Box::new(left),
             right: Box::new(right),
         }
         .into())
@@ -731,12 +727,6 @@ where
             token_matches!(keyword!("true")) => self.consume_literal(Literal::Boolean(true))?,
             token_matches!(keyword!("false")) => self.consume_literal(Literal::Boolean(false))?,
             token_matches!(@literal) => self.parse_literal()?,
-            token_matches!(punct!("[")) if self.context.is_inside_assignment_expr => {
-                self.parse_array_assignment_pattern()?
-            }
-            token_matches!(punct!("{")) if self.context.is_inside_assignment_expr => {
-                self.parse_object_assignment_pattern()?
-            }
             token_matches!(punct!("[")) => self.parse_array_literal()?,
             token_matches!(punct!("{")) => self.parse_object_literal()?,
             token_matches!(keyword!("function")) => self.parse_function_expr()?,

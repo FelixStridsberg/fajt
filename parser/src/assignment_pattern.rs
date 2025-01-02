@@ -5,7 +5,7 @@ use crate::Parser;
 use crate::ThenTry;
 use fajt_ast::PatternOrExpr;
 use fajt_ast::{
-    ArrayAssignmentPattern, AssignmentElement, AssignmentPattern, AssignmentProp, Expr,
+    ArrayAssignmentPattern, AssignmentElement, AssignmentPattern, AssignmentProp,
     NamedAssignmentProp, ObjectAssignmentPattern, SingleNameAssignmentProp, Spanned,
 };
 use fajt_common::io::{PeekRead, ReReadWithState};
@@ -19,19 +19,15 @@ where
     I: PeekRead<Token, Error = fajt_lexer::error::Error>,
     I: ReReadWithState<Token, State = LexerState, Error = fajt_lexer::error::Error>,
 {
-    pub(super) fn parse_assignment_pattern(&mut self) -> Result<Expr> {
+    pub(super) fn parse_assignment_pattern(&mut self) -> Result<AssignmentPattern> {
         match self.current()? {
-            token_matches!(punct!("[")) => self
-                .with_context(self.context.inside_assignment_expr(true))
-                .parse_array_assignment_pattern(),
-            token_matches!(punct!("{")) => self
-                .with_context(self.context.inside_assignment_expr(true))
-                .parse_object_assignment_pattern(),
-            _ => Ok(Expr::IdentRef(self.parse_identifier()?)),
+            token_matches!(punct!("[")) => self.parse_array_assignment_pattern(),
+            token_matches!(punct!("{")) => self.parse_object_assignment_pattern(),
+            token => unreachable!("Expected to parse assignment pattern, found {:?}", token),
         }
     }
 
-    pub(super) fn parse_array_assignment_pattern(&mut self) -> Result<Expr> {
+    pub(super) fn parse_array_assignment_pattern(&mut self) -> Result<AssignmentPattern> {
         let span_start = self.position();
         self.consume_assert(&punct!("["))?;
 
@@ -46,7 +42,7 @@ where
                 }
                 token_matches!(punct!("...")) => {
                     self.consume()?;
-                    let rest_expr = self.parse_left_hand_side_expr()?;
+                    let rest_expr = self.parse_destructuring_assignment_target()?;
 
                     if !self.maybe_consume(&punct!("]"))? {
                         return Err(Error::syntax_error(
@@ -55,15 +51,7 @@ where
                         ));
                     }
 
-                    // TODO temporary to change ast before implementation
-                    let adjusted_rest = match rest_expr {
-                        Expr::AssignmentPattern(pattern) => {
-                            PatternOrExpr::AssignmentPattern(pattern)
-                        }
-                        expr => PatternOrExpr::Expr(Box::new(expr)),
-                    };
-
-                    rest = Some(Box::new(adjusted_rest));
+                    rest = Some(Box::new(rest_expr));
                     break;
                 }
                 token_matches!(punct!(",")) => {
@@ -77,28 +65,17 @@ where
         }
 
         let span = self.span_from(span_start);
-        Ok(Expr::AssignmentPattern(AssignmentPattern::Array(
-            ArrayAssignmentPattern {
-                span,
-                elements,
-                rest,
-            },
-        )))
+        Ok(AssignmentPattern::Array(ArrayAssignmentPattern {
+            span,
+            elements,
+            rest,
+        }))
     }
 
     fn parse_assignment_element(&mut self) -> Result<AssignmentElement> {
         let span_start = self.position();
-        let target = self.parse_left_hand_side_expr()?;
 
-        if !matches!(target, Expr::AssignmentPattern(_))
-            && !target.is_assignment_target_type_simple(&self.context)?
-        {
-            return Err(Error::syntax_error(
-                "Invalid destructuring assignment target".to_owned(),
-                target.span().clone(),
-            ));
-        }
-
+        let target = self.parse_destructuring_assignment_target()?;
         let initializer = self
             .current_matches(&punct!("="))
             .then_try(|| {
@@ -107,22 +84,36 @@ where
             })?
             .map(Box::new);
 
-        // TODO temporary to change tree before refactoring
-        let adjusted_target = match target {
-            Expr::AssignmentPattern(pattern) => PatternOrExpr::AssignmentPattern(pattern),
-            expr => PatternOrExpr::Expr(Box::new(expr)),
-        };
-
         let span = self.span_from(span_start);
         Ok(AssignmentElement {
             span,
-            target: adjusted_target,
+            target,
             initializer,
         })
     }
 
+    fn parse_destructuring_assignment_target(&mut self) -> Result<PatternOrExpr> {
+        Ok(match self.current()? {
+            token_matches!(punct!("{") | punct!("[")) => {
+                PatternOrExpr::AssignmentPattern(self.parse_assignment_pattern()?)
+            }
+            _ => {
+                let expr = self.parse_left_hand_side_expr()?;
+
+                if !expr.is_assignment_target_type_simple(&self.context)? {
+                    return Err(Error::syntax_error(
+                        "Invalid destructuring assignment target".to_owned(),
+                        expr.span().clone(),
+                    ));
+                }
+
+                PatternOrExpr::Expr(expr)
+            }
+        })
+    }
+
     /// Parses the `ObjectAssignmentPattern` production.
-    pub(super) fn parse_object_assignment_pattern(&mut self) -> Result<Expr> {
+    pub(super) fn parse_object_assignment_pattern(&mut self) -> Result<AssignmentPattern> {
         let span_start = self.position();
         self.consume_assert(&punct!("{"))?;
 
@@ -137,7 +128,7 @@ where
                 }
                 token_matches!(punct!("...")) => {
                     self.consume()?;
-                    let rest_expr = self.parse_left_hand_side_expr()?;
+                    let rest_expr = self.parse_destructuring_assignment_target()?;
                     if !self.maybe_consume(&punct!("}"))? {
                         return Err(Error::syntax_error(
                             "Rest element must be last element".to_owned(),
@@ -145,15 +136,7 @@ where
                         ));
                     }
 
-                    // TODO temporary to change ast before implementation
-                    let adjusted_rest = match rest_expr {
-                        Expr::AssignmentPattern(pattern) => {
-                            PatternOrExpr::AssignmentPattern(pattern)
-                        }
-                        expr => PatternOrExpr::Expr(Box::new(expr)),
-                    };
-
-                    rest = Some(Box::new(adjusted_rest));
+                    rest = Some(Box::new(rest_expr));
                     break;
                 }
                 token if token_matches!(token, punct!("[")) || self.peek_matches(&punct!(":")) => {
@@ -170,9 +153,11 @@ where
         }
 
         let span = self.span_from(span_start);
-        Ok(Expr::AssignmentPattern(AssignmentPattern::Object(
-            ObjectAssignmentPattern { span, props, rest },
-        )))
+        Ok(AssignmentPattern::Object(ObjectAssignmentPattern {
+            span,
+            props,
+            rest,
+        }))
     }
 
     /// Parses the `PropertyName: AssignmentElement` case of the `AssignmentProperty` production.

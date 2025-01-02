@@ -1,8 +1,8 @@
 use crate::{Expr, Ident, PropertyName, Span};
 
-ast_node! {
+ast_mapping! {
     pub enum PatternOrExpr {
-        Expr(Box<Expr>),
+        Expr(Expr),
         AssignmentPattern(AssignmentPattern),
     }
 }
