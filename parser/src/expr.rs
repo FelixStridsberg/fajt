@@ -2,7 +2,8 @@ use crate::error::{ErrorKind, Result};
 use crate::static_semantics::ExprSemantics;
 use crate::{Context, Error, Parser};
 use fajt_ast::{
-    assignment_op, AssignmentOperator, ExprParenthesized, PatternOrExpr, Spanned, UnaryOperator,
+    assignment_op, AssignmentOperator, AssignmentPattern, ExprParenthesized, PatternOrExpr,
+    Spanned, UnaryOperator,
 };
 use fajt_ast::{unary_op, ExprTaggedTemplate};
 use fajt_ast::{update_op, UpdateOperator};
@@ -63,17 +64,28 @@ where
                 self.parse_arrow_function_expr()
             }
             _ => {
-                let token = self.current()?.clone();
+                /// When parsing an expression, it may fail during object literal parsing because
+                /// of the `CoverInitializedName` production. When that happens, we must retry
+                /// parsing as assignment pattern instead.
+                ///
+                /// The assignment pattern is only valid if it turns out this expression is the
+                /// left side of an assignment, otherwise the error must be propagated.
+                enum ExprOrRecoveredPattern {
+                    Expr(Expr),
+                    Pattern(AssignmentPattern, Error),
+                }
 
-                let mut downstream_error = None;
+                let start_token = self.current()?.clone();
+
                 let pattern_or_expr = match self.parse_conditional_expr_or_arrow_function() {
-                    Ok(expr) => PatternOrExpr::Expr(expr),
+                    Ok(expr) => ExprOrRecoveredPattern::Expr(expr),
                     Err(error) => {
+                        // We hit a literal that did not conform to a literal because of the
+                        // `CoverInitializedName` production.
                         if matches!(error.kind(), ErrorKind::InitializedNameNotAllowed) {
-                            downstream_error = Some(error.clone());
-                            self.reader.rewind_to(&token)?;
+                            self.reader.rewind_to(&start_token)?;
                             let pattern = self.parse_assignment_pattern()?;
-                            PatternOrExpr::AssignmentPattern(pattern)
+                            ExprOrRecoveredPattern::Pattern(pattern, error)
                         } else {
                             return Err(error);
                         }
@@ -81,11 +93,16 @@ where
                 };
 
                 let assignment_operator = self.parse_optional_assignment_operator();
-
                 match assignment_operator {
                     Some(AssignmentOperator::Assign) => {
-                        let assignment_expr =
-                            self.normalize_left_side_assignment(&token, pattern_or_expr)?;
+                        let assignment_expr = match pattern_or_expr {
+                            ExprOrRecoveredPattern::Expr(expr) => {
+                                self.normalize_left_side_assignment(&start_token, expr)?
+                            }
+                            ExprOrRecoveredPattern::Pattern(pattern, _) => {
+                                PatternOrExpr::AssignmentPattern(pattern)
+                            }
+                        };
 
                         self.parse_assignment(
                             span_start,
@@ -94,19 +111,16 @@ where
                         )
                     }
                     Some(operator) => match pattern_or_expr {
-                        PatternOrExpr::Expr(expr) => {
+                        ExprOrRecoveredPattern::Expr(expr) => {
                             expr.early_errors_left_hand_side_expr(&self.context)?;
                             self.parse_assignment(span_start, PatternOrExpr::Expr(expr), operator)
                         }
-                        _ => todo!("Non assignment pattern"),
+                        ExprOrRecoveredPattern::Pattern(_, error) => Err(error),
                     },
-                    _ => {
-                        if let PatternOrExpr::Expr(expr) = pattern_or_expr {
-                            Ok(expr)
-                        } else {
-                            Err(downstream_error.unwrap())
-                        }
-                    }
+                    None => match pattern_or_expr {
+                        ExprOrRecoveredPattern::Expr(expr) => Ok(expr),
+                        ExprOrRecoveredPattern::Pattern(_, error) => Err(error),
+                    },
                 }
             }
         }
@@ -117,20 +131,19 @@ where
     pub fn normalize_left_side_assignment(
         &mut self,
         start_token: &Token,
-        pattern_or_expr: PatternOrExpr,
+        pattern_or_expr: Expr,
     ) -> Result<PatternOrExpr> {
         match pattern_or_expr {
-            PatternOrExpr::AssignmentPattern(_) => Ok(pattern_or_expr),
-            PatternOrExpr::Expr(Expr::Literal(ExprLiteral {
+            Expr::Literal(ExprLiteral {
                 literal: Literal::Object(_) | Literal::Array(_),
                 ..
-            })) => {
+            }) => {
                 self.reader.rewind_to(start_token)?;
                 let pattern = self.parse_assignment_pattern()?;
                 self.consume_assert(&punct!("="))?;
                 Ok(PatternOrExpr::AssignmentPattern(pattern))
             }
-            PatternOrExpr::Expr(expr) => {
+            expr => {
                 expr.early_errors_left_hand_side_expr(&self.context)?;
                 Ok(PatternOrExpr::Expr(expr))
             }
