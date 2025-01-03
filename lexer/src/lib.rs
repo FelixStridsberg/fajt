@@ -228,7 +228,7 @@ impl<'a> Lexer<'a> {
             _ => {
                 let c = self.reader.consume()?;
                 return Err(Error::unrecognized_code_point(
-                    c,
+                    u32::from(c),
                     (start, start + c.len_utf8()),
                 ));
             }

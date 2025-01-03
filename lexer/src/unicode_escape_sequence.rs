@@ -47,7 +47,15 @@ impl Lexer<'_> {
             _ => self.read_4digit_hex(span_start)?,
         };
 
-        Ok(char::try_from(code_point).unwrap())
+        let Ok(char) = char::try_from(code_point) else {
+            let position = self.reader.position();
+            return Err(Error::unrecognized_code_point(
+                code_point,
+                (position, position),
+            ));
+        };
+
+        Ok(char)
     }
 
     fn read_code_point(&mut self, span_start: usize) -> Result<u32> {

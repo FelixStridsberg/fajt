@@ -224,7 +224,7 @@ fn zwnj_ident_continue() {
 fn zwnj_ident_start() {
     assert_lexer!(
         input: "\u{200c}ident",
-        error: Error::unrecognized_code_point('\u{200c}', (0, 3))
+        error: Error::unrecognized_code_point(0x200c, (0, 3))
     );
 }
 
@@ -242,6 +242,6 @@ fn zwj_ident_continue() {
 fn zwj_ident_start() {
     assert_lexer!(
         input: "\u{200d}ident",
-        error: Error::unrecognized_code_point('\u{200d}', (0, 3))
+        error: Error::unrecognized_code_point(0x200d, (0, 3))
     );
 }

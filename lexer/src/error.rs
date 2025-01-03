@@ -20,7 +20,7 @@ pub struct Error {
 pub enum ErrorKind {
     InvalidOrUnexpectedToken(Token),
     ForbiddenIdentifier(Keyword),
-    UnrecognizedCodePoint(char),
+    UnrecognizedCodePoint(u32),
     SyntaxError(String),
     UnexpectedEndOfStream,
     EndOfStream,
@@ -48,7 +48,7 @@ impl Error {
         }
     }
 
-    pub fn unrecognized_code_point<S: Into<Span>>(char: char, span: S) -> Self {
+    pub fn unrecognized_code_point<S: Into<Span>>(char: u32, span: S) -> Self {
         Error {
             span: span.into(),
             kind: UnrecognizedCodePoint(char),
