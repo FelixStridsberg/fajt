@@ -2,6 +2,7 @@
 extern crate bitflags;
 extern crate fajt_macros;
 
+mod string;
 mod code_point;
 pub mod error;
 
@@ -16,7 +17,7 @@ use crate::error::ErrorKind::{EndOfStream, InvalidOrUnexpectedToken};
 use crate::token::Token;
 use crate::token::TokenValue;
 use fajt_ast::Base::{Binary, Hex, Octal};
-use fajt_ast::{LitString, LitTemplate, Literal, Span, TemplatePart};
+use fajt_ast::{LitTemplate, Literal, Span, TemplatePart};
 use fajt_common::io::{PeekRead, PeekReader, ReReadWithState};
 use std::io::{Seek, SeekFrom};
 use std::mem;
@@ -362,19 +363,6 @@ impl<'a> Lexer<'a> {
         Ok(word)
     }
 
-    fn read_string_literal(&mut self) -> Result<TokenValue> {
-        let delimiter = self.reader.consume()?;
-        debug_assert!(delimiter == '"' || delimiter == '\'');
-
-        let mut value = String::new();
-        self.read_until_not_escaped(delimiter, &mut value)?;
-
-        Ok(TokenValue::Literal(Literal::String(LitString {
-            value,
-            delimiter,
-        })))
-    }
-
     fn read_template_literal_head(&mut self) -> Result<TokenValue> {
         let delimiter = self.reader.consume()?;
         debug_assert_eq!(delimiter, '`');
@@ -433,24 +421,6 @@ impl<'a> Lexer<'a> {
                 result.push(c);
             }
         }
-    }
-
-    /// Consumes from reader and push to `result` until an unescaped `delimiter` is reached.
-    fn read_until_not_escaped(&mut self, delimiter: char, result: &mut String) -> Result<()> {
-        let mut escape = false;
-        loop {
-            let c = self.reader.consume()?;
-            if !escape && c == delimiter {
-                break;
-            }
-
-            escape = c == '\\' && !escape;
-            if !escape {
-                result.push(c);
-            }
-        }
-
-        Ok(())
     }
 
     fn read_number_literal(&mut self) -> Result<TokenValue> {
