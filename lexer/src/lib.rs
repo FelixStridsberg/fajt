@@ -2,9 +2,9 @@
 extern crate bitflags;
 extern crate fajt_macros;
 
-mod string;
 mod code_point;
 pub mod error;
+mod string;
 
 #[macro_use]
 pub mod token;
@@ -382,7 +382,13 @@ impl<'a> Lexer<'a> {
     fn read_template_literal_middle_or_tail(&mut self) -> Result<Token> {
         let span_start = self.reader.position();
         let start = self.reader.consume()?;
-        debug_assert_eq!(start, '}');
+
+        if start != '}' {
+            return Err(Error::syntax_error(
+                "Expected '}' in template expression".to_owned(),
+                (span_start, span_start + 1),
+            ));
+        }
 
         let (value, ending) = self.read_until_end_of_template_literal_part()?;
 
