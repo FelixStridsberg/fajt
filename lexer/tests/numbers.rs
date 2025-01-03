@@ -158,3 +158,15 @@ fn number_scientific_with_invalid_exponent() {
         error: Error::syntax_error("expected number".to_owned(), (2, 2))
     );
 }
+
+#[test]
+fn legacy_ocal_number_is_not_supported() {
+    assert_lexer!(
+        input: "01",
+        error: Error::syntax_error("Zero prefixed numbers are deprecated and not supported".to_owned(), (0, 1))
+    );
+    assert_lexer!(
+        input: "09",
+        error: Error::syntax_error("Zero prefixed numbers are deprecated and not supported".to_owned(), (0, 1))
+    );
+}

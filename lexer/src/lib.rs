@@ -432,14 +432,21 @@ impl<'a> Lexer<'a> {
     fn read_number_literal(&mut self) -> Result<TokenValue> {
         let current = self.reader.current()?;
         let (base, number) = match self.reader.peek() {
-            Ok(&'x' | &'X') if current == &'0' => {
+            Ok('x' | 'X') if current == &'0' => {
                 (Hex, self.read_number(16, char::is_ascii_hexdigit)?)
             }
-            Ok(&'o' | &'O') if current == &'0' => {
+            Ok('o' | 'O') if current == &'0' => {
                 (Octal, self.read_number(8, |c| ('0'..='7').contains(c))?)
             }
-            Ok(&'b' | &'B') if current == &'0' => {
+            Ok('b' | 'B') if current == &'0' => {
                 (Binary, self.read_number(2, |c| c == &'0' || c == &'1')?)
+            }
+            Ok('0'..='9') if current == &'0' => {
+                let position = self.reader.position();
+                return Err(Error::syntax_error(
+                    "Zero prefixed numbers are deprecated and not supported".to_owned(),
+                    (position, position + 1),
+                ));
             }
             _ => {
                 return self.read_integer_or_decimal();
