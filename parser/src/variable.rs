@@ -1,6 +1,6 @@
-use crate::error::Result;
+use crate::error::{Error, Result};
 use crate::{Parser, ThenTry};
-use fajt_ast::{Stmt, StmtVariable, VariableDeclaration, VariableKind};
+use fajt_ast::{BindingPattern, Stmt, StmtVariable, VariableDeclaration, VariableKind};
 use fajt_common::io::{PeekRead, ReReadWithState};
 use fajt_lexer::token::Token;
 use fajt_lexer::{punct, LexerState};
@@ -56,6 +56,15 @@ where
     fn parse_variable_declaration(&mut self) -> Result<VariableDeclaration> {
         let span_start = self.position();
         let pattern = self.parse_binding_pattern()?;
+
+        if !matches!(pattern, BindingPattern::Ident(_)) && !self.current_matches(&punct!("=")) {
+            let span = self.span_from(span_start);
+            return Err(Error::syntax_error(
+                "Missing initializer in destructuring declaration".to_owned(),
+                span,
+            ));
+        }
+
         let initializer = self
             .current_matches(&punct!("="))
             .then_try(|| self.parse_initializer())?;
