@@ -60,7 +60,7 @@ fn get_arguments() -> Arguments {
         .get_one::<String>("file")
         .expect("File argument required");
     let format = matches.get_one::<String>("format");
-    let check = matches.contains_id("check");
+    let check = matches.get_flag("check");
 
     let generator_context = format.map(|format| {
         let mut context = GeneratorContext::new();
