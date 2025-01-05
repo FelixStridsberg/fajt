@@ -12,7 +12,7 @@
 ///         (keyword!("var"), (0, 3)),
 ///         (identifier!("variable"), (4, 12)),
 ///         (punct!("="), (13, 14)),
-///         (literal!(integer, 1), (15, 16)),
+///         (literal!(number, "1"), (15, 16)),
 ///     ]
 /// )
 /// ```

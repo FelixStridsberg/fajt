@@ -82,10 +82,7 @@ class cls{method(){({[this.a]:1})}}
                                         "span": "48:49",
                                         "literal": {
                                           "Number": {
-                                            "Integer": [
-                                              1,
-                                              "Decimal"
-                                            ]
+                                            "raw": "1"
                                           }
                                         }
                                       }

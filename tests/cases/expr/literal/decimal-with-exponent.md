@@ -1,16 +1,16 @@
 ### Source
-```js parse:expr check-format:no
-123_456.7
+```js parse:expr
+6.02214179e+23
 ```
 
 ### Output: ast
 ```json
 {
   "Literal": {
-    "span": "0:9",
+    "span": "0:14",
     "literal": {
       "Number": {
-        "raw": "123_456.7"
+        "raw": "6.02214179e+23"
       }
     }
   }

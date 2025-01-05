@@ -121,7 +121,7 @@ fn not_single_line_html_close_comment_if_not_first() {
             (identifier!("a"), (0, 1)),
             (punct!("--"), (1, 3)),
             (punct!(">"), (3, 4)),
-            (literal!(integer, 1), (4, 5)),
+            (literal!(number, "1"), (4, 5)),
         ]
     );
 }

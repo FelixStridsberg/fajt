@@ -30,10 +30,7 @@ switch (a) {
                   "span": "22:23",
                   "literal": {
                     "Number": {
-                      "Integer": [
-                        1,
-                        "Decimal"
-                      ]
+                      "raw": "1"
                     }
                   }
                 }
@@ -57,10 +54,7 @@ switch (a) {
                             "span": "41:42",
                             "literal": {
                               "Number": {
-                                "Integer": [
-                                  2,
-                                  "Decimal"
-                                ]
+                                "raw": "2"
                               }
                             }
                           }

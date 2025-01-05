@@ -10,7 +10,7 @@
     "span": "0:2",
     "literal": {
       "Number": {
-        "Decimal": 0.5
+        "raw": ".5"
       }
     }
   }

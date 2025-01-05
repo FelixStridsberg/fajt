@@ -30,10 +30,7 @@
                   "span": "7:8",
                   "literal": {
                     "Number": {
-                      "Integer": [
-                        1,
-                        "Decimal"
-                      ]
+                      "raw": "1"
                     }
                   }
                 }
@@ -54,10 +51,7 @@
                   "span": "15:16",
                   "literal": {
                     "Number": {
-                      "Integer": [
-                        2,
-                        "Decimal"
-                      ]
+                      "raw": "2"
                     }
                   }
                 }

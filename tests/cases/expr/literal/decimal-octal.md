@@ -10,10 +10,7 @@
     "span": "0:4",
     "literal": {
       "Number": {
-        "Integer": [
-          63,
-          "Octal"
-        ]
+        "raw": "0o77"
       }
     }
   }

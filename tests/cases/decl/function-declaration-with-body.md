@@ -48,10 +48,7 @@ function fn(){var a=1}
                     "span": "28:29",
                     "literal": {
                       "Number": {
-                        "Integer": [
-                          1,
-                          "Decimal"
-                        ]
+                        "raw": "1"
                       }
                     }
                   }

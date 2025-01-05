@@ -21,10 +21,7 @@
               "span": "2:9",
               "name": {
                 "Number": {
-                  "Integer": [
-                    1234,
-                    "Decimal"
-                  ]
+                  "raw": "1234"
                 }
               },
               "value": {

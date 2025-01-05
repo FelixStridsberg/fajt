@@ -289,42 +289,12 @@ pub enum Punctuator {
 
 #[macro_export]
 macro_rules! literal(
-    (integer, $value:expr) => {
-        literal!(number, fajt_ast::Base::Decimal, $value)
-    };
-    (hex, $value:expr) => {
-        literal!(number, fajt_ast::Base::Hex, $value)
-    };
-    (octal, $value:expr) => {
-        literal!(number, fajt_ast::Base::Octal, $value)
-    };
-    (binary, $value:expr) => {
-        literal!(number, fajt_ast::Base::Binary, $value)
-    };
-    (decimal, $value:expr) => {
-         $crate::token::TokenValue::Literal(
-            fajt_ast::Literal::Number(
-                fajt_ast::LitNumber::Decimal(
-                    $value
-                )
-            )
-        )
-    };
-    (number, $type:expr, $value:expr) => {
+    (number, $raw:expr) => {
         $crate::token::TokenValue::Literal(
             fajt_ast::Literal::Number(
-                fajt_ast::LitNumber::Integer(
-                    $value, $type
-                )
-            )
-        )
-    };
-    (scientific, $m:expr, $n:expr) => {
-        $crate::token::TokenValue::Literal(
-            fajt_ast::Literal::Number(
-                fajt_ast::LitNumber::Scientific(
-                    $m, $n
-                )
+                fajt_ast::LitNumber {
+                    raw: $raw.to_owned(),
+                }
             )
         )
     };
