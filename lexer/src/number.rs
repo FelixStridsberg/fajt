@@ -70,33 +70,31 @@ impl<'a> Lexer<'a> {
         let integer_part = self.read_number_string(span_start, char::is_ascii_digit)?;
         number_string.push_str(&integer_part);
 
-        match self.reader.current().ok() {
-            Some(&'.') => {
+        if self.reader.current().ok() == Some(&'.') {
+            number_string.push(self.reader.consume()?);
+
+            let fractional_part =
+                self.read_number_string(span_start, |c| ('0'..='9').contains(c))?;
+            number_string.push_str(&fractional_part);
+        }
+
+        if matches!(self.reader.current().ok(), Some(&'e' | &'E')) {
+            number_string.push(self.reader.consume()?);
+
+            if matches!(self.reader.current().ok(), Some(&'-' | &'+')) {
                 number_string.push(self.reader.consume()?);
-
-                let fractional_part =
-                    self.read_number_string(span_start, |c| ('0'..='9').contains(c))?;
-                number_string.push_str(&fractional_part);
             }
-            Some(&'e' | &'E') => {
-                number_string.push(self.reader.consume()?);
 
-                if matches!(self.reader.current().ok(), Some(&'-' | &'+')) {
-                    number_string.push(self.reader.consume()?);
-                }
-
-                let exponential_part = self.read_number_string(span_start, char::is_ascii_digit)?;
-                if exponential_part.is_empty() {
-                    let position = self.reader.position();
-                    return Err(Error::syntax_error(
-                        "expected number".to_owned(),
-                        (position, position),
-                    ));
-                }
-
-                number_string.push_str(&exponential_part);
+            let exponential_part = self.read_number_string(span_start, char::is_ascii_digit)?;
+            if exponential_part.is_empty() {
+                let position = self.reader.position();
+                return Err(Error::syntax_error(
+                    "expected number".to_owned(),
+                    (position, position),
+                ));
             }
-            _ => {}
+
+            number_string.push_str(&exponential_part);
         }
 
         Ok(number_string)

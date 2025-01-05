@@ -144,6 +144,17 @@ fn number_scientific_negative_exponent() {
 }
 
 #[test]
+fn number_scientific_exponent_decimal() {
+    assert_lexer!(
+        input: "123.11e+10",
+        output: [
+            (literal!(number, "123.11e+10"), (0, 10)),
+        ]
+    );
+}
+
+
+#[test]
 fn number_scientific_with_missing_exponent() {
     assert_lexer!(
         input: "1e",
