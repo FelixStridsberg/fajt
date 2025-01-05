@@ -10,10 +10,7 @@
     "span": "0:5",
     "literal": {
       "Number": {
-        "Integer": [
-          1234,
-          "Decimal"
-        ]
+        "raw": "1_234"
       }
     }
   }

@@ -31,10 +31,7 @@
                     "span": "6:7",
                     "literal": {
                       "Number": {
-                        "Integer": [
-                          1,
-                          "Decimal"
-                        ]
+                        "raw": "1"
                       }
                     }
                   }

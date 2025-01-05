@@ -39,10 +39,7 @@ export let a=1,b=2,c
                         "span": "15:16",
                         "literal": {
                           "Number": {
-                            "Integer": [
-                              1,
-                              "Decimal"
-                            ]
+                            "raw": "1"
                           }
                         }
                       }
@@ -61,10 +58,7 @@ export let a=1,b=2,c
                         "span": "33:34",
                         "literal": {
                           "Number": {
-                            "Integer": [
-                              2,
-                              "Decimal"
-                            ]
+                            "raw": "2"
                           }
                         }
                       }

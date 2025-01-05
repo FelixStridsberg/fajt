@@ -10,13 +10,13 @@ mod string;
 pub mod token;
 mod regexp;
 mod unicode_escape_sequence;
+mod number;
 
 use crate::code_point::CodePoint;
 use crate::error::Error;
 use crate::error::ErrorKind::{EndOfStream, InvalidOrUnexpectedToken};
 use crate::token::Token;
 use crate::token::TokenValue;
-use fajt_ast::Base::{Binary, Hex, Octal};
 use fajt_ast::{LitTemplate, Literal, Span, TemplatePart};
 use fajt_common::io::{PeekRead, PeekReader, ReReadWithState};
 use std::io::{Seek, SeekFrom};
@@ -427,132 +427,6 @@ impl<'a> Lexer<'a> {
                 result.push(c);
             }
         }
-    }
-
-    fn read_number_literal(&mut self) -> Result<TokenValue> {
-        let current = self.reader.current()?;
-        let (base, number) = match self.reader.peek() {
-            Ok('x' | 'X') if current == &'0' => {
-                (Hex, self.read_number(16, char::is_ascii_hexdigit)?)
-            }
-            Ok('o' | 'O') if current == &'0' => {
-                (Octal, self.read_number(8, |c| ('0'..='7').contains(c))?)
-            }
-            Ok('b' | 'B') if current == &'0' => {
-                (Binary, self.read_number(2, |c| c == &'0' || c == &'1')?)
-            }
-            Ok('0'..='9') if current == &'0' => {
-                let position = self.reader.position();
-                return Err(Error::syntax_error(
-                    "Zero prefixed numbers are deprecated and not supported".to_owned(),
-                    (position, position + 1),
-                ));
-            }
-            _ => {
-                return self.read_integer_or_decimal();
-            }
-        };
-
-        // TODO Ok(literal!(number, base, number))
-        Ok(literal!(number, "0"))
-    }
-
-    fn read_integer_or_decimal(&mut self) -> Result<TokenValue> {
-        let integral = if self.reader.current()? == &'.' {
-            // Decimals without zero: .5
-            0
-        } else {
-            self.read_number(10, |c| c.is_numeric())?
-        };
-
-        if let Ok(&'.') = self.reader.current() {
-            self.reader.consume()?;
-            if !matches!(self.reader.current(), Ok('0'..='9')) {
-                // Decimals without decimal part: 1.
-                // TODO: return Ok(literal!(decimal, integral as f64));
-                return Ok(literal!(number, "0"));
-            }
-
-            let fraction = self.read_number(10, |c| c.is_numeric())?;
-            let digits = (fraction as f64).log10().floor() + 1.0;
-            let float = integral as f64 + (fraction as f64 / 10_i32.pow(digits as u32) as f64);
-
-            if let Some(exponent) = self.read_number_exponent()? {
-                // TODO Ok(literal!(scientific, float, exponent))
-                Ok(literal!(number, "0"))
-            } else {
-                // TODO Ok(literal!(decimal, float))
-                Ok(literal!(number, "0"))
-            }
-        } else if let Some(exponent) = self.read_number_exponent()? {
-            // TODO Ok(literal!(scientific, integral as f64, exponent))
-            Ok(literal!(number, "0"))
-        } else {
-            // TODO Ok(literal!(integer, integral))
-            Ok(literal!(number, "0"))
-        }
-    }
-
-    fn read_number_exponent(&mut self) -> Result<Option<i32>> {
-        if matches!(self.reader.current(), Ok(&'e' | &'E')) {
-            self.reader.consume()?;
-
-            let sign = if matches!(self.reader.current(), Ok('-')) {
-                self.reader.consume()?;
-                -1
-            } else {
-                if self.reader.current()? == &'+' {
-                    self.reader.consume()?;
-                }
-
-                1
-            };
-
-            let exponent = self.read_number(10, |c| c.is_ascii_digit())?;
-            Ok(Some(sign * exponent as i32))
-        } else {
-            Ok(None)
-        }
-    }
-
-    fn read_number(&mut self, base: u32, check: fn(&char) -> bool) -> Result<i64> {
-        let span_start = self.reader.position();
-
-        // All but base 10 have 2 char prefix: 0b, 0o, 0x
-        if base != 10 {
-            self.reader.consume()?;
-            self.reader.consume()?;
-        }
-
-        let number_str = self.reader.read_while(|c| check(c) || c == &'_')?;
-        if number_str.contains("__") {
-            let span_end = self.reader.position();
-            return Err(Error::syntax_error(
-                "number cannot contain multiple adjacent underscores".to_owned(),
-                (span_start, span_end),
-            ));
-        }
-
-        if number_str.ends_with('_') {
-            let span_end = self.reader.position();
-            return Err(Error::syntax_error(
-                "number cannot end with underscore".to_owned(),
-                (span_start, span_end),
-            ));
-        }
-
-        let number_str = number_str.replace('_', "");
-
-        if number_str.is_empty() {
-            let position = self.reader.position();
-            return Err(Error::syntax_error(
-                "expected number".to_owned(),
-                (position, position),
-            ));
-        }
-
-        // The check must be strict enough for a safe unwrap here
-        Ok(i64::from_str_radix(&number_str, base).unwrap())
     }
 
     fn skip_whitespaces(&mut self) -> Result<()> {

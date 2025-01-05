@@ -40,10 +40,7 @@ for({a=1}of b);
                     "span": "14:15",
                     "literal": {
                       "Number": {
-                        "Integer": [
-                          1,
-                          "Decimal"
-                        ]
+                        "raw": "1"
                       }
                     }
                   }

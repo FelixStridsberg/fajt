@@ -289,12 +289,11 @@ pub enum Punctuator {
 
 #[macro_export]
 macro_rules! literal(
-    (number, $value:expr) => {
+    (number, $raw:expr) => {
         $crate::token::TokenValue::Literal(
             fajt_ast::Literal::Number(
                 fajt_ast::LitNumber {
-                    value: $value.parse().unwrap(),
-                    raw: $value.to_owned(),
+                    raw: $raw.to_owned(),
                 }
             )
         )

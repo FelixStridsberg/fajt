@@ -44,10 +44,7 @@
           "span": "9:10",
           "literal": {
             "Number": {
-              "Integer": [
-                1,
-                "Decimal"
-              ]
+              "raw": "1"
             }
           }
         }

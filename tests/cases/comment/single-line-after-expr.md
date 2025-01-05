@@ -33,10 +33,7 @@ var a=1
                   "span": "8:9",
                   "literal": {
                     "Number": {
-                      "Integer": [
-                        1,
-                        "Decimal"
-                      ]
+                      "raw": "1"
                     }
                   }
                 }

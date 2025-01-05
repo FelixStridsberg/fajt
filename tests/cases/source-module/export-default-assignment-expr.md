@@ -28,10 +28,7 @@ export default 1+10
                     "span": "15:16",
                     "literal": {
                       "Number": {
-                        "Integer": [
-                          1,
-                          "Decimal"
-                        ]
+                        "raw": "1"
                       }
                     }
                   }
@@ -41,10 +38,7 @@ export default 1+10
                     "span": "19:21",
                     "literal": {
                       "Number": {
-                        "Integer": [
-                          10,
-                          "Decimal"
-                        ]
+                        "raw": "10"
                       }
                     }
                   }

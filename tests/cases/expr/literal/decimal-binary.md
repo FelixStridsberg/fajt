@@ -10,10 +10,7 @@
     "span": "0:10",
     "literal": {
       "Number": {
-        "Integer": [
-          240,
-          "Binary"
-        ]
+        "raw": "0b11110000"
       }
     }
   }

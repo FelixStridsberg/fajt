@@ -28,7 +28,7 @@ fn number_decimal_no_integral() {
     assert_lexer!(
         input: ".5",
         output: [
-            (literal!(number, "0.5"), (0, 2)),
+            (literal!(number, ".5"), (0, 2)),
         ]
     );
 }
@@ -38,7 +38,7 @@ fn number_decimal_no_decimals() {
     assert_lexer!(
         input: "1.",
         output: [
-            (literal!(number, "1.0"), (0, 2)),
+            (literal!(number, "1."), (0, 2)),
         ]
     );
 }
@@ -58,7 +58,7 @@ fn number_hex_uppercase() {
     assert_lexer!(
         input: "0XFF08",
         output: [
-            (literal!(number, "0xff08"), (0, 6)),
+            (literal!(number, "0XFF08"), (0, 6)),
         ]
     );
 }
@@ -78,7 +78,7 @@ fn number_octal_uppercase() {
     assert_lexer!(
         input: "0O347",
         output: [
-            (literal!(number, "0o347"), (0, 5)),
+            (literal!(number, "0O347"), (0, 5)),
         ]
     );
 }
@@ -98,7 +98,7 @@ fn number_binary_uppercase() {
     assert_lexer!(
         input: "0B10111100",
         output: [
-            (literal!(number, "0b10111100"), (0, 10)),
+            (literal!(number, "0B10111100"), (0, 10)),
         ]
     );
 }
@@ -147,7 +147,7 @@ fn number_scientific_negative_exponent() {
 fn number_scientific_with_missing_exponent() {
     assert_lexer!(
         input: "1e",
-        error: Error::unexpected_end_of_stream()
+        error: Error::syntax_error("expected number".to_owned(), (2, 2))
     );
 }
 

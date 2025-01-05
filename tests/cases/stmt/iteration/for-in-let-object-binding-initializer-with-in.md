@@ -37,10 +37,7 @@ for(let{a=1 in b,c:d=e in f}in d);
                           "span": "14:15",
                           "literal": {
                             "Number": {
-                              "Integer": [
-                                1,
-                                "Decimal"
-                              ]
+                              "raw": "1"
                             }
                           }
                         }

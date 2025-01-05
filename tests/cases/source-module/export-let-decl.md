@@ -39,10 +39,7 @@ export const a=1,b=2,c
                         "span": "17:18",
                         "literal": {
                           "Number": {
-                            "Integer": [
-                              1,
-                              "Decimal"
-                            ]
+                            "raw": "1"
                           }
                         }
                       }
@@ -61,10 +58,7 @@ export const a=1,b=2,c
                         "span": "37:38",
                         "literal": {
                           "Number": {
-                            "Integer": [
-                              2,
-                              "Decimal"
-                            ]
+                            "raw": "2"
                           }
                         }
                       }

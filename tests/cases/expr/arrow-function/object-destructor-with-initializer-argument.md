@@ -49,10 +49,7 @@
           "span": "13:14",
           "literal": {
             "Number": {
-              "Integer": [
-                1,
-                "Decimal"
-              ]
+              "raw": "1"
             }
           }
         }

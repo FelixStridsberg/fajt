@@ -48,10 +48,7 @@ async function fn(){var a=1}
                     "span": "34:35",
                     "literal": {
                       "Number": {
-                        "Integer": [
-                          1,
-                          "Decimal"
-                        ]
+                        "raw": "1"
                       }
                     }
                   }
