@@ -26,7 +26,9 @@ impl Lexer<'_> {
                     ));
                 }
                 '/' => break,
-                '\\' => result.push(self.reader.consume()?),
+                '\\' if !self.reader.current()?.is_ecma_line_terminator() => {
+                    result.push(self.reader.consume()?)
+                }
                 '[' => result.push_str(&self.read_regexp_group_body()?),
                 _ => {}
             }
