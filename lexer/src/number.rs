@@ -1,4 +1,5 @@
 use super::Result;
+use crate::code_point::CodePoint;
 use crate::error::Error;
 use crate::token::TokenValue;
 use crate::Lexer;
@@ -19,6 +20,19 @@ impl<'a> Lexer<'a> {
             }
             _ => self.read_decimal_string()?,
         };
+
+        if self
+            .reader
+            .current()
+            .ok()
+            .map_or(false, CodePoint::is_start_of_identifier)
+        {
+            let position = self.reader.position();
+            return Err(Error::syntax_error(
+                "Number cannot be followed by identifier without separation".to_owned(),
+                (position, position),
+            ));
+        }
 
         Ok(literal!(number, number_string))
     }

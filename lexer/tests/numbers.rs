@@ -228,3 +228,11 @@ fn legacy_ocal_number_is_not_supported() {
         error: Error::syntax_error("Zero prefixed numbers are deprecated and not supported".to_owned(), (0, 1))
     );
 }
+
+#[test]
+fn number_followed_by_identifier_without_space() {
+    assert_lexer!(
+        input: "1foo",
+        error: Error::syntax_error("Number cannot be followed by identifier without separation".to_owned(), (1, 1))
+    );
+}
