@@ -56,7 +56,7 @@ fn unicode_escape_sequence_hex_mixed_case() {
 fn unicode_escape_sequence_hex_invalid_character() {
     assert_lexer!(
         input: r#"id\u00g6nt"#,
-        error: Error::syntax_error("invalid escape sequence".to_owned(), (2, 7))
+        error: Error::syntax_error("Invalid escape sequence".to_owned(), (2, 7))
     );
 }
 
@@ -64,7 +64,7 @@ fn unicode_escape_sequence_hex_invalid_character() {
 fn unicode_escape_sequence_hex_invalid_id_start() {
     assert_lexer!(
         input: r#"\u0030foo"#,
-        error: Error::syntax_error("invalid escape sequence".to_owned(), (0, 6))
+        error: Error::syntax_error("Invalid escape sequence".to_owned(), (0, 6))
     );
 }
 
@@ -82,7 +82,7 @@ fn unicode_escape_sequence_hex_valid_id_continue() {
 fn unicode_escape_sequence_hex_invalid_id_continue() {
     assert_lexer!(
         input: r#"foo\u0020"#,
-        error: Error::syntax_error("invalid escape sequence".to_owned(), (3, 9))
+        error: Error::syntax_error("Invalid escape sequence".to_owned(), (3, 9))
     );
 }
 
@@ -130,7 +130,7 @@ fn unicode_escape_sequence_code_point_short() {
 fn unicode_escape_sequence_code_point_invalid_character() {
     assert_lexer!(
         input: r#"id\u{00g6}nt"#,
-        error: Error::syntax_error("invalid escape sequence".to_owned(), (2, 8))
+        error: Error::syntax_error("Invalid escape sequence".to_owned(), (2, 8))
     );
 }
 
@@ -138,7 +138,7 @@ fn unicode_escape_sequence_code_point_invalid_character() {
 fn unicode_escape_sequence_code_point_invalid_id_start() {
     assert_lexer!(
         input: r#"\u{30}foo"#,
-        error: Error::syntax_error("invalid escape sequence".to_owned(), (0, 6))
+        error: Error::syntax_error("Invalid escape sequence".to_owned(), (0, 6))
     );
 }
 
@@ -156,7 +156,7 @@ fn unicode_escape_sequence_code_point_valid_id_continue() {
 fn unicode_escape_sequence_code_point_invalid_id_continue() {
     assert_lexer!(
         input: r#"foo\u{20}"#,
-        error: Error::syntax_error("invalid escape sequence".to_owned(), (3, 9))
+        error: Error::syntax_error("Invalid escape sequence".to_owned(), (3, 9))
     );
 }
 
@@ -164,7 +164,7 @@ fn unicode_escape_sequence_code_point_invalid_id_continue() {
 fn unicode_escape_sequence_code_point_overflow_int() {
     assert_lexer!(
         input: r#"\u{fffffffffffffffffffff}"#,
-        error: Error::syntax_error("invalid escape sequence".to_owned(), (0, 25))
+        error: Error::syntax_error("Invalid escape sequence".to_owned(), (0, 25))
     );
 }
 
@@ -198,7 +198,7 @@ fn unicode_escape_sequence_no_numbers() {
 fn unicode_escape_sequence_hex_not_a_u() {
     assert_lexer!(
         input: r#"\a0065"#,
-        error: Error::syntax_error("invalid escape sequence".to_owned(), (0, 2))
+        error: Error::syntax_error("Invalid escape sequence".to_owned(), (0, 2))
     );
 }
 
@@ -206,7 +206,7 @@ fn unicode_escape_sequence_hex_not_a_u() {
 fn unicode_escape_sequence_code_point_not_a_u() {
     assert_lexer!(
         input: r#"\a0065"#,
-        error: Error::syntax_error("invalid escape sequence".to_owned(), (0, 2))
+        error: Error::syntax_error("Invalid escape sequence".to_owned(), (0, 2))
     );
 }
 

@@ -21,7 +21,7 @@ impl Lexer<'_> {
                 '\n' => {
                     let span_end = self.reader.position();
                     return Err(Error::syntax_error(
-                        "unterminated regular expression literal".to_owned(),
+                        "Unterminated regular expression literal".to_owned(),
                         (span_start, span_end - 1),
                     ));
                 }

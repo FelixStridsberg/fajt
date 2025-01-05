@@ -119,7 +119,7 @@ impl<'a> Lexer<'a> {
         if number_string.is_empty() {
             let position = self.reader.position();
             return Err(Error::syntax_error(
-                "expected number".to_owned(),
+                "Expected number".to_owned(),
                 (position, position),
             ));
         }
@@ -136,7 +136,7 @@ impl<'a> Lexer<'a> {
         if number_str.contains("__") {
             let span_end = self.reader.position();
             return Err(Error::syntax_error(
-                "number cannot contain multiple adjacent underscores".to_owned(),
+                "Number cannot contain multiple adjacent underscores".to_owned(),
                 (span_start, span_end),
             ));
         }
@@ -144,7 +144,7 @@ impl<'a> Lexer<'a> {
         if number_str.ends_with('_') {
             let span_end = self.reader.position();
             return Err(Error::syntax_error(
-                "number cannot end with underscore".to_owned(),
+                "Number cannot end with underscore".to_owned(),
                 (span_start, span_end),
             ));
         }

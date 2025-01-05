@@ -52,7 +52,7 @@ fn new_line_in_regexp() {
     assert_lexer!(
         state: LexerState::regex_allowed(),
         input: "/a\nb/",
-        error: Error::syntax_error("unterminated regular expression literal".to_owned(), (0, 2))
+        error: Error::syntax_error("Unterminated regular expression literal".to_owned(), (0, 2))
     );
 }
 
@@ -61,6 +61,6 @@ fn escaped_new_line_in_regexp() {
     assert_lexer!(
         state: LexerState::regex_allowed(),
         input: "/a\\\nb/",
-        error: Error::syntax_error("unterminated regular expression literal".to_owned(), (0, 3))
+        error: Error::syntax_error("Unterminated regular expression literal".to_owned(), (0, 3))
     );
 }

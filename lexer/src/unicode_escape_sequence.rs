@@ -20,7 +20,7 @@ impl Lexer<'_> {
         if !valid {
             let span_end = self.reader.position();
             return Err(Error::syntax_error(
-                "invalid escape sequence".to_owned(),
+                "Invalid escape sequence".to_owned(),
                 (span_start, span_end),
             ));
         }
@@ -37,7 +37,7 @@ impl Lexer<'_> {
         if self.reader.consume()? != 'u' {
             let span_end = self.reader.position();
             return Err(Error::syntax_error(
-                "invalid escape sequence".to_owned(),
+                "Invalid escape sequence".to_owned(),
                 (span_start, span_end),
             ));
         }
@@ -77,7 +77,7 @@ impl Lexer<'_> {
             _ => {
                 let span_end = self.reader.position();
                 Err(Error::syntax_error(
-                    "invalid escape sequence".to_owned(),
+                    "Invalid escape sequence".to_owned(),
                     (span_start, span_end),
                 ))
             }
@@ -101,7 +101,7 @@ impl Lexer<'_> {
             _ => {
                 let span_end = self.reader.position();
                 Err(Error::syntax_error(
-                    "invalid escape sequence".to_owned(),
+                    "Invalid escape sequence".to_owned(),
                     (span_start, span_end),
                 ))
             }

@@ -67,7 +67,7 @@ fn number_hex_uppercase() {
 fn number_hex_missing_number() {
     assert_lexer!(
         input: "0x",
-        error: Error::syntax_error("expected number".to_owned(), (2, 2))
+        error: Error::syntax_error("Expected number".to_owned(), (2, 2))
     );
 }
 
@@ -75,7 +75,7 @@ fn number_hex_missing_number() {
 fn number_hex_uppercase_missing_number() {
     assert_lexer!(
         input: "0X",
-        error: Error::syntax_error("expected number".to_owned(), (2, 2))
+        error: Error::syntax_error("Expected number".to_owned(), (2, 2))
     );
 }
 
@@ -103,7 +103,7 @@ fn number_octal_uppercase() {
 fn number_octal_missing_number() {
     assert_lexer!(
         input: "0o",
-        error: Error::syntax_error("expected number".to_owned(), (2, 2))
+        error: Error::syntax_error("Expected number".to_owned(), (2, 2))
     );
 }
 
@@ -111,7 +111,7 @@ fn number_octal_missing_number() {
 fn number_octal_uppercase_missing_number() {
     assert_lexer!(
         input: "0O",
-        error: Error::syntax_error("expected number".to_owned(), (2, 2))
+        error: Error::syntax_error("Expected number".to_owned(), (2, 2))
     );
 }
 
@@ -139,7 +139,7 @@ fn number_binary_uppercase() {
 fn number_binary_missing_number() {
     assert_lexer!(
         input: "0b",
-        error: Error::syntax_error("expected number".to_owned(), (2, 2))
+        error: Error::syntax_error("Expected number".to_owned(), (2, 2))
     );
 }
 
@@ -147,7 +147,7 @@ fn number_binary_missing_number() {
 fn number_binary_uppercase_missing_number() {
     assert_lexer!(
         input: "0B",
-        error: Error::syntax_error("expected number".to_owned(), (2, 2))
+        error: Error::syntax_error("Expected number".to_owned(), (2, 2))
     );
 }
 
@@ -205,7 +205,7 @@ fn number_scientific_exponent_decimal() {
 fn number_scientific_with_missing_exponent() {
     assert_lexer!(
         input: "1e",
-        error: Error::syntax_error("expected number".to_owned(), (2, 2))
+        error: Error::syntax_error("Expected number".to_owned(), (2, 2))
     );
 }
 
@@ -213,7 +213,7 @@ fn number_scientific_with_missing_exponent() {
 fn number_scientific_with_invalid_exponent() {
     assert_lexer!(
         input: "1ea",
-        error: Error::syntax_error("expected number".to_owned(), (2, 2))
+        error: Error::syntax_error("Expected number".to_owned(), (2, 2))
     );
 }
 
