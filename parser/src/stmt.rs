@@ -330,6 +330,13 @@ where
             .then_try(|| Ok(self.parse_block_stmt()?.unwrap_block_stmt()))?;
 
         let span = self.span_from(span_start);
+        if handler.is_none() && finalizer.is_none() {
+            return Err(Error::syntax_error(
+                "Missing catch or finally after try".to_owned(),
+                span,
+            ));
+        }
+
         Ok(StmtTry {
             span,
             block,
