@@ -30,7 +30,7 @@ impl<'a> Lexer<'a> {
         number_string.push(self.reader.consume()?); // 0
         number_string.push(self.reader.consume()?); // x or X
 
-        let hex_characters = self.read_number_string(span_start, char::is_ascii_hexdigit)?;
+        let hex_characters = self.expect_read_number_string(span_start, char::is_ascii_hexdigit)?;
         number_string.push_str(&hex_characters);
 
         Ok(number_string)
@@ -43,7 +43,8 @@ impl<'a> Lexer<'a> {
         number_string.push(self.reader.consume()?); // 0
         number_string.push(self.reader.consume()?); // o or O
 
-        let octal_characters = self.read_number_string(span_start, |c| ('0'..='7').contains(c))?;
+        let octal_characters =
+            self.expect_read_number_string(span_start, |c| ('0'..='7').contains(c))?;
         number_string.push_str(&octal_characters);
 
         Ok(number_string)
@@ -56,7 +57,8 @@ impl<'a> Lexer<'a> {
         number_string.push(self.reader.consume()?); // 0
         number_string.push(self.reader.consume()?); // b or B
 
-        let binary_characters = self.read_number_string(span_start, |c| c == &'0' || c == &'1')?;
+        let binary_characters =
+            self.expect_read_number_string(span_start, |c| c == &'0' || c == &'1')?;
         number_string.push_str(&binary_characters);
 
         Ok(number_string)
@@ -85,16 +87,27 @@ impl<'a> Lexer<'a> {
                 number_string.push(self.reader.consume()?);
             }
 
-            let exponential_part = self.read_number_string(span_start, char::is_ascii_digit)?;
-            if exponential_part.is_empty() {
-                let position = self.reader.position();
-                return Err(Error::syntax_error(
-                    "expected number".to_owned(),
-                    (position, position),
-                ));
-            }
-
+            let exponential_part =
+                self.expect_read_number_string(span_start, char::is_ascii_digit)?;
             number_string.push_str(&exponential_part);
+        }
+
+        Ok(number_string)
+    }
+
+    fn expect_read_number_string(
+        &mut self,
+        span_start: usize,
+        check: fn(&char) -> bool,
+    ) -> Result<String> {
+        let number_string = self.read_number_string(span_start, check)?;
+
+        if number_string.is_empty() {
+            let position = self.reader.position();
+            return Err(Error::syntax_error(
+                "expected number".to_owned(),
+                (position, position),
+            ));
         }
 
         Ok(number_string)

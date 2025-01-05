@@ -64,6 +64,22 @@ fn number_hex_uppercase() {
 }
 
 #[test]
+fn number_hex_missing_number() {
+    assert_lexer!(
+        input: "0x",
+        error: Error::syntax_error("expected number".to_owned(), (2, 2))
+    );
+}
+
+#[test]
+fn number_hex_uppercase_missing_number() {
+    assert_lexer!(
+        input: "0X",
+        error: Error::syntax_error("expected number".to_owned(), (2, 2))
+    );
+}
+
+#[test]
 fn number_octal() {
     assert_lexer!(
         input: "0o347",
@@ -84,6 +100,22 @@ fn number_octal_uppercase() {
 }
 
 #[test]
+fn number_octal_missing_number() {
+    assert_lexer!(
+        input: "0o",
+        error: Error::syntax_error("expected number".to_owned(), (2, 2))
+    );
+}
+
+#[test]
+fn number_octal_uppercase_missing_number() {
+    assert_lexer!(
+        input: "0O",
+        error: Error::syntax_error("expected number".to_owned(), (2, 2))
+    );
+}
+
+#[test]
 fn number_binary() {
     assert_lexer!(
         input: "0b10111100",
@@ -100,6 +132,22 @@ fn number_binary_uppercase() {
         output: [
             (literal!(number, "0B10111100"), (0, 10)),
         ]
+    );
+}
+
+#[test]
+fn number_binary_missing_number() {
+    assert_lexer!(
+        input: "0b",
+        error: Error::syntax_error("expected number".to_owned(), (2, 2))
+    );
+}
+
+#[test]
+fn number_binary_uppercase_missing_number() {
+    assert_lexer!(
+        input: "0B",
+        error: Error::syntax_error("expected number".to_owned(), (2, 2))
     );
 }
 
@@ -152,7 +200,6 @@ fn number_scientific_exponent_decimal() {
         ]
     );
 }
-
 
 #[test]
 fn number_scientific_with_missing_exponent() {
