@@ -453,7 +453,8 @@ impl<'a> Lexer<'a> {
             }
         };
 
-        Ok(literal!(number, base, number))
+        // TODO Ok(literal!(number, base, number))
+        Ok(literal!(number, "0"))
     }
 
     fn read_integer_or_decimal(&mut self) -> Result<TokenValue> {
@@ -468,7 +469,8 @@ impl<'a> Lexer<'a> {
             self.reader.consume()?;
             if !matches!(self.reader.current(), Ok('0'..='9')) {
                 // Decimals without decimal part: 1.
-                return Ok(literal!(decimal, integral as f64));
+                // TODO: return Ok(literal!(decimal, integral as f64));
+                return Ok(literal!(number, "0"));
             }
 
             let fraction = self.read_number(10, |c| c.is_numeric())?;
@@ -476,14 +478,18 @@ impl<'a> Lexer<'a> {
             let float = integral as f64 + (fraction as f64 / 10_i32.pow(digits as u32) as f64);
 
             if let Some(exponent) = self.read_number_exponent()? {
-                Ok(literal!(scientific, float, exponent))
+                // TODO Ok(literal!(scientific, float, exponent))
+                Ok(literal!(number, "0"))
             } else {
-                Ok(literal!(decimal, float))
+                // TODO Ok(literal!(decimal, float))
+                Ok(literal!(number, "0"))
             }
         } else if let Some(exponent) = self.read_number_exponent()? {
-            Ok(literal!(scientific, integral as f64, exponent))
+            // TODO Ok(literal!(scientific, integral as f64, exponent))
+            Ok(literal!(number, "0"))
         } else {
-            Ok(literal!(integer, integral))
+            // TODO Ok(literal!(integer, integral))
+            Ok(literal!(number, "0"))
         }
     }
 

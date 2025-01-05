@@ -81,10 +81,9 @@ ast_struct! {
 }
 
 ast_node! {
-    pub enum LitNumber {
-        Integer(i64, Base),
-        Decimal(f64),
-        Scientific(f64, i32),
+    pub struct LitNumber {
+        pub value: f64,
+        pub raw: String,
     }
 }
 

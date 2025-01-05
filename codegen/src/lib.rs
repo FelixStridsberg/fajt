@@ -1291,15 +1291,7 @@ impl Visitor for CodeGenerator<'_> {
     }
 
     fn enter_number_literal(&mut self, node: &mut LitNumber) -> bool {
-        match node {
-            LitNumber::Integer(n, Base::Decimal) => self.string(&n.to_string()),
-            LitNumber::Integer(n, Base::Hex) => self.string(&format!("0x{n:x}")),
-            LitNumber::Integer(n, Base::Octal) => self.string(&format!("0o{n:o}")),
-            LitNumber::Integer(n, Base::Binary) => self.string(&format!("0b{n:b}")),
-            LitNumber::Decimal(n) => self.string(&n.to_string()),
-            LitNumber::Scientific(m, n) => self.string(&format!("{m}e{n}")),
-        }
-
+        self.string(&node.raw);
         false
     }
 
